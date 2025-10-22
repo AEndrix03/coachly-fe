@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../data/workout_model.dart';
 
 class WorkoutController extends Notifier<List<Workout>> {
@@ -7,7 +8,7 @@ class WorkoutController extends Notifier<List<Workout>> {
     // Mock iniziale (potrebbe arrivare da un'API in futuro)
     return [
       const Workout(
-        title: 'PETTO & TRICIPITI',
+        title: 'PETTO & TRICIPITI FORTISSIMI FORTISSIMI FORTISSIMI',
         coach: 'Luca Bianchi',
         progress: 80,
         exercises: 12,

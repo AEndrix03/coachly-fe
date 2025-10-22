@@ -1,8 +1,10 @@
+import 'package:coachly/pages/workout/ui/widgets/workout_card.dart';
 import 'package:coachly/pages/workout/ui/widgets/workout_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../providers/workout_provider.dart';
-import 'widgets/workout_card.dart';
+import 'widgets/workout_recent_card.dart';
 
 class WorkoutPage extends ConsumerStatefulWidget {
   const WorkoutPage({super.key});
@@ -43,18 +45,75 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage> {
               child: const WorkoutHeader(),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                  final workout = workouts[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: WorkoutCard(workout: workout),
-                  );
-                },
-                childCount: workouts.length,
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Text(
+                'Schede recenti',
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SizedBox(
+                  height: 330,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: workouts.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 12),
+                    itemBuilder: (context, index) => IntrinsicWidth(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minWidth: 260,
+                          maxWidth: 300,
+                        ),
+                        child: WorkoutRecentCard(workout: workouts[index]),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Tutte le Schede',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  Text(
+                    'Organizza',
+                    style: TextStyle(color: Colors.blueAccent, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text('Attive', style: TextStyle(fontSize: 14)),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (int i = 0; i < workouts.length; i++) ...[
+                    WorkoutCard(workout: workouts[i]),
+                    if (i < workouts.length - 1) const SizedBox(height: 8),
+                  ],
+                ],
               ),
             ),
           ),
