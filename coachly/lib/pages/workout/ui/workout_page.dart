@@ -1,9 +1,9 @@
-import 'package:coachly/pages/workout/ui/widgets/workout_card.dart';
-import 'package:coachly/pages/workout/ui/widgets/workout_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/workout_provider.dart';
+import 'widgets/workout_card.dart';
+import 'widgets/workout_header.dart';
 import 'widgets/workout_recent_card.dart';
 
 class WorkoutPage extends ConsumerStatefulWidget {
@@ -13,24 +13,38 @@ class WorkoutPage extends ConsumerStatefulWidget {
   ConsumerState<WorkoutPage> createState() => _WorkoutPageState();
 }
 
-class _WorkoutPageState extends ConsumerState<WorkoutPage> {
+class _WorkoutPageState extends ConsumerState<WorkoutPage>
+    with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
-  double _headerHeight = 180;
+  final ValueNotifier<double> _headerHeightNotifier = ValueNotifier(180.0);
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_handleScroll);
+    _scrollController.addListener(_onScroll);
   }
 
-  void _handleScroll() {
-    final double offset = _scrollController.offset.clamp(0, 120);
-    setState(() => _headerHeight = 180 - offset);
+  void _onScroll() {
+    final offset = _scrollController.offset.clamp(0.0, 120.0);
+    _headerHeightNotifier.value = 180.0 - offset;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _headerHeightNotifier.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final workouts = ref.watch(workoutProvider);
+    final recentWorkouts = workouts.toList();
+    final activeWorkouts = workouts.toList();
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -38,91 +52,91 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage> {
         controller: _scrollController,
         slivers: [
           SliverToBoxAdapter(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              height: _headerHeight,
-              curve: Curves.easeOut,
+            child: ValueListenableBuilder<double>(
+              valueListenable: _headerHeightNotifier,
+              builder: (context, height, child) {
+                return SizedBox(height: height, child: child);
+              },
               child: const WorkoutHeader(),
             ),
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Text(
                 'Schede recenti',
-                style: TextStyle(color: Colors.white, fontSize: 20),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
           SliverToBoxAdapter(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SizedBox(
-                  height: 330,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: workouts.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 12),
-                    itemBuilder: (context, index) => IntrinsicWidth(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: 260,
-                          maxWidth: 300,
-                        ),
-                        child: WorkoutRecentCard(workout: workouts[index]),
-                      ),
-                    ),
-                  ),
-                );
-              },
+            child: SizedBox(
+              height: 350,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: recentWorkouts.length,
+                cacheExtent: 600,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  return SizedBox(
+                    width: 280,
+                    child: WorkoutRecentCard(workout: recentWorkouts[index]),
+                  );
+                },
+              ),
             ),
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Tutte le Schede',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   Text(
                     'Organizza',
-                    style: TextStyle(color: Colors.blueAccent, fontSize: 14),
+                    style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text('Attive', style: TextStyle(fontSize: 14)),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (int i = 0; i < workouts.length; i++) ...[
-                    WorkoutCard(workout: workouts[i]),
-                    if (i < workouts.length - 1) const SizedBox(height: 8),
-                  ],
-                ],
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                'Attive',
+                style: TextStyle(fontSize: 14, color: Colors.white70),
               ),
             ),
           ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverList.separated(
+              itemCount: activeWorkouts.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                return WorkoutCard(workout: activeWorkouts[index]);
+              },
+            ),
+          ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../providers/navigation/navigation_provider.dart';
 
 class AppNavigationBar extends ConsumerWidget {
@@ -20,15 +21,18 @@ class AppNavigationBar extends ConsumerWidget {
 
     return NavigationBar(
       selectedIndex: currentIndex,
+      labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       onDestinationSelected: (index) {
-        ref.read(navigationIndexProvider.notifier).state = index;
+        ref.read(navigationIndexProvider.notifier).set(index);
         context.go(_tabs[index]['route'] as String);
       },
       destinations: _tabs
-          .map((tab) => NavigationDestination(
-        icon: Icon(tab['icon'] as IconData),
-        label: tab['label'] as String,
-      ))
+          .map(
+            (tab) => NavigationDestination(
+              icon: Icon(tab['icon'] as IconData),
+              label: tab['label'] as String,
+            ),
+          )
           .toList(),
     );
   }
