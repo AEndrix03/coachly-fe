@@ -97,13 +97,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: AppNavigationBar(),
-      floatingActionButton: navigationShell.currentIndex == 1
-          ? FloatingActionButton(
-              onPressed: () {},
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const Icon(Icons.add, color: Colors.white),
-            )
-          : null,
     );
   }
 }

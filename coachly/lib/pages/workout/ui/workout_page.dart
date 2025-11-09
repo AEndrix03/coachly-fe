@@ -48,6 +48,12 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage>
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // TODO: Azione per aggiungere un nuovo workout
+        },
+        child: const Icon(Icons.add),
+      ),
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
