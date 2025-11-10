@@ -48,7 +48,10 @@ class WorkoutDetailPage extends StatelessWidget {
               const SizedBox(height: 20),
               _buildStartButton(context),
               const SizedBox(height: 20),
-              WorkoutDetailExerciseListSection(exercises: exercises),
+              WorkoutDetailExerciseListSection(
+                exercises: exercises,
+                workoutId: id,
+              ),
               const SizedBox(height: 32),
             ],
           ),

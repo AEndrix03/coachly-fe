@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class WorkoutDetailExerciseListSection extends StatelessWidget {
   final List<ExerciseData> exercises;
+  final String? workoutId;
 
-  const WorkoutDetailExerciseListSection({super.key, required this.exercises});
+  const WorkoutDetailExerciseListSection({
+    super.key,
+    required this.exercises,
+    this.workoutId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +61,10 @@ class WorkoutDetailExerciseListSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          ...exercises.map((exercise) => _ExerciseCard(exercise: exercise)),
+          ...exercises.map(
+            (exercise) =>
+                _ExerciseCard(exercise: exercise, workoutId: workoutId ?? '1'),
+          ),
         ],
       ),
     );
@@ -64,50 +73,60 @@ class WorkoutDetailExerciseListSection extends StatelessWidget {
 
 class _ExerciseCard extends StatelessWidget {
   final ExerciseData exercise;
+  final String workoutId;
 
-  const _ExerciseCard({required this.exercise});
+  const _ExerciseCard({required this.exercise, required this.workoutId});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF2A2A3E).withOpacity(0.6),
-            const Color(0xFF1A1A2E).withOpacity(0.8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        border: Border.all(width: 1.5, color: Colors.white.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-            spreadRadius: -4,
+    return InkWell(
+      onTap: () {
+        // Navigate to exercise detail page
+        context.push(
+          '/workouts/workout/$workoutId/exercise/${exercise.number}',
+        );
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xFF2A2A3E).withOpacity(0.6),
+              const Color(0xFF1A1A2E).withOpacity(0.8),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildMainContent(),
-          Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  Colors.white.withOpacity(0.1),
-                  Colors.transparent,
-                ],
+          border: Border.all(width: 1.5, color: Colors.white.withOpacity(0.1)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+              spreadRadius: -4,
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            _buildMainContent(),
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    Colors.white.withOpacity(0.1),
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
-          ),
-          _buildBottomBar(),
-        ],
+            _buildBottomBar(),
+          ],
+        ),
       ),
     );
   }
