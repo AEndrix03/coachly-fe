@@ -81,7 +81,7 @@ class WorkoutDetailPage extends StatelessWidget {
           ],
         ),
         child: ElevatedButton.icon(
-          onPressed: () => context.go('/workouts/workout/start'),
+          onPressed: () => context.go('/workouts/workout/$id/active'),
           icon: const Icon(Icons.play_arrow, size: 22),
           label: const Text(
             'Inizia Allenamento',

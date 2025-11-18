@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../pages/home/home.dart';
 import '../pages/workout/ui/detail/workout_detail_page.dart';
+import '../pages/workout/ui/active/workout_active_page.dart';
 import '../pages/workout/ui/exercise/exercise_page.dart';
 import '../pages/workout/ui/workout_page.dart';
 import '../widgets/navigation/navigation_bar.dart';
@@ -41,6 +42,13 @@ final appRouter = GoRouter(
                     WorkoutDetailPage(id: state.pathParameters['id']!),
                   ),
                   routes: [
+                    GoRoute(
+                      path: 'active',
+                      pageBuilder: (context, state) => _fadeTransition(
+                        state,
+                        WorkoutActivePage(workoutId: state.pathParameters['id']!),
+                      ),
+                    ),
                     GoRoute(
                       path: 'exercise/:exerciseId',
                       pageBuilder: (context, state) => _fadeTransition(
