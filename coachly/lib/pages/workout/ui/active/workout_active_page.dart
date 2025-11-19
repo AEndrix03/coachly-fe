@@ -18,32 +18,38 @@ class WorkoutActivePage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0F),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            const ActiveAppBar(
-              elapsedTime: '23:45',
-              currentExercise: 2,
-              totalExercises: 11,
+            // Main content
+            Column(
+              children: [
+                const ActiveAppBar(
+                  currentExercise: 2,
+                  totalExercises: 11,
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: 3, // TODO: Da provider
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: ExerciseCard(
+                          exerciseNumber: index + 1,
+                          title: _getExerciseTitle(index),
+                          setsRange: _getSetsRange(index),
+                          repsRange: _getRepsRange(index),
+                          sets: _getSets(index),
+                          isExpanded: index == 0,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: 3, // TODO: Da provider
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: ExerciseCard(
-                      exerciseNumber: index + 1,
-                      title: _getExerciseTitle(index),
-                      setsRange: _getSetsRange(index),
-                      repsRange: _getRepsRange(index),
-                      sets: _getSets(index),
-                      isExpanded: index == 0,
-                    ),
-                  );
-                },
-              ),
-            ),
+            
+            // Floating buttons
             const ActiveBottomBar(),
           ],
         ),

@@ -1,133 +1,306 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
-class ActiveAppBar extends StatelessWidget {
-  final String elapsedTime;
+class ActiveAppBar extends StatefulWidget {
   final int currentExercise;
   final int totalExercises;
 
   const ActiveAppBar({
     super.key,
-    required this.elapsedTime,
     required this.currentExercise,
     required this.totalExercises,
   });
 
   @override
+  State<ActiveAppBar> createState() => _ActiveAppBarState();
+}
+
+class _ActiveAppBarState extends State<ActiveAppBar> {
+  late Timer _timer;
+  int _elapsedSeconds = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _elapsedSeconds++;
+        });
+      }
+    });
+  }
+
+  String get _formattedTime {
+    final hours = _elapsedSeconds ~/ 3600;
+    final minutes = (_elapsedSeconds % 3600) ~/ 60;
+    final seconds = _elapsedSeconds % 60;
+
+    if (hours > 0) {
+      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    }
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF1E1E2A), Color(0xFF14141F)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF1F2937),
+            Color(0xFF111827),
+          ],
         ),
         border: Border(
-          bottom: BorderSide(color: Color(0xFF2A2A3A), width: 1),
+          bottom: BorderSide(
+            color: Color(0xFF374151),
+            width: 1.5,
+          ),
         ),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2A2A3A), Color(0xFF1E1E2A)],
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Main app bar content - PADDING RIDOTTO
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+              child: Row(
+                children: [
+                  // Back button - STILE COPIATO
+                  _buildIconButton(
+                    icon: Icons.arrow_back_rounded,
+                    onPressed: () => _showCancelDialog(context),
+                  ),
+                  
+                  const SizedBox(width: 12),
+                  
+                  // Time and exercise counter
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min, // RIDOTTO SPAZIO
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              size: 18,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _formattedTime,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                                fontFeatures: [
+                                  FontFeature.tabularFigures(),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                const Color(0xFF3B82F6).withOpacity(0.3),
+                                const Color(0xFF2563EB).withOpacity(0.2),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: const Color(0xFF3B82F6).withOpacity(0.5),
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            'Esercizio ${widget.currentExercise}/${widget.totalExercises}',
+                            style: const TextStyle(
+                              color: Color(0xFF60A5FA),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Pause button - STILE COPIATO
+                  _buildIconButton(
+                    icon: Icons.pause_rounded,
+                    onPressed: () {
+                      // TODO: Implementare pausa
+                      _timer.cancel();
+                    },
+                  ),
+                  
+                  const SizedBox(width: 8),
+                  
+                  // Menu button - STILE COPIATO
+                  _buildMenuButton(context),
+                ],
               ),
-              shape: BoxShape.circle,
             ),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
-              padding: EdgeInsets.zero,
-              onPressed: () => _showCancelDialog(context),
-            ),
+            
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  // STILE COPIATO DA workout_detail_header.dart e exercise_header.dart
+  Widget _buildIconButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15), // STILE COPIATO
+        borderRadius: BorderRadius.circular(14), // STILE COPIATO (non cerchio!)
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: Colors.white, size: 22),
+        onPressed: onPressed,
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
+  Widget _buildMenuButton(BuildContext context) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15), // STILE COPIATO
+        borderRadius: BorderRadius.circular(14), // STILE COPIATO (non cerchio!)
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: PopupMenuButton<String>(
+        icon: const Icon(
+          Icons.more_vert_rounded,
+          color: Colors.white,
+          size: 22,
+        ),
+        color: const Color(0xFF1F2937),
+        offset: const Offset(0, 52),
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(
+            color: Color(0xFF374151),
+            width: 1.5,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              '$elapsedTime | $currentExercise/$totalExercises',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2A2A3A), Color(0xFF1E1E2A)],
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.pause, color: Colors.white, size: 20),
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                // TODO: Implementare pausa
-              },
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2A2A3A), Color(0xFF1E1E2A)],
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, color: Colors.white, size: 20),
-              color: const Color(0xFF1E1E2A),
-              offset: const Offset(0, 48),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              onSelected: (value) {
-                switch (value) {
-                  case 'notes':
-                    // TODO: Note allenamento
-                    break;
-                  case 'history':
-                    // TODO: Storico scheda
-                    break;
-                  case 'discard':
-                    _showDiscardDialog(context);
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'notes',
-                  child: Row(
-                    children: [
-                      Icon(Icons.note_outlined, color: Colors.white70, size: 20),
-                      SizedBox(width: 12),
-                      Text('Note allenamento', style: TextStyle(color: Colors.white)),
-                    ],
+        ),
+        onSelected: (value) {
+          switch (value) {
+            case 'notes':
+              // TODO: Note allenamento
+              break;
+            case 'history':
+              // TODO: Storico scheda
+              break;
+            case 'discard':
+              _showDiscardDialog(context);
+              break;
+          }
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: 'notes',
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.edit_note_outlined,
+                  color: Colors.white.withOpacity(0.8),
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Note allenamento',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const PopupMenuItem(
-                  value: 'history',
-                  child: Row(
-                    children: [
-                      Icon(Icons.history, color: Colors.white70, size: 20),
-                      SizedBox(width: 12),
-                      Text('Storico scheda', style: TextStyle(color: Colors.white)),
-                    ],
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 'history',
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.history_rounded,
+                  color: Colors.white.withOpacity(0.8),
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Storico scheda',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const PopupMenuItem(
-                  value: 'discard',
-                  child: Row(
-                    children: [
-                      Icon(Icons.close, color: Colors.red, size: 20),
-                      SizedBox(width: 12),
-                      Text('Termina e scarta', style: TextStyle(color: Colors.red)),
-                    ],
+              ],
+            ),
+          ),
+          const PopupMenuDivider(height: 1),
+          PopupMenuItem(
+            value: 'discard',
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.red.shade400,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Termina e scarta',
+                  style: TextStyle(
+                    color: Colors.red.shade400,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -142,21 +315,54 @@ class ActiveAppBar extends StatelessWidget {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E2A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Annulla allenamento?', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF1F2937),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(
+            color: Color(0xFF374151),
+            width: 1.5,
+          ),
+        ),
+        title: const Text(
+          'Annulla allenamento?',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         content: const Text(
           'I progressi attuali non verranno salvati.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 15,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Continua', style: TextStyle(color: Colors.white70)),
+            child: const Text(
+              'Continua',
+              style: TextStyle(
+                color: Colors.white70,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Annulla', style: TextStyle(color: Colors.red)),
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.red.shade400.withOpacity(0.15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Annulla',
+              style: TextStyle(
+                color: Colors.red.shade400,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -171,21 +377,54 @@ class ActiveAppBar extends StatelessWidget {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1E1E2A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Terminare e scartare?', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF1F2937),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(
+            color: Color(0xFF374151),
+            width: 1.5,
+          ),
+        ),
+        title: const Text(
+          'Terminare e scartare?',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         content: const Text(
           'Tutti i dati di questo allenamento verranno eliminati.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 15,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Annulla', style: TextStyle(color: Colors.white70)),
+            child: const Text(
+              'Annulla',
+              style: TextStyle(
+                color: Colors.white70,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Scarta', style: TextStyle(color: Colors.red)),
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.red.shade400.withOpacity(0.15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'Scarta',
+              style: TextStyle(
+                color: Colors.red.shade400,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
