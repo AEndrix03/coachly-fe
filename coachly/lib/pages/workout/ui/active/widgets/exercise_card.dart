@@ -10,6 +10,8 @@ class ExerciseCard extends StatefulWidget {
   final String repsRange;
   final List<Map<String, dynamic>> sets;
   final bool isExpanded;
+  final int restSeconds;
+  final VoidCallback? onSetCompleted;
 
   const ExerciseCard({
     super.key,
@@ -19,6 +21,8 @@ class ExerciseCard extends StatefulWidget {
     required this.repsRange,
     required this.sets,
     this.isExpanded = false,
+    this.restSeconds = 90,
+    this.onSetCompleted,
   });
 
   @override
@@ -36,12 +40,12 @@ class _ExerciseCardState extends State<ExerciseCard>
     super.initState();
     _isExpanded = widget.isExpanded;
     _expandController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 750),
       vsync: this,
     );
     _expandAnimation = CurvedAnimation(
       parent: _expandController,
-      curve: Curves.easeInOut,
+      curve: Curves.fastOutSlowIn,
     );
     if (_isExpanded) {
       _expandController.value = 1.0;
@@ -328,7 +332,24 @@ class _ExerciseCardState extends State<ExerciseCard>
           onCompleteToggle: (completed) {
             setState(() {
               widget.sets[index]['completed'] = completed;
+
+              final allCompleted = widget.sets.every(
+                (set) => set['completed'] == true,
+              );
+
+              if (allCompleted && _isExpanded) {
+                Future.microtask(() {
+                  if (mounted) {
+                    _toggleExpanded();
+                  }
+                });
+              }
             });
+
+            // Triggera timer riposo se set completato
+            if (completed && widget.onSetCompleted != null) {
+              widget.onSetCompleted!();
+            }
           },
           onWeightChanged: (weight) {
             setState(() {

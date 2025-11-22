@@ -1,17 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'providers/rest_timer_provider.dart';
 import 'widgets/active_app_bar.dart';
 import 'widgets/active_bottom_bar.dart';
 import 'widgets/exercise_card.dart';
+import 'widgets/rest_complete_dialog.dart';
 
-class WorkoutActivePage extends ConsumerWidget {
+class WorkoutActivePage extends ConsumerStatefulWidget {
   final String workoutId;
 
   const WorkoutActivePage({super.key, required this.workoutId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WorkoutActivePage> createState() => _WorkoutActivePageState();
+}
+
+class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
+  void _startRestTimer() {
+    ref.read(restTimerProvider.notifier).startTimer(90);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Listen per dialog quando timer finisce
+    ref.listen<RestTimerState>(restTimerProvider, (previous, next) {
+      if (previous != null &&
+          previous.isActive &&
+          previous.remainingSeconds > 0 &&
+          next.remainingSeconds == 0 &&
+          !next.isActive) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const RestCompleteDialog(),
+        );
+      }
+    });
+
     // TODO: Implementare provider per stato workout attivo
     // final workoutState = ref.watch(activeWorkoutProvider(workoutId));
 
@@ -23,13 +49,10 @@ class WorkoutActivePage extends ConsumerWidget {
             // Main content
             Column(
               children: [
-                const ActiveAppBar(
-                  currentExercise: 2,
-                  totalExercises: 11,
-                ),
+                const ActiveAppBar(currentExercise: 2, totalExercises: 11),
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                     itemCount: 3, // TODO: Da provider
                     itemBuilder: (context, index) {
                       return Padding(
@@ -41,6 +64,8 @@ class WorkoutActivePage extends ConsumerWidget {
                           repsRange: _getRepsRange(index),
                           sets: _getSets(index),
                           isExpanded: index == 0,
+                          restSeconds: 90,
+                          onSetCompleted: _startRestTimer,
                         ),
                       );
                     },
@@ -48,7 +73,7 @@ class WorkoutActivePage extends ConsumerWidget {
                 ),
               ],
             ),
-            
+
             // Floating buttons
             const ActiveBottomBar(),
           ],

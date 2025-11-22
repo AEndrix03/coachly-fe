@@ -1,5 +1,4 @@
 import 'package:coachly/widgets/common/ai_coach_widget.dart';
-import 'package:coachly/widgets/common/rest_timer_widget.dart';
 import 'package:flutter/material.dart';
 
 /// Barra inferiore moderna con pulsanti volanti
@@ -11,29 +10,13 @@ class ActiveBottomBar extends StatelessWidget {
     return Positioned(
       right: 20,
       bottom: 20,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // Timer button
-          _buildFloatingButton(
-            context: context,
-            icon: Icons.timer_outlined,
-            gradient: [const Color(0xFF6366F1), const Color(0xFF4F46E5)],
-            glowColor: const Color(0xFF6366F1),
-            onTap: () => _showRestTimer(context),
-          ),
-          const SizedBox(height: 14),
-
-          // AI Coach button
-          _buildFloatingButton(
-            context: context,
-            icon: Icons.smart_toy_outlined,
-            gradient: [const Color(0xFF10B981), const Color(0xFF059669)],
-            glowColor: const Color(0xFF10B981),
-            onTap: () => _showAICoach(context),
-          ),
-        ],
+      child: // AI Coach button - Viola gradient
+      _buildFloatingButton(
+        context: context,
+        icon: Icons.smart_toy_outlined,
+        gradient: [const Color(0xFF9333EA), const Color(0xFF7C3AED)],
+        glowColor: const Color(0xFF9333EA),
+        onTap: () => _showAICoach(context),
       ),
     );
   }
@@ -48,32 +31,23 @@ class ActiveBottomBar extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 64,
-        height: 64,
+        width: 56,
+        height: 56,
         decoration: BoxDecoration(
           gradient: LinearGradient(colors: gradient),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.white.withOpacity(0.2), width: 2),
           boxShadow: [
             BoxShadow(
-              color: glowColor.withOpacity(0.6),
-              blurRadius: 20,
-              spreadRadius: 4,
+              color: glowColor.withOpacity(0.4),
+              blurRadius: 16,
+              spreadRadius: 2,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Icon(icon, color: Colors.white, size: 30),
+        child: Icon(icon, color: Colors.white, size: 26),
       ),
-    );
-  }
-
-  void _showRestTimer(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) =>
-          RestTimerWidget(onClose: () => Navigator.pop(context)),
     );
   }
 
@@ -82,8 +56,10 @@ class ActiveBottomBar extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) =>
-          AICoachWidget(onClose: () => Navigator.pop(context)),
+      builder: (context) => AICoachWidget(
+        onClose: () => Navigator.pop(context),
+        showQuickActions: false,
+      ),
     );
   }
 }

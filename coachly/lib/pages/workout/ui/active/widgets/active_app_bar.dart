@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
+import '../providers/rest_timer_provider.dart';
 
-class ActiveAppBar extends StatefulWidget {
+class ActiveAppBar extends ConsumerStatefulWidget {
   final int currentExercise;
   final int totalExercises;
 
@@ -12,10 +14,10 @@ class ActiveAppBar extends StatefulWidget {
   });
 
   @override
-  State<ActiveAppBar> createState() => _ActiveAppBarState();
+  ConsumerState<ActiveAppBar> createState() => _ActiveAppBarState();
 }
 
-class _ActiveAppBarState extends State<ActiveAppBar> {
+class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
   late Timer _timer;
   int _elapsedSeconds = 0;
 
@@ -169,9 +171,90 @@ class _ActiveAppBarState extends State<ActiveAppBar> {
               ),
             ),
             
-
+            // Rest timer bar - appare solo quando attivo
+            _buildRestTimerBar(ref),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRestTimerBar(WidgetRef ref) {
+    final timerState = ref.watch(restTimerProvider);
+    
+    if (!timerState.isActive) return const SizedBox.shrink();
+
+    final minutes = timerState.remainingSeconds ~/ 60;
+    final seconds = timerState.remainingSeconds % 60;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+        ),
+        border: Border(
+          top: BorderSide(color: Color(0xFF374151), width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Icona notte
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.bedtime,
+              color: Color(0xFF60A5FA),
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Timer
+          Text(
+            '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+          
+          const SizedBox(width: 16),
+          
+          // Pulsante +15s
+          _buildIconButton(
+            icon: Icons.add,
+            onPressed: () => ref.read(restTimerProvider.notifier).addTime(15),
+          ),
+          
+          const Spacer(),
+          
+          // Pulsante X
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: const Color(0xFF991B1B).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: const Color(0xFFDC2626).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.close, color: Color(0xFFEF4444), size: 18),
+              onPressed: () => ref.read(restTimerProvider.notifier).stopTimer(),
+              padding: EdgeInsets.zero,
+            ),
+          ),
+        ],
       ),
     );
   }
