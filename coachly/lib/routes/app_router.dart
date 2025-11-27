@@ -1,12 +1,12 @@
+import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../pages/home/home.dart';
-import '../pages/workout/ui/detail/workout_detail_page.dart';
-import '../pages/workout/ui/active/workout_active_page.dart';
-import '../pages/workout/ui/exercise/exercise_page.dart';
-import '../pages/workout/ui/workout_page.dart';
-import '../widgets/navigation/navigation_bar.dart';
+import '../features/common/navigation/widgets/navigation_bar.dart';
+import '../features/home/home.dart';
+import '../features/workout/workout_active_page/workout_active_page.dart';
+import '../features/workout/workout_detail_page/workout_detail_page.dart';
+import '../features/workout/workout_exercise_page/workout_exercise_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =
@@ -46,11 +46,13 @@ final appRouter = GoRouter(
                       path: 'active',
                       pageBuilder: (context, state) => _fadeTransition(
                         state,
-                        WorkoutActivePage(workoutId: state.pathParameters['id']!),
+                        WorkoutActivePage(
+                          workoutId: state.pathParameters['id']!,
+                        ),
                       ),
                     ),
                     GoRoute(
-                      path: 'exercise/:exerciseId',
+                      path: 'workout_exercise_page/:exerciseId',
                       pageBuilder: (context, state) => _fadeTransition(
                         state,
                         ExercisePage(id: state.pathParameters['exerciseId']!),

@@ -1,10 +1,10 @@
-import 'package:coachly/pages/home/home.dart';
-import 'package:coachly/pages/workout/ui/workout_page.dart';
+import 'package:coachly/core/themes/theme.dart';
+import 'package:coachly/features/home/home.dart';
+import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'routes/app_router.dart';
-import 'themes/theme.dart';
 
 void main() {
   runApp(const ProviderScope(child: CoachlyApplication()));

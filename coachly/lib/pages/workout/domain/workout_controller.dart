@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/workout_model.dart';
+import '../../../features/workout/workout_page/data/models/workout_model.dart';
 
 class WorkoutController extends Notifier<List<Workout>> {
   @override

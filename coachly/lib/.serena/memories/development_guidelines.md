@@ -3,18 +3,21 @@
 ## 🎯 Principi Fondamentali
 
 ### 1. Clean Code
+
 - Scrivi codice **leggibile** e **manutenibile**
 - Preferisci **semplicità** a complessità
 - **DRY** (Don't Repeat Yourself) - evita duplicazione
 - **KISS** (Keep It Simple, Stupid)
 
 ### 2. Flutter Best Practices
+
 - Usa **const** ovunque possibile (performance)
 - Preferisci **StatelessWidget** quando non serve stato mutabile
 - **Estrai widget** quando diventano complessi (>50 righe)
 - Usa **composition** over inheritance
 
 ### 3. State Management con Riverpod
+
 - Usa **NotifierProvider** per stato complesso con business logic
 - Usa **Provider** per valori semplici read-only
 - **Evita** `ref.read()` in build methods, usa `ref.watch()`
@@ -23,7 +26,9 @@
 ## 🏗️ Architettura
 
 ### Feature-Based Structure
+
 Ogni feature deve essere **auto-contenuta** e organizzata in:
+
 ```
 pages/feature_name/
   ├── data/          # Models, repositories implementations
@@ -35,6 +40,7 @@ pages/feature_name/
 ```
 
 ### Separation of Concerns
+
 - **UI**: Presentation logic, layout, styling
 - **Controllers**: Business logic, state management
 - **Models**: Data structures
@@ -44,6 +50,7 @@ pages/feature_name/
 ## 📐 Design Patterns
 
 ### Repository Pattern
+
 ```dart
 // Interface (opzionale per progetti piccoli)
 abstract class WorkoutRepository {
@@ -64,6 +71,7 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
 ```
 
 ### Controller Pattern (Riverpod)
+
 ```dart
 @riverpod
 class WorkoutList extends _$WorkoutList {
@@ -89,6 +97,7 @@ class WorkoutList extends _$WorkoutList {
 ```
 
 ### Dependency Injection (Riverpod)
+
 ```dart
 // Provider per dependencies
 final apiClientProvider = Provider<ApiClient>((ref) {
@@ -115,6 +124,7 @@ class WorkoutList extends _$WorkoutList {
 ## 🎨 UI/UX Guidelines
 
 ### Responsive Design
+
 ```dart
 // Usa MediaQuery per dimensioni schermo
 final screenWidth = MediaQuery.of(context).size.width;
@@ -132,6 +142,7 @@ LayoutBuilder(
 ```
 
 ### Theme Usage
+
 ```dart
 // Usa sempre theme per colori e stili
 Container(
@@ -151,6 +162,7 @@ color: Theme.of(context).colorScheme.primary
 ```
 
 ### Accessibility
+
 ```dart
 // Usa Semantics per screen readers
 Semantics(
@@ -170,6 +182,7 @@ SizedBox(
 ## 🔄 Async Patterns
 
 ### Gestione AsyncValue (Riverpod)
+
 ```dart
 class WorkoutListPage extends ConsumerWidget {
   @override
@@ -186,6 +199,7 @@ class WorkoutListPage extends ConsumerWidget {
 ```
 
 ### Error Handling
+
 ```dart
 // Gestisci errori gracefully
 try {
@@ -210,6 +224,7 @@ try {
 ## 📦 Dependencies
 
 ### Quando Aggiungere una Nuova Dependency
+
 1. **Verifica necessità reale**: è davvero necessaria?
 2. **Check popularity**: package con buon numero di likes/pub points
 3. **Check maintenance**: ultimo update recente
@@ -217,6 +232,7 @@ try {
 5. **Valuta bundle size**: impatto su dimensione app
 
 ### Minimizza Dependencies
+
 - Preferisci soluzioni native Flutter quando possibile
 - Valuta se puoi implementare la funzionalità in-house
 - Evita package con molte sub-dependencies
@@ -224,6 +240,7 @@ try {
 ## 🧪 Testing Strategy
 
 ### Test Pyramid
+
 ```
         /\
        /  \    E2E Tests (5%)
@@ -235,6 +252,7 @@ try {
 ```
 
 ### Unit Tests
+
 ```dart
 // Test business logic
 void main() {
@@ -253,6 +271,7 @@ void main() {
 ```
 
 ### Widget Tests
+
 ```dart
 // Test UI components
 testWidgets('WorkoutCard shows title', (tester) async {
@@ -271,6 +290,7 @@ testWidgets('WorkoutCard shows title', (tester) async {
 ## 🔐 Security Best Practices
 
 ### 1. Never Hardcode Secrets
+
 ```dart
 // ❌ Bad
 const apiKey = 'sk_live_1234567890';
@@ -280,6 +300,7 @@ final apiKey = dotenv.env['API_KEY']!;
 ```
 
 ### 2. Secure Storage for Tokens
+
 ```dart
 // Use flutter_secure_storage
 final storage = FlutterSecureStorage();
@@ -287,6 +308,7 @@ await storage.write(key: 'auth_token', value: token);
 ```
 
 ### 3. Validate User Input
+
 ```dart
 // Sanitize input prima di inviare al backend
 final sanitizedInput = input.trim();
@@ -298,6 +320,7 @@ if (sanitizedInput.isEmpty) {
 ## 🚀 Performance Optimization
 
 ### 1. Lazy Loading
+
 ```dart
 // Use ListView.builder per liste lunghe
 ListView.builder(
@@ -307,6 +330,7 @@ ListView.builder(
 ```
 
 ### 2. Image Optimization
+
 ```dart
 // Cache immagini di rete
 CachedNetworkImage(
@@ -325,6 +349,7 @@ Image.network(
 ```
 
 ### 3. Avoid Expensive Operations in Build
+
 ```dart
 // ❌ Bad - computazione pesante in build
 @override
@@ -344,10 +369,11 @@ Widget build(BuildContext context) {
 ## 📝 Documentation
 
 ### Code Comments
+
 ```dart
 /// Calculates the total volume lifted in a workout.
 ///
-/// Volume is calculated as: sets × reps × weight for each exercise.
+/// Volume is calculated as: sets × reps × weight for each workout_exercise_page.
 /// 
 /// Returns the total volume in kg.
 int calculateTotalVolume(List<Exercise> exercises) {
@@ -356,6 +382,7 @@ int calculateTotalVolume(List<Exercise> exercises) {
 ```
 
 ### TODO Comments
+
 ```dart
 // TODO(username): Implementare cache per migliorare performance
 // FIXME: Bug con navigazione su iOS
@@ -365,6 +392,7 @@ int calculateTotalVolume(List<Exercise> exercises) {
 ## 🎯 Code Review Checklist
 
 ### Per Reviewer
+
 - [ ] Codice leggibile e comprensibile
 - [ ] Naming chiaro e consistente
 - [ ] Nessuna duplicazione
@@ -375,7 +403,9 @@ int calculateTotalVolume(List<Exercise> exercises) {
 - [ ] Documentazione sufficiente
 
 ### Per Author
+
 Prima di richiedere review:
+
 - [ ] Self-review del codice
 - [ ] Test locali passano
 - [ ] Formattazione corretta
@@ -385,21 +415,26 @@ Prima di richiedere review:
 ## 🌐 Internationalization (Future)
 
 ### Preparazione per i18n
+
 ```dart
 // Usa sempre Text widgets per testi
-Text(context.l10n.welcomeMessage)
+Text
+(
+context.l10n.welcomeMessage)
 
 // Non hardcodare testi
 // ❌ Bad
 Text('Welcome to Coachly')
 
 // ✅ Good (quando implementato i18n)
-Text(AppLocalizations.of(context).welcome)
+Text(AppLocalizations.of(context).welcome
+)
 ```
 
 ## 🔄 Version Control
 
 ### Branching Strategy
+
 - `main`: Production-ready code
 - `develop`: Development branch
 - `feature/*`: Feature branches
@@ -407,6 +442,7 @@ Text(AppLocalizations.of(context).welcome)
 - `hotfix/*`: Urgent production fixes
 
 ### Commit Frequency
+
 - Commit **piccoli e frequenti**
 - Un commit = una modifica logica
 - Push almeno una volta al giorno
@@ -414,12 +450,14 @@ Text(AppLocalizations.of(context).welcome)
 ## 🎓 Learning Resources
 
 ### Consigliati
+
 - Flutter Documentation: https://flutter.dev/docs
 - Riverpod: https://riverpod.dev
 - Dart Language Tour: https://dart.dev/guides/language/language-tour
 - Flutter Cookbook: https://docs.flutter.dev/cookbook
 
 ### Community
+
 - Flutter Discord
 - r/FlutterDev
 - Stack Overflow (tag: flutter)
@@ -427,11 +465,13 @@ Text(AppLocalizations.of(context).welcome)
 ## 💡 Tips & Tricks
 
 ### Hot Reload Best Practices
+
 - Use `const` constructors - non vengono ricostruiti
 - Evita logica pesante in constructors
 - Non modificare campi `final` durante hot reload
 
 ### VS Code Extensions Utili
+
 - Flutter
 - Dart
 - Error Lens
@@ -439,6 +479,7 @@ Text(AppLocalizations.of(context).welcome)
 - Pubspec Assist
 
 ### Android Studio Shortcuts
+
 - `Ctrl+Alt+L`: Format code
 - `Alt+Enter`: Quick fixes
 - `Ctrl+Space`: Code completion
@@ -447,6 +488,7 @@ Text(AppLocalizations.of(context).welcome)
 ## ⚠️ Common Pitfalls
 
 ### 1. Non usare setState in StatelessWidget
+
 ```dart
 // ❌ Non ha senso
 class MyWidget extends StatelessWidget {
@@ -460,6 +502,7 @@ class MyWidget extends StatelessWidget {
 ```
 
 ### 2. Memory Leaks con StreamSubscription
+
 ```dart
 // ✅ Cancella sempre subscriptions
 @override
@@ -470,6 +513,7 @@ void dispose() {
 ```
 
 ### 3. Non await in didChangeDependencies
+
 ```dart
 // ❌ Bad - causes issues
 @override
