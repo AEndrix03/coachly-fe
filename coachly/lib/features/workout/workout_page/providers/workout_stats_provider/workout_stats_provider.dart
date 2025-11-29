@@ -1,13 +1,13 @@
-import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'workout_list_provider.dart';
+import '../workout_list_provider/workout_list_provider.dart';
 
 part 'workout_stats_provider.g.dart';
 
 // State Class
 class WorkoutStatsState {
-  final WorkoutStats? stats;
+  final WorkoutStatsModel? stats;
   final bool isLoading;
   final String? errorMessage;
 
@@ -18,7 +18,7 @@ class WorkoutStatsState {
   });
 
   WorkoutStatsState copyWith({
-    WorkoutStats? stats,
+    WorkoutStatsModel? stats,
     bool? isLoading,
     String? errorMessage,
   }) {
@@ -37,8 +37,7 @@ class WorkoutStatsState {
 class WorkoutStatsNotifier extends _$WorkoutStatsNotifier {
   @override
   WorkoutStatsState build() {
-    // Auto-load on initialization
-    loadStats();
+    // Restituisci solo lo stato iniziale, senza chiamare loadStats()
     return const WorkoutStatsState();
   }
 

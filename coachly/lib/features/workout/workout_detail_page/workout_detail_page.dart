@@ -1,7 +1,7 @@
-import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_description.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_exercise_list_section.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_header.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_stats_cards.dart';
+import 'package:coachly/shared/widgets/cards/border_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -40,9 +40,14 @@ class WorkoutDetailPage extends StatelessWidget {
                 focus: 'Ipertrofia',
               ),
               const SizedBox(height: 20),
-              const WorkoutDetailDescription(
-                description:
-                    'Programma intensivo focalizzato sullo sviluppo della massa muscolare di petto e tricipiti. Combina esercizi composti e di isolamento per uno stimolo completo.',
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: BorderCard(
+                  title: 'Descrizione',
+                  text:
+                      'Programma intensivo focalizzato sullo sviluppo della massa muscolare di petto e tricipiti. Combina esercizi composti e di isolamento per uno stimolo completo.',
+                  borderColor: Color(0xFF2196F3),
+                ),
               ),
               const SizedBox(height: 20),
               _buildStartButton(context),

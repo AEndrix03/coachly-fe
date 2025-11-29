@@ -1,8 +1,9 @@
-import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
+import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutHeader extends StatelessWidget {
-  final WorkoutStats? stats;
+  final WorkoutStatsModel? stats;
   final bool isLoading;
   final VoidCallback? onSettings;
   final VoidCallback? onNotifications;
@@ -17,6 +18,7 @@ class WorkoutHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -34,13 +36,13 @@ class WorkoutHeader extends StatelessWidget {
         bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildAppBar(), _buildContent()],
+          children: [_buildAppBar(scheme), _buildContent(scheme)],
         ),
       ),
     );
   }
 
-  Widget _buildAppBar() {
+  Widget _buildAppBar(ColorScheme scheme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Row(
@@ -49,9 +51,9 @@ class WorkoutHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.25),
+              color: scheme.onPrimary.withOpacity(0.25),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.3)),
+              border: Border.all(color: scheme.onPrimary.withOpacity(0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -61,7 +63,7 @@ class WorkoutHeader extends StatelessWidget {
                 Text(
                   'Allenamenti',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.95),
+                    color: scheme.onPrimary.withOpacity(0.95),
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -71,9 +73,15 @@ class WorkoutHeader extends StatelessWidget {
           ),
           Row(
             children: [
-              _buildIconButton(Icons.settings_outlined, onSettings),
+              GlassIconButton(
+                icon: Icons.settings_outlined,
+                onPressed: onSettings,
+                iconColor: Colors.white,
+                size: 20,
+                marginRight: 0,
+              ),
               const SizedBox(width: 8),
-              _buildNotificationButton(),
+              _buildNotificationButton(scheme),
             ],
           ),
         ],
@@ -81,62 +89,21 @@ class WorkoutHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildIconButton(IconData icon, VoidCallback? onPressed) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: Colors.white, size: 20),
-        onPressed: onPressed ?? () {},
-        padding: EdgeInsets.zero,
-      ),
+  Widget _buildNotificationButton(ColorScheme scheme) {
+    return Stack(
+      children: [
+        GlassIconButton(
+          icon: Icons.notifications_outlined,
+          onPressed: onNotifications,
+          iconColor: Colors.white,
+          size: 20,
+        ),
+        // Se serve un badge, aggiungilo qui
+      ],
     );
   }
 
-  Widget _buildNotificationButton() {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Stack(
-        children: [
-          Center(
-            child: IconButton(
-              icon: const Icon(
-                Icons.notifications_outlined,
-                color: Colors.white,
-                size: 20,
-              ),
-              onPressed: onNotifications ?? () {},
-              padding: EdgeInsets.zero,
-            ),
-          ),
-          Positioned(
-            right: 7,
-            top: 7,
-            child: Container(
-              width: 7,
-              height: 7,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF5252),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1.2),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContent() {
+  Widget _buildContent(ColorScheme scheme) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
       child: Column(
@@ -153,20 +120,20 @@ class WorkoutHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _buildQuickStats(),
+          _buildQuickStats(scheme),
         ],
       ),
     );
   }
 
-  Widget _buildQuickStats() {
+  Widget _buildQuickStats(ColorScheme scheme) {
     if (isLoading) {
       return Container(
         width: double.infinity,
         height: 80,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
+          color: scheme.onPrimary.withOpacity(0.2),
           borderRadius: BorderRadius.circular(14),
         ),
         child: const Center(
@@ -181,7 +148,7 @@ class WorkoutHeader extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: scheme.onPrimary.withOpacity(0.2),
         borderRadius: BorderRadius.circular(14),
       ),
       child: IntrinsicHeight(
@@ -192,18 +159,20 @@ class WorkoutHeader extends StatelessWidget {
                 icon: Icons.trending_up,
                 label: 'Streak',
                 value: '${data.currentStreak} giorni',
+                scheme: scheme,
               ),
             ),
             Container(
               width: 1,
               height: 40,
-              color: Colors.white.withOpacity(0.3),
+              color: scheme.onPrimary.withOpacity(0.3),
             ),
             Expanded(
               child: _buildStatItem(
                 icon: Icons.access_time,
                 label: 'Settimana',
                 value: '${data.weeklyWorkouts} workout',
+                scheme: scheme,
               ),
             ),
           ],
@@ -216,6 +185,7 @@ class WorkoutHeader extends StatelessWidget {
     required IconData icon,
     required String label,
     required String value,
+    required ColorScheme scheme,
   }) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -234,14 +204,17 @@ class WorkoutHeader extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 10),
+          style: TextStyle(
+            color: scheme.onPrimary.withOpacity(0.8),
+            fontSize: 10,
+          ),
           textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  static const _defaultStats = WorkoutStats(
+  static const _defaultStats = WorkoutStatsModel(
     activeWorkouts: 0,
     completedWorkouts: 0,
     progressPercentage: 0,

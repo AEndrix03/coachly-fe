@@ -1,24 +1,43 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
-class AppTheme {
-  static ThemeData get light => ThemeData(
-    colorScheme: const ColorScheme.dark(
-      primary: Color(0xFF3B82F6),
-      secondary: Color(0xFF6366F1),
-      surface: Color(0xFF121212),
-      onSurface: Colors.white,
-    ),
-    textTheme: const TextTheme(
-      bodyMedium: TextStyle(color: Colors.white70),
-      titleLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-    ),
-    cardTheme: CardThemeData(
-      color: const Color(0xFF1E1E2A),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-    ),
+class AppThemeScheme {
+  static const FlexSchemeColor customScheme = FlexSchemeColor(
+    primary: Color(0xFF2196F3),
+    primaryContainer: Color(0xFF1976D2),
+    secondary: Color(0xFF9C27B0),
+    secondaryContainer: Color(0xFF7B4BC1),
+    tertiary: Color(0xFFFF9800),
+    tertiaryContainer: Color(0xFFFF5722),
+    appBarColor: Color(0xFF0F0F1E),
+    error: Color(0xFFFF5252),
   );
 
-  static ThemeData get dark => light;
+  static ThemeData lightTheme = FlexThemeData.light(
+    colors: customScheme,
+    surfaceMode: FlexSurfaceMode.highScaffoldLevelSurface,
+    blendLevel: 12,
+    appBarStyle: FlexAppBarStyle.primary,
+    subThemesData: const FlexSubThemesData(
+      blendOnLevel: 10,
+      blendOnColors: true,
+      defaultRadius: 12,
+    ),
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+    useMaterial3: true,
+  );
+
+  static ThemeData darkTheme = FlexThemeData.dark(
+    colors: customScheme,
+    surfaceMode: FlexSurfaceMode.highScaffoldLevelSurface,
+    blendLevel: 20,
+    appBarStyle: FlexAppBarStyle.primary,
+    subThemesData: const FlexSubThemesData(
+      blendOnLevel: 20,
+      blendOnColors: true,
+      defaultRadius: 12,
+    ),
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+    useMaterial3: true,
+  );
 }

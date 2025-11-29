@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../features/workout/workout_page/data/models/workout_model.dart';
+import '../../../features/workout/workout_page/data/models/workout_model/workout_model.dart';
 
-class WorkoutController extends Notifier<List<Workout>> {
+class WorkoutController extends Notifier<List<WorkoutModel>> {
   @override
-  List<Workout> build() {
+  List<WorkoutModel> build() {
     return [
-      const Workout(
+      const WorkoutModel(
         id: '1',
         title: 'PETTO & TRICIPITI POWER',
         coach: 'Luca Bianchi',
@@ -16,7 +16,7 @@ class WorkoutController extends Notifier<List<Workout>> {
         goal: 'Ipertrofia',
         lastUsed: '2 giorni fa',
       ),
-      const Workout(
+      const WorkoutModel(
         id: '2',
         title: 'LEG DAY VOLUME',
         coach: 'Marco Rossi',
@@ -26,7 +26,7 @@ class WorkoutController extends Notifier<List<Workout>> {
         goal: 'Volume',
         lastUsed: 'Ieri',
       ),
-      const Workout(
+      const WorkoutModel(
         id: '3',
         title: 'DORSO E BICIPITI',
         coach: 'Sara Verdi',
@@ -36,7 +36,7 @@ class WorkoutController extends Notifier<List<Workout>> {
         goal: 'Forza',
         lastUsed: '3 giorni fa',
       ),
-      const Workout(
+      const WorkoutModel(
         id: '4',
         title: 'SPALLE E ADDOME',
         coach: 'Andrea Neri',
@@ -46,7 +46,7 @@ class WorkoutController extends Notifier<List<Workout>> {
         goal: 'Definizione',
         lastUsed: '1 settimana fa',
       ),
-      const Workout(
+      const WorkoutModel(
         id: '5',
         title: 'FULL BODY STRENGTH',
         coach: 'Luca Bianchi',
@@ -56,7 +56,7 @@ class WorkoutController extends Notifier<List<Workout>> {
         goal: 'Forza',
         lastUsed: 'Oggi',
       ),
-      const Workout(
+      const WorkoutModel(
         id: '6',
         title: 'HIIT CARDIO',
         coach: 'Elena Gialli',
@@ -66,7 +66,7 @@ class WorkoutController extends Notifier<List<Workout>> {
         goal: 'Resistenza',
         lastUsed: '4 giorni fa',
       ),
-      const Workout(
+      const WorkoutModel(
         id: '7',
         title: 'UPPER BODY HYPERTROPHY',
         coach: 'Marco Rossi',
@@ -76,7 +76,7 @@ class WorkoutController extends Notifier<List<Workout>> {
         goal: 'Ipertrofia',
         lastUsed: '2 settimane fa',
       ),
-      const Workout(
+      const WorkoutModel(
         id: '8',
         title: 'CORE & STABILITÀ',
         coach: 'Sara Verdi',
@@ -89,7 +89,7 @@ class WorkoutController extends Notifier<List<Workout>> {
     ];
   }
 
-  void addWorkout(Workout workout) {
+  void addWorkout(WorkoutModel workout) {
     state = [...state, workout];
   }
 }

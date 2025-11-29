@@ -1,40 +1,64 @@
-import 'package:coachly/features/workout/workout_page/data/models/workout_model.dart';
-import 'package:coachly/features/workout/workout_page/providers/workout_list_provider.dart';
-import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
+import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
+import 'package:coachly/shared/widgets/buttons/add_fab_button.dart';
+import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
+import 'package:coachly/shared/widgets/sections/section_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gap/gap.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shimmer/shimmer.dart';
 
-import 'widgets/section_header.dart';
 import 'widgets/workout_card.dart';
 import 'widgets/workout_header.dart';
 import 'widgets/workout_recent_card.dart';
-import 'widgets/workout_stats_overview.dart';
 
-class WorkoutPage extends ConsumerWidget {
+class WorkoutPage extends ConsumerStatefulWidget {
   const WorkoutPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WorkoutPage> createState() => _WorkoutPageState();
+}
+
+class _WorkoutPageState extends ConsumerState<WorkoutPage> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(workoutListProvider.notifier).loadWorkouts();
+      // ref.read(workoutStatsProvider.notifier).loadStats(); // Commentato il caricamento delle stats
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final gradient = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [scheme.primary, scheme.secondary],
+    );
     final workoutState = ref.watch(workoutListProvider);
     final statsState = ref.watch(workoutStatsProvider);
-
-    ref.listen(workoutListProvider, (previous, next) {
-      if (previous == null) {
-        ref.read(workoutListProvider.notifier).loadWorkouts();
-      }
-    });
-
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1E),
-      floatingActionButton: _buildFAB(context),
+      backgroundColor: scheme.surface,
+      floatingActionButton: _buildFAB(context, scheme),
       body: RefreshIndicator(
         onRefresh: () async {
           await ref.read(workoutListProvider.notifier).refresh();
           await ref.read(workoutStatsProvider.notifier).refresh();
         },
         child: Container(
-          color: const Color(0xFF0F0F1E),
-          child: _buildBody(context, ref, workoutState, statsState),
+          color: scheme.surface,
+          child: _buildBody(
+            context,
+            ref,
+            workoutState,
+            statsState,
+            scheme,
+            gradient,
+          ),
         ),
       ),
     );
@@ -45,241 +69,139 @@ class WorkoutPage extends ConsumerWidget {
     WidgetRef ref,
     WorkoutListState workoutState,
     WorkoutStatsState statsState,
+    ColorScheme scheme,
+    LinearGradient gradient,
   ) {
     if (workoutState.hasError) {
-      return _buildErrorState(workoutState.errorMessage!);
-    }
-
-    if (workoutState.isLoading && workoutState.workouts.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF2196F3)),
+      return Center(
+        child: ShadAlert(
+          title: Text('Errore'),
+          description: Text(workoutState.errorMessage ?? 'Errore sconosciuto'),
+        ),
       );
     }
-
+    if (workoutState.isLoading && workoutState.workouts.isEmpty) {
+      return Center(
+        child: Shimmer.fromColors(
+          baseColor: scheme.surface,
+          highlightColor: scheme.primary.withOpacity(0.2),
+          child: Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+      );
+    }
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           WorkoutHeader(
-            stats: statsState.stats,
-            isLoading: statsState.isLoading,
+            stats: null, // statsState.stats,
+            isLoading: false, // statsState.isLoading,
             onSettings: () => _showSettings(context),
             onNotifications: () => _showNotifications(context),
           ),
-          const SizedBox(height: 18),
+          const Gap(18),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16),
+          //   child: WorkoutStatsOverview(
+          //     stats: statsState.stats,
+          //     isLoading: statsState.isLoading,
+          //   ),
+          // ),
+          const Gap(28),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: WorkoutStatsOverview(
-              stats: statsState.stats,
-              isLoading: statsState.isLoading,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: SectionBar(title: 'Schede Recenti'),
           ),
-          const SizedBox(height: 28),
-          const SectionHeader(title: 'Schede Recenti'),
-          const SizedBox(height: 10),
-          _buildRecentWorkouts(workoutState.recentWorkouts),
-          const SizedBox(height: 28),
-          _buildAllWorkoutsHeader(workoutState.workouts.length),
-          const SizedBox(height: 10),
-          _buildActiveSubtitle(workoutState.workouts.length),
-          const SizedBox(height: 10),
-          _buildAllWorkouts(workoutState.workouts),
-          const SizedBox(height: 32),
+          const Gap(10),
+          _buildRecentWorkouts(workoutState.recentWorkouts, scheme),
+          const Gap(28),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: SectionBar(title: 'Tutte le Schede', icon: null),
+              ),
+              const GlassIconButton(
+                icon: Icons.sort,
+                onPressed: null,
+                marginRight: 16,
+                iconColor: Colors.white,
+                size: 20,
+              ),
+            ],
+          ),
+          _buildAllWorkouts(workoutState.workouts, scheme),
+          const Gap(32),
         ],
       ),
     );
   }
 
-  Widget _buildRecentWorkouts(List<Workout> workouts) {
+  Widget _buildRecentWorkouts(List<WorkoutModel> workouts, ColorScheme scheme) {
     if (workouts.isEmpty) {
       return const SizedBox(
         height: 365,
         child: Center(
           child: Text(
             'Nessuna scheda recente',
-            style: TextStyle(color: Colors.white54),
+            style: TextStyle(color: Color(0x80000000)),
           ),
         ),
       );
     }
-
     return SizedBox(
       height: 365,
-      child: ListView.separated(
+      child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         physics: const BouncingScrollPhysics(),
         itemCount: workouts.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 14),
-        itemBuilder: (context, index) {
-          return SizedBox(
-            width: 290,
-            child: WorkoutRecentCard(workout: workouts[index]),
-          );
-        },
+        itemBuilder: (context, index) => SizedBox(
+          width: 290,
+          child: WorkoutRecentCard(workout: workouts[index]),
+        ),
       ),
     );
   }
 
-  Widget _buildAllWorkouts(List<Workout> workouts) {
+  Widget _buildAllWorkouts(List<WorkoutModel> workouts, ColorScheme scheme) {
     if (workouts.isEmpty) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(32),
           child: Text(
             'Nessuna scheda disponibile',
-            style: TextStyle(color: Colors.white54),
+            style: TextStyle(color: Color(0x80000000)),
           ),
         ),
       );
     }
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          for (int i = 0; i < workouts.length; i++) ...[
-            WorkoutCard(workout: workouts[i]),
-            if (i < workouts.length - 1) const SizedBox(height: 11),
-          ],
-        ],
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: workouts.length,
+        separatorBuilder: (_, __) => const Gap(11),
+        itemBuilder: (context, i) => WorkoutCard(workout: workouts[i]),
       ),
     );
   }
 
-  Widget _buildAllWorkoutsHeader(int count) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const SectionHeader(title: 'Tutte le Schede', showIcon: true),
-          _buildOrganizeButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActiveSubtitle(int count) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Container(
-            width: 7,
-            height: 7,
-            decoration: const BoxDecoration(
-              color: Color(0xFF4CAF50),
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 7),
-          Text(
-            'Attive',
-            style: TextStyle(
-              fontSize: 13,
-              color: Color.fromRGBO(255, 255, 255, 0.7),
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.2,
-            ),
-          ),
-          const SizedBox(width: 5),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(76, 175, 80, 0.2),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Text(
-              '$count',
-              style: const TextStyle(
-                fontSize: 10,
-                color: Color(0xFF4CAF50),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOrganizeButton() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color.fromRGBO(33, 150, 243, 0.2),
-            const Color.fromRGBO(123, 75, 193, 0.2),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(11),
-        border: Border.all(color: Color.fromRGBO(33, 150, 243, 0.3)),
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.tune, color: Color(0xFF2196F3), size: 15),
-          SizedBox(width: 5),
-          Text(
-            'Organizza',
-            style: TextStyle(
-              color: Color(0xFF2196F3),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(String message) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, color: Colors.red, size: 48),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            style: const TextStyle(color: Colors.white),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFAB(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Color.fromRGBO(33, 150, 243, 0.4),
-            blurRadius: 14,
-            spreadRadius: 2,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: FloatingActionButton(
-        onPressed: () {
-          // TODO: Implementa la navigazione verso la pagina di creazione scheda workout
-          // Navigator.of(context).pushNamed('/createWorkout');
-        },
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: const Icon(Icons.add, size: 26, color: Colors.white),
-      ),
+  Widget _buildFAB(BuildContext context, ColorScheme scheme) {
+    return AddFabButton(
+      onPressed: () {
+        // TODO: Implementa la navigazione verso la pagina di creazione scheda workout
+      },
     );
   }
 
@@ -298,8 +220,3 @@ class WorkoutPage extends ConsumerWidget {
     );
   }
 }
-
-// Fix per il tipo stats: cast esplicito se necessario
-// Dove usato: WorkoutHeader e WorkoutStatsOverview
-// Esempio:
-// stats: statsState.stats as WorkoutStats?

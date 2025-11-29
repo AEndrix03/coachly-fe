@@ -1,10 +1,10 @@
 import 'package:coachly/core/network/api_client.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../data/repositories/workout_page_repository.dart';
-import '../data/repositories/workout_page_repository_impl.dart';
-import '../data/services/workout_page_service.dart';
+import '../../data/repositories/workout_page_repository.dart';
+import '../../data/repositories/workout_page_repository_impl.dart';
+import '../../data/services/workout_page_service.dart';
 
 part 'workout_list_provider.g.dart';
 
@@ -24,8 +24,8 @@ IWorkoutPageRepository workoutPageRepository(Ref ref) {
 
 // State Class
 class WorkoutListState {
-  final List<Workout> workouts;
-  final List<Workout> recentWorkouts;
+  final List<WorkoutModel> workouts;
+  final List<WorkoutModel> recentWorkouts;
   final bool isLoading;
   final String? errorMessage;
 
@@ -37,8 +37,8 @@ class WorkoutListState {
   });
 
   WorkoutListState copyWith({
-    List<Workout>? workouts,
-    List<Workout>? recentWorkouts,
+    List<WorkoutModel>? workouts,
+    List<WorkoutModel>? recentWorkouts,
     bool? isLoading,
     String? errorMessage,
   }) {

@@ -1,3 +1,4 @@
+import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutDetailHeader extends StatelessWidget {
@@ -51,40 +52,22 @@ class WorkoutDetailHeader extends StatelessWidget {
 
   Widget _buildAppBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildIconButton(Icons.arrow_back, onBack),
-          Row(
-            children: [
-              _buildIconButton(Icons.share, onShare),
-              const SizedBox(width: 8),
-              _buildIconButton(Icons.edit, onEdit, marginRight: 4),
-            ],
+          GlassIconButton(
+            icon: Icons.arrow_back,
+            onPressed: onBack,
+            marginRight: 8,
           ),
+          const Spacer(),
+          GlassIconButton(
+            icon: Icons.share,
+            onPressed: onShare,
+            marginRight: 8,
+          ),
+          GlassIconButton(icon: Icons.edit, onPressed: onEdit),
         ],
-      ),
-    );
-  }
-
-  Widget _buildIconButton(
-    IconData icon,
-    VoidCallback onPressed, {
-    double marginRight = 0,
-  }) {
-    return Container(
-      margin: EdgeInsets.only(right: marginRight),
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: Colors.white, size: 22),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
       ),
     );
   }
