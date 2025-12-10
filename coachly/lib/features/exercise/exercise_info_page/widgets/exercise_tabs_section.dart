@@ -1,3 +1,6 @@
+import 'package:coachly/features/exercise/exercise_info_page/data/models/exercise_technique_model/exercise_technique_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/exercise_variant_model/exercise_variant_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/muscle_model/muscle_model.dart';
 import 'package:flutter/material.dart';
 
 import 'tabs/exercise_muscles_tab.dart';
@@ -5,7 +8,20 @@ import 'tabs/exercise_technique_tab.dart';
 import 'tabs/exercise_variants_tab.dart';
 
 class ExerciseTabsSection extends StatefulWidget {
-  const ExerciseTabsSection({super.key});
+  final String description;
+  final List<MuscleModel> primaryMuscles;
+  final List<MuscleModel> secondaryMuscles;
+  final List<ExerciseTechniqueModel> techniqueSteps;
+  final List<ExerciseVariantModel> variants;
+
+  const ExerciseTabsSection({
+    super.key,
+    required this.description,
+    required this.primaryMuscles,
+    required this.secondaryMuscles,
+    required this.techniqueSteps,
+    required this.variants,
+  });
 
   @override
   State<ExerciseTabsSection> createState() => _ExerciseTabsSectionState();
@@ -37,10 +53,18 @@ class _ExerciseTabsSectionState extends State<ExerciseTabsSection>
           height: 400,
           child: TabBarView(
             controller: _tabController,
-            children: const [
-              ExerciseTechniqueTab(),
-              ExerciseMusclesTab(),
-              ExerciseVariantsTab(),
+            children: [
+              ExerciseTechniqueTab(
+                description: widget.description,
+                techniqueSteps: widget.techniqueSteps,
+              ),
+              ExerciseMusclesTab(
+                primaryMuscles: widget.primaryMuscles,
+                secondaryMuscles: widget.secondaryMuscles,
+              ),
+              ExerciseVariantsTab(
+                variants: widget.variants,
+              ),
             ],
           ),
         ),

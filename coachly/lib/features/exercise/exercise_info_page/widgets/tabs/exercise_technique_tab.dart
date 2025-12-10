@@ -1,7 +1,12 @@
+import 'package:coachly/features/exercise/exercise_info_page/data/models/exercise_technique_model/exercise_technique_model.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseTechniqueTab extends StatelessWidget {
-  const ExerciseTechniqueTab({super.key});
+  final String description;
+  final List<ExerciseTechniqueModel> techniqueSteps;
+
+  const ExerciseTechniqueTab(
+      {super.key, required this.description, required this.techniqueSteps});
 
   @override
   Widget build(BuildContext context) {
@@ -10,41 +15,20 @@ class ExerciseTechniqueTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTechniqueCard(
-            icon: Icons.published_with_changes,
-            iconColor: const Color(0xFFFF4081),
-            title: 'Setup Iniziale',
-            description:
-                'Sdraiati sulla panca con piedi ben piantati a terra. Scapole retratte e petto in fuori. Afferra il bilanciere con presa poco più larga delle spalle.',
-            iconGradient: [const Color(0xFFFF4081), const Color(0xFFF50057)],
-          ),
-          const SizedBox(height: 16),
-          _buildTechniqueCard(
-            icon: Icons.arrow_downward,
-            iconColor: const Color(0xFF2196F3),
-            title: 'Fase Eccentrica',
-            description:
-                'Abbassa il bilanciere in modo controllato verso lo sterno. I gomiti formano un angolo di 45° con il corpo. Mantieni tensione continua.',
-            iconGradient: [const Color(0xFF2196F3), const Color(0xFF1976D2)],
-          ),
-          const SizedBox(height: 16),
-          _buildTechniqueCard(
-            icon: Icons.arrow_upward,
-            iconColor: const Color(0xFF4CAF50),
-            title: 'Fase Concentrica',
-            description:
-                'Spingi esplosivamente il bilanciere verso l\'alto seguendo una traiettoria leggermente diagonale. Espira durante la spinta.',
-            iconGradient: [const Color(0xFF4CAF50), const Color(0xFF388E3C)],
-          ),
-          const SizedBox(height: 16),
-          _buildTechniqueCard(
-            icon: Icons.air,
-            iconColor: const Color(0xFF9C27B0),
-            title: 'Respirazione',
-            description:
-                'Inspira profondamente durante la discesa, trattieni brevemente in basso, espira potentemente durante la salita.',
-            iconGradient: [const Color(0xFF9C27B0), const Color(0xFF7B1FA2)],
-          ),
+          ...techniqueSteps.map((step) => Column(
+                children: [
+                  _buildTechniqueCard(
+                    icon: IconData(step.iconCodePoint,
+                        fontFamily: 'MaterialIcons'),
+                    iconColor: Color(step.iconGradient.first),
+                    title: step.title,
+                    description: step.description,
+                    iconGradient:
+                        step.iconGradient.map((c) => Color(c)).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              )),
           const SizedBox(height: 20),
           _buildSafetySection(),
           const SizedBox(height: 20),

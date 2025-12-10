@@ -1,7 +1,14 @@
+import 'package:coachly/features/exercise/exercise_info_page/data/models/muscle_model/muscle_model.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseMusclesTab extends StatelessWidget {
-  const ExerciseMusclesTab({super.key});
+  final List<MuscleModel> primaryMuscles;
+  final List<MuscleModel> secondaryMuscles;
+
+  const ExerciseMusclesTab(
+      {super.key,
+      required this.primaryMuscles,
+      required this.secondaryMuscles});
 
   @override
   Widget build(BuildContext context) {
@@ -14,34 +21,12 @@ class ExerciseMusclesTab extends StatelessWidget {
           const SizedBox(height: 24),
           _buildMuscleGroupSection(
             title: 'MUSCOLI PRIMARI',
-            muscles: [
-              MuscleData(
-                name: 'Pettorale',
-                activation: 5,
-                color: const Color(0xFFFF5252),
-              ),
-              MuscleData(
-                name: 'Tricipite Brachiale',
-                activation: 4,
-                color: const Color(0xFFFF5252),
-              ),
-            ],
+            muscles: primaryMuscles,
           ),
           const SizedBox(height: 20),
           _buildMuscleGroupSection(
             title: 'MUSCOLI SECONDARI',
-            muscles: [
-              MuscleData(
-                name: 'Deltoide Anteriore',
-                activation: 3,
-                color: const Color(0xFFFF9800),
-              ),
-              MuscleData(
-                name: 'Dentato Anteriore',
-                activation: 2,
-                color: const Color(0xFFFF9800),
-              ),
-            ],
+            muscles: secondaryMuscles,
           ),
           const SizedBox(height: 20),
           _buildAiInsightsSection(),
@@ -98,7 +83,7 @@ class ExerciseMusclesTab extends StatelessWidget {
 
   Widget _buildMuscleGroupSection({
     required String title,
-    required List<MuscleData> muscles,
+    required List<MuscleModel> muscles,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,13 +112,13 @@ class ExerciseMusclesTab extends StatelessWidget {
     );
   }
 
-  Widget _buildMuscleCard(MuscleData muscle) {
+  Widget _buildMuscleCard(MuscleModel muscle) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: muscle.color.withOpacity(0.2), width: 1),
+        border: Border.all(color: Color(muscle.color).withOpacity(0.2), width: 1),
       ),
       child: Row(
         children: [
@@ -150,7 +135,7 @@ class ExerciseMusclesTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                _buildActivationBar(muscle.activation, muscle.color),
+                _buildActivationBar(muscle.activation, Color(muscle.color)),
               ],
             ),
           ),
@@ -233,16 +218,4 @@ class ExerciseMusclesTab extends StatelessWidget {
       ),
     );
   }
-}
-
-class MuscleData {
-  final String name;
-  final int activation;
-  final Color color;
-
-  const MuscleData({
-    required this.name,
-    required this.activation,
-    required this.color,
-  });
 }

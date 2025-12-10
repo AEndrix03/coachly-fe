@@ -1,7 +1,10 @@
+import 'package:coachly/features/exercise/exercise_info_page/data/models/exercise_variant_model/exercise_variant_model.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseVariantsTab extends StatelessWidget {
-  const ExerciseVariantsTab({super.key});
+  final List<ExerciseVariantModel> variants;
+
+  const ExerciseVariantsTab({super.key, required this.variants});
 
   @override
   Widget build(BuildContext context) {
@@ -10,37 +13,19 @@ class ExerciseVariantsTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildVariantCard(
-            icon: Icons.fitness_center,
-            title: 'Panca Inclinata 30°',
-            subtitle: 'Intermedio',
-            emphasis: 'Petto Alto',
-            onTap: () {},
-          ),
-          const SizedBox(height: 12),
-          _buildVariantCard(
-            icon: Icons.fitness_center,
-            title: 'Panca Declinata',
-            subtitle: 'Intermedio',
-            emphasis: 'Petto Basso',
-            onTap: () {},
-          ),
-          const SizedBox(height: 12),
-          _buildVariantCard(
-            icon: Icons.fitness_center,
-            title: 'Panca con Manubri',
-            subtitle: 'Intermedio',
-            emphasis: 'ROM Aumentato',
-            onTap: () {},
-          ),
-          const SizedBox(height: 12),
-          _buildVariantCard(
-            icon: Icons.fitness_center,
-            title: 'Panca Stretta',
-            subtitle: 'Intermedio',
-            emphasis: 'Tricipiti',
-            onTap: () {},
-          ),
+          ...variants.map((variant) => Column(
+                children: [
+                  _buildVariantCard(
+                    icon: IconData(variant.iconCodePoint,
+                        fontFamily: 'MaterialIcons'),
+                    title: variant.title,
+                    subtitle: variant.subtitle,
+                    emphasis: variant.emphasis,
+                    onTap: () {},
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              )),
         ],
       ),
     );
@@ -75,9 +60,9 @@ class ExerciseVariantsTab extends StatelessWidget {
                 color: const Color(0xFF2196F3).withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
-                Icons.fitness_center,
-                color: Color(0xFF2196F3),
+              child: Icon(
+                icon,
+                color: const Color(0xFF2196F3),
                 size: 26,
               ),
             ),
