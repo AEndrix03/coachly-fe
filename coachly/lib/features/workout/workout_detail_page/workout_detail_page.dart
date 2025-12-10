@@ -1,64 +1,175 @@
+import 'package:coachly/features/workout/workout_detail_page/providers/workout_detail_provider/workout_detail_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_exercise_list_section.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_header.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_stats_cards.dart';
 import 'package:coachly/shared/widgets/cards/border_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shimmer/shimmer.dart';
 
-class WorkoutDetailPage extends StatelessWidget {
+class WorkoutDetailPage extends ConsumerStatefulWidget {
   final String id;
 
   const WorkoutDetailPage({super.key, required this.id});
 
   @override
+  ConsumerState<WorkoutDetailPage> createState() => _WorkoutDetailPageState();
+}
+
+class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(workoutDetailPageProvider.notifier).loadWorkoutDetail(widget.id);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // TODO: Replace with actual data from BLoC/Provider
-    final exercises = _getMockExercises();
+    final state = ref.watch(workoutDetailPageProvider);
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: Container(
         color: const Color(0xFF0F0F1E),
-        child: SingleChildScrollView(
+        child: _buildBody(context, state, scheme),
+      ),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    WorkoutDetailPageState state,
+    ColorScheme scheme,
+  ) {
+    // Error State
+    if (state.hasError) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              WorkoutDetailHeader(
-                title: 'PETTO & TRICIPITI',
-                coachName: 'Coach Luca Bianchi',
-                muscleTags: const ['Petto', 'Tricipiti', 'Deltoidi Anteriori'],
-                progress: 0.8,
-                sessionsCount: 12,
-                lastSessionDays: 2,
-                onBack: () => Navigator.of(context).pop(),
-                onShare: () {},
-                onEdit: () {},
+              ShadAlert(
+                title: const Text('Errore'),
+                description: Text(state.error ?? 'Errore sconosciuto'),
               ),
-              const SizedBox(height: 20),
-              const WorkoutDetailStatsCards(
-                exercisesCount: 6,
-                duration: '45\'',
-                focus: 'Ipertrofia',
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () => ref
+                    .read(workoutDetailPageProvider.notifier)
+                    .refresh(widget.id),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Riprova'),
               ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: BorderCard(
-                  title: 'Descrizione',
-                  text:
-                      'Programma intensivo focalizzato sullo sviluppo della massa muscolare di petto e tricipiti. Combina esercizi composti e di isolamento per uno stimolo completo.',
-                  borderColor: Color(0xFF2196F3),
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildStartButton(context),
-              const SizedBox(height: 20),
-              WorkoutDetailExerciseListSection(
-                exercises: exercises,
-                workoutId: id,
-              ),
-              const SizedBox(height: 32),
             ],
           ),
+        ),
+      );
+    }
+
+    // Loading State
+    if (state.isLoading && !state.hasData) {
+      return Center(
+        child: Shimmer.fromColors(
+          baseColor: const Color(0xFF1A1A2E),
+          highlightColor: const Color(0xFF2196F3).withOpacity(0.2),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A2E),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Caricamento...',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Empty State
+    if (state.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.fitness_center_outlined,
+              size: 64,
+              color: Colors.white.withOpacity(0.3),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Nessun workout trovato',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Content State
+    final workout = state.workout!;
+    final exercises = state.exercises;
+
+    return RefreshIndicator(
+      onRefresh: () =>
+          ref.read(workoutDetailPageProvider.notifier).refresh(widget.id),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            WorkoutDetailHeader(
+              title: workout.title,
+              coachName: workout.coachName,
+              muscleTags: workout.muscleTags,
+              progress: workout.progress,
+              sessionsCount: workout.sessionsCount,
+              lastSessionDays: workout.lastSessionDays,
+              onBack: () => Navigator.of(context).pop(),
+              onShare: () => _showShareSnackbar(context),
+              onEdit: () => _showEditSnackbar(context),
+            ),
+            const SizedBox(height: 20),
+            WorkoutDetailStatsCards(
+              exercisesCount: exercises.length,
+              duration: workout.durationMinutes.toString(),
+              focus: workout.type,
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: BorderCard(
+                title: 'Descrizione',
+                text: workout.description,
+                borderColor: const Color(0xFF2196F3),
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildStartButton(context),
+            const SizedBox(height: 20),
+            WorkoutDetailExerciseListSection(
+              exercises: exercises,
+              workoutId: widget.id,
+            ),
+            const SizedBox(height: 32),
+          ],
         ),
       ),
     );
@@ -85,7 +196,7 @@ class WorkoutDetailPage extends StatelessWidget {
           ],
         ),
         child: ElevatedButton.icon(
-          onPressed: () => context.go('/workouts/workout/$id/active'),
+          onPressed: () => context.go('/workouts/workout/${widget.id}/active'),
           icon: const Icon(Icons.play_arrow, size: 22),
           label: const Text(
             'Inizia Allenamento',
@@ -110,74 +221,21 @@ class WorkoutDetailPage extends StatelessWidget {
     );
   }
 
-  List<ExerciseData> _getMockExercises() {
-    return const [
-      ExerciseData(
-        number: 1,
-        name: 'Panca Piana con Bilanciere',
-        muscle: 'Petto',
-        difficulty: 'Intermedio',
-        sets: '4 × 8-10',
-        rest: '120s',
-        weight: '85 kg',
-        progress: '+5%',
-        accentColor: Color(0xFF2196F3),
+  void _showShareSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Condividi workout'),
+        duration: Duration(seconds: 1),
       ),
-      ExerciseData(
-        number: 2,
-        name: 'Panca Inclinata Manubri',
-        muscle: 'Petto Alto',
-        difficulty: 'Intermedio',
-        sets: '4 × 10-12',
-        rest: '90s',
-        weight: '32 kg',
-        progress: '+3%',
-        accentColor: Color(0xFF2196F3),
+    );
+  }
+
+  void _showEditSnackbar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Modifica workout'),
+        duration: Duration(seconds: 1),
       ),
-      ExerciseData(
-        number: 3,
-        name: 'Croci ai Cavi',
-        muscle: 'Petto',
-        difficulty: 'Base',
-        sets: '3 × 12-15',
-        rest: '60s',
-        weight: '20 kg',
-        progress: '',
-        accentColor: Color(0xFF2196F3),
-      ),
-      ExerciseData(
-        number: 4,
-        name: 'Panca Stretta',
-        muscle: 'Tricipiti',
-        difficulty: 'Intermedio',
-        sets: '4 × 8-10',
-        rest: '90s',
-        weight: '70 kg',
-        progress: '+7%',
-        accentColor: Color(0xFF9C27B0),
-      ),
-      ExerciseData(
-        number: 5,
-        name: 'French Press',
-        muscle: 'Tricipiti',
-        difficulty: 'Base',
-        sets: '3 × 10-12',
-        rest: '75s',
-        weight: '30 kg',
-        progress: '',
-        accentColor: Color(0xFF9C27B0),
-      ),
-      ExerciseData(
-        number: 6,
-        name: 'Push Down Cavi',
-        muscle: 'Tricipiti',
-        difficulty: 'Base',
-        sets: '3 × 12-15',
-        rest: '60s',
-        weight: '35 kg',
-        progress: '+2%',
-        accentColor: Color(0xFF9C27B0),
-      ),
-    ];
+    );
   }
 }

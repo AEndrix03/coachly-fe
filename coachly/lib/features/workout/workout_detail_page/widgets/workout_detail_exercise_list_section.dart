@@ -1,8 +1,9 @@
+import 'package:coachly/features/workout/workout_detail_page/data/models/exercise_info_model/exercise_info_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class WorkoutDetailExerciseListSection extends StatelessWidget {
-  final List<ExerciseData> exercises;
+  final List<ExerciseInfoModel> exercises;
   final String? workoutId;
 
   const WorkoutDetailExerciseListSection({
@@ -72,7 +73,7 @@ class WorkoutDetailExerciseListSection extends StatelessWidget {
 }
 
 class _ExerciseCard extends StatelessWidget {
-  final ExerciseData exercise;
+  final ExerciseInfoModel exercise;
   final String workoutId;
 
   const _ExerciseCard({required this.exercise, required this.workoutId});
@@ -81,7 +82,6 @@ class _ExerciseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Navigate to workout_exercise_page detail page
         context.push(
           '/workouts/workout/$workoutId/workout_exercise_page/${exercise.number}',
         );
@@ -368,28 +368,4 @@ class _ExerciseCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class ExerciseData {
-  final int number;
-  final String name;
-  final String muscle;
-  final String difficulty;
-  final String sets;
-  final String rest;
-  final String weight;
-  final String progress;
-  final Color accentColor;
-
-  const ExerciseData({
-    required this.number,
-    required this.name,
-    required this.muscle,
-    required this.difficulty,
-    required this.sets,
-    required this.rest,
-    required this.weight,
-    required this.progress,
-    required this.accentColor,
-  });
 }

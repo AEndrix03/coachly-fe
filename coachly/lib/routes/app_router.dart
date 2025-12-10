@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/common/navigation/widgets/navigation_bar.dart';
+import '../features/exercise/exercise_info_page/exercise_info_page.dart';
 import '../features/home/home.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
 import '../features/workout/workout_detail_page/workout_detail_page.dart';
-import '../features/workout/workout_exercise_page/workout_exercise_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =

@@ -42,6 +42,12 @@ class WorkoutDetailPageRepositoryImpl implements IWorkoutDetailPageRepository {
         progress: 0.8,
         sessionsCount: 12,
         lastSessionDays: 2,
+        durationMinutes: 50,
+        type: 'Ipertrofia',
+        description:
+            'Programma focalizzato sull\'aumento della massa muscolare '
+            'per il petto e i tricipiti, ideale per chi cerca di migliorare la '
+            'definizione e la forza nella parte superiore del corpo.',
       ),
     );
   }

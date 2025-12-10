@@ -16,6 +16,9 @@ WorkoutDetailModel _$WorkoutDetailModelFromJson(Map<String, dynamic> json) =>
       progress: (json['progress'] as num).toDouble(),
       sessionsCount: (json['sessionsCount'] as num).toInt(),
       lastSessionDays: (json['lastSessionDays'] as num).toInt(),
+      durationMinutes: (json['durationMinutes'] as num).toInt(),
+      type: json['type'] as String,
+      description: json['description'] as String,
     );
 
 Map<String, dynamic> _$WorkoutDetailModelToJson(WorkoutDetailModel instance) =>
@@ -26,4 +29,7 @@ Map<String, dynamic> _$WorkoutDetailModelToJson(WorkoutDetailModel instance) =>
       'progress': instance.progress,
       'sessionsCount': instance.sessionsCount,
       'lastSessionDays': instance.lastSessionDays,
+      'durationMinutes': instance.durationMinutes,
+      'type': instance.type,
+      'description': instance.description,
     };

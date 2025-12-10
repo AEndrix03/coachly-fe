@@ -1,4 +1,4 @@
-import 'package:coachly/features/workout/workout_exercise_page/widgets/exercise_info_widget.dart';
+import 'package:coachly/features/exercise/exercise_info_page/widgets/exercise_info_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'set_row.dart';

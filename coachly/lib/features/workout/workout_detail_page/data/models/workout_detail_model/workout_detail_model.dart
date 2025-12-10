@@ -13,6 +13,11 @@ class WorkoutDetailModel with _$WorkoutDetailModel {
   final int sessionsCount;
   final int lastSessionDays;
 
+  final int durationMinutes;
+  final String type;
+
+  final String description;
+
   const WorkoutDetailModel({
     required this.title,
     required this.coachName,
@@ -20,6 +25,9 @@ class WorkoutDetailModel with _$WorkoutDetailModel {
     required this.progress,
     required this.sessionsCount,
     required this.lastSessionDays,
+    required this.durationMinutes,
+    required this.type,
+    required this.description,
   });
 
   factory WorkoutDetailModel.fromJson(Map<String, dynamic> json) =>

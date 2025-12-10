@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'workout_detail_model.dart';
+part of 'exercise_technique_model.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,40 +13,40 @@ part of 'workout_detail_model.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$WorkoutDetailModel {
+mixin _$ExerciseTechniqueModel {
 
- String get title; String get coachName; List<String> get muscleTags; double get progress; int get sessionsCount; int get lastSessionDays; int get durationMinutes; String get type; String get description;
-/// Create a copy of WorkoutDetailModel
+ String get title; String get description; int get iconCodePoint; List<int> get iconGradient;
+/// Create a copy of ExerciseTechniqueModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$WorkoutDetailModelCopyWith<WorkoutDetailModel> get copyWith => _$WorkoutDetailModelCopyWithImpl<WorkoutDetailModel>(this as WorkoutDetailModel, _$identity);
+$ExerciseTechniqueModelCopyWith<ExerciseTechniqueModel> get copyWith => _$ExerciseTechniqueModelCopyWithImpl<ExerciseTechniqueModel>(this as ExerciseTechniqueModel, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutDetailModel&&(identical(other.title, title) || other.title == title)&&(identical(other.coachName, coachName) || other.coachName == coachName)&&const DeepCollectionEquality().equals(other.muscleTags, muscleTags)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.sessionsCount, sessionsCount) || other.sessionsCount == sessionsCount)&&(identical(other.lastSessionDays, lastSessionDays) || other.lastSessionDays == lastSessionDays)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.type, type) || other.type == type)&&(identical(other.description, description) || other.description == description));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExerciseTechniqueModel&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.iconCodePoint, iconCodePoint) || other.iconCodePoint == iconCodePoint)&&const DeepCollectionEquality().equals(other.iconGradient, iconGradient));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,title,coachName,const DeepCollectionEquality().hash(muscleTags),progress,sessionsCount,lastSessionDays,durationMinutes,type,description);
+int get hashCode => Object.hash(runtimeType,title,description,iconCodePoint,const DeepCollectionEquality().hash(iconGradient));
 
 @override
 String toString() {
-  return 'WorkoutDetailModel(title: $title, coachName: $coachName, muscleTags: $muscleTags, progress: $progress, sessionsCount: $sessionsCount, lastSessionDays: $lastSessionDays, durationMinutes: $durationMinutes, type: $type, description: $description)';
+  return 'ExerciseTechniqueModel(title: $title, description: $description, iconCodePoint: $iconCodePoint, iconGradient: $iconGradient)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $WorkoutDetailModelCopyWith<$Res>  {
-  factory $WorkoutDetailModelCopyWith(WorkoutDetailModel value, $Res Function(WorkoutDetailModel) _then) = _$WorkoutDetailModelCopyWithImpl;
+abstract mixin class $ExerciseTechniqueModelCopyWith<$Res>  {
+  factory $ExerciseTechniqueModelCopyWith(ExerciseTechniqueModel value, $Res Function(ExerciseTechniqueModel) _then) = _$ExerciseTechniqueModelCopyWithImpl;
 @useResult
 $Res call({
- String title, String coachName, List<String> muscleTags, double progress, int sessionsCount, int lastSessionDays, int durationMinutes, String type, String description
+ String title, String description, int iconCodePoint, List<int> iconGradient
 });
 
 
@@ -54,35 +54,30 @@ $Res call({
 
 }
 /// @nodoc
-class _$WorkoutDetailModelCopyWithImpl<$Res>
-    implements $WorkoutDetailModelCopyWith<$Res> {
-  _$WorkoutDetailModelCopyWithImpl(this._self, this._then);
+class _$ExerciseTechniqueModelCopyWithImpl<$Res>
+    implements $ExerciseTechniqueModelCopyWith<$Res> {
+  _$ExerciseTechniqueModelCopyWithImpl(this._self, this._then);
 
-  final WorkoutDetailModel _self;
-  final $Res Function(WorkoutDetailModel) _then;
+  final ExerciseTechniqueModel _self;
+  final $Res Function(ExerciseTechniqueModel) _then;
 
-/// Create a copy of WorkoutDetailModel
+/// Create a copy of ExerciseTechniqueModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? coachName = null,Object? muscleTags = null,Object? progress = null,Object? sessionsCount = null,Object? lastSessionDays = null,Object? durationMinutes = null,Object? type = null,Object? description = null,}) {
-  return _then(WorkoutDetailModel(
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? description = null,Object? iconCodePoint = null,Object? iconGradient = null,}) {
+  return _then(ExerciseTechniqueModel(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,coachName: null == coachName ? _self.coachName : coachName // ignore: cast_nullable_to_non_nullable
-as String,muscleTags: null == muscleTags ? _self.muscleTags : muscleTags // ignore: cast_nullable_to_non_nullable
-as List<String>,progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
-as double,sessionsCount: null == sessionsCount ? _self.sessionsCount : sessionsCount // ignore: cast_nullable_to_non_nullable
-as int,lastSessionDays: null == lastSessionDays ? _self.lastSessionDays : lastSessionDays // ignore: cast_nullable_to_non_nullable
-as int,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
-as int,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,
+as String,iconCodePoint: null == iconCodePoint ? _self.iconCodePoint : iconCodePoint // ignore: cast_nullable_to_non_nullable
+as int,iconGradient: null == iconGradient ? _self.iconGradient : iconGradient // ignore: cast_nullable_to_non_nullable
+as List<int>,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [WorkoutDetailModel].
-extension WorkoutDetailModelPatterns on WorkoutDetailModel {
+/// Adds pattern-matching-related methods to [ExerciseTechniqueModel].
+extension ExerciseTechniqueModelPatterns on ExerciseTechniqueModel {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
