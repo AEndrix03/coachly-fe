@@ -72,39 +72,6 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage> {
                           size: 20,
                           marginRight: 0,
                         ),
-                        // "Allenamenti" chip
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 7,
-                          ),
-                          decoration: BoxDecoration(
-                            color: scheme.onPrimary.withOpacity(0.25),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: scheme.onPrimary.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.fitness_center,
-                                color: Colors.white,
-                                size: 15,
-                              ),
-                              const SizedBox(width: 7),
-                              Text(
-                                'Allenamenti',
-                                style: TextStyle(
-                                  color: scheme.onPrimary.withOpacity(0.95),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                         GlassIconButton(
                           icon: Icons.save,
                           onPressed: () {
@@ -218,7 +185,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage> {
             }
           },
           onEdit: () {
-            context.go('/workouts/workout/${workout.id}/edit');
+            context.push('/workouts/workout/${workout.id}/edit');
           },
         );
       },

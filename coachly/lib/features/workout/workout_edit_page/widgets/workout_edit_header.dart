@@ -55,94 +55,32 @@ class WorkoutEditHeader extends StatelessWidget {
             marginRight: 8,
           ),
           const Spacer(),
-          if (isDirty)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF9800).withOpacity(0.3),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFFFF9800).withOpacity(0.5),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.edit,
-                    size: 14,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Modificato',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          // Removed "Modificato" chip
           const SizedBox(width: 8),
-          GestureDetector(
-            onTap: isSaving ? null : onSave,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                gradient: isSaving
-                    ? LinearGradient(
-                        colors: [
-                          Colors.grey.withOpacity(0.3),
-                          Colors.grey.withOpacity(0.2),
-                        ],
-                      )
-                    : const LinearGradient(
-                        colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
-                      ),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: isSaving
-                      ? Colors.white.withOpacity(0.2)
-                      : const Color(0xFF4CAF50),
-                  width: 2,
-                ),
-                boxShadow: [
-                  if (!isSaving)
-                    BoxShadow(
-                      color: const Color(0xFF4CAF50).withOpacity(0.4),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                ],
+          Stack(
+            children: [
+              GlassIconButton(
+                icon: Icons.save,
+                onPressed: isSaving ? null : onSave,
+                iconColor: Colors.white,
+                size: 20,
+                marginRight: 0,
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (isSaving)
-                    const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  else
-                    const Icon(Icons.check, color: Colors.white, size: 18),
-                  const SizedBox(width: 8),
-                  Text(
-                    isSaving ? 'Salvataggio...' : 'Salva',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+              if (isDirty)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.5),
                     ),
                   ),
-                ],
-              ),
-            ),
+                ),
+            ],
           ),
         ],
       ),
@@ -177,28 +115,7 @@ class WorkoutEditHeader extends StatelessWidget {
             onChanged: onTitleChanged,
           ),
           const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.25),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.edit_note, color: Colors.white, size: 16),
-                SizedBox(width: 8),
-                Text(
-                  'Modalità Modifica',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Removed "Modalità Modifica" chip
         ],
       ),
     );

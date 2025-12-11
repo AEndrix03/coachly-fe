@@ -144,7 +144,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
               lastSessionDays: workout.lastSessionDays,
               onBack: () => Navigator.of(context).pop(),
               onShare: () => _showShareSnackbar(context),
-              onEdit: () => _showEditSnackbar(context),
+              onEdit: () => context.push('/workouts/workout/${widget.id}/edit'),
             ),
             const SizedBox(height: 20),
             WorkoutDetailStatsCards(

@@ -69,10 +69,6 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Widget _buildBody(WorkoutEditState state) {
-    if (state.isEmpty) {
-      return _buildEmptyState();
-    }
-
     return SingleChildScrollView(
       controller: _scrollController,
       child: Column(
@@ -82,7 +78,10 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           const SizedBox(height: 16),
           _buildDescriptionCard(state),
           const SizedBox(height: 24),
-          _buildExerciseSection(state),
+          // Conditionally show exercise section or a message if empty
+          state.exercises.isEmpty
+              ? _buildEmptyExerciseState()
+              : _buildExerciseSection(state),
           const SizedBox(height: 100), // Space for FAB
         ],
       ),
@@ -236,57 +235,94 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     final isReadonly = onChanged == null;
 
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
-          colors: [
-            const Color(0xFF1A1A2E).withOpacity(0.8),
-            const Color(0xFF16213E).withOpacity(0.9),
-          ],
+          colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: color.withOpacity(0.3), width: 1.5),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 12),
-          if (isReadonly)
-            Text(
-              value,
-              style: TextStyle(
-                color: color,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
-              textAlign: TextAlign.center,
-            )
-          else
-            TextField(
-              controller: TextEditingController(text: value)
-                ..selection = TextSelection.collapsed(offset: value.length),
-              style: TextStyle(
-                color: color,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
-              textAlign: TextAlign.center,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-              ),
-              onChanged: onChanged,
-            ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.15),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(19),
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xFF1A1A2E).withOpacity(0.95),
+              const Color(0xFF16213E).withOpacity(0.9),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [color.withOpacity(0.2), color.withOpacity(0.05)],
+                ),
+                border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+              ),
+              child: Icon(icon, color: color, size: 26),
+            ),
+            const SizedBox(height: 12),
+            if (isReadonly)
+              Text(
+                value,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                  height: 1.2,
+                ),
+              )
+            else
+              TextField(
+                controller: TextEditingController(text: value)
+                  ..selection = TextSelection.collapsed(offset: value.length),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                  height: 1.2,
+                ),
+                textAlign: TextAlign.center,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                  isDense: true, // Reduce vertical space
+                ),
+                onChanged: onChanged,
+              ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.6),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -442,6 +478,50 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     );
   }
 
+  Widget _buildEmptyExerciseState() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF2196F3).withOpacity(0.2),
+                  const Color(0xFF8E29EC).withOpacity(0.2),
+                ],
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.fitness_center,
+              size: 64,
+              color: Colors.white.withOpacity(0.5),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Nessun esercizio',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Aggiungi il primo esercizio per iniziare',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleAddExercise() {
     showModalBottomSheet(
       context: context,
@@ -536,12 +616,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   void _handleBack() {
-    final state = ref.read(workoutEditPageProvider(widget.workoutId));
-    if (state.isDirty) {
-      _showExitDialog();
-    } else {
-      context.pop();
-    }
+    // Rely on PopScope for dirty state dialog
+    context.pop();
   }
 
   void _showExitDialog() {

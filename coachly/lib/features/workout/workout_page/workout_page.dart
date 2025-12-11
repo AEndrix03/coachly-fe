@@ -203,7 +203,7 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage> {
   Widget _buildFAB(BuildContext context, ColorScheme scheme) {
     return AddFabButton(
       onPressed: () {
-        // TODO: Implementa la navigazione verso la pagina di creazione scheda workout
+        context.push('/workouts/workout/new/edit');
       },
     );
   }
