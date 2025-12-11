@@ -136,4 +136,28 @@ class WorkoutListNotifier extends _$WorkoutListNotifier {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
+
+  Future<void> updateWorkout(WorkoutModel updatedWorkout) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final repository = ref.read(workoutPageRepositoryProvider);
+      final response = await repository.updateWorkout(updatedWorkout);
+
+      if (response.success) {
+        state = state.copyWith(
+          workouts: state.workouts.map((w) {
+            return w.id == updatedWorkout.id ? updatedWorkout : w;
+          }).toList(),
+          recentWorkouts: state.recentWorkouts.map((w) {
+            return w.id == updatedWorkout.id ? updatedWorkout : w;
+          }).toList(),
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(isLoading: false, errorMessage: response.message);
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
 }

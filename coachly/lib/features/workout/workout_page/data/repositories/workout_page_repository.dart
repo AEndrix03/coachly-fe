@@ -14,4 +14,6 @@ abstract class IWorkoutPageRepository {
   Future<ApiResponse<String>> disableWorkout(String workoutId);
 
   Future<ApiResponse<String>> deleteWorkout(String workoutId);
+
+  Future<ApiResponse<String>> updateWorkout(WorkoutModel updatedWorkout);
 }

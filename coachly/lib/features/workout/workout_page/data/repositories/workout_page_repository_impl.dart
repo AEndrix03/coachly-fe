@@ -49,6 +49,20 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
     return await _service.deleteWorkoutApi(workoutId);
   }
 
+  @override
+  Future<ApiResponse<String>> updateWorkout(WorkoutModel updatedWorkout) async {
+    if (useMockData) {
+      // Simulate updating the mock data
+      final mockWorkouts = _getMockWorkouts().data ?? [];
+      final index = mockWorkouts.indexWhere((w) => w.id == updatedWorkout.id);
+      if (index != -1) {
+        mockWorkouts[index] = updatedWorkout; // This won't actually update the list returned by _getMockWorkouts
+      }
+      return ApiResponse.success(data: updatedWorkout.id); // Simulate success
+    }
+    return await _service.updateWorkoutApi(updatedWorkout);
+  }
+
   // Mock Data Helpers
   ApiResponse<List<WorkoutModel>> _getMockWorkouts() {
     return ApiResponse.success(

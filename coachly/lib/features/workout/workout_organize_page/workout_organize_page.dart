@@ -218,8 +218,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage> {
             }
           },
           onEdit: () {
-            print('Edit workout: ${workout.title}');
-            // TODO: Implement edit logic
+            context.go('/workouts/workout/${workout.id}/edit');
           },
         );
       },

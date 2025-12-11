@@ -65,4 +65,13 @@ class WorkoutPageService {
       fromJson: (data) => workoutId, // Assuming API returns nothing or success, we return the ID
     );
   }
+
+  /// Update a workout
+  Future<ApiResponse<String>> updateWorkoutApi(WorkoutModel updatedWorkout) async {
+    return await _apiClient.put<String>(
+      '/workouts/${updatedWorkout.id}',
+      body: updatedWorkout.toJson(),
+      fromJson: (data) => updatedWorkout.id, // Assuming API returns nothing or success, we return the ID
+    );
+  }
 }
