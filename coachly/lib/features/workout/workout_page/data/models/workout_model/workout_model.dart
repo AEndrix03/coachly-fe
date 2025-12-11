@@ -14,6 +14,7 @@ class WorkoutModel with _$WorkoutModel {
   final int durationMinutes;
   final String goal;
   final String lastUsed;
+  final bool active;
 
   const WorkoutModel({
     required this.id,
@@ -24,6 +25,7 @@ class WorkoutModel with _$WorkoutModel {
     required this.durationMinutes,
     required this.goal,
     required this.lastUsed,
+    this.active = true,
   });
 
   factory WorkoutModel.fromJson(Map<String, dynamic> json) =>

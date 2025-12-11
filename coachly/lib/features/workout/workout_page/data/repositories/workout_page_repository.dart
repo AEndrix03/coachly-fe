@@ -8,4 +8,10 @@ abstract class IWorkoutPageRepository {
   Future<ApiResponse<List<WorkoutModel>>> getRecentWorkouts();
 
   Future<ApiResponse<WorkoutStatsModel>> getWorkoutStats();
+
+  Future<ApiResponse<String>> enableWorkout(String workoutId);
+
+  Future<ApiResponse<String>> disableWorkout(String workoutId);
+
+  Future<ApiResponse<String>> deleteWorkout(String workoutId);
 }

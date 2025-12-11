@@ -1,8 +1,10 @@
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/exercise/exercise_info_page/widgets/exercise_header.dart';
 import 'package:coachly/features/exercise/exercise_info_page/widgets/exercise_stats_cards.dart';
-import 'package:coachly/features/exercise/exercise_info_page/widgets/exercise_tabs_section.dart';
 import 'package:coachly/features/exercise/exercise_info_page/widgets/exercise_video_section.dart';
+import 'package:coachly/features/exercise/exercise_info_page/widgets/tabs/exercise_muscles_tab.dart';
+import 'package:coachly/features/exercise/exercise_info_page/widgets/tabs/exercise_technique_tab.dart';
+import 'package:coachly/features/exercise/exercise_info_page/widgets/tabs/exercise_variants_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
@@ -16,10 +18,14 @@ class ExercisePage extends ConsumerStatefulWidget {
   ConsumerState<ExercisePage> createState() => _ExercisePageState();
 }
 
-class _ExercisePageState extends ConsumerState<ExercisePage> {
+class _ExercisePageState extends ConsumerState<ExercisePage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     Future.microtask(() {
       ref.read(exerciseInfoProvider.notifier).loadExerciseDetail(widget.id);
     });
@@ -27,7 +33,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
 
   @override
   void dispose() {
-    // Clear selected exercise when leaving page
+    _tabController.dispose();
     ref.read(exerciseInfoProvider.notifier).clearSelectedExercise();
     super.dispose();
   }
@@ -72,7 +78,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
               Text(
                 state.errorMessage ?? 'Unknown error',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: scheme.onSurface.withOpacity(0.7)),
+                style: TextStyle(color: scheme.onSurface.withAlpha((255 * 0.7).toInt())),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
@@ -93,7 +99,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
       return Center(
         child: Shimmer.fromColors(
           baseColor: const Color(0xFF1A1A2E),
-          highlightColor: const Color(0xFF6C5CE7).withOpacity(0.2),
+          highlightColor: const Color(0xFF6C5CE7).withAlpha((255 * 0.2).toInt()),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -152,17 +158,102 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
             ],
           ),
         ),
+        SliverPersistentHeader(
+          delegate: _SliverAppBarDelegate(
+            TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [scheme.primary, scheme.secondary],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: scheme.primary.withAlpha((255 * 0.3).toInt()),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              labelColor: scheme.onPrimary,
+              unselectedLabelColor: scheme.onSurface.withAlpha((255 * 0.5).toInt()),
+              labelStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.3,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              tabs: const [
+                Tab(text: 'Tecnica'),
+                Tab(text: 'Muscoli'),
+                Tab(text: 'Varianti'),
+              ],
+            ),
+          ),
+          pinned: true,
+        ),
         SliverFillRemaining(
-          hasScrollBody: false,
-          child: ExerciseTabsSection(
-            description: exercise.description,
-            primaryMuscles: exercise.primaryMuscles,
-            secondaryMuscles: exercise.secondaryMuscles,
-            techniqueSteps: exercise.techniqueSteps,
-            variants: exercise.variants,
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              ExerciseTechniqueTab(
+                description: exercise.description,
+                techniqueSteps: exercise.techniqueSteps,
+              ),
+              ExerciseMusclesTab(
+                primaryMuscles: exercise.primaryMuscles,
+                secondaryMuscles: exercise.secondaryMuscles,
+              ),
+              ExerciseVariantsTab(
+                variants: exercise.variants,
+              ),
+            ],
           ),
         ),
       ],
     );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
+
+  _SliverAppBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height + 16.0;
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height + 16.0;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      color: const Color(0xFF0F0F1E),
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface.withAlpha((255 * 0.5).toInt()),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: theme.colorScheme.onSurface.withAlpha((255 * 0.1).toInt()),
+            width: 1,
+          ),
+        ),
+        child: _tabBar,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }

@@ -41,4 +41,28 @@ class WorkoutPageService {
       },
     );
   }
+
+  /// Enable a workout
+  Future<ApiResponse<String>> enableWorkoutApi(String workoutId) async {
+    return await _apiClient.put<String>(
+      '/workouts/$workoutId/enable',
+      fromJson: (data) => workoutId, // Assuming API returns nothing or success, we return the ID
+    );
+  }
+
+  /// Disable a workout
+  Future<ApiResponse<String>> disableWorkoutApi(String workoutId) async {
+    return await _apiClient.put<String>(
+      '/workouts/$workoutId/disable',
+      fromJson: (data) => workoutId, // Assuming API returns nothing or success, we return the ID
+    );
+  }
+
+  /// Delete a workout
+  Future<ApiResponse<String>> deleteWorkoutApi(String workoutId) async {
+    return await _apiClient.delete<String>(
+      '/workouts/$workoutId',
+      fromJson: (data) => workoutId, // Assuming API returns nothing or success, we return the ID
+    );
+  }
 }

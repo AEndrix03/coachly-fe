@@ -7,6 +7,7 @@ import 'package:coachly/shared/widgets/sections/section_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -130,10 +131,12 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: SectionBar(title: 'Tutte le Schede', icon: null),
               ),
-              const GlassIconButton(
-                icon: Icons.sort,
-                onPressed: null,
-                marginRight: 16,
+              GlassIconButton(
+                icon: Icons.edit_note,
+                onPressed: () {
+                  context.go('/workouts/organize');
+                },
+                marginRight: 8,
                 iconColor: Colors.white,
                 size: 20,
               ),

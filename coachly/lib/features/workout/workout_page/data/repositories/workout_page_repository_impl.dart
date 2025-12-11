@@ -31,6 +31,24 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
     return await _service.fetchWorkoutStats();
   }
 
+  @override
+  Future<ApiResponse<String>> enableWorkout(String workoutId) async {
+    if (useMockData) return ApiResponse.success(data: workoutId); // Simulate success
+    return await _service.enableWorkoutApi(workoutId);
+  }
+
+  @override
+  Future<ApiResponse<String>> disableWorkout(String workoutId) async {
+    if (useMockData) return ApiResponse.success(data: workoutId); // Simulate success
+    return await _service.disableWorkoutApi(workoutId);
+  }
+
+  @override
+  Future<ApiResponse<String>> deleteWorkout(String workoutId) async {
+    if (useMockData) return ApiResponse.success(data: workoutId); // Simulate success
+    return await _service.deleteWorkoutApi(workoutId);
+  }
+
   // Mock Data Helpers
   ApiResponse<List<WorkoutModel>> _getMockWorkouts() {
     return ApiResponse.success(
@@ -44,6 +62,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
           goal: 'Forza',
           progress: 75,
           lastUsed: '2 ore fa',
+          active: true,
         ),
         WorkoutModel(
           id: '2',
@@ -54,6 +73,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
           goal: 'Ipertrofia',
           progress: 50,
           lastUsed: 'Ieri',
+          active: true,
         ),
         WorkoutModel(
           id: '3',
@@ -64,6 +84,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
           goal: 'Forza',
           progress: 30,
           lastUsed: '3 giorni fa',
+          active: true,
         ),
         WorkoutModel(
           id: '4',
@@ -74,6 +95,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
           goal: 'Conditioning',
           progress: 90,
           lastUsed: '1 settimana fa',
+          active: true,
         ),
       ],
     );

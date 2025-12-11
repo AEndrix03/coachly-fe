@@ -88,7 +88,7 @@ class WorkoutHeader extends StatelessWidget {
       ),
     );
   }
-
+ 
   Widget _buildNotificationButton(ColorScheme scheme) {
     return Stack(
       children: [

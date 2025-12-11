@@ -1,3 +1,4 @@
+import '../features/workout/workout_organize_page/workout_organize_page.dart';
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +36,13 @@ final appRouter = GoRouter(
               path: '/workouts',
               builder: (context, state) => const WorkoutPage(),
               routes: [
+                GoRoute(
+                  path: 'organize',
+                  pageBuilder: (context, state) => _fadeTransition(
+                    state,
+                    const WorkoutOrganizePage(),
+                  ),
+                ),
                 GoRoute(
                   path: 'workout/:id',
                   pageBuilder: (context, state) => _fadeTransition(

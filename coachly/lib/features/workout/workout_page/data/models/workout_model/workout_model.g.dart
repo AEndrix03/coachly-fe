@@ -15,6 +15,7 @@ WorkoutModel _$WorkoutModelFromJson(Map<String, dynamic> json) => WorkoutModel(
   durationMinutes: (json['durationMinutes'] as num).toInt(),
   goal: json['goal'] as String,
   lastUsed: json['lastUsed'] as String,
+  active: json['active'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$WorkoutModelToJson(WorkoutModel instance) =>
@@ -27,4 +28,5 @@ Map<String, dynamic> _$WorkoutModelToJson(WorkoutModel instance) =>
       'durationMinutes': instance.durationMinutes,
       'goal': instance.goal,
       'lastUsed': instance.lastUsed,
+      'active': instance.active,
     };

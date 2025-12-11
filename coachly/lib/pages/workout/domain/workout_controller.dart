@@ -15,6 +15,7 @@ class WorkoutController extends Notifier<List<WorkoutModel>> {
         durationMinutes: 45,
         goal: 'Ipertrofia',
         lastUsed: '2 giorni fa',
+        active: true,
       ),
       const WorkoutModel(
         id: '2',
@@ -25,6 +26,7 @@ class WorkoutController extends Notifier<List<WorkoutModel>> {
         durationMinutes: 50,
         goal: 'Volume',
         lastUsed: 'Ieri',
+        active: true,
       ),
       const WorkoutModel(
         id: '3',
@@ -35,6 +37,7 @@ class WorkoutController extends Notifier<List<WorkoutModel>> {
         durationMinutes: 55,
         goal: 'Forza',
         lastUsed: '3 giorni fa',
+        active: true,
       ),
       const WorkoutModel(
         id: '4',
@@ -45,6 +48,7 @@ class WorkoutController extends Notifier<List<WorkoutModel>> {
         durationMinutes: 35,
         goal: 'Definizione',
         lastUsed: '1 settimana fa',
+        active: true,
       ),
       const WorkoutModel(
         id: '5',
@@ -55,6 +59,7 @@ class WorkoutController extends Notifier<List<WorkoutModel>> {
         durationMinutes: 60,
         goal: 'Forza',
         lastUsed: 'Oggi',
+        active: true,
       ),
       const WorkoutModel(
         id: '6',
@@ -65,6 +70,7 @@ class WorkoutController extends Notifier<List<WorkoutModel>> {
         durationMinutes: 25,
         goal: 'Resistenza',
         lastUsed: '4 giorni fa',
+        active: true,
       ),
       const WorkoutModel(
         id: '7',
@@ -75,6 +81,7 @@ class WorkoutController extends Notifier<List<WorkoutModel>> {
         durationMinutes: 48,
         goal: 'Ipertrofia',
         lastUsed: '2 settimane fa',
+        active: true,
       ),
       const WorkoutModel(
         id: '8',

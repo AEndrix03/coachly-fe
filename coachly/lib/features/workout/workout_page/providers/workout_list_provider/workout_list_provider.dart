@@ -89,4 +89,51 @@ class WorkoutListNotifier extends _$WorkoutListNotifier {
   }
 
   Future<void> refresh() => loadWorkouts();
+
+  Future<void> deleteWorkout(String workoutId) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final repository = ref.read(workoutPageRepositoryProvider);
+      final response = await repository.deleteWorkout(workoutId);
+      if (response.success) {
+        state = state.copyWith(
+          workouts: state.workouts.where((w) => w.id != workoutId).toList(),
+          recentWorkouts: state.recentWorkouts.where((w) => w.id != workoutId).toList(),
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(isLoading: false, errorMessage: response.message);
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> updateWorkoutActiveStatus(String workoutId, bool isActive) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final repository = ref.read(workoutPageRepositoryProvider);
+      final response = isActive
+          ? await repository.enableWorkout(workoutId)
+          : await repository.disableWorkout(workoutId);
+
+      if (response.success) {
+        state = state.copyWith(
+          workouts: state.workouts.map((w) {
+            return w.id == workoutId ? w.copyWith(active: isActive) : w;
+          }).toList(),
+          recentWorkouts: state.recentWorkouts.map((w) {
+            return w.id == workoutId ? w.copyWith(active: isActive) : w;
+          }).toList(),
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(isLoading: false, errorMessage: response.message);
+        // Revert the local UI state if API call fails (optional, but good UX)
+        // You might want to pass a callback to the UI to handle this.
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
 }

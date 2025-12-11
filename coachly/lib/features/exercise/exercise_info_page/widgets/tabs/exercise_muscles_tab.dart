@@ -12,7 +12,7 @@ class ExerciseMusclesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,7 +41,7 @@ class ExerciseMusclesTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.white.withAlpha((255 * 0.1).toInt()), width: 1),
       ),
       child: Column(
         children: [
@@ -55,7 +55,7 @@ class ExerciseMusclesTab extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFF9800).withOpacity(0.4),
+                  color: const Color(0xFFFF9800).withAlpha((255 * 0.4).toInt()),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -93,7 +93,7 @@ class ExerciseMusclesTab extends StatelessWidget {
           child: Text(
             title,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withAlpha((255 * 0.5).toInt()),
               fontSize: 12,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
@@ -118,7 +118,7 @@ class ExerciseMusclesTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Color(muscle.color).withOpacity(0.2), width: 1),
+        border: Border.all(color: Color(muscle.color).withAlpha((255 * 0.2).toInt()), width: 1),
       ),
       child: Row(
         children: [
@@ -153,7 +153,7 @@ class ExerciseMusclesTab extends StatelessWidget {
           width: 12,
           height: 12,
           decoration: BoxDecoration(
-            color: index < level ? color : color.withOpacity(0.2),
+            color: index < level ? color : color.withAlpha((255 * 0.2).toInt()),
             borderRadius: BorderRadius.circular(3),
           ),
         ),
@@ -173,7 +173,7 @@ class ExerciseMusclesTab extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2196F3).withOpacity(0.3),
+            color: const Color(0xFF2196F3).withAlpha((255 * 0.3).toInt()),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

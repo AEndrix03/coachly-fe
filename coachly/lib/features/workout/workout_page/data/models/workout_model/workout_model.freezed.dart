@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutModel {
 
- String get id; String get title; String get coach; int get progress; int get exercises; int get durationMinutes; String get goal; String get lastUsed;
+ String get id; String get title; String get coach; int get progress; int get exercises; int get durationMinutes; String get goal; String get lastUsed; bool get active;
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $WorkoutModelCopyWith<WorkoutModel> get copyWith => _$WorkoutModelCopyWithImpl<W
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.coach, coach) || other.coach == coach)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.coach, coach) || other.coach == coach)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&(identical(other.active, active) || other.active == active));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,coach,progress,exercises,durationMinutes,goal,lastUsed);
+int get hashCode => Object.hash(runtimeType,id,title,coach,progress,exercises,durationMinutes,goal,lastUsed,active);
 
 @override
 String toString() {
-  return 'WorkoutModel(id: $id, title: $title, coach: $coach, progress: $progress, exercises: $exercises, durationMinutes: $durationMinutes, goal: $goal, lastUsed: $lastUsed)';
+  return 'WorkoutModel(id: $id, title: $title, coach: $coach, progress: $progress, exercises: $exercises, durationMinutes: $durationMinutes, goal: $goal, lastUsed: $lastUsed, active: $active)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $WorkoutModelCopyWith<$Res>  {
   factory $WorkoutModelCopyWith(WorkoutModel value, $Res Function(WorkoutModel) _then) = _$WorkoutModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, String coach, int progress, int exercises, int durationMinutes, String goal, String lastUsed
+ String id, String title, String coach, int progress, int exercises, int durationMinutes, String goal, String lastUsed, bool active
 });
 
 
@@ -63,7 +63,7 @@ class _$WorkoutModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? coach = null,Object? progress = null,Object? exercises = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? coach = null,Object? progress = null,Object? exercises = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? active = null,}) {
   return _then(WorkoutModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,8 @@ as int,exercises: null == exercises ? _self.exercises : exercises // ignore: cas
 as int,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
 as int,goal: null == goal ? _self.goal : goal // ignore: cast_nullable_to_non_nullable
 as String,lastUsed: null == lastUsed ? _self.lastUsed : lastUsed // ignore: cast_nullable_to_non_nullable
-as String,
+as String,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
