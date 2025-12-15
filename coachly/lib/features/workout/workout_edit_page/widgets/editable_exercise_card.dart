@@ -1,3 +1,4 @@
+import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -31,10 +32,18 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
   late TextEditingController _weightController;
   late TextEditingController _notesController;
 
+  final _debouncer = Debouncer(delay: const Duration(milliseconds: 300));
+
   @override
   void initState() {
     super.initState();
     _initializeControllers();
+
+    _setsController.addListener(() => _debouncer.run(_updateExercise));
+    _repsController.addListener(() => _debouncer.run(_updateExercise));
+    _restController.addListener(() => _debouncer.run(_updateExercise));
+    _weightController.addListener(() => _debouncer.run(_updateExercise));
+    _notesController.addListener(() => _debouncer.run(_updateExercise));
   }
 
   @override
@@ -91,6 +100,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     _restController.dispose();
     _weightController.dispose();
     _notesController.dispose();
+    _debouncer.dispose();
     super.dispose();
   }
 
@@ -301,35 +311,43 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        // Align fields to the left
         children: [
-          Wrap(
-            spacing: 16,
-            runSpacing: 12,
-            alignment: WrapAlignment.spaceEvenly,
+          Row(
             children: [
-              _buildNumericField(
-                label: 'Serie',
-                controller: _setsController,
-                hint: '4',
+              Expanded(
+                child: _buildNumericField(
+                  label: 'Serie',
+                  controller: _setsController,
+                  hint: '4',
+                ),
               ),
-              _buildNumericField(
-                label: 'Rep',
-                controller: _repsController,
-                hint: '10',
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildNumericField(
+                  label: 'Rep',
+                  controller: _repsController,
+                  hint: '10',
+                ),
               ),
-              _buildNumericField(
-                label: 'Rest',
-                controller: _restController,
-                suffix: 's',
-                hint: '90',
-              ),
-              _buildNumericField(
-                label: 'Peso',
-                controller: _weightController,
-                suffix: 'kg',
-                hint: '80',
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildNumericField(
+                  label: 'Peso',
+                  controller: _weightController,
+                  suffix: 'kg',
+                  hint: '80',
+                ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          _buildNumericField(
+            label: 'Rest',
+            controller: _restController,
+            suffix: 'seconds',
+            hint: '90',
           ),
           const SizedBox(height: 12),
           _buildNotesField(),
@@ -345,7 +363,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     String? hint,
   }) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start, // Align label to the left
       children: [
         Text(
           label,
@@ -358,7 +376,6 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         ),
         const SizedBox(height: 6),
         Container(
-          width: 60,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -370,11 +387,13 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
             border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
           ),
           child: Row(
+            mainAxisSize: MainAxisSize.min, // Use min to wrap content
             children: [
               Expanded(
                 child: TextField(
                   controller: controller,
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.start,
+                  // Align text to the left
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -389,15 +408,18 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
                       fontSize: 14,
                     ),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ), // Adjust padding
                   ),
-                  onChanged: (_) => _updateExercise(),
                   dragStartBehavior: DragStartBehavior.down,
                 ),
               ),
               if (suffix != null)
                 Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: const EdgeInsets.only(right: 12.0),
+                  // Adjust padding for suffix
                   child: Text(
                     suffix,
                     style: TextStyle(
@@ -453,7 +475,6 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(12),
             ),
-            onChanged: (_) => _updateExercise(),
           ),
         ),
       ],

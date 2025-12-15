@@ -174,7 +174,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             TextField(
               controller: _descriptionController,
               style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
-              maxLines: 3,
+              maxLines: null,
               decoration: InputDecoration(
                 hintText: 'Aggiungi una descrizione...',
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
