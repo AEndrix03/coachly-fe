@@ -1,5 +1,7 @@
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class EditableExerciseCard extends StatefulWidget {
   final EditableExerciseModel exercise;
@@ -22,7 +24,9 @@ class EditableExerciseCard extends StatefulWidget {
 }
 
 class _EditableExerciseCardState extends State<EditableExerciseCard> {
+  // Controllers for each editable part
   late TextEditingController _setsController;
+  late TextEditingController _repsController;
   late TextEditingController _restController;
   late TextEditingController _weightController;
   late TextEditingController _notesController;
@@ -30,15 +34,60 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
   @override
   void initState() {
     super.initState();
-    _setsController = TextEditingController(text: widget.exercise.sets);
-    _restController = TextEditingController(text: widget.exercise.rest);
-    _weightController = TextEditingController(text: widget.exercise.weight);
+    _initializeControllers();
+  }
+
+  @override
+  void didUpdateWidget(covariant EditableExerciseCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.exercise != oldWidget.exercise) {
+      _updateControllers();
+    }
+  }
+
+  void _initializeControllers() {
+    // Parsing logic
+    final setsParts = widget.exercise.sets
+        .split('×')
+        .map((e) => e.trim())
+        .toList();
+    final restValue = widget.exercise.rest.replaceAll(RegExp(r'[^0-9]'), '');
+    final weightValue = widget.exercise.weight.replaceAll(
+      RegExp(r'[^0-9.]'),
+      '',
+    );
+
+    _setsController = TextEditingController(text: setsParts.first);
+    _repsController = TextEditingController(
+      text: setsParts.length > 1 ? setsParts.last : '',
+    );
+    _restController = TextEditingController(text: restValue);
+    _weightController = TextEditingController(text: weightValue);
     _notesController = TextEditingController(text: widget.exercise.notes);
+  }
+
+  void _updateControllers() {
+    final setsParts = widget.exercise.sets
+        .split('×')
+        .map((e) => e.trim())
+        .toList();
+    _setsController.text = setsParts.first;
+    _repsController.text = setsParts.length > 1 ? setsParts.last : '';
+    _restController.text = widget.exercise.rest.replaceAll(
+      RegExp(r'[^0-9]'),
+      '',
+    );
+    _weightController.text = widget.exercise.weight.replaceAll(
+      RegExp(r'[^0-9.]'),
+      '',
+    );
+    _notesController.text = widget.exercise.notes;
   }
 
   @override
   void dispose() {
     _setsController.dispose();
+    _repsController.dispose();
     _restController.dispose();
     _weightController.dispose();
     _notesController.dispose();
@@ -46,11 +95,15 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
   }
 
   void _updateExercise() {
+    final sets = '${_setsController.text} × ${_repsController.text}';
+    final rest = '${_restController.text}s';
+    final weight = '${_weightController.text}kg';
+
     widget.onUpdate(
       widget.exercise.copyWith(
-        sets: _setsController.text,
-        rest: _restController.text,
-        weight: _weightController.text,
+        sets: sets,
+        rest: rest,
+        weight: weight,
         notes: _notesController.text,
       ),
     );
@@ -137,14 +190,15 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     _buildTag(
                       widget.exercise.muscle,
                       widget.exercise.accentColor,
                       Icons.fitbit,
                     ),
-                    const SizedBox(width: 8),
                     _buildTag(
                       widget.exercise.difficulty,
                       const Color(0xFFFF9800),
@@ -249,16 +303,32 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
       child: Column(
         children: [
           Wrap(
-            spacing: 12,
+            spacing: 16,
             runSpacing: 12,
+            alignment: WrapAlignment.spaceEvenly,
             children: [
-              _buildTextField(
-                'Serie × Reps',
-                _setsController,
-                '3 × 10',
+              _buildNumericField(
+                label: 'Serie',
+                controller: _setsController,
+                hint: '4',
               ),
-              _buildTextField('Rest', _restController, '60s'),
-              _buildTextField('Peso', _weightController, '80kg'),
+              _buildNumericField(
+                label: 'Rep',
+                controller: _repsController,
+                hint: '10',
+              ),
+              _buildNumericField(
+                label: 'Rest',
+                controller: _restController,
+                suffix: 's',
+                hint: '90',
+              ),
+              _buildNumericField(
+                label: 'Peso',
+                controller: _weightController,
+                suffix: 'kg',
+                hint: '80',
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -268,13 +338,14 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     );
   }
 
-  Widget _buildTextField(
-    String label,
-    TextEditingController controller,
-    String hint,
-  ) {
+  Widget _buildNumericField({
+    required String label,
+    required TextEditingController controller,
+    String? suffix,
+    String? hint,
+  }) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           label,
@@ -287,6 +358,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         ),
         const SizedBox(height: 6),
         Container(
+          width: 60,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -297,27 +369,45 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
           ),
-          child: TextField(
-            controller: controller,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: TextStyle(
-                color: Colors.white.withOpacity(0.3),
-                fontSize: 14,
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: TextStyle(
+                      color: Colors.white.withOpacity(0.3),
+                      fontSize: 14,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                  ),
+                  onChanged: (_) => _updateExercise(),
+                  dragStartBehavior: DragStartBehavior.down,
+                ),
               ),
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
-            ),
-            onChanged: (_) => _updateExercise(),
+              if (suffix != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Text(
+                    suffix,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.4),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ],
@@ -353,6 +443,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
             controller: _notesController,
             style: const TextStyle(color: Colors.white, fontSize: 13),
             maxLines: 2,
+            dragStartBehavior: DragStartBehavior.down,
             decoration: InputDecoration(
               hintText: 'Aggiungi note...',
               hintStyle: TextStyle(

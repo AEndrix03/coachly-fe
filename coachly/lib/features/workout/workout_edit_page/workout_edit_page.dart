@@ -23,7 +23,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   final _descriptionController = TextEditingController();
   final _durationController = TextEditingController();
   final _typeController = TextEditingController();
- 
+
   // Debouncer per ritardare l'aggiornamento dello stato durante la digitazione
   final _debouncer = Debouncer(delay: Duration(milliseconds: 300));
 
@@ -73,8 +73,6 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(workoutEditPageProvider(widget.workoutId));
 
-    // Sincronizza i controller con lo stato del provider
-    // Questo viene eseguito solo quando lo stato cambia effettivamente
     ref.listen(workoutEditPageProvider(widget.workoutId), (previous, next) {
       if (_descriptionController.text != next.description) {
         _descriptionController.text = next.description;
@@ -98,22 +96,45 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         backgroundColor: const Color(0xFF0F0F1E),
         body: Stack(
           children: [
-            Column(
-              children: [
-                WorkoutEditHeader(
-                  title: state.title,
-                  isDirty: state.isDirty,
-                  isSaving: state.isLoading,
-                  onBack: _handleBack,
-                  onSave: _handleSave,
-                  onTitleChanged: (value) => ref
-                      .read(workoutEditPageProvider(widget.workoutId).notifier)
-                      .updateTitle(value),
+            CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: WorkoutEditHeader(
+                    title: state.title,
+                    isDirty: state.isDirty,
+                    isSaving: state.isLoading,
+                    onBack: _handleBack,
+                    onSave: _handleSave,
+                    onTitleChanged: (value) => ref
+                        .read(workoutEditPageProvider(widget.workoutId).notifier)
+                        .updateTitle(value),
+                  ),
                 ),
-                Expanded(child: _buildBody(state)),
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      _buildInfoCards(state),
+                      const SizedBox(height: 16),
+                      _buildDescriptionCard(),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+                if (state.exercises.isEmpty && !state.isLoading)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _buildEmptyExerciseState(),
+                  )
+                else
+                  _buildExerciseSliverList(state),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: 100), // FAB space
+                ),
               ],
             ),
-            if (state.isLoading)
+            if (state.isLoading && state.exercises.isEmpty)
               Container(
                 color: Colors.black.withOpacity(0.5),
                 child: const Center(child: CircularProgressIndicator()),
@@ -125,104 +146,38 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     );
   }
 
-  Widget _buildBody(WorkoutEditState state) {
-    return SingleChildScrollView(
-      controller: _scrollController,
-      padding: const EdgeInsets.only(bottom: 100), // Spazio per FAB
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          _buildInfoCards(state),
-          const SizedBox(height: 16),
-          _buildDescriptionCard(),
-          const SizedBox(height: 24),
-          if (state.exercises.isEmpty)
-            _buildEmptyExerciseState()
-          else
-            _buildExerciseSection(state),
-        ],
-      ),
-    );
-  }
-
   Widget _buildDescriptionCard() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xFF1A1A2E).withOpacity(0.95),
-              const Color(0xFF16213E).withOpacity(0.9),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: const Color(0xFF1A1A2E),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: const Color(0xFF2196F3).withOpacity(0.3),
             width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF2196F3), Color(0xFF8E29EC)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    borderRadius: BorderRadius.circular(2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF2196F3).withOpacity(0.5),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Descrizione',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ],
+            const Text(
+              'Descrizione',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
-                fontSize: 14,
-                height: 1.6,
-                letterSpacing: 0.2,
-              ),
+              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
               maxLines: 3,
               decoration: InputDecoration(
                 hintText: 'Aggiungi una descrizione...',
-                hintStyle: TextStyle(
-                  color: Colors.white.withOpacity(0.3),
-                  fontSize: 14,
-                ),
+                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
               ),
@@ -284,14 +239,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF1A1A2E).withOpacity(0.95),
-            const Color(0xFF16213E).withOpacity(0.9),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: const Color(0xFF1A1A2E),
         border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
       child: Column(
@@ -331,10 +279,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 11,
-            ),
+            style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -343,30 +288,19 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     );
   }
 
-  Widget _buildExerciseSection(WorkoutEditState state) {
-    return ReorderableListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+  Widget _buildExerciseSliverList(WorkoutEditState state) {
+    return SliverReorderableList(
       itemCount: state.exercises.length,
       onReorder: (oldIndex, newIndex) {
         ref
             .read(workoutEditPageProvider(widget.workoutId).notifier)
             .reorderExercises(oldIndex, newIndex);
       },
-      proxyDecorator: (child, index, animation) {
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (context, child) {
-            return Transform.scale(scale: 1.02, child: child);
-          },
-          child: child,
-        );
-      },
       itemBuilder: (context, index) {
         final exercise = state.exercises[index];
         return Padding(
           key: ValueKey(exercise.id),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
           child: EditableExerciseCard(
             exercise: exercise,
             onRemove: () => _handleRemoveExercise(exercise.id),
