@@ -32,122 +32,136 @@ class _OrganizeWorkoutCardState extends State<OrganizeWorkoutCard> {
   }
 
   @override
+  void didUpdateWidget(covariant OrganizeWorkoutCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.workout != oldWidget.workout) {
+      setState(() {
+        _isActive = widget.workout.active;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF23233A).withOpacity(0.85),
-            const Color(0xFF2A2A3E).withOpacity(0.65),
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 300),
+      opacity: _isActive ? 1.0 : 0.5,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF23233A).withOpacity(0.85),
+              const Color(0xFF2A2A3E).withOpacity(0.65),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: const Color(0xFF2196F3).withOpacity(0.14),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.13),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFF2196F3).withOpacity(0.14),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.13),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _buildIconSection(),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              widget.workout.title,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 0.15,
-                                height: 1.2,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildIconSection(),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.workout.title,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 0.15,
+                                  height: 1.2,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          const SizedBox(width: 6),
-                          const CoachBadgeWidget(
-                            fontSize: 9,
-                            iconSize: 10,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 3,
+                            const SizedBox(width: 6),
+                            const CoachBadgeWidget(
+                              fontSize: 9,
+                              iconSize: 10,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 3,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: [
+                            _buildInfoChip(
+                              Icons.fitness_center,
+                              '${widget.workout.exercises} esercizi',
+                            ),
+                            _buildInfoChip(
+                              Icons.person_outline,
+                              'Coach ${widget.workout.coach}',
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    onSelected: (String result) {
+                      if (result == 'toggleActive') {
+                        setState(() {
+                          _isActive = !_isActive;
+                        });
+                        widget.onToggleActive(_isActive);
+                      } else if (result == 'edit') {
+                        widget.onEdit();
+                      } else if (result == 'delete') {
+                        widget.onDelete();
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                      PopupMenuItem<String>(
+                        value: 'toggleActive',
+                        child: Text(_isActive ? 'Disattiva' : 'Attiva'),
                       ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: [
-                          _buildInfoChip(
-                            Icons.fitness_center,
-                            '${widget.workout.exercises} esercizi',
-                          ),
-                          _buildInfoChip(
-                            Icons.person_outline,
-                            'Coach ${widget.workout.coach}',
-                          ),
-                        ],
+                      const PopupMenuItem<String>(
+                        value: 'edit',
+                        child: Text('Modifica'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'delete',
+                        child: Text('Elimina'),
                       ),
                     ],
                   ),
-                ),
-                PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, color: Colors.white),
-                  onSelected: (String result) {
-                    if (result == 'toggleActive') {
-                      setState(() {
-                        _isActive = !_isActive;
-                      });
-                      widget.onToggleActive(_isActive);
-                    } else if (result == 'edit') {
-                      widget.onEdit();
-                    } else if (result == 'delete') {
-                      widget.onDelete();
-                    }
-                  },
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    PopupMenuItem<String>(
-                      value: 'toggleActive',
-                      child: Text(_isActive ? 'Disattiva' : 'Attiva'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'edit',
-                      child: Text('Modifica'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'delete',
-                      child: Text('Elimina'),
-                    ),
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

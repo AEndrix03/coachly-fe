@@ -1,4 +1,5 @@
 import 'package:coachly/features/workout/workout_organize_page/widgets/organize_workout_card.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
@@ -15,19 +16,34 @@ class WorkoutOrganizePage extends ConsumerStatefulWidget {
       _WorkoutOrganizePageState();
 }
 
-class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage> {
+class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     Future.microtask(() {
       ref.read(workoutListProvider.notifier).loadWorkouts();
     });
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final workoutState = ref.watch(workoutListProvider);
+
+    final activeWorkouts =
+        workoutState.workouts.where((w) => w.active).toList();
+    final inactiveWorkouts =
+        workoutState.workouts.where((w) => !w.active).toList();
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -51,7 +67,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage> {
               ),
             ),
             child: SafeArea(
-              bottom: true,
+              bottom: false,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -85,80 +101,95 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Organizza gli Allenamenti',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.3,
-                            height: 1.2,
-                          ),
-                        ),
-                      ],
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(24, 8, 24, 16),
+                    child: Text(
+                      'Organizza gli Allenamenti',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          Expanded(child: _buildBody(context, workoutState, scheme)),
+          TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Schede Attive'),
+              Tab(text: 'Schede Non Attive'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildWorkoutList(context, workoutState, activeWorkouts, scheme),
+                _buildWorkoutList(
+                    context, workoutState, inactiveWorkouts, scheme),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildBody(
+  Widget _buildWorkoutList(
     BuildContext context,
     WorkoutListState workoutState,
+    List<WorkoutModel> workouts,
     ColorScheme scheme,
   ) {
     if (workoutState.hasError) {
       return Center(
         child: ShadAlert(
-          title: Text('Errore'),
+          title: const Text('Errore'),
           description: Text(workoutState.errorMessage ?? 'Errore sconosciuto'),
         ),
       );
     }
-    if (workoutState.isLoading && workoutState.workouts.isEmpty) {
+    if (workoutState.isLoading && workouts.isEmpty) {
       return Center(
         child: Shimmer.fromColors(
           baseColor: scheme.surface,
           highlightColor: scheme.primary.withOpacity(0.2),
-          child: Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: scheme.surface,
-              borderRadius: BorderRadius.circular(16),
+          child: ListView.builder(
+            itemCount: 5,
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Container(
+                height: 80,
+                decoration: BoxDecoration(
+                  color: scheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
             ),
           ),
         ),
       );
     }
 
-    if (workoutState.workouts.isEmpty) {
+    if (workouts.isEmpty) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(32),
           child: Text(
-            'Nessuna scheda disponibile da organizzare',
-            style: TextStyle(color: Color(0x80000000)),
+            'Nessuna scheda in questa categoria',
+            style: TextStyle(color: Colors.grey),
           ),
         ),
       );
     }
 
     return ListView.builder(
-      itemCount: workoutState.workouts.length,
+      itemCount: workouts.length,
       itemBuilder: (context, index) {
-        final workout = workoutState.workouts[index];
+        final workout = workouts[index];
         return OrganizeWorkoutCard(
           workout: workout,
           onDelete: () async {

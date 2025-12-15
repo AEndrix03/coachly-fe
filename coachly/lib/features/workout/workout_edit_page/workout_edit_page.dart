@@ -87,9 +87,11 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
 
     return PopScope(
       canPop: !state.isDirty,
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop && state.isDirty) {
-          _showExitDialog();
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final shouldPop = await _showExitDialog();
+        if (shouldPop ?? false) {
+          context.pop();
         }
       },
       child: Scaffold(
@@ -104,7 +106,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                     title: state.title,
                     isDirty: state.isDirty,
                     isSaving: state.isLoading,
-                    onBack: _handleBack,
+                    onBack: () => context.pop(),
                     onSave: _handleSave,
                     onTitleChanged: (value) => ref
                         .read(workoutEditPageProvider(widget.workoutId).notifier)
@@ -459,16 +461,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     }
   }
 
-  void _handleBack() {
-    if (ref.read(workoutEditPageProvider(widget.workoutId)).isDirty) {
-      _showExitDialog();
-    } else {
-      context.pop();
-    }
-  }
-
-  void _showExitDialog() {
-    showDialog(
+  Future<bool?> _showExitDialog() async {
+    return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
@@ -482,16 +476,15 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(context).pop(false),
             child: const Text('Annulla'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Chiudi dialogo
               ref
                   .read(workoutEditPageProvider(widget.workoutId).notifier)
                   .resetDirty();
-              context.pop(); // Torna indietro
+              Navigator.of(context).pop(true);
             },
             style: TextButton.styleFrom(
               foregroundColor: const Color(0xFFFF5252),
