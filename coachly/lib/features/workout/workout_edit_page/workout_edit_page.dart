@@ -1,3 +1,4 @@
+import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_edit_page/providers/workout_edit_provider/workout_edit_provider.dart';
 import 'package:flutter/material.dart';
@@ -18,17 +19,73 @@ class WorkoutEditPage extends ConsumerStatefulWidget {
 }
 
 class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
-  final ScrollController _scrollController = ScrollController();
+  final _scrollController = ScrollController();
+  final _descriptionController = TextEditingController();
+  final _durationController = TextEditingController();
+  final _typeController = TextEditingController();
+ 
+  // Debouncer per ritardare l'aggiornamento dello stato durante la digitazione
+  final _debouncer = Debouncer(delay: Duration(milliseconds: 300));
+
+  @override
+  void initState() {
+    super.initState();
+    // Aggiungi listener per aggiornare il provider quando l'utente digita
+    _descriptionController.addListener(_onDescriptionChanged);
+    _durationController.addListener(_onDurationChanged);
+    _typeController.addListener(_onTypeChanged);
+  }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _descriptionController.dispose();
+    _durationController.dispose();
+    _typeController.dispose();
     super.dispose();
+  }
+
+  void _onDescriptionChanged() {
+    _debouncer.run(() {
+      ref
+          .read(workoutEditPageProvider(widget.workoutId).notifier)
+          .updateDescription(_descriptionController.text);
+    });
+  }
+
+  void _onDurationChanged() {
+    _debouncer.run(() {
+      ref
+          .read(workoutEditPageProvider(widget.workoutId).notifier)
+          .updateDuration(_durationController.text);
+    });
+  }
+
+  void _onTypeChanged() {
+    _debouncer.run(() {
+      ref
+          .read(workoutEditPageProvider(widget.workoutId).notifier)
+          .updateType(_typeController.text);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(workoutEditPageProvider(widget.workoutId));
+
+    // Sincronizza i controller con lo stato del provider
+    // Questo viene eseguito solo quando lo stato cambia effettivamente
+    ref.listen(workoutEditPageProvider(widget.workoutId), (previous, next) {
+      if (_descriptionController.text != next.description) {
+        _descriptionController.text = next.description;
+      }
+      if (_durationController.text != next.duration) {
+        _durationController.text = next.duration;
+      }
+      if (_typeController.text != next.type) {
+        _typeController.text = next.type;
+      }
+    });
 
     return PopScope(
       canPop: !state.isDirty,
@@ -47,8 +104,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                   title: state.title,
                   isDirty: state.isDirty,
                   isSaving: state.isLoading,
-                  onBack: () => _handleBack(),
-                  onSave: () => _handleSave(),
+                  onBack: _handleBack,
+                  onSave: _handleSave,
                   onTitleChanged: (value) => ref
                       .read(workoutEditPageProvider(widget.workoutId).notifier)
                       .updateTitle(value),
@@ -71,24 +128,24 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   Widget _buildBody(WorkoutEditState state) {
     return SingleChildScrollView(
       controller: _scrollController,
+      padding: const EdgeInsets.only(bottom: 100), // Spazio per FAB
       child: Column(
         children: [
           const SizedBox(height: 20),
           _buildInfoCards(state),
           const SizedBox(height: 16),
-          _buildDescriptionCard(state),
+          _buildDescriptionCard(),
           const SizedBox(height: 24),
-          // Conditionally show exercise section or a message if empty
-          state.exercises.isEmpty
-              ? _buildEmptyExerciseState()
-              : _buildExerciseSection(state),
-          const SizedBox(height: 100), // Space for FAB
+          if (state.exercises.isEmpty)
+            _buildEmptyExerciseState()
+          else
+            _buildExerciseSection(state),
         ],
       ),
     );
   }
 
-  Widget _buildDescriptionCard(WorkoutEditState state) {
+  Widget _buildDescriptionCard() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
@@ -152,10 +209,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: TextEditingController(text: state.description)
-                ..selection = TextSelection.collapsed(
-                  offset: state.description.length,
-                ),
+              controller: _descriptionController,
               style: TextStyle(
                 color: Colors.white.withOpacity(0.8),
                 fontSize: 14,
@@ -172,9 +226,6 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
               ),
-              onChanged: (value) => ref
-                  .read(workoutEditPageProvider(widget.workoutId).notifier)
-                  .updateDescription(value),
             ),
           ],
         ),
@@ -193,7 +244,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               state.exercises.length.toString(),
               'Esercizi',
               const Color(0xFF2196F3),
-              null, // readonly
+              null,
             ),
           ),
           const SizedBox(width: 12),
@@ -201,11 +252,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             child: _buildStatCard(
               Icons.timer_outlined,
               state.duration,
-              'Durata',
+              'Durata (min)',
               const Color(0xFF9C27B0),
-              (value) => ref
-                  .read(workoutEditPageProvider(widget.workoutId).notifier)
-                  .updateDuration(value),
+              _durationController,
             ),
           ),
           const SizedBox(width: 12),
@@ -215,9 +264,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               state.type,
               'Tipo',
               const Color(0xFFFF9800),
-              (value) => ref
-                  .read(workoutEditPageProvider(widget.workoutId).notifier)
-                  .updateType(value),
+              _typeController,
             ),
           ),
         ],
@@ -230,239 +277,106 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     String value,
     String label,
     Color color,
-    Function(String)? onChanged, // nullable per readonly
+    TextEditingController? controller,
   ) {
-    final isReadonly = onChanged == null;
-
+    final isReadonly = controller == null;
     return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+          colors: [
+            const Color(0xFF1A1A2E).withOpacity(0.95),
+            const Color(0xFF16213E).withOpacity(0.9),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.15),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(19),
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xFF1A1A2E).withOpacity(0.95),
-              const Color(0xFF16213E).withOpacity(0.9),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [color.withOpacity(0.2), color.withOpacity(0.05)],
-                ),
-                border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 8),
+          if (isReadonly)
+            Text(
+              value,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
               ),
-              child: Icon(icon, color: color, size: 26),
-            ),
-            const SizedBox(height: 12),
-            if (isReadonly)
-              Text(
-                value,
+            )
+          else
+            SizedBox(
+              height: 20,
+              child: TextField(
+                controller: controller,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                  height: 1.2,
                 ),
-              )
-            else
-              TextField(
-                controller: TextEditingController(text: value)
-                  ..selection = TextSelection.collapsed(offset: value.length),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                  height: 1.2,
-                ),
-                textAlign: TextAlign.center,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
-                  isDense: true, // Reduce vertical space
+                  isDense: true,
                 ),
-                onChanged: onChanged,
-              ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
               ),
             ),
-          ],
-        ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 11,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildExerciseSection(WorkoutEditState state) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 4,
-                height: 24,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2196F3), Color(0xFF8E29EC)],
-                  ),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Esercizi',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.white.withOpacity(0.12),
-                      Colors.white.withOpacity(0.06),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.15),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  '${state.exercises.length} esercizi',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
+    return ReorderableListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: state.exercises.length,
+      onReorder: (oldIndex, newIndex) {
+        ref
+            .read(workoutEditPageProvider(widget.workoutId).notifier)
+            .reorderExercises(oldIndex, newIndex);
+      },
+      proxyDecorator: (child, index, animation) {
+        return AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            return Transform.scale(scale: 1.02, child: child);
+          },
+          child: child,
+        );
+      },
+      itemBuilder: (context, index) {
+        final exercise = state.exercises[index];
+        return Padding(
+          key: ValueKey(exercise.id),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          child: EditableExerciseCard(
+            exercise: exercise,
+            onRemove: () => _handleRemoveExercise(exercise.id),
+            onFindVariant: () => _handleFindVariant(exercise),
+            onUpdate: (updated) => ref
+                .read(workoutEditPageProvider(widget.workoutId).notifier)
+                .updateExercise(exercise.id, updated),
           ),
-          const SizedBox(height: 20),
-          ReorderableListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: state.exercises.length,
-            onReorder: (oldIndex, newIndex) {
-              ref
-                  .read(workoutEditPageProvider(widget.workoutId).notifier)
-                  .reorderExercises(oldIndex, newIndex);
-            },
-            proxyDecorator: (child, index, animation) {
-              return AnimatedBuilder(
-                animation: animation,
-                builder: (context, child) {
-                  return Transform.scale(scale: 1.02, child: child);
-                },
-                child: child,
-              );
-            },
-            itemBuilder: (context, index) {
-              final exercise = state.exercises[index];
-              return EditableExerciseCard(
-                key: ValueKey(exercise.id),
-                exercise: exercise,
-                onRemove: () => _handleRemoveExercise(exercise.id),
-                onFindVariant: () => _handleFindVariant(exercise),
-                onUpdate: (updated) => ref
-                    .read(workoutEditPageProvider(widget.workoutId).notifier)
-                    .updateExercise(exercise.id, updated),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFF2196F3).withOpacity(0.2),
-                  const Color(0xFF8E29EC).withOpacity(0.2),
-                ],
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.fitness_center,
-              size: 64,
-              color: Colors.white.withOpacity(0.5),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Nessun esercizio',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Aggiungi il primo esercizio per iniziare',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -530,14 +444,11 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       builder: (context) => ExercisePickerSheet(
         onExerciseSelected: (exercise) {
           final state = ref.read(workoutEditPageProvider(widget.workoutId));
-          // Assegna numero progressivo basato sulla lunghezza attuale
           final newNumber = state.exercises.length + 1;
-
           final newExercise = exercise.copyWith(
             id: 'exercise_${DateTime.now().millisecondsSinceEpoch}',
             number: newNumber,
           );
-
           ref
               .read(workoutEditPageProvider(widget.workoutId).notifier)
               .addExercise(newExercise);
@@ -582,7 +493,6 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   void _handleFindVariant(EditableExerciseModel exercise) {
-    // TODO: Show variant picker
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Cerca variante per: ${exercise.name}'),
@@ -595,8 +505,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     final success = await ref
         .read(workoutEditPageProvider(widget.workoutId).notifier)
         .save();
-
-    if (success && mounted) {
+    if (!mounted) return;
+    if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Scheda salvata con successo'),
@@ -604,11 +514,11 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         ),
       );
       context.pop();
-    } else if (mounted) {
-      final state = ref.read(workoutEditPageProvider(widget.workoutId));
+    } else {
+      final error = ref.read(workoutEditPageProvider(widget.workoutId)).error;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(state.error ?? 'Errore durante il salvataggio'),
+          content: Text(error ?? 'Errore durante il salvataggio'),
           backgroundColor: const Color(0xFFFF5252),
         ),
       );
@@ -616,8 +526,11 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   void _handleBack() {
-    // Rely on PopScope for dirty state dialog
-    context.pop();
+    if (ref.read(workoutEditPageProvider(widget.workoutId)).isDirty) {
+      _showExitDialog();
+    } else {
+      context.pop();
+    }
   }
 
   void _showExitDialog() {
@@ -640,8 +553,11 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              context.pop();
+              Navigator.pop(context); // Chiudi dialogo
+              ref
+                  .read(workoutEditPageProvider(widget.workoutId).notifier)
+                  .resetDirty();
+              context.pop(); // Torna indietro
             },
             style: TextButton.styleFrom(
               foregroundColor: const Color(0xFFFF5252),

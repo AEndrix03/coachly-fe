@@ -46,14 +46,14 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
   }
 
   void _updateExercise() {
-    /*widget.onUpdate(
-      widget.exercise.updateEditable(
+    widget.onUpdate(
+      widget.exercise.copyWith(
         sets: _setsController.text,
         rest: _restController.text,
         weight: _weightController.text,
         notes: _notesController.text,
       ),
-    );*/
+    );
   }
 
   @override
@@ -248,22 +248,17 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
       ),
       child: Column(
         children: [
-          Row(
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
             children: [
-              Expanded(
-                flex: 2,
-                child: _buildTextField(
-                  'Serie × Reps',
-                  _setsController,
-                  '3 × 10',
-                ),
+              _buildTextField(
+                'Serie × Reps',
+                _setsController,
+                '3 × 10',
               ),
-              const SizedBox(width: 12),
-              Expanded(child: _buildTextField('Rest', _restController, '60s')),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildTextField('Peso', _weightController, '80kg'),
-              ),
+              _buildTextField('Rest', _restController, '60s'),
+              _buildTextField('Peso', _weightController, '80kg'),
             ],
           ),
           const SizedBox(height: 12),

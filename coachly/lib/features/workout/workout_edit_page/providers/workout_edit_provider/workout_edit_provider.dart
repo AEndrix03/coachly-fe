@@ -1,5 +1,8 @@
+import 'package:coachly/features/workout/workout_detail_page/providers/workout_detail_provider/workout_detail_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../workout_detail_page/data/models/exercise_info_model/exercise_info_model.dart';
 
 part 'workout_edit_provider.g.dart';
 
@@ -59,55 +62,93 @@ class WorkoutEditState {
 
 @riverpod
 class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
+  bool _disposed = false;
+
   @override
   WorkoutEditState build(String workoutId) {
-    _loadWorkout();
-    return WorkoutEditState(workoutId: workoutId);
+    ref.onDispose(() => _disposed = true);
+    // Carica i dati del workout in modo asincrono dopo la costruzione iniziale
+    Future.microtask(() => _loadWorkout(workoutId));
+
+    // Ritorna uno stato iniziale di caricamento
+    return WorkoutEditState(workoutId: workoutId, isLoading: true);
   }
 
-  Future<void> _loadWorkout() async {
+  Future<void> _loadWorkout(String workoutId) async {
+    if (workoutId == 'new') {
+      state = state.copyWith(
+        isLoading: false,
+        title: 'Nuova Scheda',
+        description: '',
+        duration: '60',
+        type: 'Ipertrofia',
+        exercises: [],
+      );
+      return;
+    }
+
     state = state.copyWith(isLoading: true);
 
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      final repository = ref.read(workoutDetailPageRepositoryProvider);
+      final workoutResponse = await repository.getWorkoutDetail(workoutId);
+      final exercisesResponse = await repository.getWorkoutExercises(workoutId);
 
-    state = state.copyWith(
-      title: 'PETTO & TRICIPITI',
-      description: 'Programma focalizzato sull\'aumento della massa muscolare',
-      duration: '50',
-      type: 'Ipertrofia',
-      exercises: [
-        const EditableExerciseModel(
-          id: '1',
-          exerciseId: 'ex_1',
-          number: 1,
-          name: 'Panca Piana con Bilanciere',
-          muscle: 'Petto',
-          difficulty: 'Intermedio',
-          sets: '4 × 8-10',
-          rest: '120s',
-          weight: '85 kg',
-          progress: '+5%',
-          notes: '',
-          accentColorHex: '#2196F3',
-          hasVariants: true,
-        ),
-        const EditableExerciseModel(
-          id: '2',
-          exerciseId: 'ex_2',
-          number: 2,
-          name: 'Panca Inclinata Manubri',
-          muscle: 'Petto Alto',
-          difficulty: 'Intermedio',
-          sets: '4 × 10-12',
-          rest: '90s',
-          weight: '32 kg',
-          progress: '',
-          notes: '',
-          accentColorHex: '#2196F3',
-          hasVariants: true,
-        ),
-      ],
-      isLoading: false,
+      if (_disposed) return;
+
+      if (workoutResponse.success &&
+          workoutResponse.data != null &&
+          exercisesResponse.success &&
+          exercisesResponse.data != null) {
+        final workout = workoutResponse.data!;
+        final exercises = exercisesResponse.data!;
+
+        final editableExercises = exercises
+            .map((e) => _mapExerciseInfoToEditable(e))
+            .toList();
+
+        state = state.copyWith(
+          title: workout.title,
+          description: workout.description,
+          duration: workout.durationMinutes.toString(),
+          type: workout.type,
+          exercises: editableExercises,
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error:
+              workoutResponse.message ??
+              exercisesResponse.message ??
+              'Errore caricamento dati workout',
+        );
+      }
+    } catch (e) {
+      if (_disposed) return;
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  EditableExerciseModel _mapExerciseInfoToEditable(ExerciseInfoModel exercise) {
+    // La logica di mappatura va qui
+    // Assumiamo che manchino alcuni campi che devono essere gestiti
+    return EditableExerciseModel(
+      id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.name}',
+      exerciseId: exercise.name,
+      // Usiamo il nome come fallback
+      number: exercise.number,
+      name: exercise.name,
+      muscle: exercise.muscle,
+      difficulty: exercise.difficulty,
+      sets: exercise.sets,
+      rest: exercise.rest,
+      weight: exercise.weight,
+      progress: exercise.progress,
+      notes: '',
+      // Default
+      accentColorHex: exercise.accentColorHex,
+      hasVariants: false, // Default
     );
   }
 
