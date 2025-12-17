@@ -1,5 +1,6 @@
 import '../features/workout/workout_edit_page/workout_edit_page.dart';
 import '../features/workout/workout_organize_page/workout_organize_page.dart';
+import '../features/auth/login_page/login_page.dart'; // Added import for LoginPage
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,8 +17,12 @@ final GlobalKey<NavigatorState> _shellNavigatorKey =
 
 final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/home',
+  initialLocation: '/login',
   routes: [
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginPage(),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return ScaffoldWithNavBar(navigationShell: navigationShell);

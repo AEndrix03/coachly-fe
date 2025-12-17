@@ -50,6 +50,7 @@ dependencies:
 
   # ==================== EFFETTI GLASSMORPHISM ====================
   glass_kit: ^4.0.2                   # Effetti vetro moderni
+  google_fonts: ^6.3.3
 
 dev_dependencies:
   flutter_test:
@@ -67,7 +68,8 @@ flutter:
 
   # ==================== ASSETS ====================
   # Decommentare quando aggiungi assets
-  # assets:
-  #   - assets/images/
-  #   - assets/animations/
-  #   - assets/icons/
+  assets:
+    - assets/images/
+    - assets/logos/
+  #  - assets/animations/
+  #  - assets/icons/
