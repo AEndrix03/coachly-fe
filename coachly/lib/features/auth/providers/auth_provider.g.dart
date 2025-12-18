@@ -48,7 +48,7 @@ final class TokenManagerProvider
   }
 }
 
-String _$tokenManagerHash() => r'70a7eefbb904435dfa368cac9afdbecd6d9fc956';
+String _$tokenManagerHash() => r'7c9fd4b527ce2c9c18c8143abd2127b7f19a39f8';
 
 @ProviderFor(authService)
 const authServiceProvider = AuthServiceProvider._();
@@ -89,7 +89,7 @@ final class AuthServiceProvider
   }
 }
 
-String _$authServiceHash() => r'01efd2757e2885da0ff02def6a9a85f7a1a46f96';
+String _$authServiceHash() => r'2f4dba0944523dd3e4970f51743640a788865487';
 
 @ProviderFor(authRepository)
 const authRepositoryProvider = AuthRepositoryProvider._();
@@ -130,7 +130,7 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'2324eff64ae249ce4111d3ba182e65645cdfcd8e';
+String _$authRepositoryHash() => r'0acece20485d2fcbf2feb6e56916a15227453edd';
 
 @ProviderFor(Auth)
 const authProvider = AuthProvider._();

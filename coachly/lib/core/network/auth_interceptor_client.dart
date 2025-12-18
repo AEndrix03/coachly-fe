@@ -1,20 +1,19 @@
 import 'dart:async';
-import 'dart:convert';
+
 import 'package:coachly/features/auth/data/services/auth_service.dart'; // Import AuthService
 import 'package:coachly/features/auth/providers/auth_provider.dart'; // Import authServiceProvider
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_interceptor_client.g.dart';
 
 @riverpod
-http.Client httpClient(HttpClientRef ref) {
+http.Client httpClient(Ref ref) {
   return http.Client();
 }
 
 @riverpod
-AuthHttpClient authHttpClient(AuthHttpClientRef ref) {
+AuthHttpClient authHttpClient(Ref ref) {
   // Resolve circular dependency by reading authServiceProvider here
   final authService = ref.watch(authServiceProvider);
   return AuthHttpClient(ref.watch(httpClientProvider), authService);
@@ -69,7 +68,10 @@ class AuthHttpClient extends http.BaseClient {
 
     try {
       final loginResponse = await _authService.refreshToken(refreshToken);
-      await _authService.saveTokens(loginResponse.accessToken, loginResponse.refreshToken);
+      await _authService.saveTokens(
+        loginResponse.accessToken,
+        loginResponse.refreshToken,
+      );
       return true;
     } catch (e) {
       // Refresh failed due to network error or invalid refresh token

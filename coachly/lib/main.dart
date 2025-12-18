@@ -1,11 +1,11 @@
 import 'package:coachly/core/themes/theme.dart';
-import 'package:coachly/features/auth/providers/session_notifier.dart';
 import 'package:coachly/features/home/home.dart';
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
+import 'package:coachly/features/auth/providers/auth_provider.dart'; // Import authProvider
 import 'routes/app_router.dart';
 
 Future<void> main() async {
@@ -13,8 +13,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Create a ProviderContainer to access providers before runApp.
   final container = ProviderContainer();
-  // Load session tokens from storage.
-  await container.read(sessionNotifierProvider.notifier).init();
+  
+  // Initialize Auth provider to check for existing session
+  await container.read(authProvider.notifier).checkAuthStatus();
 
   runApp(
     UncontrolledProviderScope(

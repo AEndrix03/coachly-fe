@@ -7,20 +7,19 @@ import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service_impl.dart';
 import 'package:coachly/features/auth/data/services/auth_service_mock.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart'; // Import TokenManager
-import 'package:coachly/features/auth/providers/session_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
 
 // 0. Provider for TokenManager
 @riverpod
-TokenManager tokenManager(TokenManagerRef ref) {
+TokenManager tokenManager(Ref ref) {
   return TokenManager();
 }
 
 // 1. Provider for the AuthService
 @riverpod
-AuthService authService(AuthServiceRef ref) {
+AuthService authService(Ref ref) {
   const useMock = true; // Set to false to use the real implementation
 
   if (useMock) {
@@ -30,17 +29,18 @@ AuthService authService(AuthServiceRef ref) {
     // AuthHttpClient itself needs an AuthService. This creates a circular dependency.
     // We need to break this by deferring the creation of AuthHttpClient to
     // when authHttpClientProvider is called, and inject authServiceProvider into it.
-    // For now, let's pass a dummy AuthHttpClient, but this will be fixed in auth_interceptor_client.dart
     // The correct approach is usually to make AuthHttpClient take a getter for AuthService
     // or to use a separate provider for AuthHttpClient that already has AuthServiceProvider.
-    // For now, I'll pass a placeholder client.
-    return AuthServiceImpl(ref.watch(authHttpClientProvider), ref.watch(tokenManagerProvider));
+    return AuthServiceImpl(
+      ref.watch(authHttpClientProvider),
+      ref.watch(tokenManagerProvider),
+    );
   }
 }
 
 // 2. Provider for the AuthRepository
 @riverpod
-AuthRepository authRepository(AuthRepositoryRef ref) {
+AuthRepository authRepository(Ref ref) {
   return AuthRepositoryImpl(ref.watch(authServiceProvider));
 }
 
@@ -61,7 +61,10 @@ class Auth extends _$Auth {
     try {
       final loginResponse = await service.login(loginRequest);
       // On success, save tokens via AuthService
-      await service.saveTokens(loginResponse.accessToken, loginResponse.refreshToken);
+      await service.saveTokens(
+        loginResponse.accessToken,
+        loginResponse.refreshToken,
+      );
       state = AsyncData(loginResponse);
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -80,12 +83,14 @@ class Auth extends _$Auth {
     if (accessToken != null) {
       // Potentially validate token or fetch user details
       // For now, just assume authenticated if token exists
-      state = AsyncData(LoginResponseDto(
-        accessToken: accessToken,
-        refreshToken: await service.getRefreshToken() ?? '',
-        firstName: '', // Placeholder
-        lastName: '', // Placeholder
-      ));
+      state = AsyncData(
+        LoginResponseDto(
+          accessToken: accessToken,
+          refreshToken: await service.getRefreshToken() ?? '',
+          firstName: '', // Placeholder
+          lastName: '', // Placeholder
+        ),
+      );
     } else {
       state = const AsyncData(null);
     }

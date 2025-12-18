@@ -1,33 +1,32 @@
-import 'package:coachly/features/auth/providers/session_notifier.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../features/workout/workout_edit_page/workout_edit_page.dart';
-import '../features/workout/workout_organize_page/workout_organize_page.dart';
-import '../features/auth/login_page/login_page.dart';
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../features/auth/pages/login_page/login_page.dart';
+import '../features/auth/providers/auth_provider.dart'; // Import authProvider
 import '../features/common/navigation/widgets/navigation_bar.dart';
 import '../features/exercise/exercise_info_page/exercise_info_page.dart';
 import '../features/home/home.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
 import '../features/workout/workout_detail_page/workout_detail_page.dart';
+import '../features/workout/workout_edit_page/workout_edit_page.dart';
+import '../features/workout/workout_organize_page/workout_organize_page.dart';
 
 part 'app_router.g.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 @riverpod
-GoRouter router(RouterRef ref) {
-  final session = ref.watch(sessionNotifierProvider);
+GoRouter router(Ref ref) {
+  final authState = ref.watch(authProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: session.isAuthenticated ? '/workouts' : '/login',
+    initialLocation: authState.value?.accessToken != null ? '/workouts' : '/login',
     redirect: (BuildContext context, GoRouterState state) {
-      final isAuthenticated = session.isAuthenticated;
+      final isAuthenticated = authState.value?.accessToken != null;
       final isLoggingIn = state.matchedLocation == '/login';
 
       // If user is not logged in and not on the login page, redirect to login
@@ -43,10 +42,7 @@ GoRouter router(RouterRef ref) {
       return null; // No redirect needed
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginPage(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);
@@ -68,10 +64,8 @@ GoRouter router(RouterRef ref) {
                 routes: [
                   GoRoute(
                     path: 'organize',
-                    pageBuilder: (context, state) => _fadeTransition(
-                      state,
-                      const WorkoutOrganizePage(),
-                    ),
+                    pageBuilder: (context, state) =>
+                        _fadeTransition(state, const WorkoutOrganizePage()),
                   ),
                   GoRoute(
                     path: 'workout/:id',

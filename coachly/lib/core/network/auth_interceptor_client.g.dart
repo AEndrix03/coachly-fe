@@ -48,7 +48,7 @@ final class HttpClientProvider
   }
 }
 
-String _$httpClientHash() => r'ee5992436ccfa04cad4349173d374824239fea46';
+String _$httpClientHash() => r'8c21f22632338286954dc297d3cf423520492f98';
 
 @ProviderFor(authHttpClient)
 const authHttpClientProvider = AuthHttpClientProvider._();
@@ -89,4 +89,4 @@ final class AuthHttpClientProvider
   }
 }
 
-String _$authHttpClientHash() => r'b4567eb709fb0b1cd5a845cd41d5d15758622218';
+String _$authHttpClientHash() => r'79e4fa11d8d6f60622de5b7a6773cfb3c4b9e421';

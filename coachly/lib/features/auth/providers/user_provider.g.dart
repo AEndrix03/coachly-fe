@@ -48,4 +48,4 @@ final class UserProvider
   }
 }
 
-String _$userHash() => r'af741d7a7398cec9ce5b2518420dfe327cc309d5';
+String _$userHash() => r'76b22053a479905e148d5694106cb37082efd4ce';
