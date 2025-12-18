@@ -1,6 +1,5 @@
-import 'package:coachly/features/auth/data/models/user_model.dart';
+import 'package:coachly/features/auth/data/models/user_model/user_model.dart';
 import 'package:coachly/features/auth/providers/session_notifier.dart';
-import 'package:jwt_decode/jwt_decode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user_provider.g.dart';

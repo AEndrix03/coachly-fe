@@ -1,6 +1,10 @@
+import 'package:coachly/features/auth/providers/session_notifier.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../features/workout/workout_edit_page/workout_edit_page.dart';
 import '../features/workout/workout_organize_page/workout_organize_page.dart';
-import '../features/auth/login_page/login_page.dart'; // Added import for LoginPage
+import '../features/auth/login_page/login_page.dart';
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -11,110 +15,131 @@ import '../features/home/home.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
 import '../features/workout/workout_detail_page/workout_detail_page.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey =
-    GlobalKey<NavigatorState>();
+part 'app_router.g.dart';
 
-final appRouter = GoRouter(
-  navigatorKey: _rootNavigatorKey,
-  initialLocation: '/login',
-  routes: [
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginPage(),
-    ),
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return ScaffoldWithNavBar(navigationShell: navigationShell);
-      },
-      branches: [
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/community',
-              builder: (context, state) => const HomeScreen(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/workouts',
-              builder: (context, state) => const WorkoutPage(),
-              routes: [
-                GoRoute(
-                  path: 'organize',
-                  pageBuilder: (context, state) => _fadeTransition(
-                    state,
-                    const WorkoutOrganizePage(),
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+@riverpod
+GoRouter router(RouterRef ref) {
+  final session = ref.watch(sessionNotifierProvider);
+
+  return GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: session.isAuthenticated ? '/workouts' : '/login',
+    redirect: (BuildContext context, GoRouterState state) {
+      final isAuthenticated = session.isAuthenticated;
+      final isLoggingIn = state.matchedLocation == '/login';
+
+      // If user is not logged in and not on the login page, redirect to login
+      if (!isAuthenticated && !isLoggingIn) {
+        return '/login';
+      }
+
+      // If user is logged in and on the login page, redirect to the main app screen
+      if (isAuthenticated && isLoggingIn) {
+        return '/workouts';
+      }
+
+      return null; // No redirect needed
+    },
+    routes: [
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginPage(),
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return ScaffoldWithNavBar(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/community',
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/workouts',
+                builder: (context, state) => const WorkoutPage(),
+                routes: [
+                  GoRoute(
+                    path: 'organize',
+                    pageBuilder: (context, state) => _fadeTransition(
+                      state,
+                      const WorkoutOrganizePage(),
+                    ),
                   ),
-                ),
-                GoRoute(
-                  path: 'workout/:id',
-                  pageBuilder: (context, state) => _fadeTransition(
-                    state,
-                    WorkoutDetailPage(id: state.pathParameters['id']!),
-                  ),
-                  routes: [
-                    GoRoute(
-                      path: 'edit',
-                      pageBuilder: (context, state) => _fadeTransition(
-                        state,
-                        WorkoutEditPage(
-                          workoutId: state.pathParameters['id']!,
+                  GoRoute(
+                    path: 'workout/:id',
+                    pageBuilder: (context, state) => _fadeTransition(
+                      state,
+                      WorkoutDetailPage(id: state.pathParameters['id']!),
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'edit',
+                        pageBuilder: (context, state) => _fadeTransition(
+                          state,
+                          WorkoutEditPage(
+                            workoutId: state.pathParameters['id']!,
+                          ),
                         ),
                       ),
-                    ),
-                    GoRoute(
-                      path: 'active',
-                      pageBuilder: (context, state) => _fadeTransition(
-                        state,
-                        WorkoutActivePage(
-                          workoutId: state.pathParameters['id']!,
+                      GoRoute(
+                        path: 'active',
+                        pageBuilder: (context, state) => _fadeTransition(
+                          state,
+                          WorkoutActivePage(
+                            workoutId: state.pathParameters['id']!,
+                          ),
                         ),
                       ),
-                    ),
-                    GoRoute(
-                      path: 'workout_exercise_page/:exerciseId',
-                      pageBuilder: (context, state) => _fadeTransition(
-                        state,
-                        ExercisePage(id: state.pathParameters['exerciseId']!),
+                      GoRoute(
+                        path: 'workout_exercise_page/:exerciseId',
+                        pageBuilder: (context, state) => _fadeTransition(
+                          state,
+                          ExercisePage(id: state.pathParameters['exerciseId']!),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/home',
-              builder: (context, state) => const HomeScreen(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/settings',
-              builder: (context, state) => const HomeScreen(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/coach',
-              builder: (context, state) => const HomeScreen(),
-            ),
-          ],
-        ),
-      ],
-    ),
-  ],
-);
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/settings',
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/coach',
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  );
+}
 
 CustomTransitionPage<void> _fadeTransition(GoRouterState state, Widget child) {
   return CustomTransitionPage<void>(

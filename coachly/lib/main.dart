@@ -51,11 +51,12 @@ class NavbarPagesPrecache extends StatelessWidget {
   }
 }
 
-class CoachlyApplication extends StatelessWidget {
+class CoachlyApplication extends ConsumerWidget {
   const CoachlyApplication({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
     final colorScheme = AppThemeScheme.lightTheme.colorScheme;
     final shadColorScheme = ShadSlateColorScheme.light().copyWith(
       primary: colorScheme.primary,
@@ -73,7 +74,7 @@ class CoachlyApplication extends StatelessWidget {
         theme: AppThemeScheme.lightTheme,
         darkTheme: AppThemeScheme.darkTheme,
         themeMode: ThemeMode.dark,
-        routerConfig: appRouter,
+        routerConfig: router,
         builder: (context, child) =>
             Stack(children: [child!, const NavbarPagesPrecache()]),
       ),
