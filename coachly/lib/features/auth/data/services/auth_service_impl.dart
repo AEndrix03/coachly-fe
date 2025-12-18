@@ -60,7 +60,7 @@ class AuthServiceImpl implements AuthService {
   Future<LoginResponseDto> refreshToken(String refreshToken) async {
     final client = _ref.read(authHttpClientProvider);
     final response = await client.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/auth/refresh'),
+      Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.refreshEndpoint}'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'refreshToken': refreshToken}),
     );
@@ -76,7 +76,7 @@ class AuthServiceImpl implements AuthService {
       return loginResponse;
     } else {
       throw ServerFailure(
-        'Impossibile aggiornare la sessione.',
+        'Impossibile aggiornare la sessione. Effettua nuovamente il login.',
         response.statusCode,
       );
     }

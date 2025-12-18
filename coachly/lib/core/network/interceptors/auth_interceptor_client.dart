@@ -25,7 +25,8 @@ class AuthHttpClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    final isAuthRequest = request.url.path.contains('/auth');
+    // Exclude auth endpoints from having the Authorization header automatically added
+    final isAuthRequest = request.url.path.contains('/authentication');
     final authService = _ref.read(
       authServiceProvider,
     ); // Lazily get AuthService
