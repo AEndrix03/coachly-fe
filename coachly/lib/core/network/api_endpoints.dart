@@ -1,4 +1,4 @@
 class ApiEndpoints {
-  // TODO: Replace with your actual backend URL
-  static const String baseUrl = 'http://localhost:3000/api';
+  static const String baseUrl = 'https://dev.aredegalli.it:5050/praetor';
+  static const String loginEndpoint = '/authentication/login';
 }

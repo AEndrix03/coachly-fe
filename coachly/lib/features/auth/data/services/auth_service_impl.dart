@@ -16,7 +16,7 @@ class AuthServiceImpl implements AuthService {
   @override
   Future<LoginResponseDto> login(LoginRequestDto loginRequest) async {
     final response = await _client.post(
-      Uri.parse('${ApiEndpoints.baseUrl}/auth/login'),
+      Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.loginEndpoint}'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(loginRequest.toJson()),
     );
