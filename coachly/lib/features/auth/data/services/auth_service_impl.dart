@@ -8,6 +8,9 @@ import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:coachly/core/error/failures.dart';
+import 'package:http/http.dart' as http;
+
 class AuthServiceImpl implements AuthService {
   final Ref _ref;
   final TokenManager _tokenManager; // Add TokenManager dependency
@@ -17,11 +20,22 @@ class AuthServiceImpl implements AuthService {
   @override
   Future<LoginResponseDto> login(LoginRequestDto loginRequest) async {
     final client = _ref.read(authHttpClientProvider);
-    final response = await client.post(
-      Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.loginEndpoint}'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(loginRequest.toJson()),
-    );
+    late final http.Response response;
+
+    try {
+      response = await client.post(
+        Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.loginEndpoint}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(loginRequest.toJson()),
+      );
+    } catch (e) {
+      // If the error is already a Failure, rethrow it. Otherwise, wrap it.
+      if (e is Failure) {
+        rethrow;
+      }
+      throw NetworkFailure(
+          'Errore di connessione. Controlla la tua connessione internet.');
+    }
 
     if (response.statusCode == 200) {
       final loginResponse = LoginResponseDto.fromJson(
@@ -32,9 +46,13 @@ class AuthServiceImpl implements AuthService {
         loginResponse.refreshToken,
       ); // Save tokens after successful login
       return loginResponse;
+    } else if (response.statusCode == 401 || response.statusCode == 403) {
+      throw const InvalidCredentialsFailure();
     } else {
-      // In a real app, parse the error response from the server
-      throw Exception('Failed to login: ${response.body}');
+      throw ServerFailure(
+        'Errore del server. Riprova più tardi.',
+        response.statusCode,
+      );
     }
   }
 
@@ -57,7 +75,10 @@ class AuthServiceImpl implements AuthService {
       ); // Save tokens after refresh
       return loginResponse;
     } else {
-      throw Exception('Failed to refresh token: ${response.body}');
+      throw ServerFailure(
+        'Impossibile aggiornare la sessione.',
+        response.statusCode,
+      );
     }
   }
 

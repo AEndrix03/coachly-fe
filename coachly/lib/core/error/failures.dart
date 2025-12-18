@@ -62,6 +62,13 @@ class ConflictFailure extends Failure {
   ]) : super(message, code: 409);
 }
 
+/// Auth-related failures
+class InvalidCredentialsFailure extends Failure {
+  const InvalidCredentialsFailure([
+    String message = 'Credenziali non valide. Controlla email e password.',
+  ]) : super(message, code: 401);
+}
+
 /// Validation failures
 class ValidationFailure extends Failure {
   final Map<String, String> errors;

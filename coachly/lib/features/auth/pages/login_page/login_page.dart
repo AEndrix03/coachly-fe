@@ -1,3 +1,4 @@
+import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -41,9 +42,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     // Listen to the auth provider for side-effects like navigation or snackbars
     ref.listen(authProvider, (previous, next) {
       if (next is AsyncError) {
+        final error = next.error;
+        final message =
+            error is Failure ? error.message : 'Si è verificato un errore.';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login Failed: ${next.error}'),
+            content: Text(message),
             backgroundColor: colorScheme.error,
           ),
         );
