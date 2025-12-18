@@ -87,13 +87,16 @@ class Auth extends _$Auth {
         // Attempt to refresh the token to validate the session
         final loginResponse = await service.refreshToken(refreshToken);
         await service.saveTokens(loginResponse.accessToken, loginResponse.refreshToken);
+        if (!ref.mounted) return; // Check if mounted before updating state
         state = AsyncData(loginResponse);
       } catch (e) {
         // If refresh fails, tokens are invalid, so clear them
         await service.clearTokens();
+        if (!ref.mounted) return; // Check if mounted before updating state
         state = const AsyncData(null);
       }
     } else {
+      if (!ref.mounted) return; // Check if mounted before updating state
       state = const AsyncData(null);
     }
   }

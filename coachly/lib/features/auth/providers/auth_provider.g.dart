@@ -156,7 +156,7 @@ final class AuthProvider
   Auth create() => Auth();
 }
 
-String _$authHash() => r'370fa1fa8dd4a48769364f627a8e6f0fd6953a91';
+String _$authHash() => r'9a6c2fa06b1a0b987c17d99b82469a08ebba50de';
 
 abstract class _$Auth extends $AsyncNotifier<LoginResponseDto?> {
   FutureOr<LoginResponseDto?> build();
