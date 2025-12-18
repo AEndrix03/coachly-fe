@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:coachly/core/network/api_endpoints.dart';
-import 'package:coachly/core/network/auth_interceptor_client.dart';
+import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
 import 'package:coachly/features/auth/data/dto/login_request_dto/login_request_dto.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
@@ -22,8 +22,13 @@ class AuthServiceImpl implements AuthService {
     );
 
     if (response.statusCode == 200) {
-      final loginResponse = LoginResponseDto.fromJson(jsonDecode(response.body));
-      await saveTokens(loginResponse.accessToken, loginResponse.refreshToken); // Save tokens after successful login
+      final loginResponse = LoginResponseDto.fromJson(
+        jsonDecode(response.body),
+      );
+      await saveTokens(
+        loginResponse.accessToken,
+        loginResponse.refreshToken,
+      ); // Save tokens after successful login
       return loginResponse;
     } else {
       // In a real app, parse the error response from the server
@@ -40,8 +45,13 @@ class AuthServiceImpl implements AuthService {
     );
 
     if (response.statusCode == 200) {
-      final loginResponse = LoginResponseDto.fromJson(jsonDecode(response.body));
-      await saveTokens(loginResponse.accessToken, loginResponse.refreshToken); // Save tokens after refresh
+      final loginResponse = LoginResponseDto.fromJson(
+        jsonDecode(response.body),
+      );
+      await saveTokens(
+        loginResponse.accessToken,
+        loginResponse.refreshToken,
+      ); // Save tokens after refresh
       return loginResponse;
     } else {
       throw Exception('Failed to refresh token: ${response.body}');

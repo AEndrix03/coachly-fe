@@ -1,4 +1,4 @@
-import 'package:coachly/core/network/auth_interceptor_client.dart';
+import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
 import 'package:coachly/features/auth/data/dto/login_request_dto/login_request_dto.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/repositories/auth_repository.dart';
