@@ -14,22 +14,22 @@ http.Client httpClient(Ref ref) {
 
 @riverpod
 AuthHttpClient authHttpClient(Ref ref) {
-  // Resolve circular dependency by reading authServiceProvider here
-  final authService = ref.watch(authServiceProvider);
-  return AuthHttpClient(ref.watch(httpClientProvider), authService);
+  // Pass Ref directly to AuthHttpClient to resolve AuthService lazily
+  return AuthHttpClient(ref.watch(httpClientProvider), ref);
 }
 
 class AuthHttpClient extends http.BaseClient {
   final http.Client _inner;
-  final AuthService _authService; // Inject AuthService
+  final Ref _ref; // Inject Ref instead of AuthService
 
-  AuthHttpClient(this._inner, this._authService);
+  AuthHttpClient(this._inner, this._ref);
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     final isAuthRequest = request.url.path.contains('/auth');
+    final authService = _ref.read(authServiceProvider); // Lazily get AuthService
 
-    String? accessToken = await _authService.getAccessToken();
+    String? accessToken = await authService.getAccessToken();
 
     if (accessToken != null && !isAuthRequest) {
       request.headers['Authorization'] = 'Bearer $accessToken';
@@ -59,23 +59,21 @@ class AuthHttpClient extends http.BaseClient {
   }
 
   Future<bool> _refreshToken() async {
-    final refreshToken = await _authService.getRefreshToken();
+    final authService = _ref.read(authServiceProvider); // Lazily get AuthService
+    final refreshToken = await authService.getRefreshToken();
 
     if (refreshToken == null) {
-      await _authService.clearTokens(); // Clear tokens if no refresh token
+      await authService.clearTokens(); // Clear tokens if no refresh token
       return false;
     }
 
     try {
-      final loginResponse = await _authService.refreshToken(refreshToken);
-      await _authService.saveTokens(
-        loginResponse.accessToken,
-        loginResponse.refreshToken,
-      );
+      final loginResponse = await authService.refreshToken(refreshToken);
+      await authService.saveTokens(loginResponse.accessToken, loginResponse.refreshToken);
       return true;
     } catch (e) {
       // Refresh failed due to network error or invalid refresh token
-      await _authService.clearTokens();
+      await authService.clearTokens();
       return false;
     }
   }
