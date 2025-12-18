@@ -20,7 +20,7 @@ TokenManager tokenManager(Ref ref) {
 // 1. Provider for the AuthService
 @riverpod
 AuthService authService(Ref ref) {
-  const useMock = true; // Set to false to use the real implementation
+  const useMock = false; // Set to false to use the real implementation
 
   if (useMock) {
     return AuthServiceMock();
