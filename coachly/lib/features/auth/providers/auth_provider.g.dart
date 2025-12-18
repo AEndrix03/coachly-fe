@@ -89,7 +89,7 @@ final class AuthServiceProvider
   }
 }
 
-String _$authServiceHash() => r'c7c73d94cf204d057ad5924545eefce207f6ee5d';
+String _$authServiceHash() => r'a6d70a47a3958df392e702f586831cb3f62f0578';
 
 @ProviderFor(authRepository)
 const authRepositoryProvider = AuthRepositoryProvider._();

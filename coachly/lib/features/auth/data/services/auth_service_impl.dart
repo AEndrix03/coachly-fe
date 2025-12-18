@@ -6,16 +6,18 @@ import 'package:coachly/features/auth/data/dto/login_request_dto/login_request_d
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AuthServiceImpl implements AuthService {
-  final AuthHttpClient _client;
+  final Ref _ref;
   final TokenManager _tokenManager; // Add TokenManager dependency
 
-  AuthServiceImpl(this._client, this._tokenManager);
+  AuthServiceImpl(this._ref, this._tokenManager);
 
   @override
   Future<LoginResponseDto> login(LoginRequestDto loginRequest) async {
-    final response = await _client.post(
+    final client = _ref.read(authHttpClientProvider);
+    final response = await client.post(
       Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.loginEndpoint}'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(loginRequest.toJson()),
@@ -38,7 +40,8 @@ class AuthServiceImpl implements AuthService {
 
   @override
   Future<LoginResponseDto> refreshToken(String refreshToken) async {
-    final response = await _client.post(
+    final client = _ref.read(authHttpClientProvider);
+    final response = await client.post(
       Uri.parse('${ApiEndpoints.baseUrl}/auth/refresh'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'refreshToken': refreshToken}),

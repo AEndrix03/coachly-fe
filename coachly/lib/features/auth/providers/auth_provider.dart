@@ -5,7 +5,6 @@ import 'package:coachly/features/auth/data/repositories/auth_repository.dart';
 import 'package:coachly/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service_impl.dart';
-import 'package:coachly/features/auth/data/services/auth_service_mock.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart'; // Import TokenManager
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -20,22 +19,12 @@ TokenManager tokenManager(Ref ref) {
 // 1. Provider for the AuthService
 @riverpod
 AuthService authService(Ref ref) {
-  const useMock = false; // Set to false to use the real implementation
-
-  if (useMock) {
-    return AuthServiceMock();
-  } else {
-    // AuthServiceImpl now requires AuthHttpClient and TokenManager
-    // AuthHttpClient itself needs an AuthService. This creates a circular dependency.
-    // We need to break this by deferring the creation of AuthHttpClient to
-    // when authHttpClientProvider is called, and inject authServiceProvider into it.
-    // The correct approach is usually to make AuthHttpClient take a getter for AuthService
-    // or to use a separate provider for AuthHttpClient that already has AuthServiceProvider.
-    return AuthServiceImpl(
-      ref.watch(authHttpClientProvider),
-      ref.watch(tokenManagerProvider),
-    );
-  }
+  // The dependency on AuthHttpClient is now resolved lazily within AuthServiceImpl
+  // by passing the ref directly. This breaks the circular dependency.
+  return AuthServiceImpl(
+    ref,
+    ref.watch(tokenManagerProvider),
+  );
 }
 
 // 2. Provider for the AuthRepository
@@ -86,7 +75,10 @@ class Auth extends _$Auth {
       try {
         // Attempt to refresh the token to validate the session
         final loginResponse = await service.refreshToken(refreshToken);
-        await service.saveTokens(loginResponse.accessToken, loginResponse.refreshToken);
+        await service.saveTokens(
+          loginResponse.accessToken,
+          loginResponse.refreshToken,
+        );
         if (!ref.mounted) return; // Check if mounted before updating state
         state = AsyncData(loginResponse);
       } catch (e) {
