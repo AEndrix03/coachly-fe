@@ -80,17 +80,19 @@ class Auth extends _$Auth {
   Future<void> checkAuthStatus() async {
     final service = ref.read(authServiceProvider);
     final accessToken = await service.getAccessToken();
-    if (accessToken != null) {
-      // Potentially validate token or fetch user details
-      // For now, just assume authenticated if token exists
-      state = AsyncData(
-        LoginResponseDto(
-          accessToken: accessToken,
-          refreshToken: await service.getRefreshToken() ?? '',
-          firstName: '', // Placeholder
-          lastName: '', // Placeholder
-        ),
-      );
+    final refreshToken = await service.getRefreshToken();
+
+    if (accessToken != null && refreshToken != null) {
+      try {
+        // Attempt to refresh the token to validate the session
+        final loginResponse = await service.refreshToken(refreshToken);
+        await service.saveTokens(loginResponse.accessToken, loginResponse.refreshToken);
+        state = AsyncData(loginResponse);
+      } catch (e) {
+        // If refresh fails, tokens are invalid, so clear them
+        await service.clearTokens();
+        state = const AsyncData(null);
+      }
     } else {
       state = const AsyncData(null);
     }

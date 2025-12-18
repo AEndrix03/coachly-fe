@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:coachly/features/auth/data/services/auth_service.dart'; // Import AuthService
 import 'package:coachly/features/auth/providers/auth_provider.dart'; // Import authServiceProvider
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -27,7 +26,9 @@ class AuthHttpClient extends http.BaseClient {
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     final isAuthRequest = request.url.path.contains('/auth');
-    final authService = _ref.read(authServiceProvider); // Lazily get AuthService
+    final authService = _ref.read(
+      authServiceProvider,
+    ); // Lazily get AuthService
 
     String? accessToken = await authService.getAccessToken();
 
@@ -42,14 +43,14 @@ class AuthHttpClient extends http.BaseClient {
       final didRefreshToken = await _refreshToken();
       if (didRefreshToken) {
         // Retry the original request with the new token
-        accessToken = await _authService.getAccessToken(); // Get the new token
+        accessToken = await authService.getAccessToken(); // Get the new token
         if (accessToken != null) {
           request.headers['Authorization'] = 'Bearer $accessToken';
         }
         return await _inner.send(request);
       } else {
         // Refresh failed, logout the user
-        await _authService.clearTokens();
+        await authService.clearTokens();
         // It might be good to force a navigation to /login here, but that's a side effect.
         // The router's redirect logic should handle the navigation.
       }
@@ -59,7 +60,9 @@ class AuthHttpClient extends http.BaseClient {
   }
 
   Future<bool> _refreshToken() async {
-    final authService = _ref.read(authServiceProvider); // Lazily get AuthService
+    final authService = _ref.read(
+      authServiceProvider,
+    ); // Lazily get AuthService
     final refreshToken = await authService.getRefreshToken();
 
     if (refreshToken == null) {
@@ -69,7 +72,10 @@ class AuthHttpClient extends http.BaseClient {
 
     try {
       final loginResponse = await authService.refreshToken(refreshToken);
-      await authService.saveTokens(loginResponse.accessToken, loginResponse.refreshToken);
+      await authService.saveTokens(
+        loginResponse.accessToken,
+        loginResponse.refreshToken,
+      );
       return true;
     } catch (e) {
       // Refresh failed due to network error or invalid refresh token
