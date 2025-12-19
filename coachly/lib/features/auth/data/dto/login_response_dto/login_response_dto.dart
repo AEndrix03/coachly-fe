@@ -19,11 +19,10 @@ abstract class LoginResponseDto with _$LoginResponseDto {
   factory LoginResponseDto.fromTokens({
     required String accessToken,
     required String refreshToken,
-  }) =>
-      LoginResponseDto(
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        firstName: null, // Default to null when not provided
-        lastName: null, // Default to null when not provided
-      );
+  }) => LoginResponseDto(
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+    firstName: null, // Default to null when not provided
+    lastName: null, // Default to null when not provided
+  );
 }
