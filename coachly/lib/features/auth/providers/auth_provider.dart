@@ -52,12 +52,9 @@ class Auth extends _$Auth with WidgetsBindingObserver {
     });
 
     // Listen for connectivity changes to retry auth check if needed
-    ref.listen(connectivityProvider, (
-      previous,
-      next,
-    ) {
+    ref.listen(connectivityProvider, (previous, next) {
       // Use valueOrNull for safer access
-      final isConnected = next.valueOrNull != ConnectivityResult.none;
+      final isConnected = next.value != ConnectivityResult.none;
       if (isConnected && _networkErrorOccurred) {
         _networkErrorOccurred = false; // Reset flag before retrying
         checkAuthStatus();

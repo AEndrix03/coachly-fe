@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/network/api_endpoints.dart';
 import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
 import 'package:coachly/features/auth/data/dto/login_request_dto/login_request_dto.dart';
@@ -7,8 +8,6 @@ import 'package:coachly/features/auth/data/dto/login_response_dto/login_response
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:coachly/core/error/failures.dart';
 import 'package:http/http.dart' as http;
 
 class AuthServiceImpl implements AuthService {
@@ -34,7 +33,8 @@ class AuthServiceImpl implements AuthService {
         rethrow;
       }
       throw NetworkFailure(
-          'Errore di connessione. Controlla la tua connessione internet.');
+        'Errore di connessione. Controlla la tua connessione internet.',
+      );
     }
 
     if (response.statusCode == 200) {
@@ -46,13 +46,8 @@ class AuthServiceImpl implements AuthService {
         loginResponse.refreshToken,
       ); // Save tokens after successful login
       return loginResponse;
-    } else if (response.statusCode == 401 || response.statusCode == 403) {
-      throw const InvalidCredentialsFailure();
     } else {
-      throw ServerFailure(
-        'Errore del server. Riprova più tardi.',
-        response.statusCode,
-      );
+      throw const InvalidCredentialsFailure();
     }
   }
 
