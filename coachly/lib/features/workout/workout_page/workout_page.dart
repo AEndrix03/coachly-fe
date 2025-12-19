@@ -105,7 +105,6 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage> {
           WorkoutHeader(
             stats: null, // statsState.stats,
             isLoading: false, // statsState.isLoading,
-            onSettings: () => _showSettings(context),
             onNotifications: () => _showNotifications(context),
           ),
           const Gap(18),
