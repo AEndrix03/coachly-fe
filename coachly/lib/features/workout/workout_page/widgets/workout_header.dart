@@ -1,23 +1,23 @@
+import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class WorkoutHeader extends StatelessWidget {
+class WorkoutHeader extends ConsumerWidget {
   final WorkoutStatsModel? stats;
   final bool isLoading;
-  final VoidCallback? onSettings;
   final VoidCallback? onNotifications;
 
   const WorkoutHeader({
     super.key,
     this.stats,
     this.isLoading = false,
-    this.onSettings,
     this.onNotifications,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
@@ -36,13 +36,14 @@ class WorkoutHeader extends StatelessWidget {
         bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildAppBar(scheme), _buildContent(scheme)],
+          children: [_buildAppBar(context, ref, scheme), _buildContent(scheme)],
         ),
       ),
     );
   }
 
-  Widget _buildAppBar(ColorScheme scheme) {
+  Widget _buildAppBar(
+      BuildContext context, WidgetRef ref, ColorScheme scheme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Row(
@@ -73,12 +74,19 @@ class WorkoutHeader extends StatelessWidget {
           ),
           Row(
             children: [
-              GlassIconButton(
-                icon: Icons.settings_outlined,
-                onPressed: onSettings,
-                iconColor: Colors.white,
-                size: 20,
-                marginRight: 0,
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'logout') {
+                    _showLogoutDialog(context, ref);
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'logout',
+                    child: Text('Logout'),
+                  ),
+                ],
+                icon: const Icon(Icons.settings_outlined, color: Colors.white),
               ),
               const SizedBox(width: 8),
               _buildNotificationButton(scheme),
@@ -88,7 +96,34 @@ class WorkoutHeader extends StatelessWidget {
       ),
     );
   }
- 
+
+  Future<void> _showLogoutDialog(BuildContext context, WidgetRef ref) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Conferma Logout'),
+          content: const Text('Sei sicuro di voler uscire?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Annulla'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Logout'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                ref.read(authProvider.notifier).logout();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildNotificationButton(ColorScheme scheme) {
     return Stack(
       children: [
