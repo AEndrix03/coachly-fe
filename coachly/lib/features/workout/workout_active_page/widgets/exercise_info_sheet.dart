@@ -36,7 +36,7 @@ class ExerciseInfoSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             child: Column(
@@ -62,7 +62,7 @@ class ExerciseInfoSheet extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const Text(
                   'Informazioni dettagliate sull\'esercizio.',
                   style: TextStyle(
@@ -71,9 +71,9 @@ class ExerciseInfoSheet extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Emoji illustration
                 Container(
                   width: double.infinity,
@@ -83,15 +83,12 @@ class ExerciseInfoSheet extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Center(
-                    child: Text(
-                      emoji,
-                      style: const TextStyle(fontSize: 80),
-                    ),
+                    child: Text(emoji, style: const TextStyle(fontSize: 80)),
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Tecnica section
                 Container(
                   width: double.infinity,
@@ -128,9 +125,9 @@ class ExerciseInfoSheet extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Action buttons
                 Row(
                   children: [

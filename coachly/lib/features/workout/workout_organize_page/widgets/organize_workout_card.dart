@@ -58,9 +58,7 @@ class _OrganizeWorkoutCardState extends State<OrganizeWorkoutCard> {
             ],
           ),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFF2196F3).withOpacity(0.14),
-          ),
+          border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.14)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.13),
@@ -145,20 +143,21 @@ class _OrganizeWorkoutCardState extends State<OrganizeWorkoutCard> {
                         widget.onDelete();
                       }
                     },
-                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                      PopupMenuItem<String>(
-                        value: 'toggleActive',
-                        child: Text(_isActive ? 'Disattiva' : 'Attiva'),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'edit',
-                        child: Text('Modifica'),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'delete',
-                        child: Text('Elimina'),
-                      ),
-                    ],
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                          PopupMenuItem<String>(
+                            value: 'toggleActive',
+                            child: Text(_isActive ? 'Disattiva' : 'Attiva'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'edit',
+                            child: Text('Modifica'),
+                          ),
+                          const PopupMenuItem<String>(
+                            value: 'delete',
+                            child: Text('Elimina'),
+                          ),
+                        ],
                   ),
                 ],
               ),

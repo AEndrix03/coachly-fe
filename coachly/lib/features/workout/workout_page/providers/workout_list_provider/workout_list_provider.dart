@@ -98,18 +98,26 @@ class WorkoutListNotifier extends _$WorkoutListNotifier {
       if (response.success) {
         state = state.copyWith(
           workouts: state.workouts.where((w) => w.id != workoutId).toList(),
-          recentWorkouts: state.recentWorkouts.where((w) => w.id != workoutId).toList(),
+          recentWorkouts: state.recentWorkouts
+              .where((w) => w.id != workoutId)
+              .toList(),
           isLoading: false,
         );
       } else {
-        state = state.copyWith(isLoading: false, errorMessage: response.message);
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: response.message,
+        );
       }
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
 
-  Future<void> updateWorkoutActiveStatus(String workoutId, bool isActive) async {
+  Future<void> updateWorkoutActiveStatus(
+    String workoutId,
+    bool isActive,
+  ) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final repository = ref.read(workoutPageRepositoryProvider);
@@ -128,7 +136,10 @@ class WorkoutListNotifier extends _$WorkoutListNotifier {
           isLoading: false,
         );
       } else {
-        state = state.copyWith(isLoading: false, errorMessage: response.message);
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: response.message,
+        );
         // Revert the local UI state if API call fails (optional, but good UX)
         // You might want to pass a callback to the UI to handle this.
       }
@@ -154,7 +165,10 @@ class WorkoutListNotifier extends _$WorkoutListNotifier {
           isLoading: false,
         );
       } else {
-        state = state.copyWith(isLoading: false, errorMessage: response.message);
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: response.message,
+        );
       }
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());

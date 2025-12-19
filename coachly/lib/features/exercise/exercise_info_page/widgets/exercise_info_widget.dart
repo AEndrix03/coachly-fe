@@ -53,19 +53,19 @@ class ExerciseInfoWidget extends StatelessWidget {
                   // Video/Emoji placeholder
                   _buildVideoSection(),
                   const SizedBox(height: 24),
-                  
+
                   // Sezione Tecnica
                   if (technique != null) ...[
                     _buildTechniqueSection(),
                     const SizedBox(height: 20),
                   ],
-                  
+
                   // Sezione Sicurezza
                   if (safetyTips != null && safetyTips!.isNotEmpty) ...[
                     _buildSafetySection(),
                     const SizedBox(height: 20),
                   ],
-                  
+
                   // Sezione Attrezzatura
                   if (equipment != null && equipment!.isNotEmpty)
                     _buildEquipmentSection(),
@@ -118,10 +118,7 @@ class ExerciseInfoWidget extends StatelessWidget {
           colors: [Color(0xFF374151), Color(0xFF1F2937)],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: const Color(0xFF4B5563),
-          width: 1.5,
-        ),
+        border: Border.all(color: const Color(0xFF4B5563), width: 1.5),
       ),
       child: videoUrl != null
           ? ClipRRect(
@@ -159,12 +156,7 @@ class ExerciseInfoWidget extends StatelessWidget {
   }
 
   Widget _buildEmojiPlaceholder() {
-    return const Center(
-      child: Text(
-        '🏋️',
-        style: TextStyle(fontSize: 80),
-      ),
-    );
+    return const Center(child: Text('🏋️', style: TextStyle(fontSize: 80)));
   }
 
   Widget _buildTechniqueSection() {
@@ -173,10 +165,7 @@ class ExerciseInfoWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF0F1419),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,7 +260,9 @@ class ExerciseInfoWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          ...((safetyTips ?? _defaultSafetyTips).map((tip) => _buildSafetyPoint(tip)).toList()),
+          ...((safetyTips ?? _defaultSafetyTips)
+              .map((tip) => _buildSafetyPoint(tip))
+              .toList()),
         ],
       ),
     );
@@ -314,10 +305,7 @@ class ExerciseInfoWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF0F1419),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,8 +360,5 @@ class ExerciseInfoWidget extends StatelessWidget {
     'Riscaldamento specifico obbligatorio',
   ];
 
-  static const List<String> _defaultEquipment = [
-    'Bilanciere',
-    'Panca piana',
-  ];
+  static const List<String> _defaultEquipment = ['Bilanciere', 'Panca piana'];
 }

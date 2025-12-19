@@ -5,8 +5,11 @@ class ExerciseTechniqueTab extends StatelessWidget {
   final String description;
   final List<ExerciseTechniqueModel> techniqueSteps;
 
-  const ExerciseTechniqueTab(
-      {super.key, required this.description, required this.techniqueSteps});
+  const ExerciseTechniqueTab({
+    super.key,
+    required this.description,
+    required this.techniqueSteps,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,20 +18,23 @@ class ExerciseTechniqueTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...techniqueSteps.map((step) => Column(
-                children: [
-                  _buildTechniqueCard(
-                    icon: IconData(step.iconCodePoint,
-                        fontFamily: 'MaterialIcons'),
-                    iconColor: Color(step.iconGradient.first),
-                    title: step.title,
-                    description: step.description,
-                    iconGradient:
-                        step.iconGradient.map((c) => Color(c)).toList(),
+          ...techniqueSteps.map(
+            (step) => Column(
+              children: [
+                _buildTechniqueCard(
+                  icon: IconData(
+                    step.iconCodePoint,
+                    fontFamily: 'MaterialIcons',
                   ),
-                  const SizedBox(height: 16),
-                ],
-              )),
+                  iconColor: Color(step.iconGradient.first),
+                  title: step.title,
+                  description: step.description,
+                  iconGradient: step.iconGradient.map((c) => Color(c)).toList(),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
           const SizedBox(height: 20),
           _buildSafetySection(),
           const SizedBox(height: 20),
@@ -50,10 +56,7 @@ class ExerciseTechniqueTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,10 +197,7 @@ class ExerciseTechniqueTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

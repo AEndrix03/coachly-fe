@@ -24,7 +24,9 @@ GoRouter router(Ref ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: authState.value?.accessToken != null ? '/workouts' : '/login',
+    initialLocation: authState.value?.accessToken != null
+        ? '/workouts'
+        : '/login',
     redirect: (BuildContext context, GoRouterState state) {
       final isAuthenticated = authState.value?.accessToken != null;
       final isLoggingIn = state.matchedLocation == '/login';

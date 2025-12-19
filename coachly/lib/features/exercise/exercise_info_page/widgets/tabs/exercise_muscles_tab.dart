@@ -5,10 +5,11 @@ class ExerciseMusclesTab extends StatelessWidget {
   final List<MuscleModel> primaryMuscles;
   final List<MuscleModel> secondaryMuscles;
 
-  const ExerciseMusclesTab(
-      {super.key,
-      required this.primaryMuscles,
-      required this.secondaryMuscles});
+  const ExerciseMusclesTab({
+    super.key,
+    required this.primaryMuscles,
+    required this.secondaryMuscles,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,10 @@ class ExerciseMusclesTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withAlpha((255 * 0.1).toInt()), width: 1),
+        border: Border.all(
+          color: Colors.white.withAlpha((255 * 0.1).toInt()),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
@@ -118,7 +122,10 @@ class ExerciseMusclesTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Color(muscle.color).withAlpha((255 * 0.2).toInt()), width: 1),
+        border: Border.all(
+          color: Color(muscle.color).withAlpha((255 * 0.2).toInt()),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [

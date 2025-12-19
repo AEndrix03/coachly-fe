@@ -29,10 +29,7 @@ class InlineRestTimer extends ConsumerWidget {
                 colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
               ),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFF334155),
-                width: 2,
-              ),
+              border: Border.all(color: const Color(0xFF334155), width: 2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.5),
@@ -103,7 +100,8 @@ class InlineRestTimer extends ConsumerWidget {
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () => ref.read(restTimerProvider.notifier).addTime(15),
+                    onTap: () =>
+                        ref.read(restTimerProvider.notifier).addTime(15),
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -136,7 +134,8 @@ class InlineRestTimer extends ConsumerWidget {
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () => ref.read(restTimerProvider.notifier).stopTimer(),
+                    onTap: () =>
+                        ref.read(restTimerProvider.notifier).stopTimer(),
                     borderRadius: BorderRadius.circular(10),
                     child: Container(
                       padding: const EdgeInsets.all(8),

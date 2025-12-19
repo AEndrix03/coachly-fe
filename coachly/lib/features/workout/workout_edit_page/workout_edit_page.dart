@@ -109,7 +109,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                     onBack: () => context.pop(),
                     onSave: _handleSave,
                     onTitleChanged: (value) => ref
-                        .read(workoutEditPageProvider(widget.workoutId).notifier)
+                        .read(
+                          workoutEditPageProvider(widget.workoutId).notifier,
+                        )
                         .updateTitle(value),
                   ),
                 ),
@@ -175,7 +177,10 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
-              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.8),
+                fontSize: 14,
+              ),
               maxLines: null,
               decoration: InputDecoration(
                 hintText: 'Aggiungi una descrizione...',
@@ -281,7 +286,10 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 11,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

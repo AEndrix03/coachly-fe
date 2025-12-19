@@ -13,19 +13,23 @@ class ExerciseVariantsTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...variants.map((variant) => Column(
-                children: [
-                  _buildVariantCard(
-                    icon: IconData(variant.iconCodePoint,
-                        fontFamily: 'MaterialIcons'),
-                    title: variant.title,
-                    subtitle: variant.subtitle,
-                    emphasis: variant.emphasis,
-                    onTap: () {},
+          ...variants.map(
+            (variant) => Column(
+              children: [
+                _buildVariantCard(
+                  icon: IconData(
+                    variant.iconCodePoint,
+                    fontFamily: 'MaterialIcons',
                   ),
-                  const SizedBox(height: 12),
-                ],
-              )),
+                  title: variant.title,
+                  subtitle: variant.subtitle,
+                  emphasis: variant.emphasis,
+                  onTap: () {},
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -46,10 +50,7 @@ class ExerciseVariantsTab extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A2E),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.1),
-            width: 1,
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
         ),
         child: Row(
           children: [
@@ -60,11 +61,7 @@ class ExerciseVariantsTab extends StatelessWidget {
                 color: const Color(0xFF2196F3).withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: const Color(0xFF2196F3),
-                size: 26,
-              ),
+              child: Icon(icon, color: const Color(0xFF2196F3), size: 26),
             ),
             const SizedBox(width: 16),
             Expanded(

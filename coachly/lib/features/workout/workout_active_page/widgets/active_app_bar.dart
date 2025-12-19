@@ -54,8 +54,6 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -63,16 +61,10 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF1F2937),
-            Color(0xFF111827),
-          ],
+          colors: [Color(0xFF1F2937), Color(0xFF111827)],
         ),
         border: Border(
-          bottom: BorderSide(
-            color: Color(0xFF374151),
-            width: 1.5,
-          ),
+          bottom: BorderSide(color: Color(0xFF374151), width: 1.5),
         ),
       ),
       child: SafeArea(
@@ -90,9 +82,9 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
                     icon: Icons.arrow_back_rounded,
                     onPressed: () => _showCancelDialog(context),
                   ),
-                  
+
                   const SizedBox(width: 12),
-                  
+
                   // Time and exercise counter
                   Expanded(
                     child: Column(
@@ -114,9 +106,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.5,
-                                fontFeatures: [
-                                  FontFeature.tabularFigures(),
-                                ],
+                                fontFeatures: [FontFeature.tabularFigures()],
                               ),
                             ),
                           ],
@@ -153,7 +143,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
                       ],
                     ),
                   ),
-                  
+
                   // Pause button - STILE COPIATO
                   _buildIconButton(
                     icon: Icons.pause_rounded,
@@ -162,15 +152,15 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
                       _timer.cancel();
                     },
                   ),
-                  
+
                   const SizedBox(width: 8),
-                  
+
                   // Menu button - STILE COPIATO
                   _buildMenuButton(context),
                 ],
               ),
             ),
-            
+
             // Rest timer bar - appare solo quando attivo
             _buildRestTimerBar(ref),
           ],
@@ -181,7 +171,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
 
   Widget _buildRestTimerBar(WidgetRef ref) {
     final timerState = ref.watch(restTimerProvider);
-    
+
     if (!timerState.isActive) return const SizedBox.shrink();
 
     final minutes = timerState.remainingSeconds ~/ 60;
@@ -193,9 +183,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
         gradient: LinearGradient(
           colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
         ),
-        border: Border(
-          top: BorderSide(color: Color(0xFF374151), width: 1),
-        ),
+        border: Border(top: BorderSide(color: Color(0xFF374151), width: 1)),
       ),
       child: Row(
         children: [
@@ -213,7 +201,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
             ),
           ),
           const SizedBox(width: 12),
-          
+
           // Timer
           Text(
             '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
@@ -225,17 +213,17 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
               fontFeatures: [FontFeature.tabularFigures()],
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Pulsante +15s
           _buildIconButton(
             icon: Icons.add,
             onPressed: () => ref.read(restTimerProvider.notifier).addTime(15),
           ),
-          
+
           const Spacer(),
-          
+
           // Pulsante X
           Container(
             width: 36,
@@ -270,10 +258,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15), // STILE COPIATO
         borderRadius: BorderRadius.circular(14), // STILE COPIATO (non cerchio!)
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: IconButton(
         icon: Icon(icon, color: Colors.white, size: 22),
@@ -290,10 +275,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15), // STILE COPIATO
         borderRadius: BorderRadius.circular(14), // STILE COPIATO (non cerchio!)
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: PopupMenuButton<String>(
         icon: const Icon(
@@ -306,10 +288,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
         elevation: 8,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(
-            color: Color(0xFF374151),
-            width: 1.5,
-          ),
+          side: const BorderSide(color: Color(0xFF374151), width: 1.5),
         ),
         onSelected: (value) {
           switch (value) {
@@ -401,24 +380,15 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
         backgroundColor: const Color(0xFF1F2937),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(
-            color: Color(0xFF374151),
-            width: 1.5,
-          ),
+          side: const BorderSide(color: Color(0xFF374151), width: 1.5),
         ),
         title: const Text(
           'Annulla allenamento?',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
         ),
         content: const Text(
           'I progressi attuali non verranno salvati.',
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 15,
-          ),
+          style: TextStyle(color: Colors.white70, fontSize: 15),
         ),
         actions: [
           TextButton(
@@ -463,24 +433,15 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
         backgroundColor: const Color(0xFF1F2937),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(
-            color: Color(0xFF374151),
-            width: 1.5,
-          ),
+          side: const BorderSide(color: Color(0xFF374151), width: 1.5),
         ),
         title: const Text(
           'Terminare e scartare?',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
         ),
         content: const Text(
           'Tutti i dati di questo allenamento verranno eliminati.',
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 15,
-          ),
+          style: TextStyle(color: Colors.white70, fontSize: 15),
         ),
         actions: [
           TextButton(

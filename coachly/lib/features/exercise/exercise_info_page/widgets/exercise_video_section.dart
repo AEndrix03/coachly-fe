@@ -44,20 +44,13 @@ class ExerciseVideoSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
       child: Stack(
         alignment: Alignment.center,
         children: [
           // TODO: Replace with actual video player
-          const Icon(
-            Icons.fitness_center,
-            size: 60,
-            color: Color(0xFF2196F3),
-          ),
+          const Icon(Icons.fitness_center, size: 60, color: Color(0xFF2196F3)),
           Container(
             width: 70,
             height: 70,
@@ -121,10 +114,7 @@ class ExerciseVideoSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: textColor.withOpacity(0.3),
-          width: 1,
-        ),
+        border: Border.all(color: textColor.withOpacity(0.3), width: 1),
       ),
       child: Text(
         label,

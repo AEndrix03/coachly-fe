@@ -46,7 +46,8 @@ class WorkoutPageService {
   Future<ApiResponse<String>> enableWorkoutApi(String workoutId) async {
     return await _apiClient.put<String>(
       '/workouts/$workoutId/enable',
-      fromJson: (data) => workoutId, // Assuming API returns nothing or success, we return the ID
+      fromJson: (data) =>
+          workoutId, // Assuming API returns nothing or success, we return the ID
     );
   }
 
@@ -54,7 +55,8 @@ class WorkoutPageService {
   Future<ApiResponse<String>> disableWorkoutApi(String workoutId) async {
     return await _apiClient.put<String>(
       '/workouts/$workoutId/disable',
-      fromJson: (data) => workoutId, // Assuming API returns nothing or success, we return the ID
+      fromJson: (data) =>
+          workoutId, // Assuming API returns nothing or success, we return the ID
     );
   }
 
@@ -62,16 +64,20 @@ class WorkoutPageService {
   Future<ApiResponse<String>> deleteWorkoutApi(String workoutId) async {
     return await _apiClient.delete<String>(
       '/workouts/$workoutId',
-      fromJson: (data) => workoutId, // Assuming API returns nothing or success, we return the ID
+      fromJson: (data) =>
+          workoutId, // Assuming API returns nothing or success, we return the ID
     );
   }
 
   /// Update a workout
-  Future<ApiResponse<String>> updateWorkoutApi(WorkoutModel updatedWorkout) async {
+  Future<ApiResponse<String>> updateWorkoutApi(
+    WorkoutModel updatedWorkout,
+  ) async {
     return await _apiClient.put<String>(
       '/workouts/${updatedWorkout.id}',
       body: updatedWorkout.toJson(),
-      fromJson: (data) => updatedWorkout.id, // Assuming API returns nothing or success, we return the ID
+      fromJson: (data) => updatedWorkout
+          .id, // Assuming API returns nothing or success, we return the ID
     );
   }
 }

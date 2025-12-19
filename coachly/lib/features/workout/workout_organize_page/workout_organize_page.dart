@@ -40,10 +40,12 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
     final scheme = Theme.of(context).colorScheme;
     final workoutState = ref.watch(workoutListProvider);
 
-    final activeWorkouts =
-        workoutState.workouts.where((w) => w.active).toList();
-    final inactiveWorkouts =
-        workoutState.workouts.where((w) => !w.active).toList();
+    final activeWorkouts = workoutState.workouts
+        .where((w) => w.active)
+        .toList();
+    final inactiveWorkouts = workoutState.workouts
+        .where((w) => !w.active)
+        .toList();
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -127,9 +129,18 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildWorkoutList(context, workoutState, activeWorkouts, scheme),
                 _buildWorkoutList(
-                    context, workoutState, inactiveWorkouts, scheme),
+                  context,
+                  workoutState,
+                  activeWorkouts,
+                  scheme,
+                ),
+                _buildWorkoutList(
+                  context,
+                  workoutState,
+                  inactiveWorkouts,
+                  scheme,
+                ),
               ],
             ),
           ),

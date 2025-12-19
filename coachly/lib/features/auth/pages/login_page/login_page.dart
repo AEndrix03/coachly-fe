@@ -27,10 +27,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   void _submitLogin() {
     if (_formKey.currentState!.validate()) {
-      ref.read(authProvider.notifier).login(
-            _emailController.text,
-            _passwordController.text,
-          );
+      ref
+          .read(authProvider.notifier)
+          .login(_emailController.text, _passwordController.text);
     }
   }
 
@@ -43,13 +42,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref.listen(authProvider, (previous, next) {
       if (next is AsyncError) {
         final error = next.error;
-        final message =
-            error is Failure ? error.message : 'Si è verificato un errore.';
+        final message = error is Failure
+            ? error.message
+            : 'Si è verificato un errore.';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: colorScheme.error,
-          ),
+          SnackBar(content: Text(message), backgroundColor: colorScheme.error),
         );
       }
       if (next is AsyncData && next.value != null) {
@@ -104,14 +101,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                     // --- APP TITLE ---
                     Text(
-                      'Coachly',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        textStyle: textTheme.displaySmall,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ).animate().fade(delay: 300.ms, duration: 900.ms).slideY(begin: 0.5),
+                          'Coachly',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            textStyle: textTheme.displaySmall,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        )
+                        .animate()
+                        .fade(delay: 300.ms, duration: 900.ms)
+                        .slideY(begin: 0.5),
 
                     const SizedBox(height: 48),
 
@@ -121,7 +121,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       enabled: !authState.isLoading,
                       decoration: const InputDecoration(labelText: 'Email'),
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) => (value == null || !value.contains('@'))
+                      validator: (value) =>
+                          (value == null || !value.contains('@'))
                           ? 'Please enter a valid email'
                           : null,
                     ),
@@ -134,7 +135,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       enabled: !authState.isLoading,
                       decoration: const InputDecoration(labelText: 'Password'),
                       obscureText: true,
-                       validator: (value) => (value == null || value.length < 6)
+                      validator: (value) => (value == null || value.length < 6)
                           ? 'Password must be at least 6 characters'
                           : null,
                     ),
@@ -159,7 +160,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       child: authState.isLoading
                           ? const CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             )
                           : const Text('Accedi'),
                     ),
@@ -182,7 +185,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         const Expanded(child: Divider(color: Colors.white54)),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 24),
 
                     // --- SOCIAL LOGIN BUTTONS ---
@@ -195,7 +198,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             label: const Text('Google'),
                             onPressed: authState.isLoading ? null : () {},
                           ),
-						),
+                        ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: OutlinedButton.icon(
@@ -235,4 +238,3 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 }
-

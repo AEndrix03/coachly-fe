@@ -78,7 +78,9 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
               Text(
                 state.errorMessage ?? 'Unknown error',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: scheme.onSurface.withAlpha((255 * 0.7).toInt())),
+                style: TextStyle(
+                  color: scheme.onSurface.withAlpha((255 * 0.7).toInt()),
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
@@ -99,7 +101,9 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
       return Center(
         child: Shimmer.fromColors(
           baseColor: const Color(0xFF1A1A2E),
-          highlightColor: const Color(0xFF6C5CE7).withAlpha((255 * 0.2).toInt()),
+          highlightColor: const Color(
+            0xFF6C5CE7,
+          ).withAlpha((255 * 0.2).toInt()),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -178,7 +182,9 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
               labelColor: scheme.onPrimary,
-              unselectedLabelColor: scheme.onSurface.withAlpha((255 * 0.5).toInt()),
+              unselectedLabelColor: scheme.onSurface.withAlpha(
+                (255 * 0.5).toInt(),
+              ),
               labelStyle: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -209,9 +215,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
                 primaryMuscles: exercise.primaryMuscles,
                 secondaryMuscles: exercise.secondaryMuscles,
               ),
-              ExerciseVariantsTab(
-                variants: exercise.variants,
-              ),
+              ExerciseVariantsTab(variants: exercise.variants),
             ],
           ),
         ),
@@ -233,7 +237,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

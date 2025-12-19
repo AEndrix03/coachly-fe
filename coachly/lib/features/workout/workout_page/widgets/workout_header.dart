@@ -42,8 +42,7 @@ class WorkoutHeader extends ConsumerWidget {
     );
   }
 
-  Widget _buildAppBar(
-      BuildContext context, WidgetRef ref, ColorScheme scheme) {
+  Widget _buildAppBar(BuildContext context, WidgetRef ref, ColorScheme scheme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Row(

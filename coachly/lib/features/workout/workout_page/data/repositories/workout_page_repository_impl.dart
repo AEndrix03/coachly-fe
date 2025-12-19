@@ -33,19 +33,22 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
   @override
   Future<ApiResponse<String>> enableWorkout(String workoutId) async {
-    if (useMockData) return ApiResponse.success(data: workoutId); // Simulate success
+    if (useMockData)
+      return ApiResponse.success(data: workoutId); // Simulate success
     return await _service.enableWorkoutApi(workoutId);
   }
 
   @override
   Future<ApiResponse<String>> disableWorkout(String workoutId) async {
-    if (useMockData) return ApiResponse.success(data: workoutId); // Simulate success
+    if (useMockData)
+      return ApiResponse.success(data: workoutId); // Simulate success
     return await _service.disableWorkoutApi(workoutId);
   }
 
   @override
   Future<ApiResponse<String>> deleteWorkout(String workoutId) async {
-    if (useMockData) return ApiResponse.success(data: workoutId); // Simulate success
+    if (useMockData)
+      return ApiResponse.success(data: workoutId); // Simulate success
     return await _service.deleteWorkoutApi(workoutId);
   }
 
@@ -56,7 +59,8 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       final mockWorkouts = _getMockWorkouts().data ?? [];
       final index = mockWorkouts.indexWhere((w) => w.id == updatedWorkout.id);
       if (index != -1) {
-        mockWorkouts[index] = updatedWorkout; // This won't actually update the list returned by _getMockWorkouts
+        mockWorkouts[index] =
+            updatedWorkout; // This won't actually update the list returned by _getMockWorkouts
       }
       return ApiResponse.success(data: updatedWorkout.id); // Simulate success
     }

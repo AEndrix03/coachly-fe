@@ -38,8 +38,7 @@ final class Left<L, R> extends Either<L, R> {
   }
 
   @override
-  bool operator ==(Object other) =>
-      other is Left<L, R> && other.value == value;
+  bool operator ==(Object other) => other is Left<L, R> && other.value == value;
 
   @override
   int get hashCode => value.hashCode;
@@ -67,18 +66,12 @@ final class Right<L, R> extends Either<L, R> {
 extension EitherX<L, R> on Either<L, R> {
   /// Map sul valore Right
   Either<L, T> map<T>(T Function(R value) f) {
-    return fold(
-      (left) => Either.left(left),
-      (right) => Either.right(f(right)),
-    );
+    return fold((left) => Either.left(left), (right) => Either.right(f(right)));
   }
 
   /// FlatMap / bind
   Either<L, T> flatMap<T>(Either<L, T> Function(R value) f) {
-    return fold(
-      (left) => Either.left(left),
-      (right) => f(right),
-    );
+    return fold((left) => Either.left(left), (right) => f(right));
   }
 
   /// Esegui side effect se Right

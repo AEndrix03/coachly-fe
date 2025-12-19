@@ -4,16 +4,14 @@ import 'dart:async';
 class RestTimerOverlay extends StatefulWidget {
   final VoidCallback onClose;
 
-  const RestTimerOverlay({
-    super.key,
-    required this.onClose,
-  });
+  const RestTimerOverlay({super.key, required this.onClose});
 
   @override
   State<RestTimerOverlay> createState() => _RestTimerOverlayState();
 }
 
-class _RestTimerOverlayState extends State<RestTimerOverlay> with SingleTickerProviderStateMixin {
+class _RestTimerOverlayState extends State<RestTimerOverlay>
+    with SingleTickerProviderStateMixin {
   Timer? _timer;
   int _remainingSeconds = 90; // Default 90s
   bool _isRunning = false;
@@ -78,16 +76,10 @@ class _RestTimerOverlayState extends State<RestTimerOverlay> with SingleTickerPr
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF1F2937),
-                    Color(0xFF111827),
-                  ],
+                  colors: [Color(0xFF1F2937), Color(0xFF111827)],
                 ),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: const Color(0xFF374151),
-                  width: 2,
-                ),
+                border: Border.all(color: const Color(0xFF374151), width: 2),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.5),
@@ -119,9 +111,9 @@ class _RestTimerOverlayState extends State<RestTimerOverlay> with SingleTickerPr
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Timer Display
                   AnimatedBuilder(
                     animation: _pulseController,
@@ -136,8 +128,12 @@ class _RestTimerOverlayState extends State<RestTimerOverlay> with SingleTickerPr
                             end: Alignment.bottomRight,
                             colors: _remainingSeconds <= 10 && _isRunning
                                 ? [
-                                    Color(0xFFEF4444).withOpacity(0.8 + _pulseController.value * 0.2),
-                                    Color(0xFFDC2626).withOpacity(0.8 + _pulseController.value * 0.2),
+                                    Color(0xFFEF4444).withOpacity(
+                                      0.8 + _pulseController.value * 0.2,
+                                    ),
+                                    Color(0xFFDC2626).withOpacity(
+                                      0.8 + _pulseController.value * 0.2,
+                                    ),
                                   ]
                                 : [
                                     const Color(0xFF3B82F6),
@@ -146,10 +142,11 @@ class _RestTimerOverlayState extends State<RestTimerOverlay> with SingleTickerPr
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: (_remainingSeconds <= 10 && _isRunning
-                                      ? const Color(0xFFEF4444)
-                                      : const Color(0xFF3B82F6))
-                                  .withOpacity(0.5),
+                              color:
+                                  (_remainingSeconds <= 10 && _isRunning
+                                          ? const Color(0xFFEF4444)
+                                          : const Color(0xFF3B82F6))
+                                      .withOpacity(0.5),
                               blurRadius: 20,
                               spreadRadius: 5,
                             ),
@@ -170,9 +167,9 @@ class _RestTimerOverlayState extends State<RestTimerOverlay> with SingleTickerPr
                       );
                     },
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Controls
                   if (!_isRunning) ...[
                     // Start Button
@@ -285,16 +282,11 @@ class _RestTimerOverlayState extends State<RestTimerOverlay> with SingleTickerPr
         foregroundColor: Colors.white70,
         side: const BorderSide(color: Color(0xFF374151), width: 1.5),
         padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
       ),
     );
   }

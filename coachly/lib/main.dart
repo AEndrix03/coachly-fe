@@ -13,7 +13,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Create a ProviderContainer to access providers before runApp.
   final container = ProviderContainer();
-  
+
   // Initialize Auth provider to check for existing session
   await container.read(authProvider.notifier).checkAuthStatus();
 

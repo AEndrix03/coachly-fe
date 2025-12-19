@@ -5,11 +5,7 @@ class AICoachWidget extends StatelessWidget {
   final VoidCallback? onClose;
   final bool showQuickActions;
 
-  const AICoachWidget({
-    super.key,
-    this.onClose,
-    this.showQuickActions = true,
-  });
+  const AICoachWidget({super.key, this.onClose, this.showQuickActions = true});
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +38,7 @@ class AICoachWidget extends StatelessWidget {
           ],
 
           // Chat messages
-          Expanded(
-            child: _buildChatArea(),
-          ),
+          Expanded(child: _buildChatArea()),
 
           // Input field
           _buildInputField(),
@@ -87,7 +81,7 @@ class AICoachWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-          
+
           // Title
           const Expanded(
             child: Column(
@@ -113,7 +107,7 @@ class AICoachWidget extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Close button
           if (onClose != null)
             IconButton(
@@ -194,10 +188,7 @@ class AICoachWidget extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: gradient),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-              width: 1,
-            ),
+            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
             boxShadow: [
               BoxShadow(
                 color: gradient[0].withOpacity(0.3),
@@ -233,17 +224,20 @@ class AICoachWidget extends StatelessWidget {
       children: [
         _ChatBubble(
           isAI: true,
-          message: 'Ciao! Sono il tuo AI Coach. Posso aiutarti con schede di allenamento, analisi progressi, consigli nutrizionali e molto altro. Come posso aiutarti oggi? 💪',
+          message:
+              'Ciao! Sono il tuo AI Coach. Posso aiutarti con schede di allenamento, analisi progressi, consigli nutrizionali e molto altro. Come posso aiutarti oggi? 💪',
         ),
         const SizedBox(height: 12),
         _ChatBubble(
           isAI: false,
-          message: 'Sto facendo la panca piana, mi sento stanco. Devo continuare?',
+          message:
+              'Sto facendo la panca piana, mi sento stanco. Devo continuare?',
         ),
         const SizedBox(height: 12),
         _ChatBubble(
           isAI: true,
-          message: 'Ottima domanda! Se senti fatica muscolare normale, continua pure. Se invece percepisci dolore o instabilità articolare, fermati. Considera di ridurre leggermente il carico del 5-10% nelle serie rimanenti per mantenere la forma corretta. 🎯',
+          message:
+              'Ottima domanda! Se senti fatica muscolare normale, continua pure. Se invece percepisci dolore o instabilità articolare, fermati. Considera di ridurre leggermente il carico del 5-10% nelle serie rimanenti per mantenere la forma corretta. 🎯',
         ),
       ],
     );
@@ -253,9 +247,7 @@ class AICoachWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Color(0xFF374151), width: 1.5),
-        ),
+        border: Border(top: BorderSide(color: Color(0xFF374151), width: 1.5)),
       ),
       child: Row(
         children: [
@@ -284,7 +276,7 @@ class AICoachWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          
+
           // Text input
           Expanded(
             child: Container(
@@ -308,7 +300,7 @@ class AICoachWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          
+
           // Send button
           Container(
             width: 48,
@@ -351,10 +343,7 @@ class _ChatBubble extends StatelessWidget {
   final bool isAI;
   final String message;
 
-  const _ChatBubble({
-    required this.isAI,
-    required this.message,
-  });
+  const _ChatBubble({required this.isAI, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -375,9 +364,7 @@ class _ChatBubble extends StatelessWidget {
                 ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isAI
-                ? const Color(0xFF4B5563)
-                : const Color(0xFF818CF8),
+            color: isAI ? const Color(0xFF4B5563) : const Color(0xFF818CF8),
             width: 1,
           ),
           boxShadow: isAI
