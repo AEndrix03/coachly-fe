@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
+import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
 import 'package:coachly/features/auth/data/dto/login_request_dto/login_request_dto.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/repositories/auth_repository.dart';
@@ -24,9 +25,11 @@ TokenManager tokenManager(Ref ref) {
 // 1. Provider for the AuthService
 @riverpod
 AuthService authService(Ref ref) {
-  // The dependency on AuthHttpClient is now resolved lazily within AuthServiceImpl
-  // by passing the ref directly. This breaks the circular dependency.
-  return AuthServiceImpl(ref, ref.watch(tokenManagerProvider));
+  final tokenManager = ref.watch(tokenManagerProvider);
+  return AuthServiceImpl(
+    () => ref.read(authHttpClientProvider), // Pass a ValueGetter
+    tokenManager,
+  );
 }
 
 // 2. Provider for the AuthRepository
@@ -60,7 +63,8 @@ class Auth extends _$Auth with WidgetsBindingObserver {
       final isConnected = next.value != ConnectivityResult.none;
       if (isConnected && _networkErrorOccurred) {
         print(
-            'Connection restored and network error occurred, retrying checkAuthStatus.');
+          'Connection restored and network error occurred, retrying checkAuthStatus.',
+        );
         _networkErrorOccurred = false; // Reset flag before retrying
         checkAuthStatus();
       }
@@ -119,7 +123,9 @@ class Auth extends _$Auth with WidgetsBindingObserver {
       _networkErrorOccurred = false; // Reset flag on successful login
       state = AsyncData(loginResponse);
       _startRefreshTimer(); // Start the periodic refresh on successful login
-      print('Auth.login() state updated. New state value: ${state.value?.accessToken}');
+      print(
+        'Auth.login() state updated. New state value: ${state.value?.accessToken}',
+      );
     } catch (e, st) {
       print('Auth.login() failed. Error: $e, Stack: $st');
       if (e is NetworkFailure) {
@@ -145,16 +151,19 @@ class Auth extends _$Auth with WidgetsBindingObserver {
     final accessToken = await service.getAccessToken();
     final refreshToken = await service.getRefreshToken();
     print(
-        'checkAuthStatus - Retrieved tokens. AccessToken: $accessToken, RefreshToken: $refreshToken');
+      'checkAuthStatus - Retrieved tokens. AccessToken: $accessToken, RefreshToken: $refreshToken',
+    );
 
     if (accessToken != null && refreshToken != null) {
       try {
         // Attempt to refresh the token to validate the session
         final loginResponse = await service.refreshToken(refreshToken);
         print(
-            'checkAuthStatus - Refresh successful. New AccessToken: ${loginResponse.accessToken}');
+          'checkAuthStatus - Refresh successful. New AccessToken: ${loginResponse.accessToken}',
+        );
         print(
-            'checkAuthStatus - New RefreshToken: ${loginResponse.refreshToken}');
+          'checkAuthStatus - New RefreshToken: ${loginResponse.refreshToken}',
+        );
         await service.saveTokens(
           loginResponse.accessToken,
           loginResponse.refreshToken,
@@ -167,23 +176,28 @@ class Auth extends _$Auth with WidgetsBindingObserver {
         state = AsyncData(loginResponse);
         _startRefreshTimer(); // Restart timer on successful refresh
         print(
-            'checkAuthStatus - State updated to AsyncData. New state value: ${state.value?.accessToken}');
+          'checkAuthStatus - State updated to AsyncData. New state value: ${state.value?.accessToken}',
+        );
       } catch (e, st) {
         print('checkAuthStatus - Refresh failed. Error: $e, Stack: $st');
         if (e is NetworkFailure) {
           _networkErrorOccurred = true;
           // If network failure, optimistically set state to "logged in" with existing tokens
           // This allows the user to enter the app even without connection if tokens exist.
-          state = AsyncData(LoginResponseDto.fromTokens(
-            accessToken: accessToken,
-            refreshToken: refreshToken,
-          ));
+          state = AsyncData(
+            LoginResponseDto.fromTokens(
+              accessToken: accessToken,
+              refreshToken: refreshToken,
+            ),
+          );
           print(
-              'checkAuthStatus - NetworkFailure. Optimistically setting state. New state value: ${state.value?.accessToken}');
+            'checkAuthStatus - NetworkFailure. Optimistically setting state. New state value: ${state.value?.accessToken}',
+          );
         } else {
           // For any other error (e.g., invalid refresh token), log out.
           print(
-              'checkAuthStatus - Non-network failure. Clearing tokens and logging out.');
+            'checkAuthStatus - Non-network failure. Clearing tokens and logging out.',
+          );
           await service.clearTokens();
           if (!ref.mounted) {
             print('checkAuthStatus - Provider not mounted, returning.');
@@ -194,7 +208,9 @@ class Auth extends _$Auth with WidgetsBindingObserver {
         }
       }
     } else {
-      print('checkAuthStatus - No tokens found, setting state to AsyncData(null).');
+      print(
+        'checkAuthStatus - No tokens found, setting state to AsyncData(null).',
+      );
       if (!ref.mounted) {
         print('checkAuthStatus - Provider not mounted, returning.');
         return;

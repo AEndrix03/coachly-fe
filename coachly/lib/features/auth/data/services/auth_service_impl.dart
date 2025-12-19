@@ -7,18 +7,18 @@ import 'package:coachly/features/auth/data/dto/login_request_dto/login_request_d
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 class AuthServiceImpl implements AuthService {
-  final Ref _ref;
+  final ValueGetter<AuthHttpClient> _getHttpClient;
   final TokenManager _tokenManager; // Add TokenManager dependency
 
-  AuthServiceImpl(this._ref, this._tokenManager);
+  AuthServiceImpl(this._getHttpClient, this._tokenManager);
 
   @override
   Future<LoginResponseDto> login(LoginRequestDto loginRequest) async {
-    final client = _ref.read(authHttpClientProvider);
+    final client = _getHttpClient();
     late final http.Response response;
 
     try {
@@ -46,14 +46,19 @@ class AuthServiceImpl implements AuthService {
         loginResponse.refreshToken,
       ); // Save tokens after successful login
       return loginResponse;
-    } else {
+    } else if (response.statusCode == 401 || response.statusCode == 403) {
       throw const InvalidCredentialsFailure();
+    } else {
+      throw ServerFailure(
+        'Errore del server. Riprova più tardi.',
+        response.statusCode,
+      );
     }
   }
 
   @override
   Future<LoginResponseDto> refreshToken(String refreshToken) async {
-    final client = _ref.read(authHttpClientProvider);
+    final client = _getHttpClient();
     final response = await client.post(
       Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.refreshEndpoint}'),
       headers: {'Content-Type': 'application/json'},
