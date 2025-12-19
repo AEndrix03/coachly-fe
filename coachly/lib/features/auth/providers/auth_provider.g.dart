@@ -89,7 +89,7 @@ final class AuthServiceProvider
   }
 }
 
-String _$authServiceHash() => r'a6d70a47a3958df392e702f586831cb3f62f0578';
+String _$authServiceHash() => r'6fff483f5fc1176e03c7293cdf190e8c18456c0a';
 
 @ProviderFor(authRepository)
 const authRepositoryProvider = AuthRepositoryProvider._();
@@ -156,7 +156,7 @@ final class AuthProvider
   Auth create() => Auth();
 }
 
-String _$authHash() => r'5cfd5a00c6ed6a41cfa3b63225a060aa69760681';
+String _$authHash() => r'10b3cce94144db1a0de2b1efabd31ace134bfa1a';
 
 abstract class _$Auth extends $AsyncNotifier<LoginResponseDto?> {
   FutureOr<LoginResponseDto?> build();

@@ -85,7 +85,8 @@ class WorkoutHeader extends ConsumerWidget {
                     child: Text('Logout'),
                   ),
                 ],
-                icon: const Icon(Icons.settings_outlined, color: Colors.white),
+                icon: const Icon(Icons.settings_outlined, color: Colors.white, size: 20),
+                padding: EdgeInsets.zero, // Remove default padding of IconButton
               ),
               const SizedBox(width: 8),
               _buildNotificationButton(scheme),
