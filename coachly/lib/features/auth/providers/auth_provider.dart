@@ -138,10 +138,14 @@ class Auth extends _$Auth with WidgetsBindingObserver {
         state = AsyncData(loginResponse);
         _startRefreshTimer(); // Restart timer on successful refresh
       } catch (e, st) {
-        // If refresh fails due to a network error, set a flag and do nothing.
-        // The logic to retry on connection restoration will handle it.
         if (e is NetworkFailure) {
           _networkErrorOccurred = true;
+          // If network failure, optimistically set state to "logged in" with existing tokens
+          // This allows the user to enter the app even without connection if tokens exist.
+          state = AsyncData(LoginResponseDto.fromTokens(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+          ));
         } else {
           // For any other error (e.g., invalid refresh token), log out.
           await service.clearTokens();

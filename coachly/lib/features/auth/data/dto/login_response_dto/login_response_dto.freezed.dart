@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LoginResponseDto {
 
- String get accessToken; String get refreshToken; String get firstName; String get lastName;
+ String get accessToken; String get refreshToken; String? get firstName;// Make optional
+ String? get lastName;
 /// Create a copy of LoginResponseDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +49,7 @@ abstract mixin class $LoginResponseDtoCopyWith<$Res>  {
   factory $LoginResponseDtoCopyWith(LoginResponseDto value, $Res Function(LoginResponseDto) _then) = _$LoginResponseDtoCopyWithImpl;
 @useResult
 $Res call({
- String accessToken, String refreshToken, String firstName, String lastName
+ String accessToken, String refreshToken, String? firstName, String? lastName
 });
 
 
@@ -65,13 +66,13 @@ class _$LoginResponseDtoCopyWithImpl<$Res>
 
 /// Create a copy of LoginResponseDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = null,Object? refreshToken = null,Object? firstName = null,Object? lastName = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = null,Object? refreshToken = null,Object? firstName = freezed,Object? lastName = freezed,}) {
   return _then(_self.copyWith(
 accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
 as String,refreshToken: null == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
-as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
-as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String,
+as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -156,7 +157,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  String firstName,  String lastName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  String? firstName,  String? lastName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LoginResponseDto() when $default != null:
 return $default(_that.accessToken,_that.refreshToken,_that.firstName,_that.lastName);case _:
@@ -177,7 +178,7 @@ return $default(_that.accessToken,_that.refreshToken,_that.firstName,_that.lastN
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  String firstName,  String lastName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String accessToken,  String refreshToken,  String? firstName,  String? lastName)  $default,) {final _that = this;
 switch (_that) {
 case _LoginResponseDto():
 return $default(_that.accessToken,_that.refreshToken,_that.firstName,_that.lastName);case _:
@@ -197,7 +198,7 @@ return $default(_that.accessToken,_that.refreshToken,_that.firstName,_that.lastN
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String accessToken,  String refreshToken,  String firstName,  String lastName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String accessToken,  String refreshToken,  String? firstName,  String? lastName)?  $default,) {final _that = this;
 switch (_that) {
 case _LoginResponseDto() when $default != null:
 return $default(_that.accessToken,_that.refreshToken,_that.firstName,_that.lastName);case _:
@@ -212,13 +213,14 @@ return $default(_that.accessToken,_that.refreshToken,_that.firstName,_that.lastN
 @JsonSerializable()
 
 class _LoginResponseDto implements LoginResponseDto {
-  const _LoginResponseDto({required this.accessToken, required this.refreshToken, required this.firstName, required this.lastName});
+  const _LoginResponseDto({required this.accessToken, required this.refreshToken, this.firstName, this.lastName});
   factory _LoginResponseDto.fromJson(Map<String, dynamic> json) => _$LoginResponseDtoFromJson(json);
 
 @override final  String accessToken;
 @override final  String refreshToken;
-@override final  String firstName;
-@override final  String lastName;
+@override final  String? firstName;
+// Make optional
+@override final  String? lastName;
 
 /// Create a copy of LoginResponseDto
 /// with the given fields replaced by the non-null parameter values.
@@ -253,7 +255,7 @@ abstract mixin class _$LoginResponseDtoCopyWith<$Res> implements $LoginResponseD
   factory _$LoginResponseDtoCopyWith(_LoginResponseDto value, $Res Function(_LoginResponseDto) _then) = __$LoginResponseDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String accessToken, String refreshToken, String firstName, String lastName
+ String accessToken, String refreshToken, String? firstName, String? lastName
 });
 
 
@@ -270,13 +272,13 @@ class __$LoginResponseDtoCopyWithImpl<$Res>
 
 /// Create a copy of LoginResponseDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = null,Object? refreshToken = null,Object? firstName = null,Object? lastName = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = null,Object? refreshToken = null,Object? firstName = freezed,Object? lastName = freezed,}) {
   return _then(_LoginResponseDto(
 accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
 as String,refreshToken: null == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
-as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
-as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String,
+as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
