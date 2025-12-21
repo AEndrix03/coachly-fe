@@ -1,11 +1,11 @@
+import 'package:coachly/features/auth/pages/loading_page/loading_page.dart';
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/auth/pages/login_page/login_page.dart';
-import '../features/auth/providers/auth_provider.dart'; // Import authProvider
+import '../features/auth/providers/auth_provider.dart';
 import '../features/common/navigation/widgets/navigation_bar.dart';
 import '../features/exercise/exercise_info_page/exercise_info_page.dart';
 import '../features/home/home.dart';
@@ -24,26 +24,40 @@ GoRouter router(Ref ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: authState.value?.accessToken != null
-        ? '/workouts'
-        : '/login',
+    initialLocation: '/loading',
     redirect: (BuildContext context, GoRouterState state) {
-      final isAuthenticated = authState.value?.accessToken != null;
-      final isLoggingIn = state.matchedLocation == '/login';
-
-      // If user is not logged in and not on the login page, redirect to login
-      if (!isAuthenticated && !isLoggingIn) {
-        return '/login';
+      if (authState.isLoading) {
+        return state.matchedLocation == '/loading' ? null : '/loading';
       }
 
-      // If user is logged in and on the login page, redirect to the main app screen
-      if (isAuthenticated && isLoggingIn) {
-        return '/workouts';
+      final authValue = authState.value;
+      if (authValue == null) return '/loading';
+
+      final isOnLoginPage = state.matchedLocation == '/login';
+      final isOnLoadingPage = state.matchedLocation == '/loading';
+
+      if (authValue.needsReLogin) {
+        if (!isOnLoginPage) return '/login';
+        return null;
       }
 
-      return null; // No redirect needed
+      if (!authValue.isAuthenticated) {
+        if (!isOnLoginPage) return '/login';
+        return null;
+      }
+
+      if (authValue.canAccessApp) {
+        if (isOnLoginPage || isOnLoadingPage) return '/workouts';
+        return null;
+      }
+
+      return null;
     },
     routes: [
+      GoRoute(
+        path: '/loading',
+        builder: (context, state) => const LoadingPage(),
+      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

@@ -48,7 +48,48 @@ final class TokenManagerProvider
   }
 }
 
-String _$tokenManagerHash() => r'7c9fd4b527ce2c9c18c8143abd2127b7f19a39f8';
+String _$tokenManagerHash() => r'ebf6b4ef65bc1bcf82e14f4668a76d8ec9e367b1';
+
+@ProviderFor(syncManager)
+const syncManagerProvider = SyncManagerProvider._();
+
+final class SyncManagerProvider
+    extends $FunctionalProvider<SyncManager, SyncManager, SyncManager>
+    with $Provider<SyncManager> {
+  const SyncManagerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'syncManagerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$syncManagerHash();
+
+  @$internal
+  @override
+  $ProviderElement<SyncManager> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  SyncManager create(Ref ref) {
+    return syncManager(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SyncManager value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SyncManager>(value),
+    );
+  }
+}
+
+String _$syncManagerHash() => r'8767a40a13d1f0fed3c835d7bf9a177d6769bd82';
 
 @ProviderFor(authService)
 const authServiceProvider = AuthServiceProvider._();
@@ -135,8 +176,7 @@ String _$authRepositoryHash() => r'0acece20485d2fcbf2feb6e56916a15227453edd';
 @ProviderFor(Auth)
 const authProvider = AuthProvider._();
 
-final class AuthProvider
-    extends $AsyncNotifierProvider<Auth, LoginResponseDto?> {
+final class AuthProvider extends $AsyncNotifierProvider<Auth, AuthState> {
   const AuthProvider._()
     : super(
         from: null,
@@ -156,21 +196,20 @@ final class AuthProvider
   Auth create() => Auth();
 }
 
-String _$authHash() => r'10b3cce94144db1a0de2b1efabd31ace134bfa1a';
+String _$authHash() => r'e4fb970a8b61a7fc5954ec228de97770b326d4d5';
 
-abstract class _$Auth extends $AsyncNotifier<LoginResponseDto?> {
-  FutureOr<LoginResponseDto?> build();
+abstract class _$Auth extends $AsyncNotifier<AuthState> {
+  FutureOr<AuthState> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref =
-        this.ref as $Ref<AsyncValue<LoginResponseDto?>, LoginResponseDto?>;
+    final ref = this.ref as $Ref<AsyncValue<AuthState>, AuthState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<LoginResponseDto?>, LoginResponseDto?>,
-              AsyncValue<LoginResponseDto?>,
+              AnyNotifier<AsyncValue<AuthState>, AuthState>,
+              AsyncValue<AuthState>,
               Object?,
               Object?
             >;
