@@ -167,10 +167,18 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         physics: const BouncingScrollPhysics(),
         itemCount: workouts.length,
-        itemBuilder: (context, index) => SizedBox(
-          width: 290,
-          child: WorkoutRecentCard(workout: workouts[index]),
-        ),
+        itemBuilder: (context, index) {
+          final bool isLast = index == workouts.length - 1;
+          return Row(
+            children: [
+              SizedBox(
+                width: 290,
+                child: WorkoutRecentCard(workout: workouts[index]),
+              ),
+              if (!isLast) const Gap(16),
+            ],
+          );
+        },
       ),
     );
   }
