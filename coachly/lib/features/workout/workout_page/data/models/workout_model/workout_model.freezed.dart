@@ -15,27 +15,29 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutModel {
 
- String get id; String get title; String get coach; int get progress; int get exercises; int get durationMinutes; String get goal; String get lastUsed; bool get active;
+ String get id; Map<String, String> get titleI18n; Map<String, String>? get descriptionI18n; String? get coachId; String? get coachName; double get progress; int get exercises; int get durationMinutes; String get goal; DateTime get lastUsed; bool get active;
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $WorkoutModelCopyWith<WorkoutModel> get copyWith => _$WorkoutModelCopyWithImpl<WorkoutModel>(this as WorkoutModel, _$identity);
 
+  /// Serializes this WorkoutModel to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutModel&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.coach, coach) || other.coach == coach)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&(identical(other.active, active) || other.active == active));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other.titleI18n, titleI18n)&&const DeepCollectionEquality().equals(other.descriptionI18n, descriptionI18n)&&(identical(other.coachId, coachId) || other.coachId == coachId)&&(identical(other.coachName, coachName) || other.coachName == coachName)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&(identical(other.active, active) || other.active == active));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,coach,progress,exercises,durationMinutes,goal,lastUsed,active);
+int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(titleI18n),const DeepCollectionEquality().hash(descriptionI18n),coachId,coachName,progress,exercises,durationMinutes,goal,lastUsed,active);
 
 @override
 String toString() {
-  return 'WorkoutModel(id: $id, title: $title, coach: $coach, progress: $progress, exercises: $exercises, durationMinutes: $durationMinutes, goal: $goal, lastUsed: $lastUsed, active: $active)';
+  return 'WorkoutModel(id: $id, titleI18n: $titleI18n, descriptionI18n: $descriptionI18n, coachId: $coachId, coachName: $coachName, progress: $progress, exercises: $exercises, durationMinutes: $durationMinutes, goal: $goal, lastUsed: $lastUsed, active: $active)';
 }
 
 
@@ -46,7 +48,7 @@ abstract mixin class $WorkoutModelCopyWith<$Res>  {
   factory $WorkoutModelCopyWith(WorkoutModel value, $Res Function(WorkoutModel) _then) = _$WorkoutModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, String coach, int progress, int exercises, int durationMinutes, String goal, String lastUsed, bool active
+ String id, Map<String, String> titleI18n, Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int exercises, int durationMinutes, String goal, DateTime lastUsed, bool active
 });
 
 
@@ -63,17 +65,19 @@ class _$WorkoutModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? coach = null,Object? progress = null,Object? exercises = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? active = null,}) {
-  return _then(WorkoutModel(
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? titleI18n = null,Object? descriptionI18n = freezed,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? exercises = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? active = null,}) {
+  return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,coach: null == coach ? _self.coach : coach // ignore: cast_nullable_to_non_nullable
-as String,progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
-as int,exercises: null == exercises ? _self.exercises : exercises // ignore: cast_nullable_to_non_nullable
+as String,titleI18n: null == titleI18n ? _self.titleI18n : titleI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>,descriptionI18n: freezed == descriptionI18n ? _self.descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,coachId: freezed == coachId ? _self.coachId : coachId // ignore: cast_nullable_to_non_nullable
+as String?,coachName: freezed == coachName ? _self.coachName : coachName // ignore: cast_nullable_to_non_nullable
+as String?,progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
+as double,exercises: null == exercises ? _self.exercises : exercises // ignore: cast_nullable_to_non_nullable
 as int,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
 as int,goal: null == goal ? _self.goal : goal // ignore: cast_nullable_to_non_nullable
 as String,lastUsed: null == lastUsed ? _self.lastUsed : lastUsed // ignore: cast_nullable_to_non_nullable
-as String,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
+as DateTime,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -95,10 +99,11 @@ extension WorkoutModelPatterns on WorkoutModel {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WorkoutModel value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _:
+case _WorkoutModel() when $default != null:
+return $default(_that);case _:
   return orElse();
 
 }
@@ -116,10 +121,11 @@ case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WorkoutModel value)  $default,){
 final _that = this;
 switch (_that) {
-case _:
+case _WorkoutModel():
+return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -136,10 +142,11 @@ case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WorkoutModel value)?  $default,){
 final _that = this;
 switch (_that) {
-case _:
+case _WorkoutModel() when $default != null:
+return $default(_that);case _:
   return null;
 
 }
@@ -156,9 +163,10 @@ case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Map<String, String> titleI18n,  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int exercises,  int durationMinutes,  String goal,  DateTime lastUsed,  bool active)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _:
+case _WorkoutModel() when $default != null:
+return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.exercises,_that.durationMinutes,_that.goal,_that.lastUsed,_that.active);case _:
   return orElse();
 
 }
@@ -176,9 +184,10 @@ case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>() {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Map<String, String> titleI18n,  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int exercises,  int durationMinutes,  String goal,  DateTime lastUsed,  bool active)  $default,) {final _that = this;
 switch (_that) {
-case _:
+case _WorkoutModel():
+return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.exercises,_that.durationMinutes,_that.goal,_that.lastUsed,_that.active);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -195,13 +204,117 @@ case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>() {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Map<String, String> titleI18n,  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int exercises,  int durationMinutes,  String goal,  DateTime lastUsed,  bool active)?  $default,) {final _that = this;
 switch (_that) {
-case _:
+case _WorkoutModel() when $default != null:
+return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.exercises,_that.durationMinutes,_that.goal,_that.lastUsed,_that.active);case _:
   return null;
 
 }
 }
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _WorkoutModel implements WorkoutModel {
+  const _WorkoutModel({required this.id, required final  Map<String, String> titleI18n, final  Map<String, String>? descriptionI18n, this.coachId, this.coachName, required this.progress, required this.exercises, required this.durationMinutes, required this.goal, required this.lastUsed, this.active = true}): _titleI18n = titleI18n,_descriptionI18n = descriptionI18n;
+  factory _WorkoutModel.fromJson(Map<String, dynamic> json) => _$WorkoutModelFromJson(json);
+
+@override final  String id;
+ final  Map<String, String> _titleI18n;
+@override Map<String, String> get titleI18n {
+  if (_titleI18n is EqualUnmodifiableMapView) return _titleI18n;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_titleI18n);
+}
+
+ final  Map<String, String>? _descriptionI18n;
+@override Map<String, String>? get descriptionI18n {
+  final value = _descriptionI18n;
+  if (value == null) return null;
+  if (_descriptionI18n is EqualUnmodifiableMapView) return _descriptionI18n;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
+@override final  String? coachId;
+@override final  String? coachName;
+@override final  double progress;
+@override final  int exercises;
+@override final  int durationMinutes;
+@override final  String goal;
+@override final  DateTime lastUsed;
+@override@JsonKey() final  bool active;
+
+/// Create a copy of WorkoutModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WorkoutModelCopyWith<_WorkoutModel> get copyWith => __$WorkoutModelCopyWithImpl<_WorkoutModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WorkoutModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other._titleI18n, _titleI18n)&&const DeepCollectionEquality().equals(other._descriptionI18n, _descriptionI18n)&&(identical(other.coachId, coachId) || other.coachId == coachId)&&(identical(other.coachName, coachName) || other.coachName == coachName)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&(identical(other.active, active) || other.active == active));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(_titleI18n),const DeepCollectionEquality().hash(_descriptionI18n),coachId,coachName,progress,exercises,durationMinutes,goal,lastUsed,active);
+
+@override
+String toString() {
+  return 'WorkoutModel(id: $id, titleI18n: $titleI18n, descriptionI18n: $descriptionI18n, coachId: $coachId, coachName: $coachName, progress: $progress, exercises: $exercises, durationMinutes: $durationMinutes, goal: $goal, lastUsed: $lastUsed, active: $active)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WorkoutModelCopyWith<$Res> implements $WorkoutModelCopyWith<$Res> {
+  factory _$WorkoutModelCopyWith(_WorkoutModel value, $Res Function(_WorkoutModel) _then) = __$WorkoutModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, Map<String, String> titleI18n, Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int exercises, int durationMinutes, String goal, DateTime lastUsed, bool active
+});
+
+
+
+
+}
+/// @nodoc
+class __$WorkoutModelCopyWithImpl<$Res>
+    implements _$WorkoutModelCopyWith<$Res> {
+  __$WorkoutModelCopyWithImpl(this._self, this._then);
+
+  final _WorkoutModel _self;
+  final $Res Function(_WorkoutModel) _then;
+
+/// Create a copy of WorkoutModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? titleI18n = null,Object? descriptionI18n = freezed,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? exercises = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? active = null,}) {
+  return _then(_WorkoutModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,titleI18n: null == titleI18n ? _self._titleI18n : titleI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>,descriptionI18n: freezed == descriptionI18n ? _self._descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,coachId: freezed == coachId ? _self.coachId : coachId // ignore: cast_nullable_to_non_nullable
+as String?,coachName: freezed == coachName ? _self.coachName : coachName // ignore: cast_nullable_to_non_nullable
+as String?,progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
+as double,exercises: null == exercises ? _self.exercises : exercises // ignore: cast_nullable_to_non_nullable
+as int,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
+as int,goal: null == goal ? _self.goal : goal // ignore: cast_nullable_to_non_nullable
+as String,lastUsed: null == lastUsed ? _self.lastUsed : lastUsed // ignore: cast_nullable_to_non_nullable
+as DateTime,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
 
 }
 

@@ -5,6 +5,8 @@ import 'package:coachly/shared/animations/sparkle_tap_animation.dart';
 import 'package:coachly/shared/widgets/badges/coach_badge_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
 
 class WorkoutRecentCard extends StatefulWidget {
   final WorkoutModel workout;
@@ -120,7 +122,8 @@ class _WorkoutRecentCardState extends State<WorkoutRecentCard> {
       children: [
         Expanded(
           child: Text(
-            widget.workout.title,
+            widget.workout.titleI18n['it'] ??
+                widget.workout.titleI18n.values.first,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -151,7 +154,7 @@ class _WorkoutRecentCardState extends State<WorkoutRecentCard> {
         const SizedBox(width: 6),
         Flexible(
           child: Text(
-            'Coach ${widget.workout.coach}',
+            'Coach ${widget.workout.coachName ?? 'N/A'}',
             style: TextStyle(
               fontSize: 13,
               color: scheme.onSurface,
@@ -244,7 +247,7 @@ class _WorkoutRecentCardState extends State<WorkoutRecentCard> {
         Icon(Icons.schedule, size: 14, color: scheme.primary),
         const SizedBox(width: 7),
         Text(
-          'Ultima: ${widget.workout.lastUsed}',
+          'Ultima: ${DateFormat('dd/MM/yyyy').format(widget.workout.lastUsed)}',
           style: TextStyle(
             fontSize: 11,
             color: scheme.onSurface.withOpacity(0.7),

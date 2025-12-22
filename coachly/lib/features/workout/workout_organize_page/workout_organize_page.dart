@@ -207,7 +207,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             final confirmed = await _showConfirmationDialog(
               context,
               'Conferma Eliminazione',
-              'Sei sicuro di voler eliminare la scheda "${workout.title}"?',
+              'Sei sicuro di voler eliminare la scheda "${workout.titleI18n['it'] ?? workout.titleI18n.values.first}"?',
             );
             if (confirmed) {
               ref.read(workoutListProvider.notifier).deleteWorkout(workout.id);
@@ -218,7 +218,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             final confirmed = await _showConfirmationDialog(
               context,
               'Conferma Modifica Stato',
-              'Sei sicuro di voler $action la scheda "${workout.title}"?',
+              'Sei sicuro di voler $action la scheda "${workout.titleI18n['it'] ?? workout.titleI18n.values.first}"?',
             );
             if (confirmed) {
               ref

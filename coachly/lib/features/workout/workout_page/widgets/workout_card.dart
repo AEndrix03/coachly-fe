@@ -102,7 +102,9 @@ class _WorkoutCardState extends State<WorkoutCard>
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        widget.workout.title,
+                                        widget.workout.titleI18n['it'] ??
+                                            widget.workout.titleI18n.values
+                                                .first,
                                         style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
@@ -136,7 +138,7 @@ class _WorkoutCardState extends State<WorkoutCard>
                                     ),
                                     _buildInfoChip(
                                       Icons.person_outline,
-                                      'Coach ${widget.workout.coach}',
+                                      'Coach ${widget.workout.coachName ?? 'N/A'}',
                                     ),
                                   ],
                                 ),
