@@ -1,21 +1,24 @@
 import 'dart:ui';
 
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/shared/animations/sparkle_tap_animation.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/widgets/badges/coach_badge_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class WorkoutCard extends StatefulWidget {
+class WorkoutCard extends ConsumerStatefulWidget {
   final WorkoutModel workout;
 
   const WorkoutCard({super.key, required this.workout});
 
   @override
-  State<WorkoutCard> createState() => _WorkoutCardState();
+  ConsumerState<WorkoutCard> createState() => _WorkoutCardState();
 }
 
-class _WorkoutCardState extends State<WorkoutCard>
+class _WorkoutCardState extends ConsumerState<WorkoutCard>
     with SingleTickerProviderStateMixin {
   double _scale = 1.0;
   Offset? _tapPosition;
@@ -47,6 +50,7 @@ class _WorkoutCardState extends State<WorkoutCard>
 
   @override
   Widget build(BuildContext context) {
+    final language = ref.watch(languageProvider);
     return AnimatedScale(
       scale: _scale,
       duration: const Duration(milliseconds: 120),
@@ -102,9 +106,7 @@ class _WorkoutCardState extends State<WorkoutCard>
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        widget.workout.titleI18n['it'] ??
-                                            widget.workout.titleI18n.values
-                                                .first,
+                                        widget.workout.titleI18n.fromI18n(language),
                                         style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,

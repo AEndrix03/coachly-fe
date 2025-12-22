@@ -1,10 +1,13 @@
 import 'dart:ui';
 
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/widgets/badges/coach_badge_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class OrganizeWorkoutCard extends StatefulWidget {
+class OrganizeWorkoutCard extends ConsumerStatefulWidget {
   final WorkoutModel workout;
   final VoidCallback onDelete;
   final ValueChanged<bool> onToggleActive;
@@ -19,10 +22,11 @@ class OrganizeWorkoutCard extends StatefulWidget {
   });
 
   @override
-  State<OrganizeWorkoutCard> createState() => _OrganizeWorkoutCardState();
+  ConsumerState<OrganizeWorkoutCard> createState() =>
+      _OrganizeWorkoutCardState();
 }
 
-class _OrganizeWorkoutCardState extends State<OrganizeWorkoutCard> {
+class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
   late bool _isActive;
 
   @override
@@ -43,6 +47,7 @@ class _OrganizeWorkoutCardState extends State<OrganizeWorkoutCard> {
 
   @override
   Widget build(BuildContext context) {
+    final language = ref.watch(languageProvider);
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 300),
       opacity: _isActive ? 1.0 : 0.5,
@@ -88,8 +93,7 @@ class _OrganizeWorkoutCardState extends State<OrganizeWorkoutCard> {
                           children: [
                             Expanded(
                               child: Text(
-                                widget.workout.titleI18n['it'] ??
-                                    widget.workout.titleI18n.values.first,
+                                widget.workout.titleI18n.fromI18n(language),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,

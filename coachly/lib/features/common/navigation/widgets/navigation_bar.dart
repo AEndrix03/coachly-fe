@@ -11,7 +11,7 @@ class AppNavigationBar extends ConsumerWidget {
     {'icon': Icons.people, 'label': 'Community', 'route': '/community'},
     {'icon': Icons.fitness_center, 'label': 'Workouts', 'route': '/workouts'},
     {'icon': Icons.home, 'label': 'Home', 'route': '/home'},
-    {'icon': Icons.settings, 'label': 'WIP', 'route': '/WIP'},
+    {'icon': Icons.settings, 'label': 'Settings', 'route': '/settings'},
     {'icon': Icons.person, 'label': 'Coach', 'route': '/coach'},
   ];
 

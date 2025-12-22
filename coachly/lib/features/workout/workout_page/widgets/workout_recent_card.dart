@@ -1,23 +1,25 @@
 import 'dart:ui';
 
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/shared/animations/sparkle_tap_animation.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/widgets/badges/coach_badge_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-
-class WorkoutRecentCard extends StatefulWidget {
+class WorkoutRecentCard extends ConsumerStatefulWidget {
   final WorkoutModel workout;
 
   const WorkoutRecentCard({super.key, required this.workout});
 
   @override
-  State<WorkoutRecentCard> createState() => _WorkoutRecentCardState();
+  ConsumerState<WorkoutRecentCard> createState() => _WorkoutRecentCardState();
 }
 
-class _WorkoutRecentCardState extends State<WorkoutRecentCard> {
+class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
   double _scale = 1.0;
   Offset? _tapPosition;
   bool _showSparkle = false;
@@ -48,6 +50,7 @@ class _WorkoutRecentCardState extends State<WorkoutRecentCard> {
 
   @override
   Widget build(BuildContext context) {
+    final language = ref.watch(languageProvider);
     final scheme = Theme.of(context).colorScheme;
     return AnimatedScale(
       scale: _scale,
@@ -87,7 +90,7 @@ class _WorkoutRecentCardState extends State<WorkoutRecentCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildHeader(context, scheme),
+                        _buildHeader(context, scheme, language),
                         const SizedBox(height: 10),
                         _buildCoachInfo(context, scheme),
                         const SizedBox(height: 14),
@@ -116,14 +119,14 @@ class _WorkoutRecentCardState extends State<WorkoutRecentCard> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, ColorScheme scheme) {
+  Widget _buildHeader(
+      BuildContext context, ColorScheme scheme, Locale language) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Text(
-            widget.workout.titleI18n['it'] ??
-                widget.workout.titleI18n.values.first,
+            widget.workout.titleI18n.fromI18n(language),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -302,7 +305,7 @@ class _WorkoutRecentCardState extends State<WorkoutRecentCard> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 15, color: scheme.primary),
+          Icon(icon, color: scheme.primary, size: 15),
           const SizedBox(width: 6),
           Text(
             text,

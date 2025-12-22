@@ -12,6 +12,7 @@ import '../features/home/home.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
 import '../features/workout/workout_detail_page/workout_detail_page.dart';
 import '../features/workout/workout_edit_page/workout_edit_page.dart';
+import '../features/user_settings/pages/user_settings_page.dart';
 import '../features/workout/workout_organize_page/workout_organize_page.dart';
 
 part 'app_router.g.dart';
@@ -133,7 +134,7 @@ GoRouter router(Ref ref) {
             routes: [
               GoRoute(
                 path: '/settings',
-                builder: (context, state) => const HomeScreen(),
+                builder: (context, state) => const UserSettingsPage(),
               ),
             ],
           ),
