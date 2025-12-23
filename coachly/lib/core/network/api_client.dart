@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -12,37 +13,30 @@ part 'api_client.g.dart';
 // Provider per ApiClient
 @riverpod
 ApiClient apiClient(Ref ref) {
+  // Inject the authenticated client
+  final httpClient = ref.watch(authHttpClientProvider);
   return ApiClient(
-    baseUrl: 'https://your-api.com/api', // TODO: Configurare
+    client: httpClient,
+    baseUrl: 'https://dev.aredegalli.it:8800/api',
   );
 }
 
 /// HTTP Client centralizzato
 class ApiClient {
+  final http.Client _client;
   final String baseUrl;
   final Duration timeout;
   final Map<String, String> defaultHeaders;
-  String? _authToken;
 
   ApiClient({
+    required http.Client client,
     required this.baseUrl,
     this.timeout = const Duration(seconds: 30),
     Map<String, String>? defaultHeaders,
-  }) : defaultHeaders =
+  }) : _client = client,
+       defaultHeaders =
            defaultHeaders ??
            {'Content-Type': 'application/json', 'Accept': 'application/json'};
-
-  void setAuthToken(String token) => _authToken = token;
-
-  void clearAuthToken() => _authToken = null;
-
-  Map<String, String> get _headers {
-    final headers = Map<String, String>.from(defaultHeaders);
-    if (_authToken != null) {
-      headers['Authorization'] = 'Bearer $_authToken';
-    }
-    return headers;
-  }
 
   Future<ApiResponse<T>> get<T>(
     String endpoint, {
@@ -53,7 +47,9 @@ class ApiClient {
       final uri = _buildUri(endpoint, queryParameters);
       print('📡 GET: $uri');
 
-      final response = await http.get(uri, headers: _headers).timeout(timeout);
+      final response = await _client
+          .get(uri, headers: defaultHeaders)
+          .timeout(timeout);
 
       return _handleResponse<T>(response, fromJson);
     } catch (e) {
@@ -72,10 +68,10 @@ class ApiClient {
       print('📡 POST: $uri');
       print('📦 Body: ${jsonEncode(body)}');
 
-      final response = await http
+      final response = await _client
           .post(
             uri,
-            headers: _headers,
+            headers: defaultHeaders,
             body: body != null ? jsonEncode(body) : null,
           )
           .timeout(timeout);
@@ -96,10 +92,10 @@ class ApiClient {
       final uri = _buildUri(endpoint, queryParameters);
       print('📡 PUT: $uri');
 
-      final response = await http
+      final response = await _client
           .put(
             uri,
-            headers: _headers,
+            headers: defaultHeaders,
             body: body != null ? jsonEncode(body) : null,
           )
           .timeout(timeout);
@@ -119,8 +115,8 @@ class ApiClient {
       final uri = _buildUri(endpoint, queryParameters);
       print('📡 DELETE: $uri');
 
-      final response = await http
-          .delete(uri, headers: _headers)
+      final response = await _client
+          .delete(uri, headers: defaultHeaders)
           .timeout(timeout);
 
       return _handleResponse<T>(response, fromJson);
@@ -141,11 +137,22 @@ class ApiClient {
     print('📥 Response ${response.statusCode}: ${response.body}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
+      // Handle empty response body for success codes like 204 No Content
+      if (response.body.isEmpty) {
+        return ApiResponse.success(data: null, statusCode: response.statusCode);
+      }
       final jsonData = jsonDecode(response.body);
 
       if (fromJson != null) {
-        return ApiResponse.fromJson(jsonData, fromJson);
+        // The fromJson function is now responsible for converting the decoded
+        // JSON (which could be a Map or a List) into the final type T.
+        return ApiResponse.success(
+          data: fromJson(jsonData),
+          statusCode: response.statusCode,
+        );
       } else {
+        // This case is kept for when no parsing function is provided,
+        // but it's less type-safe.
         return ApiResponse.success(
           data: jsonData as T?,
           statusCode: response.statusCode,
@@ -166,7 +173,7 @@ class ApiClient {
       );
     } catch (e) {
       return ApiResponse.error(
-        message: 'Failed to parse error response',
+        message: 'Failed to parse error response: ${response.body}',
         statusCode: response.statusCode,
       );
     }

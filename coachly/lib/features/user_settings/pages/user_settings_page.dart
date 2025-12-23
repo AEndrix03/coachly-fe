@@ -12,9 +12,7 @@ class UserSettingsPage extends ConsumerWidget {
     final language = ref.watch(languageProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -25,13 +23,14 @@ class UserSettingsPage extends ConsumerWidget {
             ShadSelect<Locale>(
               placeholder: const Text('Select a language'),
               initialValue: language,
-              options: const [
-                Locale('it', 'IT'),
-                Locale('en', 'EN'),
-              ].map((locale) {
+              options: const [Locale('it', 'IT'), Locale('en', 'EN')].map((
+                locale,
+              ) {
                 return ShadOption(
                   value: locale,
-                  child: Text(locale.languageCode == 'it' ? 'Italiano' : 'English'),
+                  child: Text(
+                    locale.languageCode == 'it' ? 'Italiano' : 'English',
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -40,7 +39,9 @@ class UserSettingsPage extends ConsumerWidget {
                 }
               },
               selectedOptionBuilder: (BuildContext context, Locale value) {
-                return Text(value.languageCode == 'it' ? 'Italiano' : 'English');
+                return Text(
+                  value.languageCode == 'it' ? 'Italiano' : 'English',
+                );
               },
             ),
           ],

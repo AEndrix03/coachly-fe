@@ -17,6 +17,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final loginResponse = await authService.login(loginRequest);
       return Right(loginResponse);
+    } on Failure catch (f) {
+      return Left(f);
     } on Exception catch (e) {
       // In a real app, you would have more specific exception handling
       return Left(ServerFailure(e.toString()));
@@ -30,6 +32,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final loginResponse = await authService.refreshToken(refreshToken);
       return Right(loginResponse);
+    } on Failure catch (f) {
+      return Left(f);
     } on Exception catch (e) {
       return Left(ServerFailure(e.toString()));
     }

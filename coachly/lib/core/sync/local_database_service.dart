@@ -1,10 +1,11 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Service per gestire il database locale con Hive
 /// Fornisce API type-safe per storage locale di entità
 class LocalDatabaseService {
   // Box names
-  static const String _workoutsBox = 'workouts';
+  static const String workoutsBox = 'workouts';
   static const String _exercisesBox = 'exercises';
   static const String _settingsBox = 'settings';
 
@@ -25,7 +26,7 @@ class LocalDatabaseService {
     await Hive.initFlutter();
 
     // Open boxes
-    await Hive.openBox<Map>(_workoutsBox);
+    await Hive.openBox<Map>(workoutsBox);
     await Hive.openBox<Map>(_exercisesBox);
     await Hive.openBox<dynamic>(_settingsBox);
 
@@ -34,7 +35,7 @@ class LocalDatabaseService {
   }
 
   /// Get workouts box
-  Box<Map> get workouts => Hive.box<Map>(_workoutsBox);
+  Box<Map> get workouts => Hive.box<Map>(workoutsBox);
 
   /// Get exercises box
   Box<Map> get exercises => Hive.box<Map>(_exercisesBox);
@@ -108,7 +109,7 @@ class LocalDatabaseService {
 
   /// Clear all data (use with caution!)
   Future<void> clearAll() async {
-    await Hive.box<Map>(_workoutsBox).clear();
+    await Hive.box<Map>(workoutsBox).clear();
     await Hive.box<Map>(_exercisesBox).clear();
     await Hive.box<dynamic>(_settingsBox).clear();
     print('🧹 Cleared all local data');
@@ -131,3 +132,7 @@ class LocalDatabaseService {
     await settings.put('lastSyncTime', DateTime.now().toIso8601String());
   }
 }
+
+final localDatabaseServiceProvider = Provider<LocalDatabaseService>((ref) {
+  return LocalDatabaseService();
+});

@@ -9,108 +9,12 @@ part of 'workout_list_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(workoutPageService)
-const workoutPageServiceProvider = WorkoutPageServiceProvider._();
+@ProviderFor(WorkoutList)
+const workoutListProvider = WorkoutListProvider._();
 
-final class WorkoutPageServiceProvider
-    extends
-        $FunctionalProvider<
-          WorkoutPageService,
-          WorkoutPageService,
-          WorkoutPageService
-        >
-    with $Provider<WorkoutPageService> {
-  const WorkoutPageServiceProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'workoutPageServiceProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$workoutPageServiceHash();
-
-  @$internal
-  @override
-  $ProviderElement<WorkoutPageService> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  WorkoutPageService create(Ref ref) {
-    return workoutPageService(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(WorkoutPageService value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<WorkoutPageService>(value),
-    );
-  }
-}
-
-String _$workoutPageServiceHash() =>
-    r'1a69b138a63e70eee538b197e499cd2926c9e39e';
-
-@ProviderFor(workoutPageRepository)
-const workoutPageRepositoryProvider = WorkoutPageRepositoryProvider._();
-
-final class WorkoutPageRepositoryProvider
-    extends
-        $FunctionalProvider<
-          IWorkoutPageRepository,
-          IWorkoutPageRepository,
-          IWorkoutPageRepository
-        >
-    with $Provider<IWorkoutPageRepository> {
-  const WorkoutPageRepositoryProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'workoutPageRepositoryProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$workoutPageRepositoryHash();
-
-  @$internal
-  @override
-  $ProviderElement<IWorkoutPageRepository> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  IWorkoutPageRepository create(Ref ref) {
-    return workoutPageRepository(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(IWorkoutPageRepository value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<IWorkoutPageRepository>(value),
-    );
-  }
-}
-
-String _$workoutPageRepositoryHash() =>
-    r'2d73e24930c903de433c2eddb0f1a13f74090722';
-
-@ProviderFor(WorkoutListNotifier)
-const workoutListProvider = WorkoutListNotifierProvider._();
-
-final class WorkoutListNotifierProvider
-    extends $NotifierProvider<WorkoutListNotifier, WorkoutListState> {
-  const WorkoutListNotifierProvider._()
+final class WorkoutListProvider
+    extends $AsyncNotifierProvider<WorkoutList, List<WorkoutModel>> {
+  const WorkoutListProvider._()
     : super(
         from: null,
         argument: null,
@@ -122,36 +26,28 @@ final class WorkoutListNotifierProvider
       );
 
   @override
-  String debugGetCreateSourceHash() => _$workoutListNotifierHash();
+  String debugGetCreateSourceHash() => _$workoutListHash();
 
   @$internal
   @override
-  WorkoutListNotifier create() => WorkoutListNotifier();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(WorkoutListState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<WorkoutListState>(value),
-    );
-  }
+  WorkoutList create() => WorkoutList();
 }
 
-String _$workoutListNotifierHash() =>
-    r'fae84b34b112a649f7e0a2a3ca2a598d4a39f0f1';
+String _$workoutListHash() => r'3e19cd8aee8839ab8b93ebc3fa72894037f40692';
 
-abstract class _$WorkoutListNotifier extends $Notifier<WorkoutListState> {
-  WorkoutListState build();
+abstract class _$WorkoutList extends $AsyncNotifier<List<WorkoutModel>> {
+  FutureOr<List<WorkoutModel>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<WorkoutListState, WorkoutListState>;
+    final ref =
+        this.ref as $Ref<AsyncValue<List<WorkoutModel>>, List<WorkoutModel>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<WorkoutListState, WorkoutListState>,
-              WorkoutListState,
+              AnyNotifier<AsyncValue<List<WorkoutModel>>, List<WorkoutModel>>,
+              AsyncValue<List<WorkoutModel>>,
               Object?,
               Object?
             >;

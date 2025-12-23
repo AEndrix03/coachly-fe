@@ -120,7 +120,10 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
   }
 
   Widget _buildHeader(
-      BuildContext context, ColorScheme scheme, Locale language) {
+    BuildContext context,
+    ColorScheme scheme,
+    Locale language,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [

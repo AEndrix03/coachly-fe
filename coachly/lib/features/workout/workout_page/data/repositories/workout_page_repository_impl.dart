@@ -2,137 +2,86 @@ import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
+import 'package:coachly/features/workout/workout_page/data/services/workout_hive_service.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final workoutPageRepositoryProvider = Provider<IWorkoutPageRepository>((ref) {
+  final workoutService = ref.watch(workoutPageServiceProvider);
+  final workoutHiveService = ref.watch(workoutHiveServiceProvider);
+  return WorkoutPageRepositoryImpl(workoutService, workoutHiveService);
+});
 
 class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
-  final WorkoutPageService _service;
-  final bool useMockData;
+  final WorkoutPageService _apiService;
+  final WorkoutHiveService _hiveService;
 
-  WorkoutPageRepositoryImpl(
-    this._service, {
-    this.useMockData = true, // Toggle per development
-  });
+  WorkoutPageRepositoryImpl(this._apiService, this._hiveService);
 
   @override
   Future<ApiResponse<List<WorkoutModel>>> getWorkouts() async {
-    if (useMockData) return _getMockWorkouts();
-    return await _service.fetchWorkouts();
+    try {
+      // Fetch remote workouts first.
+      final remoteResponse = await _apiService.fetchWorkouts();
+      if (remoteResponse.success && remoteResponse.data != null) {
+        // If successful, add any new workouts to the local hive box.
+        await _hiveService.addWorkouts(remoteResponse.data!);
+      }
+
+      // Always return the data from hive as the source of truth.
+      final localWorkouts = await _hiveService.getWorkouts();
+      return ApiResponse.success(data: localWorkouts);
+    } catch (e) {
+      // If API fails, still try to return local data.
+      final localWorkouts = await _hiveService.getWorkouts();
+      if (localWorkouts.isNotEmpty) {
+        return ApiResponse.success(
+          data: localWorkouts,
+          message: "API failed, showing local data.",
+        );
+      }
+      return ApiResponse.error(
+        message: "Failed to fetch workouts: ${e.toString()}",
+      );
+    }
   }
 
   @override
   Future<ApiResponse<List<WorkoutModel>>> getRecentWorkouts() async {
-    if (useMockData) return _getMockRecentWorkouts();
-    return await _service.fetchRecentWorkouts();
+    final response = await getWorkouts();
+    if (response.success) {
+      final allWorkouts = response.data ?? [];
+      allWorkouts.sort((a, b) => b.lastUsed.compareTo(a.lastUsed));
+      return ApiResponse.success(data: allWorkouts.take(3).toList());
+    }
+    return response;
   }
 
   @override
   Future<ApiResponse<WorkoutStatsModel>> getWorkoutStats() async {
-    if (useMockData) return _getMockStats();
-    return await _service.fetchWorkoutStats();
+    return await _apiService.fetchWorkoutStats();
   }
 
   @override
   Future<ApiResponse<String>> enableWorkout(String workoutId) async {
-    if (useMockData)
-      return ApiResponse.success(data: workoutId); // Simulate success
-    return await _service.enableWorkoutApi(workoutId);
+    // Here you would typically make an API call.
+    // For now, we can imagine it succeeds and we might update local state.
+    return await _apiService.enableWorkoutApi(workoutId);
   }
 
   @override
   Future<ApiResponse<String>> disableWorkout(String workoutId) async {
-    if (useMockData)
-      return ApiResponse.success(data: workoutId); // Simulate success
-    return await _service.disableWorkoutApi(workoutId);
+    return await _apiService.disableWorkoutApi(workoutId);
   }
 
   @override
   Future<ApiResponse<String>> deleteWorkout(String workoutId) async {
-    if (useMockData)
-      return ApiResponse.success(data: workoutId); // Simulate success
-    return await _service.deleteWorkoutApi(workoutId);
+    return await _apiService.deleteWorkoutApi(workoutId);
   }
 
   @override
   Future<ApiResponse<String>> updateWorkout(WorkoutModel updatedWorkout) async {
-    if (useMockData) {
-      // Simulate updating the mock data
-      final mockWorkouts = _getMockWorkouts().data ?? [];
-      final index = mockWorkouts.indexWhere((w) => w.id == updatedWorkout.id);
-      if (index != -1) {
-        mockWorkouts[index] =
-            updatedWorkout; // This won't actually update the list returned by _getMockWorkouts
-      }
-      return ApiResponse.success(data: updatedWorkout.id); // Simulate success
-    }
-    return await _service.updateWorkoutApi(updatedWorkout);
-  }
-
-  // Mock Data Helpers
-  ApiResponse<List<WorkoutModel>> _getMockWorkouts() {
-    return ApiResponse.success(
-      data: [
-        WorkoutModel(
-          id: '1',
-          titleI18n: {'it': 'Full Body Strength', 'en': 'Full Body Strength'},
-          coachName: 'Marco',
-          exercises: 8,
-          durationMinutes: 45,
-          goal: 'Forza',
-          progress: 75.0,
-          lastUsed: DateTime.now().subtract(const Duration(hours: 2)),
-          active: true,
-        ),
-        WorkoutModel(
-          id: '2',
-          titleI18n: {'it': 'Upper Body Push', 'en': 'Upper Body Push'},
-          coachName: 'Laura',
-          exercises: 6,
-          durationMinutes: 35,
-          goal: 'Ipertrofia',
-          progress: 50.0,
-          lastUsed: DateTime.now().subtract(const Duration(days: 1)),
-          active: true,
-        ),
-        WorkoutModel(
-          id: '3',
-          titleI18n: {'it': 'Leg Day', 'en': 'Leg Day'},
-          coachName: 'Marco',
-          exercises: 7,
-          durationMinutes: 50,
-          goal: 'Forza',
-          progress: 30.0,
-          lastUsed: DateTime.now().subtract(const Duration(days: 3)),
-          active: true,
-        ),
-        WorkoutModel(
-          id: '4',
-          titleI18n: {'it': 'Core & Cardio', 'en': 'Core & Cardio'},
-          coachName: 'Sofia',
-          exercises: 5,
-          durationMinutes: 30,
-          goal: 'Conditioning',
-          progress: 90.0,
-          lastUsed: DateTime.now().subtract(const Duration(days: 7)),
-          active: true,
-        ),
-      ],
-    );
-  }
-
-  ApiResponse<List<WorkoutModel>> _getMockRecentWorkouts() {
-    final all = _getMockWorkouts().data ?? [];
-    return ApiResponse.success(data: all.take(3).toList());
-  }
-
-  ApiResponse<WorkoutStatsModel> _getMockStats() {
-    return ApiResponse.success(
-      data: const WorkoutStatsModel(
-        activeWorkouts: 4,
-        completedWorkouts: 24,
-        progressPercentage: 12.0,
-        currentStreak: 7,
-        weeklyWorkouts: 3,
-      ),
-    );
+    // TODO: Implement logic to mark workout as dirty and sync later.
+    return await _apiService.updateWorkoutApi(updatedWorkout);
   }
 }

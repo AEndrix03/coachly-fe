@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 extension I18nExtension on Map<String, String> {
   String fromI18n(Locale locale) {
-    final languageCodeWithCountry = '${locale.languageCode}_${locale.countryCode}';
+    final languageCodeWithCountry =
+        '${locale.languageCode}_${locale.countryCode}';
     if (this[languageCodeWithCountry] != null) {
       return this[languageCodeWithCountry]!;
     }

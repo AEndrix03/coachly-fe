@@ -15,50 +15,35 @@ import 'widgets/workout_card.dart';
 import 'widgets/workout_header.dart';
 import 'widgets/workout_recent_card.dart';
 
-class WorkoutPage extends ConsumerStatefulWidget {
+class WorkoutPage extends ConsumerWidget {
   const WorkoutPage({super.key});
 
   @override
-  ConsumerState<WorkoutPage> createState() => _WorkoutPageState();
-}
-
-class _WorkoutPageState extends ConsumerState<WorkoutPage> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      ref.read(workoutListProvider.notifier).loadWorkouts();
-      // ref.read(workoutStatsProvider.notifier).loadStats(); // Commentato il caricamento delle stats
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
-    final gradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [scheme.primary, scheme.secondary],
-    );
     final workoutState = ref.watch(workoutListProvider);
+    final recentWorkoutsState = ref.watch(recentWorkoutsProvider);
     final statsState = ref.watch(workoutStatsProvider);
+
     return Scaffold(
       backgroundColor: scheme.surface,
       floatingActionButton: _buildFAB(context, scheme),
       body: RefreshIndicator(
         onRefresh: () async {
-          await ref.read(workoutListProvider.notifier).refresh();
-          await ref.read(workoutStatsProvider.notifier).refresh();
+          ref.invalidate(workoutListProvider);
+          ref.invalidate(recentWorkoutsProvider);
+          // ref.invalidate(workoutStatsProvider);
+          await ref.read(workoutListProvider.future);
         },
-        child: Container(
-          color: scheme.surface,
-          child: _buildBody(
+        child: workoutState.when(
+          loading: () => _buildLoading(scheme),
+          error: (err, stack) => _buildError(err),
+          data: (workouts) => _buildBody(
             context,
-            ref,
-            workoutState,
+            workouts,
+            recentWorkoutsState,
             statsState,
             scheme,
-            gradient,
           ),
         ),
       ),
@@ -67,61 +52,33 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage> {
 
   Widget _buildBody(
     BuildContext context,
-    WidgetRef ref,
-    WorkoutListState workoutState,
+    List<WorkoutModel> workouts,
+    AsyncValue<List<WorkoutModel>> recentWorkoutsState,
     WorkoutStatsState statsState,
     ColorScheme scheme,
-    LinearGradient gradient,
   ) {
-    if (workoutState.hasError) {
-      return Center(
-        child: ShadAlert(
-          title: Text('Errore'),
-          description: Text(workoutState.errorMessage ?? 'Errore sconosciuto'),
-        ),
-      );
-    }
-    if (workoutState.isLoading && workoutState.workouts.isEmpty) {
-      return Center(
-        child: Shimmer.fromColors(
-          baseColor: scheme.surface,
-          highlightColor: scheme.primary.withOpacity(0.2),
-          child: Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: scheme.surface,
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-        ),
-      );
-    }
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           WorkoutHeader(
-            stats: null, // statsState.stats,
-            isLoading: false, // statsState.isLoading,
+            stats: statsState.stats,
+            isLoading: statsState.isLoading,
             onNotifications: () => _showNotifications(context),
           ),
           const Gap(18),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 16),
-          //   child: WorkoutStatsOverview(
-          //     stats: statsState.stats,
-          //     isLoading: statsState.isLoading,
-          //   ),
-          // ),
           const Gap(28),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18),
             child: SectionBar(title: 'Schede Recenti'),
           ),
           const Gap(10),
-          _buildRecentWorkouts(workoutState.recentWorkouts, scheme),
+          recentWorkoutsState.when(
+            loading: () => _buildRecentLoading(scheme),
+            error: (err, stack) => Text(err.toString()),
+            data: (recent) => _buildRecentWorkouts(recent, scheme),
+          ),
           const Gap(28),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,9 +98,52 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage> {
               ),
             ],
           ),
-          _buildAllWorkouts(workoutState.workouts, scheme),
+          _buildAllWorkouts(workouts, scheme),
           const Gap(32),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLoading(ColorScheme scheme) {
+    return Center(
+      child: Shimmer.fromColors(
+        baseColor: scheme.surface,
+        highlightColor: scheme.primary.withOpacity(0.2),
+        child: Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentLoading(ColorScheme scheme) {
+    return SizedBox(
+      height: 365,
+      child: Shimmer.fromColors(
+        baseColor: scheme.surface,
+        highlightColor: scheme.primary.withOpacity(0.2),
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          children: List.generate(
+            3,
+            (index) => const SizedBox(width: 290, child: Card()),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildError(Object err) {
+    return Center(
+      child: ShadAlert(
+        title: Text('Errore'),
+        description: Text(err.toString()),
       ),
     );
   }
@@ -212,12 +212,6 @@ class _WorkoutPageState extends ConsumerState<WorkoutPage> {
       onPressed: () {
         context.push('/workouts/workout/new/edit');
       },
-    );
-  }
-
-  void _showSettings(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Settings'), duration: Duration(seconds: 1)),
     );
   }
 

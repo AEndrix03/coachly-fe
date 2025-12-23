@@ -24,9 +24,6 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    Future.microtask(() {
-      ref.read(workoutListProvider.notifier).loadWorkouts();
-    });
   }
 
   @override
@@ -40,84 +37,11 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
     final scheme = Theme.of(context).colorScheme;
     final workoutState = ref.watch(workoutListProvider);
 
-    final activeWorkouts = workoutState.workouts
-        .where((w) => w.active)
-        .toList();
-    final inactiveWorkouts = workoutState.workouts
-        .where((w) => !w.active)
-        .toList();
-
     return Scaffold(
       backgroundColor: scheme.surface,
       body: Column(
         children: [
-          Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF2196F3),
-                  Color(0xFF1976D2),
-                  Color(0xFF7B4BC1),
-                ],
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(32),
-                bottomRight: Radius.circular(32),
-              ),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GlassIconButton(
-                          icon: Icons.arrow_back,
-                          onPressed: () {
-                            context.pop();
-                          },
-                          iconColor: Colors.white,
-                          size: 20,
-                          marginRight: 0,
-                        ),
-                        GlassIconButton(
-                          icon: Icons.save,
-                          onPressed: () {
-                            // TODO: Implement save functionality
-                          },
-                          iconColor: Colors.white,
-                          size: 20,
-                          marginRight: 0,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(24, 8, 24, 16),
-                    child: Text(
-                      'Organizza gli Allenamenti',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _buildHeader(context),
           TabBar(
             controller: _tabController,
             tabs: const [
@@ -126,22 +50,22 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             ],
           ),
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildWorkoutList(
-                  context,
-                  workoutState,
-                  activeWorkouts,
-                  scheme,
-                ),
-                _buildWorkoutList(
-                  context,
-                  workoutState,
-                  inactiveWorkouts,
-                  scheme,
-                ),
-              ],
+            child: workoutState.when(
+              loading: () => _buildLoading(scheme),
+              error: (err, stack) => _buildError(err),
+              data: (workouts) {
+                final activeWorkouts = workouts.where((w) => w.active).toList();
+                final inactiveWorkouts = workouts
+                    .where((w) => !w.active)
+                    .toList();
+                return TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildWorkoutList(context, activeWorkouts, scheme),
+                    _buildWorkoutList(context, inactiveWorkouts, scheme),
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -149,42 +73,74 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
     );
   }
 
-  Widget _buildWorkoutList(
-    BuildContext context,
-    WorkoutListState workoutState,
-    List<WorkoutModel> workouts,
-    ColorScheme scheme,
-  ) {
-    if (workoutState.hasError) {
-      return Center(
-        child: ShadAlert(
-          title: const Text('Errore'),
-          description: Text(workoutState.errorMessage ?? 'Errore sconosciuto'),
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2196F3), Color(0xFF1976D2), Color(0xFF7B4BC1)],
         ),
-      );
-    }
-    if (workoutState.isLoading && workouts.isEmpty) {
-      return Center(
-        child: Shimmer.fromColors(
-          baseColor: scheme.surface,
-          highlightColor: scheme.primary.withOpacity(0.2),
-          child: ListView.builder(
-            itemCount: 5,
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Container(
-                height: 80,
-                decoration: BoxDecoration(
-                  color: scheme.surface,
-                  borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GlassIconButton(
+                    icon: Icons.arrow_back,
+                    onPressed: () {
+                      context.pop();
+                    },
+                    iconColor: Colors.white,
+                    size: 20,
+                    marginRight: 0,
+                  ),
+                  GlassIconButton(
+                    icon: Icons.save,
+                    onPressed: () {
+                      // TODO: Implement save functionality
+                    },
+                    iconColor: Colors.white,
+                    size: 20,
+                    marginRight: 0,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(24, 8, 24, 16),
+              child: Text(
+                'Organizza gli Allenamenti',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-          ),
+          ],
         ),
-      );
-    }
+      ),
+    );
+  }
 
+  Widget _buildWorkoutList(
+    BuildContext context,
+    List<WorkoutModel> workouts,
+    ColorScheme scheme,
+  ) {
     if (workouts.isEmpty) {
       return const Center(
         child: Padding(
@@ -221,9 +177,15 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
               'Sei sicuro di voler $action la scheda "${workout.titleI18n['it'] ?? workout.titleI18n.values.first}"?',
             );
             if (confirmed) {
-              ref
-                  .read(workoutListProvider.notifier)
-                  .updateWorkoutActiveStatus(workout.id, isActive);
+              if (isActive) {
+                ref
+                    .read(workoutListProvider.notifier)
+                    .enableWorkout(workout.id);
+              } else {
+                ref
+                    .read(workoutListProvider.notifier)
+                    .disableWorkout(workout.id);
+              }
             }
           },
           onEdit: () {
@@ -231,6 +193,37 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
           },
         );
       },
+    );
+  }
+
+  Widget _buildLoading(ColorScheme scheme) {
+    return Center(
+      child: Shimmer.fromColors(
+        baseColor: scheme.surface,
+        highlightColor: scheme.primary.withOpacity(0.2),
+        child: ListView.builder(
+          itemCount: 5,
+          itemBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Container(
+              height: 80,
+              decoration: BoxDecoration(
+                color: scheme.surface,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildError(Object err) {
+    return Center(
+      child: ShadAlert(
+        title: const Text('Errore'),
+        description: Text(err.toString()),
+      ),
     );
   }
 }

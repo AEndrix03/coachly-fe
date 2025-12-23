@@ -15,11 +15,13 @@ class Language extends _$Language {
       final deviceLocale = WidgetsBinding.instance.platformDispatcher.locale;
       languageCode = '${deviceLocale.languageCode}_${deviceLocale.countryCode}';
       if (languageCode == 'en_US') {
-        languageCode = 'en_EN'; // Use en_EN instead of en_US as default fallback for consistency
+        languageCode =
+            'en_EN'; // Use en_EN instead of en_US as default fallback for consistency
       } else if (languageCode == 'it_IT') {
         // Keep it_IT
       } else {
-        languageCode = 'it_IT'; // Default to it_IT if device locale is neither en_US nor it_IT
+        languageCode =
+            'it_IT'; // Default to it_IT if device locale is neither en_US nor it_IT
       }
     }
 
@@ -33,7 +35,10 @@ class Language extends _$Language {
 
   Future<void> setLanguage(Locale locale) async {
     final db = LocalDatabaseService();
-    await db.settings.put('language', '${locale.languageCode}_${locale.countryCode}');
+    await db.settings.put(
+      'language',
+      '${locale.languageCode}_${locale.countryCode}',
+    );
     state = locale;
   }
 }
