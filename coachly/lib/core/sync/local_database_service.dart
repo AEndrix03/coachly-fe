@@ -1,11 +1,17 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:coachly/core/sync/adapters/workout_adapter.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 /// Service per gestire il database locale con Hive
 /// Fornisce API type-safe per storage locale di entità
 class LocalDatabaseService {
+  // Box version
+  static const int _dbVersion = 1;
+  static const bool devMode = true;
+
   // Box names
-  static const String workoutsBox = 'workouts';
+  static String get workoutsBox => 'workouts_v$_dbVersion';
   static const String _exercisesBox = 'exercises';
   static const String _settingsBox = 'settings';
 
@@ -25,17 +31,39 @@ class LocalDatabaseService {
 
     await Hive.initFlutter();
 
-    // Open boxes
-    await Hive.openBox<Map>(workoutsBox);
+    // Registra adapter
+    if (!Hive.isAdapterRegistered(0)) {
+      Hive.registerAdapter(WorkoutAdapter());
+    }
+
+    // Pulisci vecchi box
+    await _cleanOldBoxes();
+
+    // Apri box con versione nel nome
+    await Hive.openBox<WorkoutModel>(workoutsBox);
     await Hive.openBox<Map>(_exercisesBox);
     await Hive.openBox<dynamic>(_settingsBox);
 
     _initialized = true;
-    print('📦 Local database initialized');
+    print('📦 Local database initialized (v$_dbVersion)');
+  }
+
+  Future<void> _cleanOldBoxes() async {
+    if (!devMode) {
+      for (int v = 1; v < _dbVersion; v++) {
+        try {
+          await Hive.deleteBoxFromDisk('workouts_v$v');
+          print('🧹 Cleaned old box: workouts_v$v');
+        } catch (_) {}
+      }
+    } else {
+      print('⚠️ Dev mode active: Old box cleanup');
+      Hive.deleteFromDisk();
+    }
   }
 
   /// Get workouts box
-  Box<Map> get workouts => Hive.box<Map>(workoutsBox);
+  Box<WorkoutModel> get workouts => Hive.box<WorkoutModel>(workoutsBox);
 
   /// Get exercises box
   Box<Map> get exercises => Hive.box<Map>(_exercisesBox);
@@ -109,7 +137,7 @@ class LocalDatabaseService {
 
   /// Clear all data (use with caution!)
   Future<void> clearAll() async {
-    await Hive.box<Map>(workoutsBox).clear();
+    await Hive.box<WorkoutModel>(workoutsBox).clear();
     await Hive.box<Map>(_exercisesBox).clear();
     await Hive.box<dynamic>(_settingsBox).clear();
     print('🧹 Cleared all local data');

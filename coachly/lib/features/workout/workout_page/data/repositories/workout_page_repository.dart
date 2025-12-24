@@ -9,11 +9,11 @@ abstract class IWorkoutPageRepository {
 
   Future<ApiResponse<WorkoutStatsModel>> getWorkoutStats();
 
-  Future<ApiResponse<String>> enableWorkout(String workoutId);
+  Future<ApiResponse<void>> enableWorkout(String workoutId);
 
-  Future<ApiResponse<String>> disableWorkout(String workoutId);
+  Future<ApiResponse<void>> disableWorkout(String workoutId);
 
-  Future<ApiResponse<String>> deleteWorkout(String workoutId);
+  Future<ApiResponse<void>> deleteWorkout(String workoutId);
 
-  Future<ApiResponse<String>> updateWorkout(WorkoutModel updatedWorkout);
+  Future<ApiResponse<void>> updateWorkout(WorkoutModel updatedWorkout);
 }

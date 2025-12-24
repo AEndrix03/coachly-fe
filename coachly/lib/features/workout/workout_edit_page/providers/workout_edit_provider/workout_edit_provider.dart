@@ -220,9 +220,27 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
-      state = state.copyWith(isLoading: false, isDirty: false);
-      return true;
+      final service = ref.read(workoutDetailPageServiceProvider);
+      final workoutData = {
+        'title': state.title,
+        'description': state.description,
+        'durationMinutes': int.tryParse(state.duration) ?? 60,
+        'type': state.type,
+        'exercises': state.exercises.map((e) => e.toJson()).toList(),
+      };
+
+      final response = await service.patchWorkout(state.workoutId, workoutData);
+
+      if (response.success) {
+        state = state.copyWith(isLoading: false, isDirty: false);
+        return true;
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          error: response.message ?? 'Errore durante il salvataggio',
+        );
+        return false;
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

@@ -17,6 +17,8 @@ abstract class WorkoutModel with _$WorkoutModel {
     required String goal,
     required DateTime lastUsed,
     @Default(true) bool active,
+    @Default(false) bool dirty,
+    @Default(false) bool delete,
   }) = _WorkoutModel;
 
   factory WorkoutModel.fromJson(Map<String, dynamic> json) =>

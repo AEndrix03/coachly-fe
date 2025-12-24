@@ -32,4 +32,16 @@ class WorkoutDetailPageService {
       },
     );
   }
+
+  /// Patch a workout
+  Future<ApiResponse<void>> patchWorkout(
+    String workoutId,
+    Map<String, dynamic> data,
+  ) async {
+    return await _apiClient.post<void>(
+      '/workouts/$workoutId',
+      body: data,
+      fromJson: (_) => null,
+    );
+  }
 }

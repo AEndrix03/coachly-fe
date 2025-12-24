@@ -25,7 +25,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       final remoteResponse = await _apiService.fetchWorkouts();
       if (remoteResponse.success && remoteResponse.data != null) {
         // If successful, add any new workouts to the local hive box.
-        await _hiveService.addWorkouts(remoteResponse.data!);
+        await _hiveService.patchWorkouts(remoteResponse.data!);
       }
 
       // Always return the data from hive as the source of truth.
@@ -63,25 +63,35 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   }
 
   @override
-  Future<ApiResponse<String>> enableWorkout(String workoutId) async {
-    // Here you would typically make an API call.
-    // For now, we can imagine it succeeds and we might update local state.
-    return await _apiService.enableWorkoutApi(workoutId);
+  Future<ApiResponse<void>> enableWorkout(String workoutId) async {
+    return ApiResponse.success(
+      data: _hiveService.enableWorkout(workoutId),
+      message: "Enabled workout ${workoutId}",
+    );
   }
 
   @override
-  Future<ApiResponse<String>> disableWorkout(String workoutId) async {
-    return await _apiService.disableWorkoutApi(workoutId);
+  Future<ApiResponse<void>> disableWorkout(String workoutId) async {
+    return ApiResponse.success(
+      data: _hiveService.disableWorkout(workoutId),
+      message: "Disabeled workout ${workoutId}",
+    );
   }
 
   @override
-  Future<ApiResponse<String>> deleteWorkout(String workoutId) async {
-    return await _apiService.deleteWorkoutApi(workoutId);
+  Future<ApiResponse<void>> deleteWorkout(String workoutId) async {
+    return ApiResponse.success(
+      data: _hiveService.deleteWorkout(workoutId),
+      message: "Deleted workout ${workoutId}",
+    );
   }
 
   @override
-  Future<ApiResponse<String>> updateWorkout(WorkoutModel updatedWorkout) async {
+  Future<ApiResponse<void>> updateWorkout(WorkoutModel updatedWorkout) async {
     // TODO: Implement logic to mark workout as dirty and sync later.
-    return await _apiService.updateWorkoutApi(updatedWorkout);
+    return ApiResponse.success(
+      data: _hiveService.patchWorkout(updatedWorkout),
+      message: "Updated workout ${updatedWorkout.id}",
+    );
   }
 }

@@ -22,12 +22,14 @@ class WorkoutPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
     final workoutState = ref.watch(workoutListProvider);
-    final recentWorkoutsState = ref.watch(recentWorkoutsProvider);
-    final statsState = ref.watch(workoutStatsProvider);
 
     return Scaffold(
       backgroundColor: scheme.surface,
-      floatingActionButton: _buildFAB(context, scheme),
+      floatingActionButton: workoutState.maybeWhen(
+        data: (workouts) =>
+            workouts.isEmpty ? null : _buildFAB(context, scheme),
+        orElse: () => _buildFAB(context, scheme),
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(workoutListProvider);
@@ -38,13 +40,17 @@ class WorkoutPage extends ConsumerWidget {
         child: workoutState.when(
           loading: () => _buildLoading(scheme),
           error: (err, stack) => _buildError(err),
-          data: (workouts) => _buildBody(
-            context,
-            workouts,
-            recentWorkoutsState,
-            statsState,
-            scheme,
-          ),
+          data: (workouts) {
+            final recentWorkoutsState = ref.watch(recentWorkoutsProvider);
+            final statsState = ref.watch(workoutStatsProvider);
+            return _buildBody(
+              context,
+              workouts,
+              recentWorkoutsState,
+              statsState,
+              scheme,
+            );
+          },
         ),
       ),
     );
@@ -57,6 +63,9 @@ class WorkoutPage extends ConsumerWidget {
     WorkoutStatsState statsState,
     ColorScheme scheme,
   ) {
+    if (workouts.isEmpty) {
+      return _buildEmptyState(context, scheme);
+    }
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       child: Column(
@@ -68,16 +77,26 @@ class WorkoutPage extends ConsumerWidget {
             onNotifications: () => _showNotifications(context),
           ),
           const Gap(18),
-          const Gap(28),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-            child: SectionBar(title: 'Schede Recenti'),
-          ),
-          const Gap(10),
           recentWorkoutsState.when(
             loading: () => _buildRecentLoading(scheme),
             error: (err, stack) => Text(err.toString()),
-            data: (recent) => _buildRecentWorkouts(recent, scheme),
+            data: (recent) {
+              if (recent.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Gap(28),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: SectionBar(title: 'Schede Recenti'),
+                  ),
+                  const Gap(10),
+                  _buildRecentWorkouts(recent, scheme),
+                ],
+              );
+            },
           ),
           const Gap(28),
           Row(
@@ -100,6 +119,28 @@ class WorkoutPage extends ConsumerWidget {
           ),
           _buildAllWorkouts(workouts, scheme),
           const Gap(32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context, ColorScheme scheme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Crea la tua prima scheda!',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const Gap(16),
+          ShadButton(
+            onPressed: () {
+              context.push('/workouts/workout/new/edit');
+            },
+            backgroundColor: scheme.primary,
+            child: const Text('Iniziamo'),
+          ),
         ],
       ),
     );
@@ -150,15 +191,7 @@ class WorkoutPage extends ConsumerWidget {
 
   Widget _buildRecentWorkouts(List<WorkoutModel> workouts, ColorScheme scheme) {
     if (workouts.isEmpty) {
-      return const SizedBox(
-        height: 365,
-        child: Center(
-          child: Text(
-            'Nessuna scheda recente',
-            style: TextStyle(color: Color(0x80000000)),
-          ),
-        ),
-      );
+      return const SizedBox.shrink();
     }
     return SizedBox(
       height: 365,
@@ -184,17 +217,6 @@ class WorkoutPage extends ConsumerWidget {
   }
 
   Widget _buildAllWorkouts(List<WorkoutModel> workouts, ColorScheme scheme) {
-    if (workouts.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(32),
-          child: Text(
-            'Nessuna scheda disponibile',
-            style: TextStyle(color: Color(0x80000000)),
-          ),
-        ),
-      );
-    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.separated(

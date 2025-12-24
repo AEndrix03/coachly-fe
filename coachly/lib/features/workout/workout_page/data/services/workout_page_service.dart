@@ -31,8 +31,6 @@ class WorkoutPageService {
   }
 
   Future<ApiResponse<List<WorkoutModel>>> fetchRecentWorkouts() async {
-    // For now, fetch all and get the 3 most recent ones.
-    // In the future, this might be a dedicated endpoint.
     final allWorkoutsResponse = await fetchWorkouts();
     if (allWorkoutsResponse.success) {
       final allWorkouts = allWorkoutsResponse.data ?? [];
@@ -43,7 +41,6 @@ class WorkoutPageService {
   }
 
   Future<ApiResponse<WorkoutStatsModel>> fetchWorkoutStats() async {
-    // Mocked response as requested
     return ApiResponse.success(
       data: const WorkoutStatsModel(
         activeWorkouts: 4,
@@ -55,28 +52,14 @@ class WorkoutPageService {
     );
   }
 
-  Future<ApiResponse<String>> enableWorkoutApi(String workoutId) async {
-    // Mocked response
-    return ApiResponse.success(data: workoutId, message: 'Workout enabled');
-  }
-
-  Future<ApiResponse<String>> disableWorkoutApi(String workoutId) async {
-    // Mocked response
-    return ApiResponse.success(data: workoutId, message: 'Workout disabled');
-  }
-
-  Future<ApiResponse<String>> deleteWorkoutApi(String workoutId) async {
-    // Mocked response
-    return ApiResponse.success(data: workoutId, message: 'Workout deleted');
-  }
-
-  Future<ApiResponse<String>> updateWorkoutApi(
-    WorkoutModel updatedWorkout,
+  // Sincronizza workout dirty con il BE
+  Future<ApiResponse<void>> syncDirtyWorkouts(
+    List<WorkoutModel> dirtyWorkouts,
   ) async {
-    // Mocked response
-    return ApiResponse.success(
-      data: updatedWorkout.id,
-      message: 'Workout updated',
+    return await _apiClient.post<void>(
+      '/workouts/sync',
+      body: {'workouts': dirtyWorkouts.map((w) => w.toJson()).toList()},
+      fromJson: (_) => null,
     );
   }
 }

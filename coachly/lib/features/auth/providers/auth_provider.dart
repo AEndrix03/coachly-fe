@@ -127,7 +127,7 @@ class Auth extends _$Auth with WidgetsBindingObserver {
     state = AsyncValue.data(await _checkAuthStatus());
   }
 
-  Future<AuthState> _checkAuthStatus() async {
+  Future<AuthState> _checkAuthStatus({bool forceRefresh = false}) async {
     print('🔍 Checking auth status...');
     final service = ref.read(authServiceProvider);
     final accessToken = await service.getAccessToken();
@@ -150,7 +150,7 @@ class Auth extends _$Auth with WidgetsBindingObserver {
       '✓ Access valid: $isAccessValid, Refresh valid: $isRefreshValid, Internet: $hasInternet',
     );
 
-    if (isAccessValid) {
+    if (isAccessValid && !forceRefresh) {
       print('✅ Access token valid - scheduling refresh');
       _scheduleSmartRefresh(accessToken);
       return AuthState(
@@ -241,7 +241,7 @@ class Auth extends _$Auth with WidgetsBindingObserver {
     final refreshAt = remaining - const Duration(minutes: 5);
     if (refreshAt.isNegative) {
       print('⚠️  Token already expiring - checking immediately');
-      _checkAuthStatus();
+      _checkAuthStatus(forceRefresh: true);
       return;
     }
 

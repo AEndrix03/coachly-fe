@@ -21,6 +21,8 @@ _WorkoutModel _$WorkoutModelFromJson(Map<String, dynamic> json) =>
       goal: json['goal'] as String,
       lastUsed: DateTime.parse(json['lastUsed'] as String),
       active: json['active'] as bool? ?? true,
+      dirty: json['dirty'] as bool? ?? false,
+      delete: json['delete'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$WorkoutModelToJson(_WorkoutModel instance) =>
@@ -36,4 +38,6 @@ Map<String, dynamic> _$WorkoutModelToJson(_WorkoutModel instance) =>
       'goal': instance.goal,
       'lastUsed': instance.lastUsed.toIso8601String(),
       'active': instance.active,
+      'dirty': instance.dirty,
+      'delete': instance.delete,
     };
