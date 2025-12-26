@@ -19,7 +19,7 @@ _WorkoutModel _$WorkoutModelFromJson(Map<String, dynamic> json) =>
       lastUsed: DateTime.parse(json['lastUsed'] as String),
       muscleTags:
           (json['muscleTags'] as List<dynamic>?)
-              ?.map((e) => e as String)
+              ?.map((e) => TagDto.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
       sessionsCount: (json['sessionsCount'] as num).toInt(),

@@ -1,3 +1,4 @@
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_detail_provider/workout_detail_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_exercise_list_section.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_header.dart';
@@ -9,7 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:coachly/features/user_settings/providers/settings_provider.g.dart'; // Import for languageProvider
 
 class WorkoutDetailPage extends ConsumerStatefulWidget {
   final String id;
@@ -140,7 +140,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
             WorkoutDetailHeader(
               title: workout.titleI18n.fromI18n(locale),
               coachName: workout.coachName ?? '',
-              muscleTags: workout.muscleTags.map((tag) => tag.nameI18n.fromI18n(locale)).toList(),
+              muscleTags: workout.muscleTags,
               progress: workout.progress,
               sessionsCount: workout.sessionsCount,
               lastSessionDays: workout.lastSessionDays,

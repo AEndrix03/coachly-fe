@@ -12,7 +12,7 @@ part of 'settings_provider.dart';
 @ProviderFor(Language)
 const languageProvider = LanguageProvider._();
 
-final class LanguageProvider extends $NotifierProvider<\\\\\\\\\\\\Language, Locale> {
+final class LanguageProvider extends $NotifierProvider<Language, Locale> {
   const LanguageProvider._()
     : super(
         from: null,

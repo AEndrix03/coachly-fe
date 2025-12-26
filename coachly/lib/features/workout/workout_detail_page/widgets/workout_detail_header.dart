@@ -1,12 +1,12 @@
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart'; // Import for TagDto
+import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import for ConsumerWidget
-import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart'; // Import for TagDto
-import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
-import 'package:coachly/features/user_settings/providers/settings_provider.g.dart'; // Import for languageProvider
 
-
-class WorkoutDetailHeader extends ConsumerWidget { // Changed to ConsumerWidget
+class WorkoutDetailHeader extends ConsumerWidget {
+  // Changed to ConsumerWidget
   final String title;
   final String coachName;
   final List<TagDto> muscleTags; // Changed to List<TagDto>
@@ -31,7 +31,8 @@ class WorkoutDetailHeader extends ConsumerWidget { // Changed to ConsumerWidget
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) { // Added WidgetRef ref
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Added WidgetRef ref
     final locale = ref.watch(languageProvider); // Use languageProvider
     return Container(
       width: double.infinity,
@@ -50,7 +51,10 @@ class WorkoutDetailHeader extends ConsumerWidget { // Changed to ConsumerWidget
         bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildAppBar(), _buildContent(locale)], // Pass locale to _buildContent
+          children: [
+            _buildAppBar(),
+            _buildContent(locale),
+          ], // Pass locale to _buildContent
         ),
       ),
     );
@@ -78,7 +82,8 @@ class WorkoutDetailHeader extends ConsumerWidget { // Changed to ConsumerWidget
     );
   }
 
-  Widget _buildContent(Locale locale) { // Accept locale
+  Widget _buildContent(Locale locale) {
+    // Accept locale
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
       child: Column(
@@ -129,11 +134,14 @@ class WorkoutDetailHeader extends ConsumerWidget { // Changed to ConsumerWidget
     );
   }
 
-  Widget _buildMuscleTags(Locale locale) { // Accept locale
+  Widget _buildMuscleTags(Locale locale) {
+    // Accept locale
     return Wrap(
       spacing: 8,
       runSpacing: 8,
-      children: muscleTags.map((tag) => _buildTag(tag.nameI18n.fromI18n(locale))).toList(),
+      children: muscleTags
+          .map((tag) => _buildTag(tag.nameI18n.fromI18n(locale)))
+          .toList(),
     );
   }
 

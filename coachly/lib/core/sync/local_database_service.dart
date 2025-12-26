@@ -48,17 +48,40 @@ class LocalDatabaseService {
     print('📦 Local database initialized (v$_dbVersion)');
   }
 
+  // local_database_service.dart
+
   Future<void> _cleanOldBoxes() async {
-    if (!devMode) {
+    if (devMode) {
+      print('⚠️ Dev mode: Cleaning ALL boxes');
+
+      // Chiudi tutti i box prima di cancellarli
+      if (Hive.isBoxOpen(workoutsBox)) {
+        await Hive.box<WorkoutModel>(workoutsBox).close();
+      }
+      if (Hive.isBoxOpen(_exercisesBox)) {
+        await Hive.box<Map>(_exercisesBox).close();
+      }
+      if (Hive.isBoxOpen(_settingsBox)) {
+        await Hive.box<dynamic>(_settingsBox).close();
+      }
+
+      // Cancella tutti i box dal disco
+      try {
+        await Hive.deleteBoxFromDisk(workoutsBox);
+        await Hive.deleteBoxFromDisk(_exercisesBox);
+        await Hive.deleteBoxFromDisk(_settingsBox);
+        print('✅ All boxes cleaned');
+      } catch (e) {
+        print('⚠️ Error cleaning boxes: $e');
+      }
+    } else {
+      // Pulisci solo vecchie versioni in produzione
       for (int v = 1; v < _dbVersion; v++) {
         try {
           await Hive.deleteBoxFromDisk('workouts_v$v');
           print('🧹 Cleaned old box: workouts_v$v');
         } catch (_) {}
       }
-    } else {
-      print('⚠️ Dev mode active: Old box cleanup');
-      Hive.deleteFromDisk();
     }
   }
 
