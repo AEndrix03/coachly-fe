@@ -1,5 +1,6 @@
 import 'package:coachly/core/network/api_client.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_info_page_service.dart';
@@ -18,13 +19,13 @@ ExerciseInfoPageService exerciseInfoPageService(Ref ref) {
 @riverpod
 IExerciseInfoPageRepository exerciseInfoPageRepository(Ref ref) {
   final service = ref.watch(exerciseInfoPageServiceProvider);
-  return ExerciseInfoPageRepositoryImpl(service, useMockData: true);
+  return ExerciseInfoPageRepositoryImpl(service);
 }
 
 // State Class
 class ExerciseInfoState {
   final List<ExerciseModel> exercises;
-  final ExerciseModel? selectedExercise;
+  final ExerciseDetailModel? selectedExercise;
   final bool isLoading;
   final bool isLoadingDetail;
   final String? errorMessage;
@@ -39,17 +40,23 @@ class ExerciseInfoState {
 
   ExerciseInfoState copyWith({
     List<ExerciseModel>? exercises,
-    ExerciseModel? selectedExercise,
+    ExerciseDetailModel? selectedExercise,
+    bool clearSelectedExercise = false,
     bool? isLoading,
     bool? isLoadingDetail,
     String? errorMessage,
+    bool clearErrorMessage = false,
   }) {
     return ExerciseInfoState(
       exercises: exercises ?? this.exercises,
-      selectedExercise: selectedExercise ?? this.selectedExercise,
+      selectedExercise: clearSelectedExercise
+          ? null
+          : selectedExercise ?? this.selectedExercise,
       isLoading: isLoading ?? this.isLoading,
       isLoadingDetail: isLoadingDetail ?? this.isLoadingDetail,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessage: clearErrorMessage
+          ? null
+          : errorMessage ?? this.errorMessage,
     );
   }
 
@@ -72,7 +79,7 @@ class ExerciseInfoNotifier extends _$ExerciseInfoNotifier {
   }
 
   Future<void> loadAllExercises() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    state = state.copyWith(isLoading: true, clearErrorMessage: true);
 
     try {
       final repository = ref.read(exerciseInfoPageRepositoryProvider);
@@ -92,7 +99,7 @@ class ExerciseInfoNotifier extends _$ExerciseInfoNotifier {
   }
 
   Future<void> loadExerciseDetail(String exerciseId) async {
-    state = state.copyWith(isLoadingDetail: true, errorMessage: null);
+    state = state.copyWith(isLoadingDetail: true, clearErrorMessage: true);
 
     try {
       final repository = ref.read(exerciseInfoPageRepositoryProvider);
@@ -120,6 +127,6 @@ class ExerciseInfoNotifier extends _$ExerciseInfoNotifier {
   Future<void> refresh() => loadAllExercises();
 
   void clearSelectedExercise() {
-    state = state.copyWith(selectedExercise: null);
+    state = state.copyWith(clearSelectedExercise: true);
   }
 }

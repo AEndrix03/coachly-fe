@@ -1,9 +1,13 @@
-import 'package:coachly/features/workout/workout_detail_page/data/models/exercise_info_model/exercise_info_model.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import for ConsumerWidget
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class WorkoutDetailExerciseListSection extends StatelessWidget {
-  final List<ExerciseInfoModel> exercises;
+  final List<WorkoutExerciseModel> exercises;
   final String? workoutId;
 
   const WorkoutDetailExerciseListSection({
@@ -62,9 +66,12 @@ class WorkoutDetailExerciseListSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          ...exercises.map(
-            (exercise) =>
-                _ExerciseCard(exercise: exercise, workoutId: workoutId ?? '1'),
+          ...exercises.asMap().entries.map(
+            (entry) => _ExerciseCard(
+              workoutExercise: entry.value,
+              workoutId: workoutId ?? '1',
+              exerciseNumber: entry.key + 1,
+            ),
           ),
         ],
       ),
@@ -72,18 +79,27 @@ class WorkoutDetailExerciseListSection extends StatelessWidget {
   }
 }
 
-class _ExerciseCard extends StatelessWidget {
-  final ExerciseInfoModel exercise;
+class _ExerciseCard extends ConsumerWidget {
+  // Changed to ConsumerWidget
+  final WorkoutExerciseModel workoutExercise;
   final String workoutId;
+  final int exerciseNumber;
 
-  const _ExerciseCard({required this.exercise, required this.workoutId});
+  const _ExerciseCard({
+    super.key, // Added super.key
+    required this.workoutExercise,
+    required this.workoutId,
+    required this.exerciseNumber,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Added WidgetRef ref
+    final locale = ref.watch(languageProvider); // Use languageProvider
     return InkWell(
       onTap: () {
         context.push(
-          '/workouts/workout/$workoutId/workout_exercise_page/${exercise.number}',
+          '/workouts/workout/$workoutId/workout_exercise_page/$exerciseNumber',
         );
       },
       borderRadius: BorderRadius.circular(20),
@@ -111,7 +127,7 @@ class _ExerciseCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            _buildMainContent(),
+            _buildMainContent(locale),
             Container(
               height: 1,
               decoration: BoxDecoration(
@@ -131,7 +147,8 @@ class _ExerciseCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMainContent() {
+  Widget _buildMainContent(Locale locale) {
+    final exercise = workoutExercise.exercise;
     return Padding(
       padding: const EdgeInsets.all(14),
       child: Row(
@@ -143,7 +160,7 @@ class _ExerciseCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  exercise.name,
+                  exercise.nameI18n.fromI18n(locale),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -160,13 +177,16 @@ class _ExerciseCard extends StatelessWidget {
                   child: Row(
                     children: [
                       _buildTag(
-                        exercise.muscle,
-                        exercise.accentColor,
+                        exercise.muscles.firstOrNull?.muscle.nameI18n.fromI18n(
+                              locale,
+                            ) ??
+                            'N/A',
+                        const Color(0xFF2196F3), // Hardcoded color
                         Icons.fitbit,
                       ),
                       const SizedBox(width: 8),
                       _buildTag(
-                        exercise.difficulty,
+                        exercise.difficultyLevel,
                         const Color(0xFFFF9800),
                         Icons.whatshot,
                       ),
@@ -205,7 +225,7 @@ class _ExerciseCard extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          exercise.number.toString(),
+          exerciseNumber.toString(),
           style: TextStyle(
             color: Colors.white.withOpacity(0.9),
             fontSize: 18,
@@ -239,6 +259,11 @@ class _ExerciseCard extends StatelessWidget {
   }
 
   Widget _buildBottomBar() {
+    final progressFormat = NumberFormat.percentPattern();
+    final progressText = workoutExercise.progress > 0
+        ? '+${progressFormat.format(workoutExercise.progress)}'
+        : '';
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -250,9 +275,9 @@ class _ExerciseCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _buildInfoChip(Icons.repeat, exercise.sets),
+          _buildInfoChip(Icons.repeat, workoutExercise.sets),
           const SizedBox(width: 12),
-          _buildInfoChip(Icons.timer_outlined, exercise.rest),
+          _buildInfoChip(Icons.timer_outlined, workoutExercise.rest),
           const Spacer(),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -270,7 +295,7 @@ class _ExerciseCard extends StatelessWidget {
               ),
             ),
             child: Text(
-              exercise.weight,
+              workoutExercise.weight,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 12,
@@ -279,7 +304,7 @@ class _ExerciseCard extends StatelessWidget {
               ),
             ),
           ),
-          if (exercise.progress.isNotEmpty) ...[
+          if (progressText.isNotEmpty) ...[
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -304,7 +329,7 @@ class _ExerciseCard extends StatelessWidget {
                 ],
               ),
               child: Text(
-                exercise.progress,
+                progressText,
                 style: const TextStyle(
                   color: Color(0xFF4CAF50),
                   fontSize: 11,

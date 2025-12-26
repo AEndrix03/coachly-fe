@@ -229,7 +229,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
           context,
           scheme,
           Icons.fitness_center,
-          '${widget.workout.exercises} esercizi',
+          '${widget.workout.workoutExercises.length} esercizi',
         ),
         _buildStatChip(
           context,

@@ -1,55 +1,60 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/models/exercise_technique_model/exercise_technique_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_equipment_model/exercise_equipment_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_instruction_model/exercise_instruction_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_safety_model/exercise_safety_model.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import for ConsumerWidget
 
-class ExerciseTechniqueTab extends StatelessWidget {
+class ExerciseTechniqueTab extends ConsumerWidget {
+  // Changed to ConsumerWidget
   final String description;
-  final List<ExerciseTechniqueModel> techniqueSteps;
+  final List<ExerciseInstructionModel> instructions;
+  final List<ExerciseSafetyModel> safety;
+  final List<ExerciseEquipmentModel> equipments;
 
   const ExerciseTechniqueTab({
     super.key,
     required this.description,
-    required this.techniqueSteps,
+    required this.instructions,
+    required this.safety,
+    required this.equipments,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Added WidgetRef ref
+    final locale = ref.watch(languageProvider); // Use languageProvider
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...techniqueSteps.map(
-            (step) => Column(
-              children: [
-                _buildTechniqueCard(
-                  icon: IconData(
-                    step.iconCodePoint,
-                    fontFamily: 'MaterialIcons',
-                  ),
-                  iconColor: Color(step.iconGradient.first),
-                  title: step.title,
-                  description: step.description,
-                  iconGradient: step.iconGradient.map((c) => Color(c)).toList(),
-                ),
-                const SizedBox(height: 16),
-              ],
+          ...instructions.map(
+            (step) => Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: _buildTechniqueCard(
+                order: step.stepNumber,
+                description: step.instructionTextI18n.fromI18n(locale),
+              ),
             ),
           ),
-          const SizedBox(height: 20),
-          _buildSafetySection(),
-          const SizedBox(height: 20),
-          _buildEquipmentSection(),
+          if (safety.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            _buildSafetySection(safety, locale),
+          ],
+          if (equipments.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            _buildEquipmentSection(equipments, locale),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildTechniqueCard({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
+    required int order,
     required String description,
-    required List<Color> iconGradient,
   }) {
     return Container(
       padding: const EdgeInsets.all(18),
@@ -62,48 +67,40 @@ class ExerciseTechniqueTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: iconGradient,
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4A4A5E), Color(0xFF2A2A3E)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: iconColor.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                width: 2,
+                color: Colors.white.withOpacity(0.15),
+              ),
             ),
-            child: Icon(icon, color: Colors.white, size: 24),
+            child: Center(
+              child: Text(
+                order.toString(),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  description,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
-                ),
-              ],
+            child: Text(
+              description,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.85),
+                fontSize: 14,
+                height: 1.5,
+              ),
             ),
           ),
         ],
@@ -111,7 +108,10 @@ class ExerciseTechniqueTab extends StatelessWidget {
     );
   }
 
-  Widget _buildSafetySection() {
+  Widget _buildSafetySection(
+    List<ExerciseSafetyModel> safetyItems,
+    Locale locale,
+  ) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -151,10 +151,9 @@ class ExerciseTechniqueTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          _buildSafetyPoint('Usa sempre spotter per carichi massimali'),
-          _buildSafetyPoint('Evita il rimbalzo sul petto'),
-          _buildSafetyPoint('Mantieni i polsi dritti e allineati'),
-          _buildSafetyPoint('Riscaldamento specifico obbligatorio'),
+          ...safetyItems.map(
+            (item) => _buildSafetyPoint(item.safetyNotesI18n.fromI18n(locale)),
+          ),
         ],
       ),
     );
@@ -191,7 +190,10 @@ class ExerciseTechniqueTab extends StatelessWidget {
     );
   }
 
-  Widget _buildEquipmentSection() {
+  Widget _buildEquipmentSection(
+    List<ExerciseEquipmentModel> equipments,
+    Locale locale,
+  ) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -214,10 +216,13 @@ class ExerciseTechniqueTab extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: [
-              _buildEquipmentChip('Bilanciere'),
-              _buildEquipmentChip('Panca piana'),
-            ],
+            children: equipments
+                .map(
+                  (e) => _buildEquipmentChip(
+                    e.equipment.nameI18n.fromI18n(locale),
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),

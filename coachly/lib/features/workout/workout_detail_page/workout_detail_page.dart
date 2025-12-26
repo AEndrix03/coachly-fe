@@ -2,12 +2,14 @@ import 'package:coachly/features/workout/workout_detail_page/providers/workout_d
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_exercise_list_section.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_header.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_stats_cards.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
 import 'package:coachly/shared/widgets/cards/border_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.g.dart'; // Import for languageProvider
 
 class WorkoutDetailPage extends ConsumerStatefulWidget {
   final String id;
@@ -45,6 +47,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     WorkoutDetailPageState state,
     ColorScheme scheme,
   ) {
+    final locale = ref.watch(languageProvider); // Use languageProvider
     // Error State
     if (state.hasError) {
       return Center(
@@ -125,7 +128,6 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
 
     // Content State
     final workout = state.workout!;
-    final exercises = state.exercises;
 
     return RefreshIndicator(
       onRefresh: () =>
@@ -136,9 +138,9 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             WorkoutDetailHeader(
-              title: workout.title,
-              coachName: workout.coachName,
-              muscleTags: workout.muscleTags,
+              title: workout.titleI18n.fromI18n(locale),
+              coachName: workout.coachName ?? '',
+              muscleTags: workout.muscleTags.map((tag) => tag.nameI18n.fromI18n(locale)).toList(),
               progress: workout.progress,
               sessionsCount: workout.sessionsCount,
               lastSessionDays: workout.lastSessionDays,
@@ -148,7 +150,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
             ),
             const SizedBox(height: 20),
             WorkoutDetailStatsCards(
-              exercisesCount: exercises.length,
+              exercisesCount: workout.workoutExercises.length,
               duration: workout.durationMinutes.toString(),
               focus: workout.type,
             ),
@@ -157,7 +159,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: BorderCard(
                 title: 'Descrizione',
-                text: workout.description,
+                text: workout.descriptionI18n.fromI18n(locale),
                 borderColor: const Color(0xFF2196F3),
               ),
             ),
@@ -165,7 +167,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
             _buildStartButton(context),
             const SizedBox(height: 20),
             WorkoutDetailExerciseListSection(
-              exercises: exercises,
+              exercises: workout.workoutExercises,
               workoutId: widget.id,
             ),
             const SizedBox(height: 32),

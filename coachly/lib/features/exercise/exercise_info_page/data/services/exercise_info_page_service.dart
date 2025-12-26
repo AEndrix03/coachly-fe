@@ -1,7 +1,7 @@
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
-
-import '../models/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 
 class ExerciseInfoPageService {
   final ApiClient _apiClient;
@@ -9,12 +9,13 @@ class ExerciseInfoPageService {
   ExerciseInfoPageService(this._apiClient);
 
   /// Fetch exercise details by id
-  Future<ApiResponse<ExerciseModel>> fetchExerciseDetails(
+  Future<ApiResponse<ExerciseDetailModel>> fetchExerciseDetails(
     String exerciseId,
   ) async {
-    return await _apiClient.get<ExerciseModel>(
-      '/exercises/$exerciseId',
-      fromJson: (json) => ExerciseModel.fromJson(json),
+    // Assuming the endpoint for the full detail model is now /details
+    return await _apiClient.get<ExerciseDetailModel>(
+      '/exercises/$exerciseId/details',
+      fromJson: (json) => ExerciseDetailModel.fromJson(json),
     );
   }
 

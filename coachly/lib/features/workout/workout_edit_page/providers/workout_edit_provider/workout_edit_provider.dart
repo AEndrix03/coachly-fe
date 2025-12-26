@@ -1,8 +1,10 @@
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_detail_provider/workout_detail_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart'; // Required for fromI18n
+import 'package:flutter/material.dart'; // Required for Locale
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../../workout_detail_page/data/models/exercise_info_model/exercise_info_model.dart';
 
 part 'workout_edit_provider.g.dart';
 
@@ -67,14 +69,12 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
   @override
   WorkoutEditState build(String workoutId) {
     ref.onDispose(() => _disposed = true);
-    // Carica i dati del workout in modo asincrono dopo la costruzione iniziale
-    Future.microtask(() => _loadWorkout(workoutId));
-
-    // Ritorna uno stato iniziale di caricamento
+    final locale = ref.watch(languageProvider); // Get locale from provider
+    Future.microtask(() => _loadWorkout(workoutId, locale)); // Pass locale
     return WorkoutEditState(workoutId: workoutId, isLoading: true);
   }
 
-  Future<void> _loadWorkout(String workoutId) async {
+  Future<void> _loadWorkout(String workoutId, Locale locale) async {
     if (workoutId == 'new') {
       state = state.copyWith(
         isLoading: false,
@@ -91,25 +91,28 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
 
     try {
       final repository = ref.read(workoutDetailPageRepositoryProvider);
-      final workoutResponse = await repository.getWorkoutDetail(workoutId);
-      final exercisesResponse = await repository.getWorkoutExercises(workoutId);
+      final response = await repository.getWorkout(workoutId);
 
       if (_disposed) return;
 
-      if (workoutResponse.success &&
-          workoutResponse.data != null &&
-          exercisesResponse.success &&
-          exercisesResponse.data != null) {
-        final workout = workoutResponse.data!;
-        final exercises = exercisesResponse.data!;
+      if (response.success && response.data != null) {
+        final workout = response.data!;
 
-        final editableExercises = exercises
-            .map((e) => _mapExerciseInfoToEditable(e))
+        final editableExercises = workout.workoutExercises
+            .asMap()
+            .entries
+            .map(
+              (entry) => _mapWorkoutExerciseToEditable(
+                entry.value,
+                entry.key + 1,
+                locale,
+              ),
+            )
             .toList();
 
         state = state.copyWith(
-          title: workout.title,
-          description: workout.description,
+          title: workout.titleI18n.fromI18n(locale),
+          description: workout.descriptionI18n.fromI18n(locale),
           duration: workout.durationMinutes.toString(),
           type: workout.type,
           exercises: editableExercises,
@@ -118,10 +121,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error:
-              workoutResponse.message ??
-              exercisesResponse.message ??
-              'Errore caricamento dati workout',
+          error: response.message ?? 'Errore caricamento dati workout',
         );
       }
     } catch (e) {
@@ -130,25 +130,29 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
     }
   }
 
-  EditableExerciseModel _mapExerciseInfoToEditable(ExerciseInfoModel exercise) {
-    // La logica di mappatura va qui
-    // Assumiamo che manchino alcuni campi che devono essere gestiti
+  EditableExerciseModel _mapWorkoutExerciseToEditable(
+    WorkoutExerciseModel workoutExercise,
+    int number,
+    Locale locale,
+  ) {
+    final exercise = workoutExercise.exercise;
     return EditableExerciseModel(
-      id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.name}',
-      exerciseId: exercise.name,
-      // Usiamo il nome come fallback
-      number: exercise.number,
-      name: exercise.name,
-      muscle: exercise.muscle,
-      difficulty: exercise.difficulty,
-      sets: exercise.sets,
-      rest: exercise.rest,
-      weight: exercise.weight,
-      progress: exercise.progress,
+      id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
+      exerciseId: exercise.id,
+      number: number,
+      name: exercise.nameI18n.fromI18n(locale),
+      muscle:
+          exercise.muscles.firstOrNull?.muscle.nameI18n.fromI18n(locale) ?? '',
+      difficulty: exercise.difficultyLevel,
+      sets: workoutExercise.sets,
+      rest: workoutExercise.rest,
+      weight: workoutExercise.weight,
+      progress: workoutExercise.progress.toString(),
       notes: '',
       // Default
-      accentColorHex: exercise.accentColorHex,
-      hasVariants: false, // Default
+      accentColorHex: '#2196F3',
+      // Default
+      hasVariants: exercise.variants.isNotEmpty,
     );
   }
 

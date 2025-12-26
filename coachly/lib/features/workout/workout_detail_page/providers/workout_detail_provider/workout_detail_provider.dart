@@ -1,53 +1,48 @@
 import 'package:coachly/core/network/api_client.dart';
-import 'package:coachly/features/workout/workout_detail_page/data/models/exercise_info_model/exercise_info_model.dart';
 import 'package:coachly/features/workout/workout_detail_page/data/repositories/workout_detail_page_repository.dart';
 import 'package:coachly/features/workout/workout_detail_page/data/repositories/workout_detail_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_detail_page/data/services/workout_detail_page_service.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../data/models/workout_detail_model/workout_detail_model.dart';
 
 part 'workout_detail_provider.g.dart';
 
 // Service Provider
 @riverpod
-WorkoutDetailPageService workoutDetailPageService(Ref ref) {
+WorkoutDetailPageService workoutDetailPageService(ref) {
   final apiClient = ref.watch(apiClientProvider);
   return WorkoutDetailPageService(apiClient);
 }
 
 // Repository Provider
 @riverpod
-IWorkoutDetailPageRepository workoutDetailPageRepository(Ref ref) {
+IWorkoutDetailPageRepository workoutDetailPageRepository(ref) {
   final service = ref.watch(workoutDetailPageServiceProvider);
-  return WorkoutDetailPageRepositoryImpl(service, useMockData: true);
+  return WorkoutDetailPageRepositoryImpl(service);
 }
 
 // State Class
 class WorkoutDetailPageState {
-  final WorkoutDetailModel? workout;
-  final List<ExerciseInfoModel> exercises;
+  final WorkoutModel? workout;
   final bool isLoading;
   final String? error;
 
   const WorkoutDetailPageState({
     this.workout,
-    this.exercises = const [],
     this.isLoading = false,
     this.error,
   });
 
   WorkoutDetailPageState copyWith({
-    WorkoutDetailModel? workout,
-    List<ExerciseInfoModel>? exercises,
+    WorkoutModel? workout,
     bool? isLoading,
     String? error,
+    bool clearError = false,
   }) {
     return WorkoutDetailPageState(
       workout: workout ?? this.workout,
-      exercises: exercises ?? this.exercises,
       isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
+      error: clearError ? null : error ?? this.error,
     );
   }
 
@@ -55,41 +50,32 @@ class WorkoutDetailPageState {
 
   bool get hasData => workout != null;
 
-  bool get isEmpty => workout == null && !isLoading;
+  bool get isEmpty => workout == null && !isLoading && !hasError;
 }
 
 // Notifier with Code Generation
 @riverpod
 class WorkoutDetailPageNotifier extends _$WorkoutDetailPageNotifier {
+  late final IWorkoutDetailPageRepository _repository;
+
   @override
   WorkoutDetailPageState build() {
+    _repository = ref.watch(workoutDetailPageRepositoryProvider);
     return const WorkoutDetailPageState();
   }
 
   Future<void> loadWorkoutDetail(String workoutId) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final repository = ref.read(workoutDetailPageRepositoryProvider);
-      final workoutResponse = await repository.getWorkoutDetail(workoutId);
-      final exercisesResponse = await repository.getWorkoutExercises(workoutId);
+      final response = await _repository.getWorkout(workoutId);
 
-      if (workoutResponse.success &&
-          workoutResponse.data != null &&
-          exercisesResponse.success &&
-          exercisesResponse.data != null) {
-        state = state.copyWith(
-          workout: workoutResponse.data!,
-          exercises: exercisesResponse.data!,
-          isLoading: false,
-        );
+      if (response.success && response.data != null) {
+        state = state.copyWith(workout: response.data!, isLoading: false);
       } else {
         state = state.copyWith(
           isLoading: false,
-          error:
-              workoutResponse.message ??
-              exercisesResponse.message ??
-              'Errore caricamento dettagli allenamento',
+          error: response.message ?? 'Errore caricamento dettagli allenamento',
         );
       }
     } catch (e) {

@@ -5,6 +5,8 @@ import 'package:coachly/features/exercise/exercise_info_page/widgets/exercise_vi
 import 'package:coachly/features/exercise/exercise_info_page/widgets/tabs/exercise_muscles_tab.dart';
 import 'package:coachly/features/exercise/exercise_info_page/widgets/tabs/exercise_technique_tab.dart';
 import 'package:coachly/features/exercise/exercise_info_page/widgets/tabs/exercise_variants_tab.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
+import 'package:collection/collection.dart'; // Import for firstWhereOrNull
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
@@ -56,6 +58,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
     ExerciseInfoState state,
     ColorScheme scheme,
   ) {
+    final locale = Localizations.localeOf(context); // Get locale here
     // 1. Error State
     if (state.hasError) {
       return Center(
@@ -128,6 +131,9 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
 
     // 3. Content State
     final exercise = state.selectedExercise!;
+    final video = exercise.media.firstWhereOrNull(
+      (m) => m.mediaType == 'video',
+    );
 
     return CustomScrollView(
       slivers: [
@@ -148,15 +154,17 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
             children: [
               const SizedBox(height: 20),
               ExerciseVideoSection(
-                videoUrl: exercise.videoUrl,
-                exerciseName: exercise.name,
-                tags: exercise.tags,
+                videoUrl: video?.mediaUrl ?? '',
+                exerciseName: exercise.nameI18n.fromI18n(locale),
+                tags: exercise.tags
+                    .map((t) => t.nameI18n.fromI18n(locale))
+                    .toList(),
               ),
               const SizedBox(height: 24),
               ExerciseStatsCards(
-                difficulty: exercise.difficulty,
-                mechanics: exercise.mechanics,
-                type: exercise.type,
+                difficulty: exercise.difficultyLevel,
+                mechanics: exercise.mechanicsType,
+                type: exercise.forceType,
               ),
               const SizedBox(height: 24),
             ],
@@ -208,13 +216,12 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
             controller: _tabController,
             children: [
               ExerciseTechniqueTab(
-                description: exercise.description,
-                techniqueSteps: exercise.techniqueSteps,
+                description: exercise.descriptionI18n.fromI18n(locale),
+                instructions: exercise.instructions,
+                safety: exercise.safety,
+                equipments: exercise.equipments,
               ),
-              ExerciseMusclesTab(
-                primaryMuscles: exercise.primaryMuscles,
-                secondaryMuscles: exercise.secondaryMuscles,
-              ),
+              ExerciseMusclesTab(muscles: exercise.muscles),
               ExerciseVariantsTab(variants: exercise.variants),
             ],
           ),

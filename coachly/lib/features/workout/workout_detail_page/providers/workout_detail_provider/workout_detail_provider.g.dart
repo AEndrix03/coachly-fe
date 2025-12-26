@@ -55,7 +55,7 @@ final class WorkoutDetailPageServiceProvider
 }
 
 String _$workoutDetailPageServiceHash() =>
-    r'c39912465d69a141ad8b1df5f94650dde0c09c2b';
+    r'3287777e1c5a82c39850aea999dbd721aaf0985d';
 
 @ProviderFor(workoutDetailPageRepository)
 const workoutDetailPageRepositoryProvider =
@@ -104,7 +104,7 @@ final class WorkoutDetailPageRepositoryProvider
 }
 
 String _$workoutDetailPageRepositoryHash() =>
-    r'cb326769c2bed0cf41fa863963c23cb5b92db096';
+    r'e5ba4c8e1b66dc7bd43f24d3cc05557d896e5040';
 
 @ProviderFor(WorkoutDetailPageNotifier)
 const workoutDetailPageProvider = WorkoutDetailPageNotifierProvider._();
@@ -140,7 +140,7 @@ final class WorkoutDetailPageNotifierProvider
 }
 
 String _$workoutDetailPageNotifierHash() =>
-    r'a7fbcd2449bcefc17e8cdcb1528446544575dd59';
+    r'5f32a37fcae43051dc5bdbd5ccf21534f75dd3e8';
 
 abstract class _$WorkoutDetailPageNotifier
     extends $Notifier<WorkoutDetailPageState> {

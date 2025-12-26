@@ -1,34 +1,38 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/models/muscle_model/muscle_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_muscle_model/exercise_muscle_model.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
 import 'package:flutter/material.dart';
 
 class ExerciseMusclesTab extends StatelessWidget {
-  final List<MuscleModel> primaryMuscles;
-  final List<MuscleModel> secondaryMuscles;
+  final List<ExerciseMuscleModel> muscles;
 
-  const ExerciseMusclesTab({
-    super.key,
-    required this.primaryMuscles,
-    required this.secondaryMuscles,
-  });
+  const ExerciseMusclesTab({super.key, required this.muscles});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+    final locale = Localizations.localeOf(context); // Get locale here
+    final primaryMuscles = [];
+    final secondaryMuscles = [];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildMuscleMapSection(),
           const SizedBox(height: 24),
-          _buildMuscleGroupSection(
-            title: 'MUSCOLI PRIMARI',
-            muscles: primaryMuscles,
-          ),
+          if (primaryMuscles.isNotEmpty)
+            _buildMuscleGroupSection(
+              title: 'MUSCOLI PRIMARI',
+              muscles: [],
+              locale: locale,
+            ),
           const SizedBox(height: 20),
-          _buildMuscleGroupSection(
-            title: 'MUSCOLI SECONDARI',
-            muscles: secondaryMuscles,
-          ),
+          if (secondaryMuscles.isNotEmpty)
+            _buildMuscleGroupSection(
+              title: 'MUSCOLI SECONDARI',
+              muscles: [],
+              locale: locale,
+            ),
           const SizedBox(height: 20),
           _buildAiInsightsSection(),
         ],
@@ -37,6 +41,7 @@ class ExerciseMusclesTab extends StatelessWidget {
   }
 
   Widget _buildMuscleMapSection() {
+    // This section can be enhanced to show a real muscle map in the future
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -66,7 +71,7 @@ class ExerciseMusclesTab extends StatelessWidget {
               ],
             ),
             child: const Icon(
-              Icons.fitness_center,
+              Icons.accessibility_new,
               size: 60,
               color: Colors.white,
             ),
@@ -87,7 +92,8 @@ class ExerciseMusclesTab extends StatelessWidget {
 
   Widget _buildMuscleGroupSection({
     required String title,
-    required List<MuscleModel> muscles,
+    required List<ExerciseMuscleModel> muscles,
+    required Locale locale,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +114,7 @@ class ExerciseMusclesTab extends StatelessWidget {
             .map(
               (muscle) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: _buildMuscleCard(muscle),
+                child: _buildMuscleCard(muscle, locale),
               ),
             )
             .toList(),
@@ -116,14 +122,14 @@ class ExerciseMusclesTab extends StatelessWidget {
     );
   }
 
-  Widget _buildMuscleCard(MuscleModel muscle) {
+  Widget _buildMuscleCard(ExerciseMuscleModel exerciseMuscle, Locale locale) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Color(muscle.color).withAlpha((255 * 0.2).toInt()),
+          color: const Color(0xFF2196F3).withAlpha((255 * 0.2).toInt()),
           width: 1,
         ),
       ),
@@ -134,36 +140,17 @@ class ExerciseMusclesTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  muscle.name,
+                  exerciseMuscle.muscle.nameI18n.fromI18n(locale),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 8),
-                _buildActivationBar(muscle.activation, Color(muscle.color)),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildActivationBar(int level, Color color) {
-    return Row(
-      children: List.generate(
-        5,
-        (index) => Container(
-          margin: const EdgeInsets.only(right: 6),
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: index < level ? color : color.withAlpha((255 * 0.2).toInt()),
-            borderRadius: BorderRadius.circular(3),
-          ),
-        ),
       ),
     );
   }
@@ -211,7 +198,7 @@ class ExerciseMusclesTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Massima tensione muscolare raggiunta a 90° di flessione del gomito. Per massimizzare l\'ipertrofia, mantieni la fase eccentrica lenta.',
+                  'Dati non ancora disponibili. Il coach AI sta analizzando il tuo profilo per fornire consigli personalizzati.',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
                     fontSize: 13,

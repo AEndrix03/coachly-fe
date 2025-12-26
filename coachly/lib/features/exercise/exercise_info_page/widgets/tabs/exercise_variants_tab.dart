@@ -1,33 +1,42 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/models/exercise_variant_model/exercise_variant_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_variant_model/exercise_variant_model.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import for ConsumerWidget
 
-class ExerciseVariantsTab extends StatelessWidget {
+class ExerciseVariantsTab extends ConsumerWidget {
+  // Changed to ConsumerWidget
   final List<ExerciseVariantModel> variants;
 
   const ExerciseVariantsTab({super.key, required this.variants});
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Added WidgetRef ref
+    if (variants.isEmpty) {
+      return const Center(
+        child: Text(
+          'Nessuna variante disponibile.',
+          style: TextStyle(color: Colors.white70),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...variants.map(
-            (variant) => Column(
-              children: [
-                _buildVariantCard(
-                  icon: IconData(
-                    variant.iconCodePoint,
-                    fontFamily: 'MaterialIcons',
-                  ),
-                  title: variant.title,
-                  subtitle: variant.subtitle,
-                  emphasis: variant.emphasis,
-                  onTap: () {},
-                ),
-                const SizedBox(height: 12),
-              ],
+            (variant) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildVariantCard(
+                variant: variant,
+                onTap: () {
+                  // TODO: Navigate to variant detail page
+                },
+                ref: ref, // Pass ref to _buildVariantCard
+              ),
             ),
           ),
         ],
@@ -36,12 +45,11 @@ class ExerciseVariantsTab extends StatelessWidget {
   }
 
   Widget _buildVariantCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String emphasis,
+    required ExerciseVariantModel variant,
     required VoidCallback onTap,
+    required WidgetRef ref, // Accept WidgetRef
   }) {
+    final locale = ref.watch(languageProvider); // Use languageProvider
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -61,7 +69,11 @@ class ExerciseVariantsTab extends StatelessWidget {
                 color: const Color(0xFF2196F3).withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: const Color(0xFF2196F3), size: 26),
+              child: const Icon(
+                Icons.sync_alt,
+                color: Color(0xFF2196F3),
+                size: 26,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -69,7 +81,7 @@ class ExerciseVariantsTab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    variant.nameI18n.fromI18n(locale),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,
@@ -93,7 +105,7 @@ class ExerciseVariantsTab extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          subtitle,
+                          variant.difficultyLevel,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.6),
                             fontSize: 11,
@@ -103,7 +115,7 @@ class ExerciseVariantsTab extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        emphasis,
+                        variant.variationType,
                         style: const TextStyle(
                           color: Color(0xFF2196F3),
                           fontSize: 12,

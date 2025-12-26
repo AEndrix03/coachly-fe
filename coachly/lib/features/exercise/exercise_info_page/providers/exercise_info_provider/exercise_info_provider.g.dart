@@ -104,7 +104,7 @@ final class ExerciseInfoPageRepositoryProvider
 }
 
 String _$exerciseInfoPageRepositoryHash() =>
-    r'61b3cd4bb93955971aefdb869e0fee851f1d3f61';
+    r'815da93e37a586975e4a51ca56cfd4fe8205fbf2';
 
 @ProviderFor(ExerciseInfoNotifier)
 const exerciseInfoProvider = ExerciseInfoNotifierProvider._();
@@ -139,7 +139,7 @@ final class ExerciseInfoNotifierProvider
 }
 
 String _$exerciseInfoNotifierHash() =>
-    r'8e8f612a173cba822792ebd1c5593b3da001b0de';
+    r'b1a9cad0ed9b6844854180d159009ff4851e1c63';
 
 abstract class _$ExerciseInfoNotifier extends $Notifier<ExerciseInfoState> {
   ExerciseInfoState build();

@@ -1,6 +1,8 @@
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_organize_page/widgets/organize_workout_card.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -141,6 +143,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
     List<WorkoutModel> workouts,
     ColorScheme scheme,
   ) {
+    final locale = ref.watch(languageProvider); // Use languageProvider
     if (workouts.isEmpty) {
       return const Center(
         child: Padding(
@@ -163,7 +166,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             final confirmed = await _showConfirmationDialog(
               context,
               'Conferma Eliminazione',
-              'Sei sicuro di voler eliminare la scheda "${workout.titleI18n['it'] ?? workout.titleI18n.values.first}"?',
+              'Sei sicuro di voler eliminare la scheda "${workout.titleI18n.fromI18n(locale)}"?',
             );
             if (confirmed) {
               ref.read(workoutListProvider.notifier).deleteWorkout(workout.id);
@@ -174,7 +177,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             final confirmed = await _showConfirmationDialog(
               context,
               'Conferma Modifica Stato',
-              'Sei sicuro di voler $action la scheda "${workout.titleI18n['it'] ?? workout.titleI18n.values.first}"?',
+              'Sei sicuro di voler $action la scheda "${workout.titleI18n.fromI18n(locale)}"?',
             );
             if (confirmed) {
               if (isActive) {

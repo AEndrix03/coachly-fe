@@ -123,7 +123,7 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                           children: [
                             _buildInfoChip(
                               Icons.fitness_center,
-                              '${widget.workout.exercises} esercizi',
+                              '${widget.workout.workoutExercises.length} esercizi',
                             ),
                             _buildInfoChip(
                               Icons.person_outline,
