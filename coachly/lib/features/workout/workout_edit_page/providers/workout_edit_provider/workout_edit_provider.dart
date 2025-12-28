@@ -1,7 +1,10 @@
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
-import 'package:coachly/features/workout/workout_detail_page/providers/workout_detail_provider/workout_detail_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
+import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
+import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart'; // Required for fromI18n
 import 'package:flutter/material.dart'; // Required for Locale
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -69,12 +72,10 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
   @override
   WorkoutEditState build(String workoutId) {
     ref.onDispose(() => _disposed = true);
-    final locale = ref.watch(languageProvider); // Get locale from provider
-    Future.microtask(() => _loadWorkout(workoutId, locale)); // Pass locale
     return WorkoutEditState(workoutId: workoutId, isLoading: true);
   }
 
-  Future<void> _loadWorkout(String workoutId, Locale locale) async {
+  Future<void> loadWorkout(String workoutId, Locale locale) async {
     if (workoutId == 'new') {
       state = state.copyWith(
         isLoading: false,
@@ -90,7 +91,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
     state = state.copyWith(isLoading: true);
 
     try {
-      final repository = ref.read(workoutDetailPageRepositoryProvider);
+      final repository = ref.read(workoutPageRepositoryProvider);
       final response = await repository.getWorkout(workoutId);
 
       if (_disposed) return;
@@ -147,7 +148,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       sets: workoutExercise.sets,
       rest: workoutExercise.rest,
       weight: workoutExercise.weight,
-      progress: workoutExercise.progress.toString(),
+      progress: (workoutExercise.progress ?? 0).toString(),
       notes: '',
       // Default
       accentColorHex: '#2196F3',
@@ -224,7 +225,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final service = ref.read(workoutDetailPageServiceProvider);
+      final repository = ref.read(workoutPageRepositoryProvider);
       final workoutData = {
         'title': state.title,
         'description': state.description,
@@ -233,10 +234,15 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
         'exercises': state.exercises.map((e) => e.toJson()).toList(),
       };
 
-      final response = await service.patchWorkout(state.workoutId, workoutData);
+      final response = await repository.patchWorkout(
+        state.workoutId,
+        workoutData,
+      );
 
       if (response.success) {
         state = state.copyWith(isLoading: false, isDirty: false);
+        // After saving, invalidate the list to show the updated item.
+        ref.invalidate(workoutListProvider);
         return true;
       } else {
         state = state.copyWith(
@@ -256,5 +262,26 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
 
   void resetDirty() {
     state = state.copyWith(isDirty: false);
+  }
+
+  void setInitialWorkout(WorkoutModel workout, Locale locale) {
+    final editableExercises = workout.workoutExercises
+        .asMap()
+        .entries
+        .map(
+          (entry) =>
+              _mapWorkoutExerciseToEditable(entry.value, entry.key + 1, locale),
+        )
+        .toList();
+
+    state = state.copyWith(
+      title: workout.titleI18n.fromI18n(locale),
+      description: workout.descriptionI18n.fromI18n(locale),
+      duration: workout.durationMinutes.toString(),
+      type: workout.type,
+      exercises: editableExercises,
+      isLoading: false,
+      isDirty: false, // Start not dirty if loaded from initial data
+    );
   }
 }

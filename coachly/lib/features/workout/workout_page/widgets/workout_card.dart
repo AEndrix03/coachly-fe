@@ -38,7 +38,10 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
       _scale = 1.0;
       _showSparkle = false;
     });
-    context.go('/workouts/workout/${widget.workout.id}');
+    context.go(
+      '/workouts/workout/${widget.workout.id}',
+      extra: widget.workout,
+    );
   }
 
   void _onTapCancel() {

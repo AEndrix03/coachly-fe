@@ -1,6 +1,8 @@
 import 'package:coachly/core/utils/debouncer.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_edit_page/providers/workout_edit_provider/workout_edit_provider.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,8 +13,9 @@ import 'widgets/workout_edit_header.dart';
 
 class WorkoutEditPage extends ConsumerStatefulWidget {
   final String workoutId;
+  final WorkoutModel? workout;
 
-  const WorkoutEditPage({super.key, required this.workoutId});
+  const WorkoutEditPage({super.key, required this.workoutId, this.workout});
 
   @override
   ConsumerState<WorkoutEditPage> createState() => _WorkoutEditPageState();
@@ -30,6 +33,21 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.workout != null) {
+      final locale = ref.read(languageProvider);
+      Future.microtask(() {
+        ref
+            .read(workoutEditPageProvider(widget.workoutId).notifier)
+            .setInitialWorkout(widget.workout!, locale);
+      });
+    } else {
+      final locale = ref.read(languageProvider);
+      Future.microtask(() {
+        ref
+            .read(workoutEditPageProvider(widget.workoutId).notifier)
+            .loadWorkout(widget.workoutId, locale);
+      });
+    }
     // Aggiungi listener per aggiornare il provider quando l'utente digita
     _descriptionController.addListener(_onDescriptionChanged);
     _durationController.addListener(_onDurationChanged);

@@ -9,6 +9,7 @@ part of 'workout_exercise_model.dart';
 _WorkoutExerciseModel _$WorkoutExerciseModelFromJson(
   Map<String, dynamic> json,
 ) => _WorkoutExerciseModel(
+  id: json['id'] as String,
   exercise: ExerciseDetailModel.fromJson(
     json['exercise'] as Map<String, dynamic>,
   ),
@@ -21,6 +22,7 @@ _WorkoutExerciseModel _$WorkoutExerciseModelFromJson(
 Map<String, dynamic> _$WorkoutExerciseModelToJson(
   _WorkoutExerciseModel instance,
 ) => <String, dynamic>{
+  'id': instance.id,
   'exercise': instance.exercise,
   'sets': instance.sets,
   'rest': instance.rest,

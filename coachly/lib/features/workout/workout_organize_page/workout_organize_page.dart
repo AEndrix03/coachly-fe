@@ -192,7 +192,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             }
           },
           onEdit: () {
-            context.push('/workouts/workout/${workout.id}/edit');
+            context.push('/workouts/workout/${workout.id}/edit', extra: workout);
           },
         );
       },

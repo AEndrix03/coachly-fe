@@ -62,4 +62,15 @@ class WorkoutPageService {
       fromJson: (_) => null,
     );
   }
+
+  Future<ApiResponse<void>> patchWorkout(
+    String workoutId,
+    Map<String, dynamic> data,
+  ) async {
+    return await _apiClient.post<void>(
+      '/workouts',
+      body: data,
+      fromJson: (_) => null,
+    );
+  }
 }

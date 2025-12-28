@@ -13,8 +13,8 @@ _WorkoutModel _$WorkoutModelFromJson(Map<String, dynamic> json) =>
       descriptionI18n: Map<String, String>.from(json['descriptionI18n'] as Map),
       coachId: json['coachId'] as String?,
       coachName: json['coachName'] as String?,
-      progress: (json['progress'] as num).toDouble(),
-      durationMinutes: (json['durationMinutes'] as num).toInt(),
+      progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
+      durationMinutes: (json['durationMinutes'] as num?)?.toInt() ?? 0,
       goal: json['goal'] as String,
       lastUsed: DateTime.parse(json['lastUsed'] as String),
       muscleTags:
@@ -22,8 +22,9 @@ _WorkoutModel _$WorkoutModelFromJson(Map<String, dynamic> json) =>
               ?.map((e) => TagDto.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      sessionsCount: (json['sessionsCount'] as num).toInt(),
-      lastSessionDays: (json['lastSessionDays'] as num).toInt(),
+      exercises: (json['exercises'] as num?)?.toInt() ?? 0,
+      sessionsCount: (json['sessionsCount'] as num?)?.toInt() ?? 0,
+      lastSessionDays: (json['lastSessionDays'] as num?)?.toInt() ?? 0,
       type: json['type'] as String,
       workoutExercises:
           (json['workoutExercises'] as List<dynamic>?)
@@ -49,6 +50,7 @@ Map<String, dynamic> _$WorkoutModelToJson(_WorkoutModel instance) =>
       'goal': instance.goal,
       'lastUsed': instance.lastUsed.toIso8601String(),
       'muscleTags': instance.muscleTags,
+      'exercises': instance.exercises,
       'sessionsCount': instance.sessionsCount,
       'lastSessionDays': instance.lastSessionDays,
       'type': instance.type,

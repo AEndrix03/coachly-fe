@@ -16,6 +16,11 @@ class WorkoutHiveService {
     return box.values.toList();
   }
 
+  Future<WorkoutModel?> getWorkout(String workoutId) async {
+    final box = _localDbService.workouts;
+    return box.get(workoutId);
+  }
+
   Future<void> saveWorkouts(List<WorkoutModel> workouts) async {
     final box = _localDbService.workouts;
     await box.clear();

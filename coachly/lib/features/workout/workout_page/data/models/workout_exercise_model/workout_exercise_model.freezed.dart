@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutExerciseModel {
 
- ExerciseDetailModel get exercise; String get sets; String get rest; String get weight; double get progress;
+ String get id; ExerciseDetailModel get exercise; String get sets; String get rest; String get weight; double get progress;
 /// Create a copy of WorkoutExerciseModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $WorkoutExerciseModelCopyWith<WorkoutExerciseModel> get copyWith => _$WorkoutExe
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutExerciseModel&&(identical(other.exercise, exercise) || other.exercise == exercise)&&(identical(other.sets, sets) || other.sets == sets)&&(identical(other.rest, rest) || other.rest == rest)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.progress, progress) || other.progress == progress));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutExerciseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.exercise, exercise) || other.exercise == exercise)&&(identical(other.sets, sets) || other.sets == sets)&&(identical(other.rest, rest) || other.rest == rest)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.progress, progress) || other.progress == progress));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,exercise,sets,rest,weight,progress);
+int get hashCode => Object.hash(runtimeType,id,exercise,sets,rest,weight,progress);
 
 @override
 String toString() {
-  return 'WorkoutExerciseModel(exercise: $exercise, sets: $sets, rest: $rest, weight: $weight, progress: $progress)';
+  return 'WorkoutExerciseModel(id: $id, exercise: $exercise, sets: $sets, rest: $rest, weight: $weight, progress: $progress)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $WorkoutExerciseModelCopyWith<$Res>  {
   factory $WorkoutExerciseModelCopyWith(WorkoutExerciseModel value, $Res Function(WorkoutExerciseModel) _then) = _$WorkoutExerciseModelCopyWithImpl;
 @useResult
 $Res call({
- ExerciseDetailModel exercise, String sets, String rest, String weight, double progress
+ String id, ExerciseDetailModel exercise, String sets, String rest, String weight, double progress
 });
 
 
@@ -65,9 +65,10 @@ class _$WorkoutExerciseModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutExerciseModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? exercise = null,Object? sets = null,Object? rest = null,Object? weight = null,Object? progress = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? exercise = null,Object? sets = null,Object? rest = null,Object? weight = null,Object? progress = null,}) {
   return _then(_self.copyWith(
-exercise: null == exercise ? _self.exercise : exercise // ignore: cast_nullable_to_non_nullable
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,exercise: null == exercise ? _self.exercise : exercise // ignore: cast_nullable_to_non_nullable
 as ExerciseDetailModel,sets: null == sets ? _self.sets : sets // ignore: cast_nullable_to_non_nullable
 as String,rest: null == rest ? _self.rest : rest // ignore: cast_nullable_to_non_nullable
 as String,weight: null == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable
@@ -166,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ExerciseDetailModel exercise,  String sets,  String rest,  String weight,  double progress)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  ExerciseDetailModel exercise,  String sets,  String rest,  String weight,  double progress)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WorkoutExerciseModel() when $default != null:
-return $default(_that.exercise,_that.sets,_that.rest,_that.weight,_that.progress);case _:
+return $default(_that.id,_that.exercise,_that.sets,_that.rest,_that.weight,_that.progress);case _:
   return orElse();
 
 }
@@ -187,10 +188,10 @@ return $default(_that.exercise,_that.sets,_that.rest,_that.weight,_that.progress
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ExerciseDetailModel exercise,  String sets,  String rest,  String weight,  double progress)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  ExerciseDetailModel exercise,  String sets,  String rest,  String weight,  double progress)  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutExerciseModel():
-return $default(_that.exercise,_that.sets,_that.rest,_that.weight,_that.progress);case _:
+return $default(_that.id,_that.exercise,_that.sets,_that.rest,_that.weight,_that.progress);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +208,10 @@ return $default(_that.exercise,_that.sets,_that.rest,_that.weight,_that.progress
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ExerciseDetailModel exercise,  String sets,  String rest,  String weight,  double progress)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  ExerciseDetailModel exercise,  String sets,  String rest,  String weight,  double progress)?  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutExerciseModel() when $default != null:
-return $default(_that.exercise,_that.sets,_that.rest,_that.weight,_that.progress);case _:
+return $default(_that.id,_that.exercise,_that.sets,_that.rest,_that.weight,_that.progress);case _:
   return null;
 
 }
@@ -222,9 +223,10 @@ return $default(_that.exercise,_that.sets,_that.rest,_that.weight,_that.progress
 @JsonSerializable()
 
 class _WorkoutExerciseModel implements WorkoutExerciseModel {
-  const _WorkoutExerciseModel({required this.exercise, required this.sets, required this.rest, required this.weight, required this.progress});
+  const _WorkoutExerciseModel({required this.id, required this.exercise, required this.sets, required this.rest, required this.weight, required this.progress});
   factory _WorkoutExerciseModel.fromJson(Map<String, dynamic> json) => _$WorkoutExerciseModelFromJson(json);
 
+@override final  String id;
 @override final  ExerciseDetailModel exercise;
 @override final  String sets;
 @override final  String rest;
@@ -244,16 +246,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutExerciseModel&&(identical(other.exercise, exercise) || other.exercise == exercise)&&(identical(other.sets, sets) || other.sets == sets)&&(identical(other.rest, rest) || other.rest == rest)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.progress, progress) || other.progress == progress));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutExerciseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.exercise, exercise) || other.exercise == exercise)&&(identical(other.sets, sets) || other.sets == sets)&&(identical(other.rest, rest) || other.rest == rest)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.progress, progress) || other.progress == progress));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,exercise,sets,rest,weight,progress);
+int get hashCode => Object.hash(runtimeType,id,exercise,sets,rest,weight,progress);
 
 @override
 String toString() {
-  return 'WorkoutExerciseModel(exercise: $exercise, sets: $sets, rest: $rest, weight: $weight, progress: $progress)';
+  return 'WorkoutExerciseModel(id: $id, exercise: $exercise, sets: $sets, rest: $rest, weight: $weight, progress: $progress)';
 }
 
 
@@ -264,7 +266,7 @@ abstract mixin class _$WorkoutExerciseModelCopyWith<$Res> implements $WorkoutExe
   factory _$WorkoutExerciseModelCopyWith(_WorkoutExerciseModel value, $Res Function(_WorkoutExerciseModel) _then) = __$WorkoutExerciseModelCopyWithImpl;
 @override @useResult
 $Res call({
- ExerciseDetailModel exercise, String sets, String rest, String weight, double progress
+ String id, ExerciseDetailModel exercise, String sets, String rest, String weight, double progress
 });
 
 
@@ -281,9 +283,10 @@ class __$WorkoutExerciseModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutExerciseModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? exercise = null,Object? sets = null,Object? rest = null,Object? weight = null,Object? progress = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? exercise = null,Object? sets = null,Object? rest = null,Object? weight = null,Object? progress = null,}) {
   return _then(_WorkoutExerciseModel(
-exercise: null == exercise ? _self.exercise : exercise // ignore: cast_nullable_to_non_nullable
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,exercise: null == exercise ? _self.exercise : exercise // ignore: cast_nullable_to_non_nullable
 as ExerciseDetailModel,sets: null == sets ? _self.sets : sets // ignore: cast_nullable_to_non_nullable
 as String,rest: null == rest ? _self.rest : rest // ignore: cast_nullable_to_non_nullable
 as String,weight: null == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable

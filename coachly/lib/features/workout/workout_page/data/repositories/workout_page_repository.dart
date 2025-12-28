@@ -7,6 +7,8 @@ abstract class IWorkoutPageRepository {
 
   Future<ApiResponse<List<WorkoutModel>>> getRecentWorkouts();
 
+  Future<ApiResponse<WorkoutModel?>> getWorkout(String workoutId);
+
   Future<ApiResponse<WorkoutStatsModel>> getWorkoutStats();
 
   Future<ApiResponse<void>> enableWorkout(String workoutId);
@@ -16,4 +18,9 @@ abstract class IWorkoutPageRepository {
   Future<ApiResponse<void>> deleteWorkout(String workoutId);
 
   Future<ApiResponse<void>> updateWorkout(WorkoutModel updatedWorkout);
+
+  Future<ApiResponse<void>> patchWorkout(
+    String workoutId,
+    Map<String, dynamic> data,
+  );
 }

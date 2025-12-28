@@ -38,7 +38,10 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
       _scale = 1.0;
       _showSparkle = false;
     });
-    context.go('/workouts/workout/${widget.workout.id}');
+    context.go(
+      '/workouts/workout/${widget.workout.id}',
+      extra: widget.workout,
+    );
   }
 
   void _onTapCancel() {
@@ -267,7 +270,10 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: () => context.go('/workouts/workout/${widget.workout.id}'),
+        onPressed: () => context.go(
+          '/workouts/workout/${widget.workout.id}',
+          extra: widget.workout,
+        ),
         icon: Icon(Icons.play_arrow, size: 20, color: scheme.onPrimary),
         label: Text(
           'Inizia Workout',

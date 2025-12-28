@@ -1,4 +1,5 @@
 import 'package:coachly/features/auth/pages/loading_page/loading_page.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,10 +10,10 @@ import '../features/auth/providers/auth_provider.dart';
 import '../features/common/navigation/widgets/navigation_bar.dart';
 import '../features/exercise/exercise_info_page/exercise_info_page.dart';
 import '../features/home/home.dart';
+import '../features/user_settings/pages/user_settings_page.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
 import '../features/workout/workout_detail_page/workout_detail_page.dart';
 import '../features/workout/workout_edit_page/workout_edit_page.dart';
-import '../features/user_settings/pages/user_settings_page.dart';
 import '../features/workout/workout_organize_page/workout_organize_page.dart';
 
 part 'app_router.g.dart';
@@ -86,19 +87,28 @@ GoRouter router(Ref ref) {
                   ),
                   GoRoute(
                     path: 'workout/:id',
-                    pageBuilder: (context, state) => _fadeTransition(
-                      state,
-                      WorkoutDetailPage(id: state.pathParameters['id']!),
-                    ),
+                    pageBuilder: (context, state) {
+                      final workout = state.extra as WorkoutModel;
+                      return _fadeTransition(
+                        state,
+                        WorkoutDetailPage(
+                          workout: workout,
+                        ),
+                      );
+                    },
                     routes: [
                       GoRoute(
                         path: 'edit',
-                        pageBuilder: (context, state) => _fadeTransition(
-                          state,
-                          WorkoutEditPage(
-                            workoutId: state.pathParameters['id']!,
-                          ),
-                        ),
+                        pageBuilder: (context, state) {
+                          final workout = state.extra as WorkoutModel?;
+                          return _fadeTransition(
+                            state,
+                            WorkoutEditPage(
+                              workoutId: state.pathParameters['id']!,
+                              workout: workout,
+                            ),
+                          );
+                        },
                       ),
                       GoRoute(
                         path: 'active',

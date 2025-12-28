@@ -60,7 +60,7 @@ final class WorkoutEditPageNotifierProvider
 }
 
 String _$workoutEditPageNotifierHash() =>
-    r'b69c0ffbba92ca7a6b0b61cc48e1e146a829e295';
+    r'3965898aab8eebcf9a616f7ea2aa49ec39303f1c';
 
 final class WorkoutEditPageNotifierFamily extends $Family
     with

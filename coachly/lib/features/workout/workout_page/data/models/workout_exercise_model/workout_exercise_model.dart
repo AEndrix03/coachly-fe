@@ -7,6 +7,7 @@ part 'workout_exercise_model.g.dart';
 @freezed
 abstract class WorkoutExerciseModel with _$WorkoutExerciseModel {
   const factory WorkoutExerciseModel({
+    required String id,
     required ExerciseDetailModel exercise,
     required String sets,
     required String rest,

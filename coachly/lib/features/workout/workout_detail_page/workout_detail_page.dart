@@ -1,137 +1,46 @@
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
-import 'package:coachly/features/workout/workout_detail_page/providers/workout_detail_provider/workout_detail_provider.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_exercise_list_section.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_header.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_stats_cards.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/widgets/cards/border_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:shimmer/shimmer.dart';
 
-class WorkoutDetailPage extends ConsumerStatefulWidget {
-  final String id;
+class WorkoutDetailPage extends ConsumerWidget {
+  final WorkoutModel workout;
 
-  const WorkoutDetailPage({super.key, required this.id});
+  const WorkoutDetailPage({super.key, required this.workout});
 
   @override
-  ConsumerState<WorkoutDetailPage> createState() => _WorkoutDetailPageState();
-}
-
-class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      ref.read(workoutDetailPageProvider.notifier).loadWorkoutDetail(widget.id);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final state = ref.watch(workoutDetailPageProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: Container(
         color: const Color(0xFF0F0F1E),
-        child: _buildBody(context, state, scheme),
+        child: _buildBody(context, ref, workout, scheme),
       ),
     );
   }
 
   Widget _buildBody(
     BuildContext context,
-    WorkoutDetailPageState state,
+    WidgetRef ref,
+    WorkoutModel workout,
     ColorScheme scheme,
   ) {
-    final locale = ref.watch(languageProvider); // Use languageProvider
-    // Error State
-    if (state.hasError) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ShadAlert(
-                title: const Text('Errore'),
-                description: Text(state.error ?? 'Errore sconosciuto'),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () => ref
-                    .read(workoutDetailPageProvider.notifier)
-                    .refresh(widget.id),
-                icon: const Icon(Icons.refresh),
-                label: const Text('Riprova'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // Loading State
-    if (state.isLoading && !state.hasData) {
-      return Center(
-        child: Shimmer.fromColors(
-          baseColor: const Color(0xFF1A1A2E),
-          highlightColor: const Color(0xFF2196F3).withOpacity(0.2),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A2E),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Caricamento...',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // Empty State
-    if (state.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.fitness_center_outlined,
-              size: 64,
-              color: Colors.white.withOpacity(0.3),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Nessun workout trovato',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Content State
-    final workout = state.workout!;
+    final locale = ref.watch(languageProvider);
 
     return RefreshIndicator(
-      onRefresh: () =>
-          ref.read(workoutDetailPageProvider.notifier).refresh(widget.id),
+      onRefresh: () async {
+        ref.invalidate(workoutListProvider);
+        // We might need to pop and let the workout page rebuild, or find a way
+        // to get the updated workout model here. For now, just invalidating.
+      },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Column(
@@ -146,7 +55,10 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
               lastSessionDays: workout.lastSessionDays,
               onBack: () => Navigator.of(context).pop(),
               onShare: () => _showShareSnackbar(context),
-              onEdit: () => context.push('/workouts/workout/${widget.id}/edit'),
+              onEdit: () => context.push(
+                '/workouts/workout/${workout.id}/edit',
+                extra: workout,
+              ),
             ),
             const SizedBox(height: 20),
             WorkoutDetailStatsCards(
@@ -164,11 +76,11 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildStartButton(context),
+            _buildStartButton(context, workout.id),
             const SizedBox(height: 20),
             WorkoutDetailExerciseListSection(
               exercises: workout.workoutExercises,
-              workoutId: widget.id,
+              workoutId: workout.id,
             ),
             const SizedBox(height: 32),
           ],
@@ -177,7 +89,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     );
   }
 
-  Widget _buildStartButton(BuildContext context) {
+  Widget _buildStartButton(BuildContext context, String workoutId) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Container(
@@ -198,7 +110,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
           ],
         ),
         child: ElevatedButton.icon(
-          onPressed: () => context.go('/workouts/workout/${widget.id}/active'),
+          onPressed: () => context.go('/workouts/workout/$workoutId/active'),
           icon: const Icon(Icons.play_arrow, size: 22),
           label: const Text(
             'Inizia Allenamento',
@@ -227,15 +139,6 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Condividi workout'),
-        duration: Duration(seconds: 1),
-      ),
-    );
-  }
-
-  void _showEditSnackbar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Modifica workout'),
         duration: Duration(seconds: 1),
       ),
     );

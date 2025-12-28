@@ -58,6 +58,20 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   }
 
   @override
+  Future<ApiResponse<WorkoutModel?>> getWorkout(String workoutId) async {
+    try {
+      final workout = await _hiveService.getWorkout(workoutId);
+      if (workout != null) {
+        return ApiResponse.success(data: workout);
+      } else {
+        return ApiResponse.error(message: 'Workout not found in local cache');
+      }
+    } catch (e) {
+      return ApiResponse.error(message: e.toString());
+    }
+  }
+
+  @override
   Future<ApiResponse<WorkoutStatsModel>> getWorkoutStats() async {
     return await _apiService.fetchWorkoutStats();
   }
@@ -93,5 +107,15 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       data: _hiveService.patchWorkout(updatedWorkout),
       message: "Updated workout ${updatedWorkout.id}",
     );
+  }
+
+  @override
+  Future<ApiResponse<void>> patchWorkout(
+    String workoutId,
+    Map<String, dynamic> data,
+  ) async {
+    // TODO: After patching, the local HIVE data will be stale.
+    // We need a way to get the updated model and save it to Hive.
+    return await _apiService.patchWorkout(workoutId, data);
   }
 }
