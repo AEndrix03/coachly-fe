@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_variant_model/exercise_variant_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'editable_exercise_model.freezed.dart';
@@ -12,7 +13,7 @@ class EditableExerciseModel with _$EditableExerciseModel {
   final String exerciseId;
   final int number;
   final String name;
-  final String muscle;
+  final List<String> muscles;
   final String difficulty;
   final String sets;
   final String rest;
@@ -20,14 +21,14 @@ class EditableExerciseModel with _$EditableExerciseModel {
   final String progress;
   final String notes;
   final String accentColorHex;
-  final bool hasVariants;
+  final List<ExerciseVariantModel> variants; // Changed to List
 
   const EditableExerciseModel({
     required this.id,
     required this.exerciseId,
     required this.number,
     required this.name,
-    required this.muscle,
+    required this.muscles,
     required this.difficulty,
     required this.sets,
     required this.rest,
@@ -35,7 +36,7 @@ class EditableExerciseModel with _$EditableExerciseModel {
     required this.progress,
     required this.notes,
     required this.accentColorHex,
-    required this.hasVariants,
+    required this.variants,
   });
 
   factory EditableExerciseModel.fromJson(Map<String, dynamic> json) =>

@@ -13,7 +13,7 @@ EditableExerciseModel _$EditableExerciseModelFromJson(
   exerciseId: json['exerciseId'] as String,
   number: (json['number'] as num).toInt(),
   name: json['name'] as String,
-  muscle: json['muscle'] as String,
+  muscles: (json['muscles'] as List<dynamic>).map((e) => e as String).toList(),
   difficulty: json['difficulty'] as String,
   sets: json['sets'] as String,
   rest: json['rest'] as String,
@@ -21,7 +21,9 @@ EditableExerciseModel _$EditableExerciseModelFromJson(
   progress: json['progress'] as String,
   notes: json['notes'] as String,
   accentColorHex: json['accentColorHex'] as String,
-  hasVariants: json['hasVariants'] as bool,
+  variants: (json['variants'] as List<dynamic>)
+      .map((e) => ExerciseVariantModel.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$EditableExerciseModelToJson(
@@ -31,7 +33,7 @@ Map<String, dynamic> _$EditableExerciseModelToJson(
   'exerciseId': instance.exerciseId,
   'number': instance.number,
   'name': instance.name,
-  'muscle': instance.muscle,
+  'muscles': instance.muscles,
   'difficulty': instance.difficulty,
   'sets': instance.sets,
   'rest': instance.rest,
@@ -39,5 +41,5 @@ Map<String, dynamic> _$EditableExerciseModelToJson(
   'progress': instance.progress,
   'notes': instance.notes,
   'accentColorHex': instance.accentColorHex,
-  'hasVariants': instance.hasVariants,
+  'variants': instance.variants,
 };

@@ -1,136 +1,66 @@
+import 'package:coachly/core/utils/debouncer.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
+import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ExercisePickerSheet extends StatefulWidget {
+class ExercisePickerSheet extends ConsumerStatefulWidget {
   final Function(EditableExerciseModel) onExerciseSelected;
 
   const ExercisePickerSheet({super.key, required this.onExerciseSelected});
 
   @override
-  State<ExercisePickerSheet> createState() => _ExercisePickerSheetState();
+  ConsumerState<ExercisePickerSheet> createState() =>
+      _ExercisePickerSheetState();
 }
 
-class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
+class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   final TextEditingController _searchController = TextEditingController();
+  final Debouncer _debouncer = Debouncer(
+    delay: const Duration(milliseconds: 500),
+  );
   bool _showFilters = false;
-  String _selectedMuscle = 'Tutti';
-  String _selectedDifficulty = 'Tutti';
+  String? _selectedMuscle;
+  String? _selectedDifficulty;
 
-  final List<String> _muscles = [
-    'Tutti',
-    'Petto',
-    'Dorsali',
-    'Spalle',
-    'Bicipiti',
-    'Tricipiti',
-    'Gambe',
-    'Addominali',
-  ];
+  ExerciseFilterModel _currentFilter = const ExerciseFilterModel();
 
-  final List<String> _difficulties = [
-    'Tutti',
-    'Base',
-    'Intermedio',
-    'Avanzato',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
 
-  final List<EditableExerciseModel> _allExercises = const [
-    EditableExerciseModel(
-      id: 'new_1',
-      exerciseId: 'ex_3',
-      number: 0,
-      name: 'Panca Declinata',
-      muscle: 'Petto Basso',
-      difficulty: 'Intermedio',
-      sets: '3 × 10',
-      rest: '90s',
-      weight: '',
-      progress: '',
-      notes: '',
-      accentColorHex: '#2196F3',
-      hasVariants: true,
-    ),
-    EditableExerciseModel(
-      id: 'new_2',
-      exerciseId: 'ex_4',
-      number: 0,
-      name: 'Croci Manubri',
-      muscle: 'Petto',
-      difficulty: 'Base',
-      sets: '3 × 12-15',
-      rest: '60s',
-      weight: '',
-      progress: '',
-      notes: '',
-      accentColorHex: '#2196F3',
-      hasVariants: true,
-    ),
-    EditableExerciseModel(
-      id: 'new_3',
-      exerciseId: 'ex_5',
-      number: 0,
-      name: 'Dips',
-      muscle: 'Petto Basso',
-      difficulty: 'Avanzato',
-      sets: '4 × 8',
-      rest: '120s',
-      weight: '',
-      progress: '',
-      notes: '',
-      accentColorHex: '#2196F3',
-      hasVariants: false,
-    ),
-    EditableExerciseModel(
-      id: 'new_4',
-      exerciseId: 'ex_6',
-      number: 0,
-      name: 'Lat Machine',
-      muscle: 'Dorsali',
-      difficulty: 'Base',
-      sets: '3 × 12',
-      rest: '75s',
-      weight: '',
-      progress: '',
-      notes: '',
-      accentColorHex: '#4CAF50',
-      hasVariants: true,
-    ),
-    EditableExerciseModel(
-      id: 'new_5',
-      exerciseId: 'ex_7',
-      number: 0,
-      name: 'Rematore Bilanciere',
-      muscle: 'Dorsali',
-      difficulty: 'Intermedio',
-      sets: '4 × 8-10',
-      rest: '90s',
-      weight: '',
-      progress: '',
-      notes: '',
-      accentColorHex: '#4CAF50',
-      hasVariants: true,
-    ),
-  ];
+  void _onSearchChanged() {
+    _debouncer.run(() {
+      _performSearch();
+    });
+  }
 
-  List<EditableExerciseModel> get _filteredExercises {
-    return _allExercises.where((exercise) {
-      final searchMatch = exercise.name.toLowerCase().contains(
-        _searchController.text.toLowerCase(),
+  void _performSearch() {
+    final locale = ref.read(languageProvider);
+    final langFilter = '${locale.languageCode}_${locale.countryCode}';
+
+    setState(() {
+      _currentFilter = _currentFilter.copyWith(
+        textFilter:
+            _searchController.text.length >= 3 || _searchController.text.isEmpty
+            ? _searchController.text
+            : null,
+        langFilter: langFilter,
       );
-      final muscleMatch =
-          _selectedMuscle == 'Tutti' ||
-          exercise.muscle.contains(_selectedMuscle);
-      final difficultyMatch =
-          _selectedDifficulty == 'Tutti' ||
-          exercise.difficulty == _selectedDifficulty;
-
-      return searchMatch && muscleMatch && difficultyMatch;
-    }).toList();
+    });
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _debouncer.dispose();
     super.dispose();
   }
 
@@ -153,7 +83,42 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
         children: [
           _buildHeader(),
           _buildSearchBar(),
-          if (_showFilters) _buildFilters(),
+          // Conditionally build filters based on _showFilters
+          // We use a Consumer here to access the exerciseListProvider to get available filter options
+          if (_showFilters)
+            Consumer(
+              builder: (context, ref, child) {
+                final exerciseListValue = ref.watch(
+                  exerciseListProvider(filter: _currentFilter),
+                );
+                return exerciseListValue.when(
+                  data: (exercises) {
+                    final locale = ref.read(languageProvider);
+                    final availableMuscles =
+                        exercises
+                            .expand(
+                              (e) => e.muscles.map(
+                                (m) => m.muscle.nameI18n?.fromI18n(locale) ?? 'N/A',
+                              ),
+                            )
+                            .toSet()
+                            .toList()
+                          ..sort();
+                    final availableDifficulties =
+                        exercises.map((e) => e.difficultyLevel).toSet().toList()
+                          ..sort();
+                    return _buildFilters(
+                      availableMuscles,
+                      availableDifficulties,
+                    );
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) =>
+                      const SizedBox.shrink(), // Don't show error in filter section
+                );
+              },
+            ),
           Expanded(child: _buildExerciseList()),
         ],
       ),
@@ -246,13 +211,16 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
               vertical: 14,
             ),
           ),
-          onChanged: (_) => setState(() {}),
+          // onChanged is now handled by the listener on _searchController
         ),
       ),
     );
   }
 
-  Widget _buildFilters() {
+  Widget _buildFilters(
+    List<String> availableMuscles,
+    List<String> availableDifficulties,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -268,15 +236,32 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
             ),
           ),
           const SizedBox(height: 12),
-          _buildFilterChips('Muscolo', _muscles, _selectedMuscle, (value) {
-            setState(() => _selectedMuscle = value);
+          _buildFilterChips('Muscolo', availableMuscles, _selectedMuscle, (value) {
+            _debouncer.run(() {
+              setState(() {
+                _selectedMuscle = value;
+                _currentFilter = _currentFilter.copyWith(
+                  muscleIds: value != null ? [value] : null,
+                );
+              });
+            });
           }),
           const SizedBox(height: 12),
-          _buildFilterChips('Difficoltà', _difficulties, _selectedDifficulty, (
-            value,
-          ) {
-            setState(() => _selectedDifficulty = value);
-          }),
+          _buildFilterChips(
+            'Difficoltà',
+            availableDifficulties,
+            _selectedDifficulty,
+            (value) {
+              _debouncer.run(() {
+                setState(() {
+                  _selectedDifficulty = value;
+                  _currentFilter = _currentFilter.copyWith(
+                    difficultyLevel: value,
+                  );
+                });
+              });
+            },
+          ),
         ],
       ),
     );
@@ -285,8 +270,8 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
   Widget _buildFilterChips(
     String label,
     List<String> options,
-    String selected,
-    Function(String) onSelected,
+    String? selected,
+    Function(String?) onSelected,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,17 +288,16 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: options.map((option) {
-            final isSelected = option == selected;
-            return GestureDetector(
-              onTap: () => onSelected(option),
+          children: [
+            GestureDetector(
+              onTap: () => onSelected(null), // Option to clear filter
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  gradient: isSelected
+                  gradient: selected == null
                       ? const LinearGradient(
                           colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
                         )
@@ -325,69 +309,159 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                         ),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected
+                    color: selected == null
                         ? const Color(0xFF2196F3)
                         : Colors.white.withOpacity(0.2),
                     width: 1.5,
                   ),
                 ),
                 child: Text(
-                  option,
+                  'Tutti',
                   style: TextStyle(
-                    color: isSelected
+                    color: selected == null
                         ? Colors.white
                         : Colors.white.withOpacity(0.7),
                     fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    fontWeight: selected == null
+                        ? FontWeight.w700
+                        : FontWeight.w500,
                   ),
                 ),
               ),
-            );
-          }).toList(),
+            ),
+            ...options.map((option) {
+              final isSelected = option == selected;
+              return GestureDetector(
+                onTap: () => onSelected(option),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: isSelected
+                        ? const LinearGradient(
+                            colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+                          )
+                        : LinearGradient(
+                            colors: [
+                              Colors.white.withOpacity(0.08),
+                              Colors.white.withOpacity(0.04),
+                            ],
+                          ),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected
+                          ? const Color(0xFF2196F3)
+                          : Colors.white.withOpacity(0.2),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Text(
+                    option,
+                    style: TextStyle(
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.7),
+                      fontSize: 13,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ],
         ),
       ],
     );
   }
 
   Widget _buildExerciseList() {
-    final exercises = _filteredExercises;
+    final exerciseListValue = ref.watch(
+      exerciseListProvider(filter: _currentFilter),
+    );
 
-    if (exercises.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search_off,
-              size: 64,
-              color: Colors.white.withOpacity(0.3),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Nessun esercizio trovato',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
-                fontSize: 16,
-              ),
-            ),
-          ],
+    return exerciseListValue.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(
+        child: Text(
+          'Error: ${err.toString()}',
+          style: const TextStyle(color: Colors.red),
         ),
-      );
-    }
+      ),
+      data: (exercises) {
+        if (exercises.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.search_off,
+                  size: 64,
+                  color: Colors.white.withOpacity(0.3),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Nessun esercizio trovato',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.6),
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: exercises.length,
-      itemBuilder: (context, index) {
-        return _buildExerciseCard(exercises[index]);
+        return ListView.builder(
+          padding: const EdgeInsets.all(20),
+          itemCount: exercises.length,
+          itemBuilder: (context, index) {
+            return _buildExerciseCard(exercises[index]);
+          },
+        );
       },
     );
   }
 
-  Widget _buildExerciseCard(EditableExerciseModel exercise) {
+  Widget _buildExerciseCard(ExerciseDetailModel exercise) {
+    final locale = ref.watch(languageProvider);
+    // ExerciseDetailModel does not have accentColorHex directly.
+    // Use a default color for now. In a real app, this might be derived from tags, difficulty, or a backend-provided field.
+    final accentColor = Color(
+      int.parse('0xFF2196F3'),
+    ); // Default to a blue color
+
     return GestureDetector(
       onTap: () {
-        widget.onExerciseSelected(exercise);
+        // Convert ExerciseDetailModel to EditableExerciseModel
+        final editableExercise = EditableExerciseModel(
+          id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
+          exerciseId: exercise.id,
+          number: 0,
+          // This will be updated when added to the list
+          name: exercise.nameI18n?.fromI18n(locale) ?? exercise.id, // Fallback to id if nameI18n is null
+          muscles: exercise.muscles
+              .map((m) => m.muscle.nameI18n?.fromI18n(locale) ?? 'N/A')
+              .toList(),
+          difficulty: exercise.difficultyLevel,
+          sets: '3',
+          // Default value
+          rest: '60s',
+          // Default value
+          weight: '',
+          // Default value
+          progress: '0',
+          // Default value
+          notes: '',
+          // Default value
+          accentColorHex: '#2196F3',
+          // Default blue hex
+          variants: exercise.variants,
+        );
+        widget.onExerciseSelected(editableExercise);
         Navigator.pop(context);
       },
       child: Container(
@@ -409,13 +483,10 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
               width: 12,
               height: 12,
               decoration: BoxDecoration(
-                color: exercise.accentColor,
+                color: accentColor,
                 shape: BoxShape.circle,
                 boxShadow: [
-                  BoxShadow(
-                    color: exercise.accentColor.withOpacity(0.5),
-                    blurRadius: 8,
-                  ),
+                  BoxShadow(color: accentColor.withOpacity(0.5), blurRadius: 8),
                 ],
               ),
             ),
@@ -425,7 +496,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    exercise.name,
+                    exercise.nameI18n?.fromI18n(locale) ?? exercise.id, // Fallback to id if nameI18n is null
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,
@@ -436,13 +507,16 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      _buildSmallTag(exercise.muscle, exercise.accentColor),
+                      _buildSmallTag(
+                        exercise.muscles.map((m) => m.muscle.nameI18n?.fromI18n(locale) ?? 'N/A').join(', '),
+                        accentColor,
+                      ),
                       const SizedBox(width: 8),
                       _buildSmallTag(
-                        exercise.difficulty,
+                        exercise.difficultyLevel,
                         const Color(0xFFFF9800),
                       ),
-                      if (exercise.hasVariants) ...[
+                      if (exercise.variants.isNotEmpty) ...[
                         const SizedBox(width: 8),
                         Icon(
                           Icons.swap_horiz,
@@ -455,11 +529,7 @@ class _ExercisePickerSheetState extends State<ExercisePickerSheet> {
                 ],
               ),
             ),
-            Icon(
-              Icons.add_circle_outline,
-              color: exercise.accentColor,
-              size: 24,
-            ),
+            Icon(Icons.add_circle_outline, color: accentColor, size: 24),
           ],
         ),
       ),

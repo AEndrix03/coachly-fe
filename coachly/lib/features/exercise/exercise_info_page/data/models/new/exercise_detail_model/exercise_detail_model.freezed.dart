@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExerciseDetailModel {
 
- String get id; Map<String, String> get nameI18n; Map<String, String> get descriptionI18n; Map<String, String> get tipsI18n; String get difficultyLevel; String get mechanicsType; String get forceType; bool get isUnilateral; bool get isBodyweight; ExerciseEnvironmentModel? get environment; List<ExerciseInstructionModel> get instructions; ExerciseMovementPatternModel? get movementPattern; List<ExerciseVariantModel> get variants; List<ExerciseMediaModel> get media; List<ExerciseCategoryModel> get categories; List<ExerciseSafetyModel> get safety; List<ExerciseSafetyContraindicationModel> get safetyContraindications; List<ExerciseMuscleModel> get muscles; List<ExerciseEquipmentModel> get equipments; List<TagModel> get tags;
+ String get id; Map<String, String>? get nameI18n; Map<String, String>? get descriptionI18n; Map<String, String>? get tipsI18n; String get difficultyLevel; String get mechanicsType; String get forceType; bool get isUnilateral; bool get isBodyweight; ExerciseEnvironmentModel? get environment; List<ExerciseInstructionModel> get instructions; ExerciseMovementPatternModel? get movementPattern; List<ExerciseVariantModel> get variants; List<ExerciseMediaModel> get media; List<ExerciseCategoryModel> get categories; List<ExerciseSafetyModel> get safety; List<ExerciseSafetyContraindicationModel> get safetyContraindications; List<ExerciseMuscleModel> get muscles; List<ExerciseEquipmentModel> get equipments; List<TagModel> get tags;
 /// Create a copy of ExerciseDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $ExerciseDetailModelCopyWith<$Res>  {
   factory $ExerciseDetailModelCopyWith(ExerciseDetailModel value, $Res Function(ExerciseDetailModel) _then) = _$ExerciseDetailModelCopyWithImpl;
 @useResult
 $Res call({
- String id, Map<String, String> nameI18n, Map<String, String> descriptionI18n, Map<String, String> tipsI18n, String difficultyLevel, String mechanicsType, String forceType, bool isUnilateral, bool isBodyweight, ExerciseEnvironmentModel? environment, List<ExerciseInstructionModel> instructions, ExerciseMovementPatternModel? movementPattern, List<ExerciseVariantModel> variants, List<ExerciseMediaModel> media, List<ExerciseCategoryModel> categories, List<ExerciseSafetyModel> safety, List<ExerciseSafetyContraindicationModel> safetyContraindications, List<ExerciseMuscleModel> muscles, List<ExerciseEquipmentModel> equipments, List<TagModel> tags
+ String id, Map<String, String>? nameI18n, Map<String, String>? descriptionI18n, Map<String, String>? tipsI18n, String difficultyLevel, String mechanicsType, String forceType, bool isUnilateral, bool isBodyweight, ExerciseEnvironmentModel? environment, List<ExerciseInstructionModel> instructions, ExerciseMovementPatternModel? movementPattern, List<ExerciseVariantModel> variants, List<ExerciseMediaModel> media, List<ExerciseCategoryModel> categories, List<ExerciseSafetyModel> safety, List<ExerciseSafetyContraindicationModel> safetyContraindications, List<ExerciseMuscleModel> muscles, List<ExerciseEquipmentModel> equipments, List<TagModel> tags
 });
 
 
@@ -65,13 +65,13 @@ class _$ExerciseDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of ExerciseDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? nameI18n = null,Object? descriptionI18n = null,Object? tipsI18n = null,Object? difficultyLevel = null,Object? mechanicsType = null,Object? forceType = null,Object? isUnilateral = null,Object? isBodyweight = null,Object? environment = freezed,Object? instructions = null,Object? movementPattern = freezed,Object? variants = null,Object? media = null,Object? categories = null,Object? safety = null,Object? safetyContraindications = null,Object? muscles = null,Object? equipments = null,Object? tags = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? nameI18n = freezed,Object? descriptionI18n = freezed,Object? tipsI18n = freezed,Object? difficultyLevel = null,Object? mechanicsType = null,Object? forceType = null,Object? isUnilateral = null,Object? isBodyweight = null,Object? environment = freezed,Object? instructions = null,Object? movementPattern = freezed,Object? variants = null,Object? media = null,Object? categories = null,Object? safety = null,Object? safetyContraindications = null,Object? muscles = null,Object? equipments = null,Object? tags = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,nameI18n: null == nameI18n ? _self.nameI18n : nameI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,descriptionI18n: null == descriptionI18n ? _self.descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,tipsI18n: null == tipsI18n ? _self.tipsI18n : tipsI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,difficultyLevel: null == difficultyLevel ? _self.difficultyLevel : difficultyLevel // ignore: cast_nullable_to_non_nullable
+as String,nameI18n: freezed == nameI18n ? _self.nameI18n : nameI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,descriptionI18n: freezed == descriptionI18n ? _self.descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,tipsI18n: freezed == tipsI18n ? _self.tipsI18n : tipsI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,difficultyLevel: null == difficultyLevel ? _self.difficultyLevel : difficultyLevel // ignore: cast_nullable_to_non_nullable
 as String,mechanicsType: null == mechanicsType ? _self.mechanicsType : mechanicsType // ignore: cast_nullable_to_non_nullable
 as String,forceType: null == forceType ? _self.forceType : forceType // ignore: cast_nullable_to_non_nullable
 as String,isUnilateral: null == isUnilateral ? _self.isUnilateral : isUnilateral // ignore: cast_nullable_to_non_nullable
@@ -196,7 +196,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Map<String, String> nameI18n,  Map<String, String> descriptionI18n,  Map<String, String> tipsI18n,  String difficultyLevel,  String mechanicsType,  String forceType,  bool isUnilateral,  bool isBodyweight,  ExerciseEnvironmentModel? environment,  List<ExerciseInstructionModel> instructions,  ExerciseMovementPatternModel? movementPattern,  List<ExerciseVariantModel> variants,  List<ExerciseMediaModel> media,  List<ExerciseCategoryModel> categories,  List<ExerciseSafetyModel> safety,  List<ExerciseSafetyContraindicationModel> safetyContraindications,  List<ExerciseMuscleModel> muscles,  List<ExerciseEquipmentModel> equipments,  List<TagModel> tags)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Map<String, String>? nameI18n,  Map<String, String>? descriptionI18n,  Map<String, String>? tipsI18n,  String difficultyLevel,  String mechanicsType,  String forceType,  bool isUnilateral,  bool isBodyweight,  ExerciseEnvironmentModel? environment,  List<ExerciseInstructionModel> instructions,  ExerciseMovementPatternModel? movementPattern,  List<ExerciseVariantModel> variants,  List<ExerciseMediaModel> media,  List<ExerciseCategoryModel> categories,  List<ExerciseSafetyModel> safety,  List<ExerciseSafetyContraindicationModel> safetyContraindications,  List<ExerciseMuscleModel> muscles,  List<ExerciseEquipmentModel> equipments,  List<TagModel> tags)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExerciseDetailModel() when $default != null:
 return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.environment,_that.instructions,_that.movementPattern,_that.variants,_that.media,_that.categories,_that.safety,_that.safetyContraindications,_that.muscles,_that.equipments,_that.tags);case _:
@@ -217,7 +217,7 @@ return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Map<String, String> nameI18n,  Map<String, String> descriptionI18n,  Map<String, String> tipsI18n,  String difficultyLevel,  String mechanicsType,  String forceType,  bool isUnilateral,  bool isBodyweight,  ExerciseEnvironmentModel? environment,  List<ExerciseInstructionModel> instructions,  ExerciseMovementPatternModel? movementPattern,  List<ExerciseVariantModel> variants,  List<ExerciseMediaModel> media,  List<ExerciseCategoryModel> categories,  List<ExerciseSafetyModel> safety,  List<ExerciseSafetyContraindicationModel> safetyContraindications,  List<ExerciseMuscleModel> muscles,  List<ExerciseEquipmentModel> equipments,  List<TagModel> tags)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Map<String, String>? nameI18n,  Map<String, String>? descriptionI18n,  Map<String, String>? tipsI18n,  String difficultyLevel,  String mechanicsType,  String forceType,  bool isUnilateral,  bool isBodyweight,  ExerciseEnvironmentModel? environment,  List<ExerciseInstructionModel> instructions,  ExerciseMovementPatternModel? movementPattern,  List<ExerciseVariantModel> variants,  List<ExerciseMediaModel> media,  List<ExerciseCategoryModel> categories,  List<ExerciseSafetyModel> safety,  List<ExerciseSafetyContraindicationModel> safetyContraindications,  List<ExerciseMuscleModel> muscles,  List<ExerciseEquipmentModel> equipments,  List<TagModel> tags)  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseDetailModel():
 return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.environment,_that.instructions,_that.movementPattern,_that.variants,_that.media,_that.categories,_that.safety,_that.safetyContraindications,_that.muscles,_that.equipments,_that.tags);case _:
@@ -237,7 +237,7 @@ return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Map<String, String> nameI18n,  Map<String, String> descriptionI18n,  Map<String, String> tipsI18n,  String difficultyLevel,  String mechanicsType,  String forceType,  bool isUnilateral,  bool isBodyweight,  ExerciseEnvironmentModel? environment,  List<ExerciseInstructionModel> instructions,  ExerciseMovementPatternModel? movementPattern,  List<ExerciseVariantModel> variants,  List<ExerciseMediaModel> media,  List<ExerciseCategoryModel> categories,  List<ExerciseSafetyModel> safety,  List<ExerciseSafetyContraindicationModel> safetyContraindications,  List<ExerciseMuscleModel> muscles,  List<ExerciseEquipmentModel> equipments,  List<TagModel> tags)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Map<String, String>? nameI18n,  Map<String, String>? descriptionI18n,  Map<String, String>? tipsI18n,  String difficultyLevel,  String mechanicsType,  String forceType,  bool isUnilateral,  bool isBodyweight,  ExerciseEnvironmentModel? environment,  List<ExerciseInstructionModel> instructions,  ExerciseMovementPatternModel? movementPattern,  List<ExerciseVariantModel> variants,  List<ExerciseMediaModel> media,  List<ExerciseCategoryModel> categories,  List<ExerciseSafetyModel> safety,  List<ExerciseSafetyContraindicationModel> safetyContraindications,  List<ExerciseMuscleModel> muscles,  List<ExerciseEquipmentModel> equipments,  List<TagModel> tags)?  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseDetailModel() when $default != null:
 return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.environment,_that.instructions,_that.movementPattern,_that.variants,_that.media,_that.categories,_that.safety,_that.safetyContraindications,_that.muscles,_that.equipments,_that.tags);case _:
@@ -252,29 +252,35 @@ return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_th
 @JsonSerializable()
 
 class _ExerciseDetailModel implements ExerciseDetailModel {
-  const _ExerciseDetailModel({required this.id, required final  Map<String, String> nameI18n, required final  Map<String, String> descriptionI18n, required final  Map<String, String> tipsI18n, required this.difficultyLevel, required this.mechanicsType, required this.forceType, required this.isUnilateral, required this.isBodyweight, this.environment, final  List<ExerciseInstructionModel> instructions = const [], this.movementPattern, final  List<ExerciseVariantModel> variants = const [], final  List<ExerciseMediaModel> media = const [], final  List<ExerciseCategoryModel> categories = const [], final  List<ExerciseSafetyModel> safety = const [], final  List<ExerciseSafetyContraindicationModel> safetyContraindications = const [], final  List<ExerciseMuscleModel> muscles = const [], final  List<ExerciseEquipmentModel> equipments = const [], final  List<TagModel> tags = const []}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_tipsI18n = tipsI18n,_instructions = instructions,_variants = variants,_media = media,_categories = categories,_safety = safety,_safetyContraindications = safetyContraindications,_muscles = muscles,_equipments = equipments,_tags = tags;
+  const _ExerciseDetailModel({required this.id, required final  Map<String, String>? nameI18n, required final  Map<String, String>? descriptionI18n, required final  Map<String, String>? tipsI18n, required this.difficultyLevel, required this.mechanicsType, required this.forceType, required this.isUnilateral, required this.isBodyweight, this.environment, final  List<ExerciseInstructionModel> instructions = const [], this.movementPattern, final  List<ExerciseVariantModel> variants = const [], final  List<ExerciseMediaModel> media = const [], final  List<ExerciseCategoryModel> categories = const [], final  List<ExerciseSafetyModel> safety = const [], final  List<ExerciseSafetyContraindicationModel> safetyContraindications = const [], final  List<ExerciseMuscleModel> muscles = const [], final  List<ExerciseEquipmentModel> equipments = const [], final  List<TagModel> tags = const []}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_tipsI18n = tipsI18n,_instructions = instructions,_variants = variants,_media = media,_categories = categories,_safety = safety,_safetyContraindications = safetyContraindications,_muscles = muscles,_equipments = equipments,_tags = tags;
   factory _ExerciseDetailModel.fromJson(Map<String, dynamic> json) => _$ExerciseDetailModelFromJson(json);
 
 @override final  String id;
- final  Map<String, String> _nameI18n;
-@override Map<String, String> get nameI18n {
+ final  Map<String, String>? _nameI18n;
+@override Map<String, String>? get nameI18n {
+  final value = _nameI18n;
+  if (value == null) return null;
   if (_nameI18n is EqualUnmodifiableMapView) return _nameI18n;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_nameI18n);
+  return EqualUnmodifiableMapView(value);
 }
 
- final  Map<String, String> _descriptionI18n;
-@override Map<String, String> get descriptionI18n {
+ final  Map<String, String>? _descriptionI18n;
+@override Map<String, String>? get descriptionI18n {
+  final value = _descriptionI18n;
+  if (value == null) return null;
   if (_descriptionI18n is EqualUnmodifiableMapView) return _descriptionI18n;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_descriptionI18n);
+  return EqualUnmodifiableMapView(value);
 }
 
- final  Map<String, String> _tipsI18n;
-@override Map<String, String> get tipsI18n {
+ final  Map<String, String>? _tipsI18n;
+@override Map<String, String>? get tipsI18n {
+  final value = _tipsI18n;
+  if (value == null) return null;
   if (_tipsI18n is EqualUnmodifiableMapView) return _tipsI18n;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_tipsI18n);
+  return EqualUnmodifiableMapView(value);
 }
 
 @override final  String difficultyLevel;
@@ -381,7 +387,7 @@ abstract mixin class _$ExerciseDetailModelCopyWith<$Res> implements $ExerciseDet
   factory _$ExerciseDetailModelCopyWith(_ExerciseDetailModel value, $Res Function(_ExerciseDetailModel) _then) = __$ExerciseDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, Map<String, String> nameI18n, Map<String, String> descriptionI18n, Map<String, String> tipsI18n, String difficultyLevel, String mechanicsType, String forceType, bool isUnilateral, bool isBodyweight, ExerciseEnvironmentModel? environment, List<ExerciseInstructionModel> instructions, ExerciseMovementPatternModel? movementPattern, List<ExerciseVariantModel> variants, List<ExerciseMediaModel> media, List<ExerciseCategoryModel> categories, List<ExerciseSafetyModel> safety, List<ExerciseSafetyContraindicationModel> safetyContraindications, List<ExerciseMuscleModel> muscles, List<ExerciseEquipmentModel> equipments, List<TagModel> tags
+ String id, Map<String, String>? nameI18n, Map<String, String>? descriptionI18n, Map<String, String>? tipsI18n, String difficultyLevel, String mechanicsType, String forceType, bool isUnilateral, bool isBodyweight, ExerciseEnvironmentModel? environment, List<ExerciseInstructionModel> instructions, ExerciseMovementPatternModel? movementPattern, List<ExerciseVariantModel> variants, List<ExerciseMediaModel> media, List<ExerciseCategoryModel> categories, List<ExerciseSafetyModel> safety, List<ExerciseSafetyContraindicationModel> safetyContraindications, List<ExerciseMuscleModel> muscles, List<ExerciseEquipmentModel> equipments, List<TagModel> tags
 });
 
 
@@ -398,13 +404,13 @@ class __$ExerciseDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of ExerciseDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? nameI18n = null,Object? descriptionI18n = null,Object? tipsI18n = null,Object? difficultyLevel = null,Object? mechanicsType = null,Object? forceType = null,Object? isUnilateral = null,Object? isBodyweight = null,Object? environment = freezed,Object? instructions = null,Object? movementPattern = freezed,Object? variants = null,Object? media = null,Object? categories = null,Object? safety = null,Object? safetyContraindications = null,Object? muscles = null,Object? equipments = null,Object? tags = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? nameI18n = freezed,Object? descriptionI18n = freezed,Object? tipsI18n = freezed,Object? difficultyLevel = null,Object? mechanicsType = null,Object? forceType = null,Object? isUnilateral = null,Object? isBodyweight = null,Object? environment = freezed,Object? instructions = null,Object? movementPattern = freezed,Object? variants = null,Object? media = null,Object? categories = null,Object? safety = null,Object? safetyContraindications = null,Object? muscles = null,Object? equipments = null,Object? tags = null,}) {
   return _then(_ExerciseDetailModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,nameI18n: null == nameI18n ? _self._nameI18n : nameI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,descriptionI18n: null == descriptionI18n ? _self._descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,tipsI18n: null == tipsI18n ? _self._tipsI18n : tipsI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,difficultyLevel: null == difficultyLevel ? _self.difficultyLevel : difficultyLevel // ignore: cast_nullable_to_non_nullable
+as String,nameI18n: freezed == nameI18n ? _self._nameI18n : nameI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,descriptionI18n: freezed == descriptionI18n ? _self._descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,tipsI18n: freezed == tipsI18n ? _self._tipsI18n : tipsI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,difficultyLevel: null == difficultyLevel ? _self.difficultyLevel : difficultyLevel // ignore: cast_nullable_to_non_nullable
 as String,mechanicsType: null == mechanicsType ? _self.mechanicsType : mechanicsType // ignore: cast_nullable_to_non_nullable
 as String,forceType: null == forceType ? _self.forceType : forceType // ignore: cast_nullable_to_non_nullable
 as String,isUnilateral: null == isUnilateral ? _self.isUnilateral : isUnilateral // ignore: cast_nullable_to_non_nullable

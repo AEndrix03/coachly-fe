@@ -155,7 +155,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
               const SizedBox(height: 20),
               ExerciseVideoSection(
                 videoUrl: video?.mediaUrl ?? '',
-                exerciseName: exercise.nameI18n.fromI18n(locale),
+                exerciseName: exercise.nameI18n!.fromI18n(locale),
                 tags: exercise.tags
                     .map((t) => t.nameI18n.fromI18n(locale))
                     .toList(),
@@ -216,7 +216,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
             controller: _tabController,
             children: [
               ExerciseTechniqueTab(
-                description: exercise.descriptionI18n.fromI18n(locale),
+                description: exercise.descriptionI18n!.fromI18n(locale),
                 instructions: exercise.instructions,
                 safety: exercise.safety,
                 equipments: exercise.equipments,

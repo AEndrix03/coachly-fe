@@ -38,10 +38,7 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
       _scale = 1.0;
       _showSparkle = false;
     });
-    context.go(
-      '/workouts/workout/${widget.workout.id}',
-      extra: widget.workout,
-    );
+    context.go('/workouts/workout/${widget.workout.id}', extra: widget.workout);
   }
 
   void _onTapCancel() {
@@ -109,9 +106,10 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        widget.workout.titleI18n.fromI18n(
-                                          language,
-                                        ),
+                                        widget.workout.titleI18n?.fromI18n(
+                                              language,
+                                            ) ??
+                                            '',
                                         style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,

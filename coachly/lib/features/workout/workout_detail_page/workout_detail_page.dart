@@ -47,7 +47,7 @@ class WorkoutDetailPage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             WorkoutDetailHeader(
-              title: workout.titleI18n.fromI18n(locale),
+              title: workout.titleI18n?.fromI18n(locale) ?? '',
               coachName: workout.coachName ?? '',
               muscleTags: workout.muscleTags,
               progress: workout.progress,
@@ -71,7 +71,7 @@ class WorkoutDetailPage extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: BorderCard(
                 title: 'Descrizione',
-                text: workout.descriptionI18n.fromI18n(locale),
+                text: workout.descriptionI18n?.fromI18n(locale) ?? '',
                 borderColor: const Color(0xFF2196F3),
               ),
             ),

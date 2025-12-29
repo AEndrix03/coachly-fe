@@ -205,7 +205,9 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
                   runSpacing: 8,
                   children: [
                     _buildTag(
-                      widget.exercise.muscle,
+                      widget.exercise.muscles.isNotEmpty
+                          ? widget.exercise.muscles.first
+                          : 'N/A', // Provide a fallback if muscles list is empty
                       widget.exercise.accentColor,
                       Icons.fitbit,
                     ),
@@ -267,7 +269,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (widget.exercise.hasVariants)
+        if (widget.exercise.variants.isNotEmpty)
           _buildIconButton(
             Icons.swap_horiz,
             widget.exercise.accentColor,

@@ -1,8 +1,6 @@
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
-import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart'; // Required for fromI18n
@@ -112,8 +110,8 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
             .toList();
 
         state = state.copyWith(
-          title: workout.titleI18n.fromI18n(locale),
-          description: workout.descriptionI18n.fromI18n(locale),
+          title: workout.titleI18n?.fromI18n(locale) ?? '',
+          description: workout.descriptionI18n?.fromI18n(locale) ?? '',
           duration: workout.durationMinutes.toString(),
           type: workout.type,
           exercises: editableExercises,
@@ -141,9 +139,10 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
       exerciseId: exercise.id,
       number: number,
-      name: exercise.nameI18n.fromI18n(locale),
-      muscle:
-          exercise.muscles.firstOrNull?.muscle.nameI18n.fromI18n(locale) ?? '',
+      name: exercise.nameI18n?.fromI18n(locale) ?? exercise.id,
+      muscles: exercise.muscles
+          .map((m) => m.muscle.nameI18n?.fromI18n(locale) ?? 'N/A')
+          .toList(),
       difficulty: exercise.difficultyLevel,
       sets: workoutExercise.sets,
       rest: workoutExercise.rest,
@@ -153,7 +152,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       // Default
       accentColorHex: '#2196F3',
       // Default
-      hasVariants: exercise.variants.isNotEmpty,
+      variants: exercise.variants,
     );
   }
 
@@ -275,8 +274,8 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
         .toList();
 
     state = state.copyWith(
-      title: workout.titleI18n.fromI18n(locale),
-      description: workout.descriptionI18n.fromI18n(locale),
+      title: workout.titleI18n?.fromI18n(locale) ?? '',
+      description: workout.descriptionI18n?.fromI18n(locale) ?? '',
       duration: workout.durationMinutes.toString(),
       type: workout.type,
       exercises: editableExercises,

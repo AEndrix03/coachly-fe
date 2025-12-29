@@ -9,8 +9,8 @@ part 'workout_model.g.dart';
 abstract class WorkoutModel with _$WorkoutModel {
   const factory WorkoutModel({
     required String id,
-    required Map<String, String> titleI18n,
-    required Map<String, String> descriptionI18n,
+    required Map<String, String>? titleI18n,
+    required Map<String, String>? descriptionI18n,
     String? coachId,
     String? coachName,
     @Default(0.0) double progress,

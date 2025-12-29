@@ -1,5 +1,6 @@
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_info_page_service.dart';
@@ -19,5 +20,12 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   @override
   Future<ApiResponse<List<ExerciseModel>>> getAllExercises() async {
     return await _service.fetchAllExercises();
+  }
+
+  @override
+  Future<ApiResponse<List<ExerciseDetailModel>>> getFilteredExercises(
+    ExerciseFilterModel filter,
+  ) async {
+    return await _service.fetchFilteredExercises(filter);
   }
 }

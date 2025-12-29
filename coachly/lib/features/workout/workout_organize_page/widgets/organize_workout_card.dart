@@ -93,7 +93,7 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                           children: [
                             Expanded(
                               child: Text(
-                                widget.workout.titleI18n.fromI18n(language),
+                                widget.workout.titleI18n?.fromI18n(language) ?? '',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,

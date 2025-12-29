@@ -9,8 +9,12 @@ part of 'workout_model.dart';
 _WorkoutModel _$WorkoutModelFromJson(Map<String, dynamic> json) =>
     _WorkoutModel(
       id: json['id'] as String,
-      titleI18n: Map<String, String>.from(json['titleI18n'] as Map),
-      descriptionI18n: Map<String, String>.from(json['descriptionI18n'] as Map),
+      titleI18n: (json['titleI18n'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
+      descriptionI18n: (json['descriptionI18n'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
       coachId: json['coachId'] as String?,
       coachName: json['coachName'] as String?,
       progress: (json['progress'] as num?)?.toDouble() ?? 0.0,

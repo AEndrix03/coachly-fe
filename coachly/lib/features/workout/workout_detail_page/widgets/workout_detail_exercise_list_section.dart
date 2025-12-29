@@ -160,7 +160,7 @@ class _ExerciseCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  exercise.nameI18n.fromI18n(locale),
+                  exercise.nameI18n!.fromI18n(locale),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(

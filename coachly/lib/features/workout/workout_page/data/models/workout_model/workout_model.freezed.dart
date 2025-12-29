@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutModel {
 
- String get id; Map<String, String> get titleI18n; Map<String, String> get descriptionI18n; String? get coachId; String? get coachName; double get progress; int get durationMinutes; String get goal; DateTime get lastUsed; List<TagDto> get muscleTags;// Changed to List<TagDto>
+ String get id; Map<String, String>? get titleI18n; Map<String, String>? get descriptionI18n; String? get coachId; String? get coachName; double get progress; int get durationMinutes; String get goal; DateTime get lastUsed; List<TagDto> get muscleTags;// Changed to List<TagDto>
  int get exercises; int get sessionsCount; int get lastSessionDays; String get type; List<WorkoutExerciseModel> get workoutExercises; bool get active; bool get dirty; bool get delete;
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
@@ -49,7 +49,7 @@ abstract mixin class $WorkoutModelCopyWith<$Res>  {
   factory $WorkoutModelCopyWith(WorkoutModel value, $Res Function(WorkoutModel) _then) = _$WorkoutModelCopyWithImpl;
 @useResult
 $Res call({
- String id, Map<String, String> titleI18n, Map<String, String> descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
+ String id, Map<String, String>? titleI18n, Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
 });
 
 
@@ -66,12 +66,12 @@ class _$WorkoutModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? titleI18n = null,Object? descriptionI18n = null,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? muscleTags = null,Object? exercises = null,Object? sessionsCount = null,Object? lastSessionDays = null,Object? type = null,Object? workoutExercises = null,Object? active = null,Object? dirty = null,Object? delete = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? titleI18n = freezed,Object? descriptionI18n = freezed,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? muscleTags = null,Object? exercises = null,Object? sessionsCount = null,Object? lastSessionDays = null,Object? type = null,Object? workoutExercises = null,Object? active = null,Object? dirty = null,Object? delete = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,titleI18n: null == titleI18n ? _self.titleI18n : titleI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,descriptionI18n: null == descriptionI18n ? _self.descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,coachId: freezed == coachId ? _self.coachId : coachId // ignore: cast_nullable_to_non_nullable
+as String,titleI18n: freezed == titleI18n ? _self.titleI18n : titleI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,descriptionI18n: freezed == descriptionI18n ? _self.descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,coachId: freezed == coachId ? _self.coachId : coachId // ignore: cast_nullable_to_non_nullable
 as String?,coachName: freezed == coachName ? _self.coachName : coachName // ignore: cast_nullable_to_non_nullable
 as String?,progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
 as double,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
@@ -171,7 +171,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Map<String, String> titleI18n,  Map<String, String> descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Map<String, String>? titleI18n,  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WorkoutModel() when $default != null:
 return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.active,_that.dirty,_that.delete);case _:
@@ -192,7 +192,7 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Map<String, String> titleI18n,  Map<String, String> descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Map<String, String>? titleI18n,  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutModel():
 return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.active,_that.dirty,_that.delete);case _:
@@ -212,7 +212,7 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Map<String, String> titleI18n,  Map<String, String> descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Map<String, String>? titleI18n,  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutModel() when $default != null:
 return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.active,_that.dirty,_that.delete);case _:
@@ -227,22 +227,26 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 @JsonSerializable()
 
 class _WorkoutModel implements WorkoutModel {
-  const _WorkoutModel({required this.id, required final  Map<String, String> titleI18n, required final  Map<String, String> descriptionI18n, this.coachId, this.coachName, this.progress = 0.0, this.durationMinutes = 0, required this.goal, required this.lastUsed, final  List<TagDto> muscleTags = const [], this.exercises = 0, this.sessionsCount = 0, this.lastSessionDays = 0, required this.type, final  List<WorkoutExerciseModel> workoutExercises = const [], this.active = true, this.dirty = false, this.delete = false}): _titleI18n = titleI18n,_descriptionI18n = descriptionI18n,_muscleTags = muscleTags,_workoutExercises = workoutExercises;
+  const _WorkoutModel({required this.id, required final  Map<String, String>? titleI18n, required final  Map<String, String>? descriptionI18n, this.coachId, this.coachName, this.progress = 0.0, this.durationMinutes = 0, required this.goal, required this.lastUsed, final  List<TagDto> muscleTags = const [], this.exercises = 0, this.sessionsCount = 0, this.lastSessionDays = 0, required this.type, final  List<WorkoutExerciseModel> workoutExercises = const [], this.active = true, this.dirty = false, this.delete = false}): _titleI18n = titleI18n,_descriptionI18n = descriptionI18n,_muscleTags = muscleTags,_workoutExercises = workoutExercises;
   factory _WorkoutModel.fromJson(Map<String, dynamic> json) => _$WorkoutModelFromJson(json);
 
 @override final  String id;
- final  Map<String, String> _titleI18n;
-@override Map<String, String> get titleI18n {
+ final  Map<String, String>? _titleI18n;
+@override Map<String, String>? get titleI18n {
+  final value = _titleI18n;
+  if (value == null) return null;
   if (_titleI18n is EqualUnmodifiableMapView) return _titleI18n;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_titleI18n);
+  return EqualUnmodifiableMapView(value);
 }
 
- final  Map<String, String> _descriptionI18n;
-@override Map<String, String> get descriptionI18n {
+ final  Map<String, String>? _descriptionI18n;
+@override Map<String, String>? get descriptionI18n {
+  final value = _descriptionI18n;
+  if (value == null) return null;
   if (_descriptionI18n is EqualUnmodifiableMapView) return _descriptionI18n;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_descriptionI18n);
+  return EqualUnmodifiableMapView(value);
 }
 
 @override final  String? coachId;
@@ -307,7 +311,7 @@ abstract mixin class _$WorkoutModelCopyWith<$Res> implements $WorkoutModelCopyWi
   factory _$WorkoutModelCopyWith(_WorkoutModel value, $Res Function(_WorkoutModel) _then) = __$WorkoutModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, Map<String, String> titleI18n, Map<String, String> descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
+ String id, Map<String, String>? titleI18n, Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
 });
 
 
@@ -324,12 +328,12 @@ class __$WorkoutModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? titleI18n = null,Object? descriptionI18n = null,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? muscleTags = null,Object? exercises = null,Object? sessionsCount = null,Object? lastSessionDays = null,Object? type = null,Object? workoutExercises = null,Object? active = null,Object? dirty = null,Object? delete = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? titleI18n = freezed,Object? descriptionI18n = freezed,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? muscleTags = null,Object? exercises = null,Object? sessionsCount = null,Object? lastSessionDays = null,Object? type = null,Object? workoutExercises = null,Object? active = null,Object? dirty = null,Object? delete = null,}) {
   return _then(_WorkoutModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,titleI18n: null == titleI18n ? _self._titleI18n : titleI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,descriptionI18n: null == descriptionI18n ? _self._descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
-as Map<String, String>,coachId: freezed == coachId ? _self.coachId : coachId // ignore: cast_nullable_to_non_nullable
+as String,titleI18n: freezed == titleI18n ? _self._titleI18n : titleI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,descriptionI18n: freezed == descriptionI18n ? _self._descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,coachId: freezed == coachId ? _self.coachId : coachId // ignore: cast_nullable_to_non_nullable
 as String?,coachName: freezed == coachName ? _self.coachName : coachName // ignore: cast_nullable_to_non_nullable
 as String?,progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
 as double,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable

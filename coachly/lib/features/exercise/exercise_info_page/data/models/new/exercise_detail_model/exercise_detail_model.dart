@@ -18,9 +18,9 @@ part 'exercise_detail_model.g.dart';
 abstract class ExerciseDetailModel with _$ExerciseDetailModel {
   const factory ExerciseDetailModel({
     required String id,
-    required Map<String, String> nameI18n,
-    required Map<String, String> descriptionI18n,
-    required Map<String, String> tipsI18n,
+    required Map<String, String>? nameI18n,
+    required Map<String, String>? descriptionI18n,
+    required Map<String, String>? tipsI18n,
     required String difficultyLevel,
     required String mechanicsType,
     required String forceType,

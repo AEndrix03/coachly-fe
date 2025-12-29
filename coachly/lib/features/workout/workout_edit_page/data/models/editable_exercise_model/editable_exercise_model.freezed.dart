@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$EditableExerciseModel {
 
- String get id; String get exerciseId; int get number; String get name; String get muscle; String get difficulty; String get sets; String get rest; String get weight; String get progress; String get notes; String get accentColorHex; bool get hasVariants;
+ String get id; String get exerciseId; int get number; String get name; List<String> get muscles; String get difficulty; String get sets; String get rest; String get weight; String get progress; String get notes; String get accentColorHex; List<ExerciseVariantModel> get variants;
 /// Create a copy of EditableExerciseModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $EditableExerciseModelCopyWith<EditableExerciseModel> get copyWith => _$Editable
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EditableExerciseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.exerciseId, exerciseId) || other.exerciseId == exerciseId)&&(identical(other.number, number) || other.number == number)&&(identical(other.name, name) || other.name == name)&&(identical(other.muscle, muscle) || other.muscle == muscle)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.sets, sets) || other.sets == sets)&&(identical(other.rest, rest) || other.rest == rest)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.accentColorHex, accentColorHex) || other.accentColorHex == accentColorHex)&&(identical(other.hasVariants, hasVariants) || other.hasVariants == hasVariants));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EditableExerciseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.exerciseId, exerciseId) || other.exerciseId == exerciseId)&&(identical(other.number, number) || other.number == number)&&(identical(other.name, name) || other.name == name)&&const DeepCollectionEquality().equals(other.muscles, muscles)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.sets, sets) || other.sets == sets)&&(identical(other.rest, rest) || other.rest == rest)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.accentColorHex, accentColorHex) || other.accentColorHex == accentColorHex)&&const DeepCollectionEquality().equals(other.variants, variants));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,exerciseId,number,name,muscle,difficulty,sets,rest,weight,progress,notes,accentColorHex,hasVariants);
+int get hashCode => Object.hash(runtimeType,id,exerciseId,number,name,const DeepCollectionEquality().hash(muscles),difficulty,sets,rest,weight,progress,notes,accentColorHex,const DeepCollectionEquality().hash(variants));
 
 @override
 String toString() {
-  return 'EditableExerciseModel(id: $id, exerciseId: $exerciseId, number: $number, name: $name, muscle: $muscle, difficulty: $difficulty, sets: $sets, rest: $rest, weight: $weight, progress: $progress, notes: $notes, accentColorHex: $accentColorHex, hasVariants: $hasVariants)';
+  return 'EditableExerciseModel(id: $id, exerciseId: $exerciseId, number: $number, name: $name, muscles: $muscles, difficulty: $difficulty, sets: $sets, rest: $rest, weight: $weight, progress: $progress, notes: $notes, accentColorHex: $accentColorHex, variants: $variants)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $EditableExerciseModelCopyWith<$Res>  {
   factory $EditableExerciseModelCopyWith(EditableExerciseModel value, $Res Function(EditableExerciseModel) _then) = _$EditableExerciseModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String exerciseId, int number, String name, String muscle, String difficulty, String sets, String rest, String weight, String progress, String notes, String accentColorHex, bool hasVariants
+ String id, String exerciseId, int number, String name, List<String> muscles, String difficulty, String sets, String rest, String weight, String progress, String notes, String accentColorHex, List<ExerciseVariantModel> variants
 });
 
 
@@ -63,22 +63,22 @@ class _$EditableExerciseModelCopyWithImpl<$Res>
 
 /// Create a copy of EditableExerciseModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? exerciseId = null,Object? number = null,Object? name = null,Object? muscle = null,Object? difficulty = null,Object? sets = null,Object? rest = null,Object? weight = null,Object? progress = null,Object? notes = null,Object? accentColorHex = null,Object? hasVariants = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? exerciseId = null,Object? number = null,Object? name = null,Object? muscles = null,Object? difficulty = null,Object? sets = null,Object? rest = null,Object? weight = null,Object? progress = null,Object? notes = null,Object? accentColorHex = null,Object? variants = null,}) {
   return _then(EditableExerciseModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,exerciseId: null == exerciseId ? _self.exerciseId : exerciseId // ignore: cast_nullable_to_non_nullable
 as String,number: null == number ? _self.number : number // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,muscle: null == muscle ? _self.muscle : muscle // ignore: cast_nullable_to_non_nullable
-as String,difficulty: null == difficulty ? _self.difficulty : difficulty // ignore: cast_nullable_to_non_nullable
+as String,muscles: null == muscles ? _self.muscles : muscles // ignore: cast_nullable_to_non_nullable
+as List<String>,difficulty: null == difficulty ? _self.difficulty : difficulty // ignore: cast_nullable_to_non_nullable
 as String,sets: null == sets ? _self.sets : sets // ignore: cast_nullable_to_non_nullable
 as String,rest: null == rest ? _self.rest : rest // ignore: cast_nullable_to_non_nullable
 as String,weight: null == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable
 as String,progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
 as String,notes: null == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String,accentColorHex: null == accentColorHex ? _self.accentColorHex : accentColorHex // ignore: cast_nullable_to_non_nullable
-as String,hasVariants: null == hasVariants ? _self.hasVariants : hasVariants // ignore: cast_nullable_to_non_nullable
-as bool,
+as String,variants: null == variants ? _self.variants : variants // ignore: cast_nullable_to_non_nullable
+as List<ExerciseVariantModel>,
   ));
 }
 

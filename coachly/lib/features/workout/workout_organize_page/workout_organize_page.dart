@@ -166,7 +166,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             final confirmed = await _showConfirmationDialog(
               context,
               'Conferma Eliminazione',
-              'Sei sicuro di voler eliminare la scheda "${workout.titleI18n.fromI18n(locale)}"?',
+              'Sei sicuro di voler eliminare la scheda "${workout.titleI18n?.fromI18n(locale) ?? ''}"?',
             );
             if (confirmed) {
               ref.read(workoutListProvider.notifier).deleteWorkout(workout.id);
@@ -177,7 +177,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             final confirmed = await _showConfirmationDialog(
               context,
               'Conferma Modifica Stato',
-              'Sei sicuro di voler $action la scheda "${workout.titleI18n.fromI18n(locale)}"?',
+              'Sei sicuro di voler $action la scheda "${workout.titleI18n?.fromI18n(locale) ?? ''}"?',
             );
             if (confirmed) {
               if (isActive) {
@@ -192,7 +192,10 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             }
           },
           onEdit: () {
-            context.push('/workouts/workout/${workout.id}/edit', extra: workout);
+            context.push(
+              '/workouts/workout/${workout.id}/edit',
+              extra: workout,
+            );
           },
         );
       },

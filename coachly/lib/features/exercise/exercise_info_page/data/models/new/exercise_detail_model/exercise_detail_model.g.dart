@@ -10,9 +10,15 @@ _ExerciseDetailModel _$ExerciseDetailModelFromJson(
   Map<String, dynamic> json,
 ) => _ExerciseDetailModel(
   id: json['id'] as String,
-  nameI18n: Map<String, String>.from(json['nameI18n'] as Map),
-  descriptionI18n: Map<String, String>.from(json['descriptionI18n'] as Map),
-  tipsI18n: Map<String, String>.from(json['tipsI18n'] as Map),
+  nameI18n: (json['nameI18n'] as Map<String, dynamic>?)?.map(
+    (k, e) => MapEntry(k, e as String),
+  ),
+  descriptionI18n: (json['descriptionI18n'] as Map<String, dynamic>?)?.map(
+    (k, e) => MapEntry(k, e as String),
+  ),
+  tipsI18n: (json['tipsI18n'] as Map<String, dynamic>?)?.map(
+    (k, e) => MapEntry(k, e as String),
+  ),
   difficultyLevel: json['difficultyLevel'] as String,
   mechanicsType: json['mechanicsType'] as String,
   forceType: json['forceType'] as String,
