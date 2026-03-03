@@ -1,5 +1,6 @@
 import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart'; // Import for TagDto
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/shared/json_converters/map_converter.dart'; // Import MapConverter
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'workout_model.freezed.dart';
@@ -9,8 +10,8 @@ part 'workout_model.g.dart';
 abstract class WorkoutModel with _$WorkoutModel {
   const factory WorkoutModel({
     required String id,
-    required Map<String, String>? titleI18n,
-    required Map<String, String>? descriptionI18n,
+    @MapConverter() required Map<String, String>? titleI18n,
+    @MapConverter() required Map<String, String>? descriptionI18n,
     String? coachId,
     String? coachName,
     @Default(0.0) double progress,

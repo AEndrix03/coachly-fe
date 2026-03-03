@@ -9,12 +9,8 @@ part of 'workout_model.dart';
 _WorkoutModel _$WorkoutModelFromJson(Map<String, dynamic> json) =>
     _WorkoutModel(
       id: json['id'] as String,
-      titleI18n: (json['titleI18n'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, e as String),
-      ),
-      descriptionI18n: (json['descriptionI18n'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry(k, e as String),
-      ),
+      titleI18n: const MapConverter().fromJson(json['titleI18n']),
+      descriptionI18n: const MapConverter().fromJson(json['descriptionI18n']),
       coachId: json['coachId'] as String?,
       coachName: json['coachName'] as String?,
       progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
@@ -45,8 +41,8 @@ _WorkoutModel _$WorkoutModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$WorkoutModelToJson(_WorkoutModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'titleI18n': instance.titleI18n,
-      'descriptionI18n': instance.descriptionI18n,
+      'titleI18n': const MapConverter().toJson(instance.titleI18n),
+      'descriptionI18n': const MapConverter().toJson(instance.descriptionI18n),
       'coachId': instance.coachId,
       'coachName': instance.coachName,
       'progress': instance.progress,

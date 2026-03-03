@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExerciseMuscleModel {
 
- MuscleModel get muscle; String get involvementLevel; ContractionTypeModel get primaryContractionType; int get activationPercentage;
+ MuscleModel? get muscle; String? get involvementLevel; ContractionTypeModel? get primaryContractionType; int? get activationPercentage;
 /// Create a copy of ExerciseMuscleModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,11 +48,11 @@ abstract mixin class $ExerciseMuscleModelCopyWith<$Res>  {
   factory $ExerciseMuscleModelCopyWith(ExerciseMuscleModel value, $Res Function(ExerciseMuscleModel) _then) = _$ExerciseMuscleModelCopyWithImpl;
 @useResult
 $Res call({
- MuscleModel muscle, String involvementLevel, ContractionTypeModel primaryContractionType, int activationPercentage
+ MuscleModel? muscle, String? involvementLevel, ContractionTypeModel? primaryContractionType, int? activationPercentage
 });
 
 
-$MuscleModelCopyWith<$Res> get muscle;$ContractionTypeModelCopyWith<$Res> get primaryContractionType;
+$MuscleModelCopyWith<$Res>? get muscle;$ContractionTypeModelCopyWith<$Res>? get primaryContractionType;
 
 }
 /// @nodoc
@@ -65,31 +65,37 @@ class _$ExerciseMuscleModelCopyWithImpl<$Res>
 
 /// Create a copy of ExerciseMuscleModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? muscle = null,Object? involvementLevel = null,Object? primaryContractionType = null,Object? activationPercentage = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? muscle = freezed,Object? involvementLevel = freezed,Object? primaryContractionType = freezed,Object? activationPercentage = freezed,}) {
   return _then(_self.copyWith(
-muscle: null == muscle ? _self.muscle : muscle // ignore: cast_nullable_to_non_nullable
-as MuscleModel,involvementLevel: null == involvementLevel ? _self.involvementLevel : involvementLevel // ignore: cast_nullable_to_non_nullable
-as String,primaryContractionType: null == primaryContractionType ? _self.primaryContractionType : primaryContractionType // ignore: cast_nullable_to_non_nullable
-as ContractionTypeModel,activationPercentage: null == activationPercentage ? _self.activationPercentage : activationPercentage // ignore: cast_nullable_to_non_nullable
-as int,
+muscle: freezed == muscle ? _self.muscle : muscle // ignore: cast_nullable_to_non_nullable
+as MuscleModel?,involvementLevel: freezed == involvementLevel ? _self.involvementLevel : involvementLevel // ignore: cast_nullable_to_non_nullable
+as String?,primaryContractionType: freezed == primaryContractionType ? _self.primaryContractionType : primaryContractionType // ignore: cast_nullable_to_non_nullable
+as ContractionTypeModel?,activationPercentage: freezed == activationPercentage ? _self.activationPercentage : activationPercentage // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 /// Create a copy of ExerciseMuscleModel
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$MuscleModelCopyWith<$Res> get muscle {
-  
-  return $MuscleModelCopyWith<$Res>(_self.muscle, (value) {
+$MuscleModelCopyWith<$Res>? get muscle {
+    if (_self.muscle == null) {
+    return null;
+  }
+
+  return $MuscleModelCopyWith<$Res>(_self.muscle!, (value) {
     return _then(_self.copyWith(muscle: value));
   });
 }/// Create a copy of ExerciseMuscleModel
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$ContractionTypeModelCopyWith<$Res> get primaryContractionType {
-  
-  return $ContractionTypeModelCopyWith<$Res>(_self.primaryContractionType, (value) {
+$ContractionTypeModelCopyWith<$Res>? get primaryContractionType {
+    if (_self.primaryContractionType == null) {
+    return null;
+  }
+
+  return $ContractionTypeModelCopyWith<$Res>(_self.primaryContractionType!, (value) {
     return _then(_self.copyWith(primaryContractionType: value));
   });
 }
@@ -174,7 +180,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( MuscleModel muscle,  String involvementLevel,  ContractionTypeModel primaryContractionType,  int activationPercentage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( MuscleModel? muscle,  String? involvementLevel,  ContractionTypeModel? primaryContractionType,  int? activationPercentage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExerciseMuscleModel() when $default != null:
 return $default(_that.muscle,_that.involvementLevel,_that.primaryContractionType,_that.activationPercentage);case _:
@@ -195,7 +201,7 @@ return $default(_that.muscle,_that.involvementLevel,_that.primaryContractionType
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( MuscleModel muscle,  String involvementLevel,  ContractionTypeModel primaryContractionType,  int activationPercentage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( MuscleModel? muscle,  String? involvementLevel,  ContractionTypeModel? primaryContractionType,  int? activationPercentage)  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseMuscleModel():
 return $default(_that.muscle,_that.involvementLevel,_that.primaryContractionType,_that.activationPercentage);case _:
@@ -215,7 +221,7 @@ return $default(_that.muscle,_that.involvementLevel,_that.primaryContractionType
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( MuscleModel muscle,  String involvementLevel,  ContractionTypeModel primaryContractionType,  int activationPercentage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( MuscleModel? muscle,  String? involvementLevel,  ContractionTypeModel? primaryContractionType,  int? activationPercentage)?  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseMuscleModel() when $default != null:
 return $default(_that.muscle,_that.involvementLevel,_that.primaryContractionType,_that.activationPercentage);case _:
@@ -230,13 +236,13 @@ return $default(_that.muscle,_that.involvementLevel,_that.primaryContractionType
 @JsonSerializable()
 
 class _ExerciseMuscleModel implements ExerciseMuscleModel {
-  const _ExerciseMuscleModel({required this.muscle, required this.involvementLevel, required this.primaryContractionType, required this.activationPercentage});
+  const _ExerciseMuscleModel({this.muscle = null, this.involvementLevel = null, this.primaryContractionType = null, this.activationPercentage = null});
   factory _ExerciseMuscleModel.fromJson(Map<String, dynamic> json) => _$ExerciseMuscleModelFromJson(json);
 
-@override final  MuscleModel muscle;
-@override final  String involvementLevel;
-@override final  ContractionTypeModel primaryContractionType;
-@override final  int activationPercentage;
+@override@JsonKey() final  MuscleModel? muscle;
+@override@JsonKey() final  String? involvementLevel;
+@override@JsonKey() final  ContractionTypeModel? primaryContractionType;
+@override@JsonKey() final  int? activationPercentage;
 
 /// Create a copy of ExerciseMuscleModel
 /// with the given fields replaced by the non-null parameter values.
@@ -271,11 +277,11 @@ abstract mixin class _$ExerciseMuscleModelCopyWith<$Res> implements $ExerciseMus
   factory _$ExerciseMuscleModelCopyWith(_ExerciseMuscleModel value, $Res Function(_ExerciseMuscleModel) _then) = __$ExerciseMuscleModelCopyWithImpl;
 @override @useResult
 $Res call({
- MuscleModel muscle, String involvementLevel, ContractionTypeModel primaryContractionType, int activationPercentage
+ MuscleModel? muscle, String? involvementLevel, ContractionTypeModel? primaryContractionType, int? activationPercentage
 });
 
 
-@override $MuscleModelCopyWith<$Res> get muscle;@override $ContractionTypeModelCopyWith<$Res> get primaryContractionType;
+@override $MuscleModelCopyWith<$Res>? get muscle;@override $ContractionTypeModelCopyWith<$Res>? get primaryContractionType;
 
 }
 /// @nodoc
@@ -288,13 +294,13 @@ class __$ExerciseMuscleModelCopyWithImpl<$Res>
 
 /// Create a copy of ExerciseMuscleModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? muscle = null,Object? involvementLevel = null,Object? primaryContractionType = null,Object? activationPercentage = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? muscle = freezed,Object? involvementLevel = freezed,Object? primaryContractionType = freezed,Object? activationPercentage = freezed,}) {
   return _then(_ExerciseMuscleModel(
-muscle: null == muscle ? _self.muscle : muscle // ignore: cast_nullable_to_non_nullable
-as MuscleModel,involvementLevel: null == involvementLevel ? _self.involvementLevel : involvementLevel // ignore: cast_nullable_to_non_nullable
-as String,primaryContractionType: null == primaryContractionType ? _self.primaryContractionType : primaryContractionType // ignore: cast_nullable_to_non_nullable
-as ContractionTypeModel,activationPercentage: null == activationPercentage ? _self.activationPercentage : activationPercentage // ignore: cast_nullable_to_non_nullable
-as int,
+muscle: freezed == muscle ? _self.muscle : muscle // ignore: cast_nullable_to_non_nullable
+as MuscleModel?,involvementLevel: freezed == involvementLevel ? _self.involvementLevel : involvementLevel // ignore: cast_nullable_to_non_nullable
+as String?,primaryContractionType: freezed == primaryContractionType ? _self.primaryContractionType : primaryContractionType // ignore: cast_nullable_to_non_nullable
+as ContractionTypeModel?,activationPercentage: freezed == activationPercentage ? _self.activationPercentage : activationPercentage // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -302,18 +308,24 @@ as int,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$MuscleModelCopyWith<$Res> get muscle {
-  
-  return $MuscleModelCopyWith<$Res>(_self.muscle, (value) {
+$MuscleModelCopyWith<$Res>? get muscle {
+    if (_self.muscle == null) {
+    return null;
+  }
+
+  return $MuscleModelCopyWith<$Res>(_self.muscle!, (value) {
     return _then(_self.copyWith(muscle: value));
   });
 }/// Create a copy of ExerciseMuscleModel
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$ContractionTypeModelCopyWith<$Res> get primaryContractionType {
-  
-  return $ContractionTypeModelCopyWith<$Res>(_self.primaryContractionType, (value) {
+$ContractionTypeModelCopyWith<$Res>? get primaryContractionType {
+    if (_self.primaryContractionType == null) {
+    return null;
+  }
+
+  return $ContractionTypeModelCopyWith<$Res>(_self.primaryContractionType!, (value) {
     return _then(_self.copyWith(primaryContractionType: value));
   });
 }

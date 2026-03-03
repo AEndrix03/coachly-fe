@@ -6,13 +6,13 @@ part 'exercise_category_model.g.dart';
 @freezed
 abstract class ExerciseCategoryModel with _$ExerciseCategoryModel {
   const factory ExerciseCategoryModel({
-    required String id,
-    required String code,
-    required Map<String, String> nameI18n,
-    required Map<String, String> descriptionI18n,
-    required int categoryLevel,
-    bool? isPrimary,
-    @Default([]) List<ExerciseCategoryModel> children,
+    @Default(null) String? id,
+    @Default(null) String? code,
+    @MapConverter() @Default(null) Map<String, String>? nameI18n,
+    @MapConverter() @Default(null) Map<String, String>? descriptionI18n,
+    @Default(null) int? categoryLevel,
+    @Default(null) bool? isPrimary,
+    @Default(null) List<ExerciseCategoryModel>? children,
   }) = _ExerciseCategoryModel;
 
   factory ExerciseCategoryModel.fromJson(Map<String, dynamic> json) =>

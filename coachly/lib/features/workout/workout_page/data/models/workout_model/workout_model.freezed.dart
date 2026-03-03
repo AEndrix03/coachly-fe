@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutModel {
 
- String get id; Map<String, String>? get titleI18n; Map<String, String>? get descriptionI18n; String? get coachId; String? get coachName; double get progress; int get durationMinutes; String get goal; DateTime get lastUsed; List<TagDto> get muscleTags;// Changed to List<TagDto>
+ String get id;@MapConverter() Map<String, String>? get titleI18n;@MapConverter() Map<String, String>? get descriptionI18n; String? get coachId; String? get coachName; double get progress; int get durationMinutes; String get goal; DateTime get lastUsed; List<TagDto> get muscleTags;// Changed to List<TagDto>
  int get exercises; int get sessionsCount; int get lastSessionDays; String get type; List<WorkoutExerciseModel> get workoutExercises; bool get active; bool get dirty; bool get delete;
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
@@ -49,7 +49,7 @@ abstract mixin class $WorkoutModelCopyWith<$Res>  {
   factory $WorkoutModelCopyWith(WorkoutModel value, $Res Function(WorkoutModel) _then) = _$WorkoutModelCopyWithImpl;
 @useResult
 $Res call({
- String id, Map<String, String>? titleI18n, Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
+ String id,@MapConverter() Map<String, String>? titleI18n,@MapConverter() Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
 });
 
 
@@ -171,7 +171,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  Map<String, String>? titleI18n,  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @MapConverter()  Map<String, String>? titleI18n, @MapConverter()  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WorkoutModel() when $default != null:
 return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.active,_that.dirty,_that.delete);case _:
@@ -192,7 +192,7 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  Map<String, String>? titleI18n,  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @MapConverter()  Map<String, String>? titleI18n, @MapConverter()  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutModel():
 return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.active,_that.dirty,_that.delete);case _:
@@ -212,7 +212,7 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  Map<String, String>? titleI18n,  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @MapConverter()  Map<String, String>? titleI18n, @MapConverter()  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutModel() when $default != null:
 return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.active,_that.dirty,_that.delete);case _:
@@ -227,12 +227,12 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 @JsonSerializable()
 
 class _WorkoutModel implements WorkoutModel {
-  const _WorkoutModel({required this.id, required final  Map<String, String>? titleI18n, required final  Map<String, String>? descriptionI18n, this.coachId, this.coachName, this.progress = 0.0, this.durationMinutes = 0, required this.goal, required this.lastUsed, final  List<TagDto> muscleTags = const [], this.exercises = 0, this.sessionsCount = 0, this.lastSessionDays = 0, required this.type, final  List<WorkoutExerciseModel> workoutExercises = const [], this.active = true, this.dirty = false, this.delete = false}): _titleI18n = titleI18n,_descriptionI18n = descriptionI18n,_muscleTags = muscleTags,_workoutExercises = workoutExercises;
+  const _WorkoutModel({required this.id, @MapConverter() required final  Map<String, String>? titleI18n, @MapConverter() required final  Map<String, String>? descriptionI18n, this.coachId, this.coachName, this.progress = 0.0, this.durationMinutes = 0, required this.goal, required this.lastUsed, final  List<TagDto> muscleTags = const [], this.exercises = 0, this.sessionsCount = 0, this.lastSessionDays = 0, required this.type, final  List<WorkoutExerciseModel> workoutExercises = const [], this.active = true, this.dirty = false, this.delete = false}): _titleI18n = titleI18n,_descriptionI18n = descriptionI18n,_muscleTags = muscleTags,_workoutExercises = workoutExercises;
   factory _WorkoutModel.fromJson(Map<String, dynamic> json) => _$WorkoutModelFromJson(json);
 
 @override final  String id;
  final  Map<String, String>? _titleI18n;
-@override Map<String, String>? get titleI18n {
+@override@MapConverter() Map<String, String>? get titleI18n {
   final value = _titleI18n;
   if (value == null) return null;
   if (_titleI18n is EqualUnmodifiableMapView) return _titleI18n;
@@ -241,7 +241,7 @@ class _WorkoutModel implements WorkoutModel {
 }
 
  final  Map<String, String>? _descriptionI18n;
-@override Map<String, String>? get descriptionI18n {
+@override@MapConverter() Map<String, String>? get descriptionI18n {
   final value = _descriptionI18n;
   if (value == null) return null;
   if (_descriptionI18n is EqualUnmodifiableMapView) return _descriptionI18n;
@@ -311,7 +311,7 @@ abstract mixin class _$WorkoutModelCopyWith<$Res> implements $WorkoutModelCopyWi
   factory _$WorkoutModelCopyWith(_WorkoutModel value, $Res Function(_WorkoutModel) _then) = __$WorkoutModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, Map<String, String>? titleI18n, Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
+ String id,@MapConverter() Map<String, String>? titleI18n,@MapConverter() Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
 });
 
 

@@ -8,10 +8,10 @@ part 'exercise_muscle_model.g.dart';
 @freezed
 abstract class ExerciseMuscleModel with _$ExerciseMuscleModel {
   const factory ExerciseMuscleModel({
-    required MuscleModel muscle,
-    required String involvementLevel,
-    required ContractionTypeModel primaryContractionType,
-    required int activationPercentage,
+    @Default(null) MuscleModel? muscle,
+    @Default(null) String? involvementLevel,
+    @Default(null) ContractionTypeModel? primaryContractionType,
+    @Default(null) int? activationPercentage,
   }) = _ExerciseMuscleModel;
 
   factory ExerciseMuscleModel.fromJson(Map<String, dynamic> json) =>

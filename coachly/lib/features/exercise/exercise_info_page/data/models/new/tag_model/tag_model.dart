@@ -6,11 +6,11 @@ part 'tag_model.g.dart';
 @freezed
 abstract class TagModel with _$TagModel {
   const factory TagModel({
-    required String id,
-    required String code,
-    required Map<String, String> nameI18n,
-    required Map<String, String> descriptionI18n,
-    required String tagType,
+    @Default(null) String? id,
+    @Default(null) String? code,
+    @MapConverter() @Default(null) Map<String, String>? nameI18n,
+    @MapConverter() @Default(null) Map<String, String>? descriptionI18n,
+    @Default(null) String? tagType,
   }) = _TagModel;
 
   factory TagModel.fromJson(Map<String, dynamic> json) =>

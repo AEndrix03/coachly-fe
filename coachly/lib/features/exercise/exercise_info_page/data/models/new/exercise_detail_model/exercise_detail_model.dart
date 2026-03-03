@@ -9,6 +9,7 @@ import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exe
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_safety_contraindication_model/exercise_safety_contraindication_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_safety_model/exercise_safety_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/tag_model/tag_model.dart';
+import 'package:coachly/shared/json_converters/map_converter.dart'; // Import MapConverter
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'exercise_detail_model.freezed.dart';
@@ -17,27 +18,26 @@ part 'exercise_detail_model.g.dart';
 @freezed
 abstract class ExerciseDetailModel with _$ExerciseDetailModel {
   const factory ExerciseDetailModel({
-    required String id,
-    required Map<String, String>? nameI18n,
-    required Map<String, String>? descriptionI18n,
-    required Map<String, String>? tipsI18n,
-    required String difficultyLevel,
-    required String mechanicsType,
-    required String forceType,
-    required bool isUnilateral,
-    required bool isBodyweight,
-    ExerciseEnvironmentModel? environment,
-    @Default([]) List<ExerciseInstructionModel> instructions,
-    ExerciseMovementPatternModel? movementPattern,
-    @Default([]) List<ExerciseVariantModel> variants,
-    @Default([]) List<ExerciseMediaModel> media,
-    @Default([]) List<ExerciseCategoryModel> categories,
-    @Default([]) List<ExerciseSafetyModel> safety,
-    @Default([])
-    List<ExerciseSafetyContraindicationModel> safetyContraindications,
-    @Default([]) List<ExerciseMuscleModel> muscles,
-    @Default([]) List<ExerciseEquipmentModel> equipments,
-    @Default([]) List<TagModel> tags,
+    @Default(null) String? id,
+    @MapConverter() @Default(null) Map<String, String>? nameI18n,
+    @MapConverter() @Default(null) Map<String, String>? descriptionI18n,
+    @MapConverter() @Default(null) Map<String, String>? tipsI18n,
+    @Default(null) String? difficultyLevel,
+    @Default(null) String? mechanicsType,
+    @Default(null) String? forceType,
+    @Default(null) bool? isUnilateral,
+    @Default(null) bool? isBodyweight,
+    @Default(null) ExerciseEnvironmentModel? environment,
+    @Default(null) List<ExerciseInstructionModel>? instructions,
+    @Default(null) ExerciseMovementPatternModel? movementPattern,
+    @Default(null) List<ExerciseVariantModel>? variants,
+    @Default(null) List<ExerciseMediaModel>? media,
+    @Default(null) List<ExerciseCategoryModel>? categories,
+    @Default(null) List<ExerciseSafetyModel>? safety,
+    @Default(null) List<ExerciseSafetyContraindicationModel>? safetyContraindications,
+    @Default(null) List<ExerciseMuscleModel>? muscles,
+    @Default(null) List<ExerciseEquipmentModel>? equipments,
+    @Default(null) List<TagModel>? tags,
   }) = _ExerciseDetailModel;
 
   factory ExerciseDetailModel.fromJson(Map<String, dynamic> json) =>
