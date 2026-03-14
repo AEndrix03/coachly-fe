@@ -1,4 +1,6 @@
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
@@ -225,18 +227,10 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
 
     try {
       final repository = ref.read(workoutPageRepositoryProvider);
-      final workoutData = {
-        'title': state.title,
-        'description': state.description,
-        'durationMinutes': int.tryParse(state.duration) ?? 60,
-        'type': state.type,
-        'exercises': state.exercises.map((e) => e.toJson()).toList(),
-      };
+      final locale = ref.read(languageProvider);
+      final command = WorkoutWriteCommandMapper.fromEditState(state, locale);
 
-      final response = await repository.patchWorkout(
-        state.workoutId,
-        workoutData,
-      );
+      final response = await repository.patchWorkout(state.workoutId, command);
 
       if (response.success) {
         state = state.copyWith(isLoading: false, isDirty: false);

@@ -1,0 +1,245 @@
+import 'package:coachly/core/error/failures.dart';
+import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:coachly/features/workout/workout_edit_page/providers/workout_edit_provider/workout_edit_provider.dart';
+import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:flutter/material.dart';
+
+class WorkoutWriteCommandMapper {
+  static final RegExp _uuidPattern = RegExp(
+    r'^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[1-5][0-9a-fA-F]{3}\-[89abAB][0-9a-fA-F]{3}\-[0-9a-fA-F]{12}$',
+  );
+
+  static WorkoutWriteCommand fromEditState(
+    WorkoutEditState state,
+    Locale locale,
+  ) {
+    final workoutId = state.workoutId == 'new' ? null : state.workoutId;
+    final localeKey = locale.languageCode;
+    final name = state.title.trim();
+    final description = _nullIfBlank(state.description);
+
+    _validateName(name);
+
+    return WorkoutWriteCommand(
+      id: workoutId,
+      name: name,
+      translations: {
+        localeKey: WorkoutTranslationWritePayload(
+          name: name,
+          description: description,
+        ),
+      },
+      status: 'active',
+      blocks: [
+        WorkoutBlockWritePayload(
+          id: '${workoutId ?? 'new'}-block-0',
+          position: 0,
+          label: _nullIfBlank(state.type),
+          restSeconds: null,
+          notes: null,
+          entries: state.exercises.asMap().entries.map((entry) {
+            return _entryFromEditableExercise(
+              exercise: entry.value,
+              position: entry.key,
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  static WorkoutWriteCommand fromWorkoutModel(WorkoutModel workout) {
+    final translationKeys = {
+      ...?workout.titleI18n?.keys,
+      ...?workout.descriptionI18n?.keys,
+    };
+
+    final translations = <String, WorkoutTranslationWritePayload>{};
+    for (final key in translationKeys) {
+      final translatedName = workout.titleI18n?[key]?.trim();
+      if (translatedName == null || translatedName.isEmpty) {
+        continue;
+      }
+
+      translations[key] = WorkoutTranslationWritePayload(
+        name: translatedName,
+        description: _nullIfBlank(workout.descriptionI18n?[key]),
+      );
+    }
+
+    final fallbackName =
+        translations['it']?.name ??
+        translations['en']?.name ??
+        translations.values.firstOrNull?.name ??
+        workout.id;
+
+    return WorkoutWriteCommand(
+      id: workout.id,
+      name: fallbackName,
+      translations: translations,
+      status: workout.delete
+          ? 'deleted'
+          : workout.active
+          ? 'active'
+          : 'inactive',
+      blocks: [
+        WorkoutBlockWritePayload(
+          id: '${workout.id}-block-0',
+          position: 0,
+          label: _nullIfBlank(workout.type),
+          restSeconds: null,
+          notes: null,
+          entries: workout.workoutExercises.asMap().entries.map((entry) {
+            return _entryFromWorkoutExercise(
+              exercise: entry.value,
+              position: entry.key,
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  static WorkoutEntryWritePayload _entryFromEditableExercise({
+    required EditableExerciseModel exercise,
+    required int position,
+  }) {
+    _validateExerciseId(exercise.exerciseId);
+
+    final setCount = _parseSetCount(exercise.sets);
+    final reps = _parseReps(exercise.sets);
+    final load = _parseLoad(exercise.weight);
+    final restSeconds = _parseSeconds(exercise.rest);
+    final notes = _nullIfBlank(exercise.notes);
+
+    return WorkoutEntryWritePayload(
+      id: exercise.id,
+      exerciseId: exercise.exerciseId,
+      position: position,
+      sets: List.generate(setCount, (index) {
+        return WorkoutSetWritePayload(
+          id: '${exercise.id}-set-$index',
+          position: index,
+          setType: 'standard',
+          reps: reps,
+          load: load,
+          loadUnit: load != null ? 'kg' : null,
+          restSeconds: restSeconds,
+          notes: notes,
+        );
+      }),
+    );
+  }
+
+  static WorkoutEntryWritePayload _entryFromWorkoutExercise({
+    required WorkoutExerciseModel exercise,
+    required int position,
+  }) {
+    final exerciseId = exercise.exercise.id;
+    if (exerciseId == null) {
+      throw const ValidationFailure({
+        'exerciseId':
+            'Each synced workout entry must reference an exercise id.',
+      });
+    }
+
+    _validateExerciseId(exerciseId);
+
+    final setCount = _parseSetCount(exercise.sets);
+    final reps = _parseReps(exercise.sets);
+    final load = _parseLoad(exercise.weight);
+    final restSeconds = _parseSeconds(exercise.rest);
+
+    return WorkoutEntryWritePayload(
+      id: exercise.id,
+      exerciseId: exerciseId,
+      position: position,
+      sets: List.generate(setCount, (index) {
+        return WorkoutSetWritePayload(
+          id: '${exercise.id}-set-$index',
+          position: index,
+          setType: 'standard',
+          reps: reps,
+          load: load,
+          loadUnit: load != null ? 'kg' : null,
+          restSeconds: restSeconds,
+          notes: null,
+        );
+      }),
+    );
+  }
+
+  static void _validateName(String name) {
+    if (name.isEmpty) {
+      throw const ValidationFailure({'name': 'Workout name cannot be empty.'});
+    }
+  }
+
+  static void _validateExerciseId(String exerciseId) {
+    if (!_uuidPattern.hasMatch(exerciseId)) {
+      throw ValidationFailure({
+        'exerciseId': 'Exercise id "$exerciseId" is not a valid catalog UUID.',
+      });
+    }
+  }
+
+  static int _parseSetCount(String rawSets) {
+    final values = RegExp(r'\d+')
+        .allMatches(rawSets)
+        .map((match) => int.tryParse(match.group(0)!))
+        .whereType<int>()
+        .toList();
+    final setCount = values.isEmpty ? null : values.first;
+
+    if (setCount == null || setCount <= 0) {
+      throw ValidationFailure({
+        'sets': 'Sets value "$rawSets" cannot be converted to structured sets.',
+      });
+    }
+
+    return setCount;
+  }
+
+  static int? _parseReps(String rawSets) {
+    final values = RegExp(r'\d+')
+        .allMatches(rawSets)
+        .map((match) => int.tryParse(match.group(0)!))
+        .whereType<int>()
+        .toList();
+    if (values.length < 2) {
+      return null;
+    }
+    return values[1];
+  }
+
+  static int? _parseSeconds(String rawValue) {
+    final match = RegExp(r'(\d+)').firstMatch(rawValue);
+    return match == null ? null : int.tryParse(match.group(1)!);
+  }
+
+  static num? _parseLoad(String rawWeight) {
+    final match = RegExp(r'(\d+(?:[.,]\d+)?)').firstMatch(rawWeight);
+    if (match == null) {
+      return null;
+    }
+
+    final normalized = match.group(1)!.replaceAll(',', '.');
+    final doubleValue = double.tryParse(normalized);
+    if (doubleValue == null) {
+      return null;
+    }
+
+    return doubleValue % 1 == 0 ? doubleValue.toInt() : doubleValue;
+  }
+
+  static String? _nullIfBlank(String? value) {
+    if (value == null) {
+      return null;
+    }
+
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+}
