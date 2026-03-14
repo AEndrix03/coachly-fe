@@ -26,6 +26,7 @@ class AuthHttpClient extends http.BaseClient {
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     final isAuthRequest = _isAuthRequest(request.url);
     final authService = _ref.read(authServiceProvider);
+    final retryRequest = isAuthRequest ? null : _copyRequest(request);
 
     String? accessToken = await authService.getAccessToken();
 
@@ -48,10 +49,14 @@ class AuthHttpClient extends http.BaseClient {
       final didRefreshToken = await _refreshToken();
       if (didRefreshToken) {
         final refreshedAccessToken = await authService.getAccessToken();
-        if (refreshedAccessToken != null) {
-          request.headers['Authorization'] = 'Bearer $refreshedAccessToken';
+        final replayRequest = retryRequest;
+        if (refreshedAccessToken != null && replayRequest != null) {
+          replayRequest.headers['Authorization'] =
+              'Bearer $refreshedAccessToken';
         }
-        return _inner.send(request);
+        if (replayRequest != null) {
+          return _inner.send(replayRequest);
+        }
       }
 
       await authService.clearTokens();
@@ -63,6 +68,31 @@ class AuthHttpClient extends http.BaseClient {
 
   bool _isAuthRequest(Uri uri) {
     return uri.toString().startsWith(ApiEndpoints.keycloakTokenEndpoint);
+  }
+
+  http.BaseRequest _copyRequest(http.BaseRequest request) {
+    if (request is http.Request) {
+      final copy = http.Request(request.method, request.url)
+        ..followRedirects = request.followRedirects
+        ..maxRedirects = request.maxRedirects
+        ..persistentConnection = request.persistentConnection
+        ..headers.addAll(request.headers)
+        ..bodyBytes = request.bodyBytes;
+      return copy;
+    }
+
+    if (request is http.MultipartRequest) {
+      final copy = http.MultipartRequest(request.method, request.url)
+        ..followRedirects = request.followRedirects
+        ..maxRedirects = request.maxRedirects
+        ..persistentConnection = request.persistentConnection
+        ..headers.addAll(request.headers)
+        ..fields.addAll(request.fields)
+        ..files.addAll(request.files);
+      return copy;
+    }
+
+    throw StateError('Cannot retry requests of type ${request.runtimeType}.');
   }
 
   Future<bool> _refreshToken() async {
