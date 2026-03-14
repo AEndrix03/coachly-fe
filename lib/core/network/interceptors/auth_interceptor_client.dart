@@ -1,6 +1,6 @@
-import 'dart:async';
-
-import 'package:coachly/features/auth/providers/auth_provider.dart'; // Import authServiceProvider
+import 'package:coachly/core/network/api_endpoints.dart';
+import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
+import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -13,61 +13,65 @@ http.Client httpClient(Ref ref) {
 
 @riverpod
 AuthHttpClient authHttpClient(Ref ref) {
-  // Pass Ref directly to AuthHttpClient to resolve AuthService lazily
   return AuthHttpClient(ref.watch(httpClientProvider), ref);
 }
 
 class AuthHttpClient extends http.BaseClient {
   final http.Client _inner;
-  final Ref _ref; // Inject Ref instead of AuthService
+  final Ref _ref;
 
   AuthHttpClient(this._inner, this._ref);
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    // Exclude auth endpoints from having the Authorization header automatically added
-    final isAuthRequest = request.url.path.contains('/authentication');
-    final authService = _ref.read(
-      authServiceProvider,
-    ); // Lazily get AuthService
+    final isAuthRequest = _isAuthRequest(request.url);
+    final authService = _ref.read(authServiceProvider);
 
     String? accessToken = await authService.getAccessToken();
 
-    if (accessToken != null && !isAuthRequest) {
-      request.headers['Authorization'] = 'Bearer $accessToken';
+    if (!isAuthRequest && accessToken != null) {
+      if (JwtValidator.isRefreshNeeded(accessToken)) {
+        final didRefreshToken = await _refreshToken();
+        if (didRefreshToken) {
+          accessToken = await authService.getAccessToken();
+        }
+      }
+
+      if (accessToken != null) {
+        request.headers['Authorization'] = 'Bearer $accessToken';
+      }
     }
 
     final response = await _inner.send(request);
 
     if (response.statusCode == 401 && !isAuthRequest) {
-      // Token is likely expired, try to refresh it
       final didRefreshToken = await _refreshToken();
       if (didRefreshToken) {
-        // Retry the original request with the new token
-        accessToken = await authService.getAccessToken(); // Get the new token
-        if (accessToken != null) {
-          request.headers['Authorization'] = 'Bearer $accessToken';
+        final refreshedAccessToken = await authService.getAccessToken();
+        if (refreshedAccessToken != null) {
+          request.headers['Authorization'] = 'Bearer $refreshedAccessToken';
         }
-        return await _inner.send(request);
-      } else {
-        // Refresh failed, logout the user
-        await authService.clearTokens();
-        // It might be good to force a navigation to /login here, but that's a side effect.
-        // The router's redirect logic should handle the navigation.
+        return _inner.send(request);
       }
+
+      await authService.clearTokens();
+      _ref.invalidate(authProvider);
     }
 
     return response;
   }
 
+  bool _isAuthRequest(Uri uri) {
+    return uri.toString().startsWith(ApiEndpoints.keycloakTokenEndpoint);
+  }
+
   Future<bool> _refreshToken() async {
-    final authService = _ref.read(
-      authServiceProvider,
-    ); // Lazily get AuthService
+    final authService = _ref.read(authServiceProvider);
     final refreshToken = await authService.getRefreshToken();
 
     if (refreshToken == null) {
-      await authService.clearTokens(); // Clear tokens if no refresh token
+      await authService.clearTokens();
+      _ref.invalidate(authProvider);
       return false;
     }
 
@@ -78,9 +82,9 @@ class AuthHttpClient extends http.BaseClient {
         loginResponse.refreshToken,
       );
       return true;
-    } catch (e) {
-      // Refresh failed due to network error or invalid refresh token
+    } catch (_) {
       await authService.clearTokens();
+      _ref.invalidate(authProvider);
       return false;
     }
   }

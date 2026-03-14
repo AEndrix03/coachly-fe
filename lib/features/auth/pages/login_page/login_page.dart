@@ -1,14 +1,24 @@
+import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends ConsumerState<LoginPage> {
+  @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final authState = ref.watch(authProvider);
+    final authValue = authState.valueOrNull;
+    final isLoading = authState.isLoading || authValue?.isLoading == true;
+    final errorMessage = authValue?.errorMessage;
 
     return Scaffold(
       body: Stack(
@@ -27,9 +37,7 @@ class LoginPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.18,
-                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.18),
                     Image.asset(
                       'assets/logos/app_logo_no_bg_dark.png',
                       height: 80,
@@ -59,7 +67,7 @@ class LoginPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Autenticazione temporaneamente disabilitata',
+                            'Accedi con Keycloak',
                             style: textTheme.titleLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -68,20 +76,62 @@ class LoginPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Il login applicativo e la gestione dei token sono stati scollegati durante il refactor del backend. Puoi entrare direttamente nell’app.',
+                            'Il login avviene nel browser di sistema con Authorization Code Flow e PKCE. L app non gestisce direttamente username e password.',
                             style: textTheme.bodyMedium?.copyWith(
                               color: Colors.white70,
                               height: 1.5,
                             ),
                             textAlign: TextAlign.center,
                           ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.white12),
+                            ),
+                            child: Text(
+                              'Se il client Keycloak e le redirect URI sono configurati correttamente, dopo il login torni automaticamente nell app.',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: Colors.white70,
+                                height: 1.45,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          if (errorMessage != null) ...[
+                            const SizedBox(height: 16),
+                            Text(
+                              errorMessage,
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: const Color(0xFFFFB4B4),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                           const SizedBox(height: 24),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
-                            onPressed: () => context.go('/workouts'),
-                            child: const Text('Entra nell\'app'),
+                            onPressed: isLoading
+                                ? null
+                                : () async {
+                                    await ref
+                                        .read(authProvider.notifier)
+                                        .login();
+                                  },
+                            child: isLoading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text('Continua con Keycloak'),
                           ),
                         ],
                       ),

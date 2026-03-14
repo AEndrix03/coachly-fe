@@ -3,38 +3,37 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class TokenManager {
   static const String _accessTokenKey = 'accessToken';
   static const String _refreshTokenKey = 'refreshToken';
+  static const String _idTokenKey = 'idToken';
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
-  Future<void> saveTokens(String accessToken, String refreshToken) async {
-    print(
-      'TokenManager: Saving tokens - Access: ${accessToken.substring(0, 5)}..., Refresh: ${refreshToken.substring(0, 5)}...',
-    );
+  Future<void> saveTokens(
+    String accessToken,
+    String refreshToken, {
+    String? idToken,
+  }) async {
     await _storage.write(key: _accessTokenKey, value: accessToken);
     await _storage.write(key: _refreshTokenKey, value: refreshToken);
-    print('TokenManager: Tokens saved.');
+    if (idToken != null) {
+      await _storage.write(key: _idTokenKey, value: idToken);
+    }
   }
 
   Future<String?> getAccessToken() async {
-    final token = await _storage.read(key: _accessTokenKey);
-    print(
-      'TokenManager: Retrieved AccessToken: ${token != null ? token.substring(0, 5) + '...' : 'null'}',
-    );
-    return token;
+    return _storage.read(key: _accessTokenKey);
   }
 
   Future<String?> getRefreshToken() async {
-    final token = await _storage.read(key: _refreshTokenKey);
-    print(
-      'TokenManager: Retrieved RefreshToken: ${token != null ? token.substring(0, 5) + '...' : 'null'}',
-    );
-    return token;
+    return _storage.read(key: _refreshTokenKey);
+  }
+
+  Future<String?> getIdToken() async {
+    return _storage.read(key: _idTokenKey);
   }
 
   Future<void> clearTokens() async {
-    print('TokenManager: Clearing tokens...');
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
-    print('TokenManager: Tokens cleared.');
+    await _storage.delete(key: _idTokenKey);
   }
 }

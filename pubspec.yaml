@@ -22,6 +22,7 @@ dependencies:
 
   # ==================== HTTP & NETWORK ====================
   http: ^1.6.0
+  flutter_appauth: ^12.0.0
 
   # ==================== UTILITIES BASE ====================
   cupertino_icons: ^1.0.8

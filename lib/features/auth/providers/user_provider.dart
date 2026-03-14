@@ -23,7 +23,27 @@ UserModel? user(Ref ref) {
   if (payload == null) return null;
 
   try {
-    return UserModel.fromJson(payload);
+    final firstName =
+        (payload['given_name'] ??
+                payload['firstName'] ??
+                payload['preferred_username'] ??
+                '')
+            .toString();
+    final lastName = (payload['family_name'] ?? payload['lastName'] ?? '')
+        .toString();
+    final exp = payload['exp'];
+    final sub = (payload['sub'] ?? '').toString();
+
+    if (firstName.isEmpty || sub.isEmpty || exp is! int) {
+      return null;
+    }
+
+    return UserModel(
+      sub: sub,
+      firstName: firstName,
+      lastName: lastName,
+      exp: exp,
+    );
   } catch (e) {
     return null;
   }

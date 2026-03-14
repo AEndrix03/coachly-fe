@@ -1,3 +1,4 @@
+import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/auth/pages/loading_page/loading_page.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
@@ -21,9 +22,33 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 @riverpod
 GoRouter router(Ref ref) {
+  final authState = ref.watch(authProvider);
+
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/workouts',
+    initialLocation: '/loading',
+    redirect: (context, state) {
+      final isLoading = authState.isLoading;
+      final isAuthenticated =
+          authState.valueOrNull?.isAuthenticated == true &&
+          authState.valueOrNull?.isTokenValid == true;
+      final isOnLogin = state.matchedLocation == '/login';
+      final isOnLoading = state.matchedLocation == '/loading';
+
+      if (isLoading) {
+        return isOnLoading ? null : '/loading';
+      }
+
+      if (!isAuthenticated) {
+        return isOnLogin ? null : '/login';
+      }
+
+      if (isOnLogin || isOnLoading) {
+        return '/workouts';
+      }
+
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/loading',
@@ -60,9 +85,7 @@ GoRouter router(Ref ref) {
                       final workout = state.extra as WorkoutModel;
                       return _fadeTransition(
                         state,
-                        WorkoutDetailPage(
-                          workout: workout,
-                        ),
+                        WorkoutDetailPage(workout: workout),
                       );
                     },
                     routes: [

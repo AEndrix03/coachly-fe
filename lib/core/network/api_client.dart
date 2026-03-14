@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:coachly/core/network/api_endpoints.dart';
 import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,11 +14,8 @@ part 'api_client.g.dart';
 // Provider per ApiClient
 @riverpod
 ApiClient apiClient(Ref ref) {
-  final httpClient = ref.watch(httpClientProvider);
-  return ApiClient(
-    client: httpClient,
-    baseUrl: 'https://dev.aredegalli.it:8800/api',
-  );
+  final httpClient = ref.watch(authHttpClientProvider);
+  return ApiClient(client: httpClient, baseUrl: ApiEndpoints.apiBaseUrl);
 }
 
 /// HTTP Client centralizzato

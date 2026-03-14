@@ -1,90 +1,106 @@
-import 'dart:convert';
-
 import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/network/api_endpoints.dart';
-import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
-import 'package:coachly/features/auth/data/dto/login_request_dto/login_request_dto.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_appauth/flutter_appauth.dart';
 
 class AuthServiceImpl implements AuthService {
-  final ValueGetter<AuthHttpClient> _getHttpClient;
-  final TokenManager _tokenManager; // Add TokenManager dependency
+  final TokenManager _tokenManager;
+  final FlutterAppAuth _appAuth;
 
-  AuthServiceImpl(this._getHttpClient, this._tokenManager);
+  AuthServiceImpl(this._tokenManager) : _appAuth = const FlutterAppAuth();
 
   @override
-  Future<LoginResponseDto> login(LoginRequestDto loginRequest) async {
-    final client = _getHttpClient();
-    late final http.Response response;
-
+  Future<LoginResponseDto> login() async {
     try {
-      response = await client.post(
-        Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.loginEndpoint}'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(loginRequest.toJson()),
+      final response = await _appAuth.authorizeAndExchangeCode(
+        AuthorizationTokenRequest(
+          ApiEndpoints.keycloakClientId,
+          ApiEndpoints.keycloakRedirectUri,
+          issuer: ApiEndpoints.keycloakIssuer,
+          discoveryUrl: ApiEndpoints.keycloakDiscoveryUrl,
+          scopes: ApiEndpoints.openIdScopes,
+        ),
       );
-    } catch (e) {
-      // If the error is already a Failure, rethrow it. Otherwise, wrap it.
-      if (e is Failure) {
-        rethrow;
-      }
-      throw NetworkFailure(
-        'Errore di connessione. Controlla la tua connessione internet.',
-      );
-    }
 
-    if (response.statusCode == 200) {
-      final loginResponse = LoginResponseDto.fromJson(
-        jsonDecode(response.body),
+      if (response == null ||
+          response.accessToken == null ||
+          response.refreshToken == null) {
+        throw const ServerFailure(
+          'Keycloak ha completato il login ma non ha restituito i token attesi.',
+        );
+      }
+
+      final loginResponse = LoginResponseDto.fromTokens(
+        accessToken: response.accessToken!,
+        refreshToken: response.refreshToken!,
       );
+
       await saveTokens(
         loginResponse.accessToken,
         loginResponse.refreshToken,
-      ); // Save tokens after successful login
-      return loginResponse;
-    } else if (response.statusCode == 401 || response.statusCode == 403) {
-      throw const InvalidCredentialsFailure();
-    } else {
-      throw ServerFailure(
-        'Errore del server. Riprova più tardi.',
-        response.statusCode,
+        idToken: response.idToken,
       );
+      return loginResponse;
+    } catch (e) {
+      if (e is Failure) {
+        rethrow;
+      }
+      throw ServerFailure('Errore durante il login con Keycloak: $e');
     }
   }
 
   @override
   Future<LoginResponseDto> refreshToken(String refreshToken) async {
-    final client = _getHttpClient();
-    final response = await client.post(
-      Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.refreshEndpoint}'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'refreshToken': refreshToken}),
-    );
-
-    if (response.statusCode == 200) {
-      final loginResponse = LoginResponseDto.fromJson(
-        jsonDecode(response.body),
+    try {
+      final response = await _appAuth.token(
+        TokenRequest(
+          ApiEndpoints.keycloakClientId,
+          ApiEndpoints.keycloakRedirectUri,
+          issuer: ApiEndpoints.keycloakIssuer,
+          discoveryUrl: ApiEndpoints.keycloakDiscoveryUrl,
+          scopes: ApiEndpoints.openIdScopes,
+          refreshToken: refreshToken,
+        ),
       );
+
+      if (response == null ||
+          response.accessToken == null ||
+          response.refreshToken == null) {
+        throw const ServerFailure(
+          'Keycloak non ha restituito i token aggiornati.',
+        );
+      }
+
+      final loginResponse = LoginResponseDto.fromTokens(
+        accessToken: response.accessToken!,
+        refreshToken: response.refreshToken!,
+      );
+
       await saveTokens(
         loginResponse.accessToken,
         loginResponse.refreshToken,
-      ); // Save tokens after refresh
+        idToken: response.idToken,
+      );
       return loginResponse;
-    } else {
-      throw ServerFailure(
-        'Impossibile aggiornare la sessione. Effettua nuovamente il login.',
-        response.statusCode,
+    } catch (e) {
+      if (e is Failure) {
+        rethrow;
+      }
+      throw NetworkFailure(
+        'Impossibile aggiornare la sessione tramite Keycloak: $e',
       );
     }
   }
 
   @override
-  Future<void> saveTokens(String accessToken, String refreshToken) async {
-    await _tokenManager.saveTokens(accessToken, refreshToken);
+  Future<void> saveTokens(
+    String accessToken,
+    String refreshToken, {
+    String? idToken,
+  }) async {
+    await _tokenManager.saveTokens(accessToken, refreshToken, idToken: idToken);
   }
 
   @override
@@ -100,5 +116,31 @@ class AuthServiceImpl implements AuthService {
   @override
   Future<String?> getRefreshToken() async {
     return _tokenManager.getRefreshToken();
+  }
+
+  @override
+  Future<String?> getIdToken() async {
+    return _tokenManager.getIdToken();
+  }
+
+  @override
+  Future<void> endSession() async {
+    final idToken = await getIdToken();
+    if (idToken == null) {
+      return;
+    }
+
+    try {
+      await _appAuth.endSession(
+        EndSessionRequest(
+          idTokenHint: idToken,
+          postLogoutRedirectUrl: ApiEndpoints.keycloakPostLogoutRedirectUri,
+          issuer: ApiEndpoints.keycloakIssuer,
+          discoveryUrl: ApiEndpoints.keycloakDiscoveryUrl,
+        ),
+      );
+    } catch (_) {
+      return;
+    }
   }
 }
