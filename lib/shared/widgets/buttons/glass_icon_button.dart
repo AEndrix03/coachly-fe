@@ -40,9 +40,9 @@ class _GlassIconButtonState extends State<GlassIconButton>
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.12),
+        color: Colors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.25), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),

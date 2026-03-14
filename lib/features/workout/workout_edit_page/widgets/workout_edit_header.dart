@@ -105,7 +105,7 @@ class WorkoutEditHeader extends StatelessWidget {
             decoration: InputDecoration(
               hintText: 'Nome scheda...',
               hintStyle: TextStyle(
-                color: Colors.white.withOpacity(0.4),
+                color: Colors.white.withValues(alpha: 0.4),
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),

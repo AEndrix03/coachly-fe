@@ -32,7 +32,7 @@ class ExerciseInfoSheet extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -79,7 +79,7 @@ class ExerciseInfoSheet extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(32),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF111827).withOpacity(0.6),
+                    color: const Color(0xFF111827).withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Center(

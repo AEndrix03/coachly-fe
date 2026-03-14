@@ -53,7 +53,7 @@ class SetRow extends StatelessWidget {
         boxShadow: completed
             ? [
                 BoxShadow(
-                  color: const Color(0xFF10B981).withOpacity(0.5),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.5),
                   blurRadius: 12,
                   spreadRadius: 1,
                   offset: const Offset(0, 4),
@@ -61,7 +61,7 @@ class SetRow extends StatelessWidget {
               ]
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -77,8 +77,8 @@ class SetRow extends StatelessWidget {
             child: Icon(
               Icons.close,
               color: completed
-                  ? Colors.white.withOpacity(0.9)
-                  : Colors.white.withOpacity(0.4),
+                  ? Colors.white.withValues(alpha: 0.9)
+                  : Colors.white.withValues(alpha: 0.4),
               size: 14,
             ),
           ),
@@ -107,12 +107,12 @@ class SetRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
       decoration: BoxDecoration(
         color: completed
-            ? Colors.white.withOpacity(0.15)
+            ? Colors.white.withValues(alpha: 0.15)
             : const Color(0xFF1F2937),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: completed
-              ? Colors.white.withOpacity(0.3)
+              ? Colors.white.withValues(alpha: 0.3)
               : const Color(0xFF374151),
           width: 1.5,
         ),
@@ -214,12 +214,12 @@ class SetRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: completed
-            ? Colors.white.withOpacity(0.15)
+            ? Colors.white.withValues(alpha: 0.15)
             : const Color(0xFF1F2937),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: completed
-              ? Colors.white.withOpacity(0.3)
+              ? Colors.white.withValues(alpha: 0.3)
               : const Color(0xFF374151),
           width: 1.5,
         ),
@@ -263,8 +263,8 @@ class SetRow extends StatelessWidget {
             'kg',
             style: TextStyle(
               color: completed
-                  ? Colors.white.withOpacity(0.7)
-                  : Colors.white.withOpacity(0.4),
+                  ? Colors.white.withValues(alpha: 0.7)
+                  : Colors.white.withValues(alpha: 0.4),
               fontSize: 11,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.2,
@@ -281,12 +281,12 @@ class SetRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: completed
-            ? Colors.white.withOpacity(0.15)
+            ? Colors.white.withValues(alpha: 0.15)
             : const Color(0xFF1F2937),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: completed
-              ? Colors.white.withOpacity(0.3)
+              ? Colors.white.withValues(alpha: 0.3)
               : const Color(0xFF374151),
           width: 1.5,
         ),
@@ -328,8 +328,8 @@ class SetRow extends StatelessWidget {
         icon: Icon(
           Icons.more_vert,
           color: completed
-              ? Colors.white.withOpacity(0.8)
-              : Colors.white.withOpacity(0.4),
+              ? Colors.white.withValues(alpha: 0.8)
+              : Colors.white.withValues(alpha: 0.4),
           size: 20,
         ),
         onPressed: () {
@@ -481,7 +481,7 @@ class SetRow extends StatelessWidget {
           boxShadow: completed
               ? [
                   BoxShadow(
-                    color: const Color(0xFF10B981).withOpacity(0.5),
+                    color: const Color(0xFF10B981).withValues(alpha: 0.5),
                     blurRadius: 8,
                     spreadRadius: 1,
                   ),

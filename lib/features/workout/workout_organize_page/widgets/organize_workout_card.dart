@@ -58,15 +58,15 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF23233A).withOpacity(0.85),
-              const Color(0xFF2A2A3E).withOpacity(0.65),
+              const Color(0xFF23233A).withValues(alpha: 0.85),
+              const Color(0xFF2A2A3E).withValues(alpha: 0.65),
             ],
           ),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.14)),
+          border: Border.all(color: const Color(0xFF2196F3).withValues(alpha: 0.14)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.13),
+              color: Colors.black.withValues(alpha: 0.13),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -186,7 +186,7 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2196F3).withOpacity(0.16),
+            color: const Color(0xFF2196F3).withValues(alpha: 0.16),
             blurRadius: 6,
             offset: const Offset(0, 1),
           ),
@@ -200,20 +200,20 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.10),
+        color: Colors.white.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.white.withOpacity(0.16)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white.withOpacity(0.80), size: 10),
+          Icon(icon, color: Colors.white.withValues(alpha: 0.80), size: 10),
           const SizedBox(width: 4),
           Text(
             text,
             style: TextStyle(
               fontSize: 10,
-              color: Colors.white.withOpacity(0.80),
+              color: Colors.white.withValues(alpha: 0.80),
               fontWeight: FontWeight.w500,
             ),
           ),

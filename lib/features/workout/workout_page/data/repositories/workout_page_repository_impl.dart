@@ -80,7 +80,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   Future<ApiResponse<void>> enableWorkout(String workoutId) async {
     return ApiResponse.success(
       data: _hiveService.enableWorkout(workoutId),
-      message: "Enabled workout ${workoutId}",
+      message: "Enabled workout $workoutId",
     );
   }
 
@@ -88,7 +88,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   Future<ApiResponse<void>> disableWorkout(String workoutId) async {
     return ApiResponse.success(
       data: _hiveService.disableWorkout(workoutId),
-      message: "Disabeled workout ${workoutId}",
+      message: "Disabled workout $workoutId",
     );
   }
 
@@ -96,7 +96,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   Future<ApiResponse<void>> deleteWorkout(String workoutId) async {
     return ApiResponse.success(
       data: _hiveService.deleteWorkout(workoutId),
-      message: "Deleted workout ${workoutId}",
+      message: "Deleted workout $workoutId",
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:coachly/core/sync/adapters/workout_adapter.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -45,14 +46,14 @@ class LocalDatabaseService {
     await Hive.openBox<dynamic>(_settingsBox);
 
     _initialized = true;
-    print('📦 Local database initialized (v$_dbVersion)');
+    debugPrint('📦 Local database initialized (v$_dbVersion)');
   }
 
   // local_database_service.dart
 
   Future<void> _cleanOldBoxes() async {
     if (devMode) {
-      print('⚠️ Dev mode: Cleaning ALL boxes');
+      debugPrint('⚠️ Dev mode: Cleaning ALL boxes');
 
       // Chiudi tutti i box prima di cancellarli
       if (Hive.isBoxOpen(workoutsBox)) {
@@ -70,16 +71,16 @@ class LocalDatabaseService {
         await Hive.deleteBoxFromDisk(workoutsBox);
         await Hive.deleteBoxFromDisk(_exercisesBox);
         await Hive.deleteBoxFromDisk(_settingsBox);
-        print('✅ All boxes cleaned');
+        debugPrint('✅ All boxes cleaned');
       } catch (e) {
-        print('⚠️ Error cleaning boxes: $e');
+        debugPrint('⚠️ Error cleaning boxes: $e');
       }
     } else {
       // Pulisci solo vecchie versioni in produzione
       for (int v = 1; v < _dbVersion; v++) {
         try {
           await Hive.deleteBoxFromDisk('workouts_v$v');
-          print('🧹 Cleaned old box: workouts_v$v');
+          debugPrint('🧹 Cleaned old box: workouts_v$v');
         } catch (_) {}
       }
     }
@@ -108,7 +109,7 @@ class LocalDatabaseService {
       'lastModified': DateTime.now().toIso8601String(),
     };
     await box.put(key, enrichedData);
-    print('💾 Saved $key to $boxName (dirty=true)');
+    debugPrint('💾 Saved $key to $boxName (dirty=true)');
   }
 
   /// Mark entity as synced (not dirty)
@@ -122,7 +123,7 @@ class LocalDatabaseService {
       data['isDirty'] = false;
       data['lastSynced'] = DateTime.now().toIso8601String();
       await box.put(key, data);
-      print('✓ Marked $key as synced');
+      debugPrint('✓ Marked $key as synced');
     }
   }
 
@@ -138,7 +139,7 @@ class LocalDatabaseService {
       }
     }
 
-    print('🔍 Found ${dirtyItems.length} dirty items in $boxName');
+    debugPrint('🔍 Found ${dirtyItems.length} dirty items in $boxName');
     return dirtyItems;
   }
 
@@ -155,7 +156,7 @@ class LocalDatabaseService {
   }) async {
     final box = await Hive.openBox<Map>(boxName);
     await box.delete(key);
-    print('🗑️ Deleted $key from $boxName');
+    debugPrint('🗑️ Deleted $key from $boxName');
   }
 
   /// Clear all data (use with caution!)
@@ -163,7 +164,7 @@ class LocalDatabaseService {
     await Hive.box<WorkoutModel>(workoutsBox).clear();
     await Hive.box<Map>(_exercisesBox).clear();
     await Hive.box<dynamic>(_settingsBox).clear();
-    print('🧹 Cleared all local data');
+    debugPrint('🧹 Cleared all local data');
   }
 
   /// Get sync settings
@@ -171,7 +172,7 @@ class LocalDatabaseService {
 
   Future<void> setSyncEnabled(bool enabled) async {
     await settings.put('syncEnabled', enabled);
-    print('⚙️ Sync ${enabled ? 'enabled' : 'disabled'}');
+    debugPrint('⚙️ Sync ${enabled ? 'enabled' : 'disabled'}');
   }
 
   DateTime? get lastSyncTime {

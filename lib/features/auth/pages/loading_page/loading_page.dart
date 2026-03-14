@@ -16,7 +16,7 @@ class LoadingPage extends StatelessWidget {
             'assets/images/auth_page_background.jpg',
             fit: BoxFit.cover,
           ),
-          Container(color: Colors.black.withOpacity(0.5)),
+          Container(color: Colors.black.withValues(alpha: 0.5)),
           SafeArea(
             child: Center(
               child: Column(

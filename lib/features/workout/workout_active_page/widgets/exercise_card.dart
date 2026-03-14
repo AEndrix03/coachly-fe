@@ -76,7 +76,7 @@ class _ExerciseCardState extends State<ExerciseCard>
         border: Border.all(color: const Color(0xFF2A2A3A), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -163,7 +163,7 @@ class _ExerciseCardState extends State<ExerciseCard>
                       ),
                       decoration: BoxDecoration(
                         color: completedSets == totalSets
-                            ? const Color(0xFF10B981).withOpacity(0.2)
+                            ? const Color(0xFF10B981).withValues(alpha: 0.2)
                             : const Color(0xFF2A2A3A),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
@@ -204,7 +204,7 @@ class _ExerciseCardState extends State<ExerciseCard>
           IconButton(
             icon: Icon(
               Icons.info_outline,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               size: 22,
             ),
             onPressed: () => _showExerciseInfo(context),
@@ -214,7 +214,7 @@ class _ExerciseCardState extends State<ExerciseCard>
           PopupMenuButton<String>(
             icon: Icon(
               Icons.more_vert,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               size: 22,
             ),
             color: const Color(0xFF2A2A3A),

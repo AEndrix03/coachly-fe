@@ -43,7 +43,7 @@ class _SmokeIconButtonState extends State<SmokeIconButton> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),

@@ -43,20 +43,20 @@ class WorkoutDetailExerciseListSection extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.white.withOpacity(0.12),
-                      Colors.white.withOpacity(0.06),
+                      Colors.white.withValues(alpha: 0.12),
+                      Colors.white.withValues(alpha: 0.06),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     width: 1,
                   ),
                 ),
                 child: Text(
                   '${exercises.length} esercizi',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
@@ -109,16 +109,16 @@ class _ExerciseCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
             colors: [
-              const Color(0xFF2A2A3E).withOpacity(0.6),
-              const Color(0xFF1A1A2E).withOpacity(0.8),
+              const Color(0xFF2A2A3E).withValues(alpha: 0.6),
+              const Color(0xFF1A1A2E).withValues(alpha: 0.8),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          border: Border.all(width: 1.5, color: Colors.white.withOpacity(0.1)),
+          border: Border.all(width: 1.5, color: Colors.white.withValues(alpha: 0.1)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 20,
               offset: const Offset(0, 8),
               spreadRadius: -4,
@@ -134,7 +134,7 @@ class _ExerciseCard extends ConsumerWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    Colors.white.withOpacity(0.1),
+                    Colors.white.withValues(alpha: 0.1),
                     Colors.transparent,
                   ],
                 ),
@@ -220,10 +220,10 @@ class _ExerciseCard extends ConsumerWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(width: 2, color: Colors.white.withOpacity(0.15)),
+        border: Border.all(width: 2, color: Colors.white.withValues(alpha: 0.15)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -233,7 +233,7 @@ class _ExerciseCard extends ConsumerWidget {
         child: Text(
           exerciseNumber.toString(),
           style: TextStyle(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
             fontSize: 18,
             fontWeight: FontWeight.w900,
             letterSpacing: -0.5,
@@ -249,16 +249,16 @@ class _ExerciseCard extends ConsumerWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.white.withOpacity(0.08),
-            Colors.white.withOpacity(0.03),
+            Colors.white.withValues(alpha: 0.08),
+            Colors.white.withValues(alpha: 0.03),
           ],
         ),
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.5),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12), width: 1.5),
       ),
       child: Icon(
         Icons.arrow_forward_ios,
-        color: Colors.white.withOpacity(0.6),
+        color: Colors.white.withValues(alpha: 0.6),
         size: 16,
       ),
     );
@@ -273,7 +273,7 @@ class _ExerciseCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(19),
           bottomRight: Radius.circular(19),
@@ -290,13 +290,13 @@ class _ExerciseCard extends ConsumerWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.white.withOpacity(0.12),
-                  Colors.white.withOpacity(0.06),
+                  Colors.white.withValues(alpha: 0.12),
+                  Colors.white.withValues(alpha: 0.06),
                 ],
               ),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 width: 1,
               ),
             ),
@@ -317,18 +317,18 @@ class _ExerciseCard extends ConsumerWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF4CAF50).withOpacity(0.25),
-                    const Color(0xFF4CAF50).withOpacity(0.15),
+                    const Color(0xFF4CAF50).withValues(alpha: 0.25),
+                    const Color(0xFF4CAF50).withValues(alpha: 0.15),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: const Color(0xFF4CAF50).withOpacity(0.4),
+                  color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4CAF50).withOpacity(0.2),
+                    color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -354,12 +354,12 @@ class _ExerciseCard extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: Colors.white.withOpacity(0.6), size: 16),
+        Icon(icon, color: Colors.white.withValues(alpha: 0.6), size: 16),
         const SizedBox(width: 6),
         Text(
           text,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.75),
+            color: Colors.white.withValues(alpha: 0.75),
             fontSize: 13,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.2,
@@ -374,10 +374,10 @@ class _ExerciseCard extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
         ),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.35), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.35), width: 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

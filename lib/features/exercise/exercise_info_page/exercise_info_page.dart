@@ -9,6 +9,7 @@ import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fr
 import 'package:collection/collection.dart'; // Import for firstWhereOrNull
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ExercisePage extends ConsumerStatefulWidget {
@@ -139,7 +140,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
       slivers: [
         SliverToBoxAdapter(
           child: ExerciseHeader(
-            onBack: () => Navigator.of(context).pop(),
+            onBack: () => context.pop(),
             onShare: () {
               // TODO: Implement share functionality
             },

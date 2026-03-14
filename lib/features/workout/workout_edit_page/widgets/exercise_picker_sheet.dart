@@ -139,7 +139,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -190,12 +190,12 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.white.withOpacity(0.1),
-              Colors.white.withOpacity(0.05),
+              Colors.white.withValues(alpha: 0.1),
+              Colors.white.withValues(alpha: 0.05),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1),
         ),
         child: TextField(
           controller: _searchController,
@@ -203,12 +203,12 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           decoration: InputDecoration(
             hintText: 'Cerca esercizio...',
             hintStyle: TextStyle(
-              color: Colors.white.withOpacity(0.4),
+              color: Colors.white.withValues(alpha: 0.4),
               fontSize: 15,
             ),
             prefixIcon: Icon(
               Icons.search,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
             ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(
@@ -234,7 +234,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           Text(
             'Filtri',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               fontSize: 13,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
@@ -284,7 +284,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
             fontSize: 11,
             fontWeight: FontWeight.w600,
           ),
@@ -308,15 +308,15 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                         )
                       : LinearGradient(
                           colors: [
-                            Colors.white.withOpacity(0.08),
-                            Colors.white.withOpacity(0.04),
+                            Colors.white.withValues(alpha: 0.08),
+                            Colors.white.withValues(alpha: 0.04),
                           ],
                         ),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: selected == null
                         ? const Color(0xFF2196F3)
-                        : Colors.white.withOpacity(0.2),
+                        : Colors.white.withValues(alpha: 0.2),
                     width: 1.5,
                   ),
                 ),
@@ -325,7 +325,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                   style: TextStyle(
                     color: selected == null
                         ? Colors.white
-                        : Colors.white.withOpacity(0.7),
+                        : Colors.white.withValues(alpha: 0.7),
                     fontSize: 13,
                     fontWeight: selected == null
                         ? FontWeight.w700
@@ -350,15 +350,15 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                           )
                         : LinearGradient(
                             colors: [
-                              Colors.white.withOpacity(0.08),
-                              Colors.white.withOpacity(0.04),
+                              Colors.white.withValues(alpha: 0.08),
+                              Colors.white.withValues(alpha: 0.04),
                             ],
                           ),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isSelected
                           ? const Color(0xFF2196F3)
-                          : Colors.white.withOpacity(0.2),
+                          : Colors.white.withValues(alpha: 0.2),
                       width: 1.5,
                     ),
                   ),
@@ -367,7 +367,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                     style: TextStyle(
                       color: isSelected
                           ? Colors.white
-                          : Colors.white.withOpacity(0.7),
+                          : Colors.white.withValues(alpha: 0.7),
                       fontSize: 13,
                       fontWeight: isSelected
                           ? FontWeight.w700
@@ -405,13 +405,13 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                 Icon(
                   Icons.search_off,
                   size: 64,
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'Nessun esercizio trovato',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 16,
                   ),
                 ),
@@ -477,12 +477,12 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color(0xFF2A2A3E).withOpacity(0.6),
-              const Color(0xFF1A1A2E).withOpacity(0.8),
+              const Color(0xFF2A2A3E).withValues(alpha: 0.6),
+              const Color(0xFF1A1A2E).withValues(alpha: 0.8),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
         ),
         child: Row(
           children: [
@@ -493,7 +493,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                 color: accentColor,
                 shape: BoxShape.circle,
                 boxShadow: [
-                  BoxShadow(color: accentColor.withOpacity(0.5), blurRadius: 8),
+                  BoxShadow(color: accentColor.withValues(alpha: 0.5), blurRadius: 8),
                 ],
               ),
             ),
@@ -536,7 +536,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                         Icon(
                           Icons.swap_horiz,
                           size: 14,
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                         ),
                       ],
                     ],
@@ -556,10 +556,10 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
         ),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Text(
         label,

@@ -50,9 +50,9 @@ class WorkoutHeader extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
-              color: scheme.onPrimary.withOpacity(0.25),
+              color: scheme.onPrimary.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: scheme.onPrimary.withOpacity(0.3)),
+              border: Border.all(color: scheme.onPrimary.withValues(alpha: 0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -62,7 +62,7 @@ class WorkoutHeader extends ConsumerWidget {
                 Text(
                   'Allenamenti',
                   style: TextStyle(
-                    color: scheme.onPrimary.withOpacity(0.95),
+                    color: scheme.onPrimary.withValues(alpha: 0.95),
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -167,7 +167,7 @@ class WorkoutHeader extends ConsumerWidget {
         height: 80,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: scheme.onPrimary.withOpacity(0.2),
+          color: scheme.onPrimary.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(14),
         ),
         child: const Center(
@@ -182,7 +182,7 @@ class WorkoutHeader extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: scheme.onPrimary.withOpacity(0.2),
+        color: scheme.onPrimary.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(14),
       ),
       child: IntrinsicHeight(
@@ -199,7 +199,7 @@ class WorkoutHeader extends ConsumerWidget {
             Container(
               width: 1,
               height: 40,
-              color: scheme.onPrimary.withOpacity(0.3),
+              color: scheme.onPrimary.withValues(alpha: 0.3),
             ),
             Expanded(
               child: _buildStatItem(
@@ -239,7 +239,7 @@ class WorkoutHeader extends ConsumerWidget {
         Text(
           label,
           style: TextStyle(
-            color: scheme.onPrimary.withOpacity(0.8),
+            color: scheme.onPrimary.withValues(alpha: 0.8),
             fontSize: 10,
           ),
           textAlign: TextAlign.center,

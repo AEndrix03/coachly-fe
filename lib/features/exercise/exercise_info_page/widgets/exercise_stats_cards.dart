@@ -73,7 +73,7 @@ class ExerciseStatsCards extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: Column(
         children: [
@@ -88,7 +88,7 @@ class ExerciseStatsCards extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -100,7 +100,7 @@ class ExerciseStatsCards extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 11,
               fontWeight: FontWeight.w500,
             ),

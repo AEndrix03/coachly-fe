@@ -53,7 +53,7 @@ class WorkoutDetailPage extends ConsumerWidget {
               progress: workout.progress,
               sessionsCount: workout.sessionsCount,
               lastSessionDays: workout.lastSessionDays,
-              onBack: () => Navigator.of(context).pop(),
+              onBack: () => context.pop(),
               onShare: () => _showShareSnackbar(context),
               onEdit: () => context.push(
                 '/workouts/workout/${workout.id}/edit',
@@ -103,7 +103,7 @@ class WorkoutDetailPage extends ConsumerWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF2196F3).withOpacity(0.3),
+              color: const Color(0xFF2196F3).withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),

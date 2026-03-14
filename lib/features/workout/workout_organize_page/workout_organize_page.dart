@@ -3,7 +3,6 @@ import 'package:coachly/features/workout/workout_organize_page/widgets/organize_
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -207,7 +206,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
     return Center(
       child: Shimmer.fromColors(
         baseColor: scheme.surface,
-        highlightColor: scheme.primary.withOpacity(0.2),
+        highlightColor: scheme.primary.withValues(alpha: 0.2),
         child: ListView.builder(
           itemCount: 5,
           itemBuilder: (context, index) => Padding(

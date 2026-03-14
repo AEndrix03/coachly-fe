@@ -44,7 +44,7 @@ class ExerciseVideoSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -61,7 +61,7 @@ class ExerciseVideoSection extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF2196F3).withOpacity(0.4),
+                  color: const Color(0xFF2196F3).withValues(alpha: 0.4),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -93,19 +93,19 @@ class ExerciseVideoSection extends StatelessWidget {
     switch (label.toLowerCase()) {
       case 'intermedio':
       case 'intermediate':
-        backgroundColor = const Color(0xFFFF9800).withOpacity(0.15);
+        backgroundColor = const Color(0xFFFF9800).withValues(alpha: 0.15);
         textColor = const Color(0xFFFF9800);
         break;
       case 'compound':
-        backgroundColor = const Color(0xFF9C27B0).withOpacity(0.15);
+        backgroundColor = const Color(0xFF9C27B0).withValues(alpha: 0.15);
         textColor = const Color(0xFF9C27B0);
         break;
       case 'push':
-        backgroundColor = const Color(0xFFFF5252).withOpacity(0.15);
+        backgroundColor = const Color(0xFFFF5252).withValues(alpha: 0.15);
         textColor = const Color(0xFFFF5252);
         break;
       default:
-        backgroundColor = const Color(0xFF2196F3).withOpacity(0.15);
+        backgroundColor = const Color(0xFF2196F3).withValues(alpha: 0.15);
         textColor = const Color(0xFF2196F3);
     }
 
@@ -114,7 +114,7 @@ class ExerciseVideoSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: textColor.withOpacity(0.3), width: 1),
+        border: Border.all(color: textColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Text(
         label,

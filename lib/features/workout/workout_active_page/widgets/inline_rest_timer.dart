@@ -32,7 +32,7 @@ class InlineRestTimer extends ConsumerWidget {
               border: Border.all(color: const Color(0xFF334155), width: 2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   blurRadius: 20,
                   spreadRadius: 2,
                 ),

@@ -19,12 +19,12 @@ class BorderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor.withOpacity(0.25), width: 1.5),
+        border: Border.all(color: borderColor.withValues(alpha: 0.25), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: borderColor.withOpacity(0.10),
+            color: borderColor.withValues(alpha: 0.10),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

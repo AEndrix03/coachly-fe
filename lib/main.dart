@@ -23,7 +23,7 @@ class CoachlyApplication extends ConsumerWidget {
     final shadColorScheme = ShadSlateColorScheme.light().copyWith(
       primary: colorScheme.primary,
       secondary: colorScheme.secondary,
-      background: colorScheme.background,
+      background: colorScheme.surface,
     );
 
     return ShadTheme(

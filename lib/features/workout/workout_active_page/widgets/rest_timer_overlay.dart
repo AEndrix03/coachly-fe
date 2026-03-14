@@ -65,7 +65,7 @@ class _RestTimerOverlayState extends State<RestTimerOverlay>
     return GestureDetector(
       onTap: widget.onClose,
       child: Container(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         child: Center(
           child: GestureDetector(
             onTap: () {}, // Prevent closing when tapping card
@@ -82,7 +82,7 @@ class _RestTimerOverlayState extends State<RestTimerOverlay>
                 border: Border.all(color: const Color(0xFF374151), width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     blurRadius: 24,
                     spreadRadius: 4,
                   ),
@@ -128,11 +128,11 @@ class _RestTimerOverlayState extends State<RestTimerOverlay>
                             end: Alignment.bottomRight,
                             colors: _remainingSeconds <= 10 && _isRunning
                                 ? [
-                                    Color(0xFFEF4444).withOpacity(
-                                      0.8 + _pulseController.value * 0.2,
+                                    Color(0xFFEF4444).withValues(
+                                      alpha: 0.8 + _pulseController.value * 0.2,
                                     ),
-                                    Color(0xFFDC2626).withOpacity(
-                                      0.8 + _pulseController.value * 0.2,
+                                    Color(0xFFDC2626).withValues(
+                                      alpha: 0.8 + _pulseController.value * 0.2,
                                     ),
                                   ]
                                 : [
@@ -146,7 +146,7 @@ class _RestTimerOverlayState extends State<RestTimerOverlay>
                                   (_remainingSeconds <= 10 && _isRunning
                                           ? const Color(0xFFEF4444)
                                           : const Color(0xFF3B82F6))
-                                      .withOpacity(0.5),
+                                      .withValues(alpha: 0.5),
                               blurRadius: 20,
                               spreadRadius: 5,
                             ),

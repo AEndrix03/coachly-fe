@@ -19,7 +19,7 @@ class RestCompleteDialog extends StatelessWidget {
           border: Border.all(color: const Color(0xFF334155), width: 2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 30,
               spreadRadius: 5,
             ),
@@ -46,7 +46,7 @@ class RestCompleteDialog extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF10B981).withOpacity(0.5),
+                          color: const Color(0xFF10B981).withValues(alpha: 0.5),
                           blurRadius: 20,
                           spreadRadius: 3,
                         ),

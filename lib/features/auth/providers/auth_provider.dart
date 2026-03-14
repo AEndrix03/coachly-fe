@@ -6,16 +6,12 @@ import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service_impl.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
-import 'package:coachly/features/auth/data/utils/sync_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
 
 @riverpod
 TokenManager tokenManager(Ref ref) => TokenManager();
-
-@riverpod
-SyncManager syncManager(Ref ref) => SyncManager();
 
 @riverpod
 AuthService authService(Ref ref) {

@@ -35,7 +35,7 @@ class ExerciseInfoWidget extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -139,7 +139,7 @@ class ExerciseInfoWidget extends StatelessWidget {
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -165,7 +165,7 @@ class ExerciseInfoWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF0F1419),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +181,7 @@ class ExerciseInfoWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF6366F1).withOpacity(0.3),
+                      color: const Color(0xFF6366F1).withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -210,7 +210,7 @@ class ExerciseInfoWidget extends StatelessWidget {
             technique ??
                 'Mantieni i gomiti a 45° dal corpo. Scendi controllato fino allo sterno. Spingi esplosivamente fino ad estensione completa evitando di iperestendere i gomiti. Mantieni scapole retratte e petto in fuori durante tutto il movimento.',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 15,
               height: 1.6,
             ),
@@ -227,7 +227,7 @@ class ExerciseInfoWidget extends StatelessWidget {
         color: const Color(0xFF2D1B1B),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFEF4444).withOpacity(0.3),
+          color: const Color(0xFFEF4444).withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -239,7 +239,7 @@ class ExerciseInfoWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEF4444).withOpacity(0.2),
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -288,7 +288,7 @@ class ExerciseInfoWidget extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontSize: 14,
                 height: 1.5,
               ),
@@ -305,7 +305,7 @@ class ExerciseInfoWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF0F1419),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -335,10 +335,10 @@ class ExerciseInfoWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withOpacity(0.15),
+        color: const Color(0xFF10B981).withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF10B981).withOpacity(0.3),
+          color: const Color(0xFF10B981).withValues(alpha: 0.3),
           width: 1,
         ),
       ),

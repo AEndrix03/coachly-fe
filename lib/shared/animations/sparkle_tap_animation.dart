@@ -34,8 +34,8 @@ class SparkleTapAnimation extends StatelessWidget {
             shape: BoxShape.circle,
             gradient: RadialGradient(
               colors: [
-                Colors.white.withOpacity(0.7),
-                Colors.blueAccent.withOpacity(0.3),
+                Colors.white.withValues(alpha: 0.7),
+                Colors.blueAccent.withValues(alpha: 0.3),
                 Colors.transparent,
               ],
               stops: const [0.0, 0.5, 1.0],

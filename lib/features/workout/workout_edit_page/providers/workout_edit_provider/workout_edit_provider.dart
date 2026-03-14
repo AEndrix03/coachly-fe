@@ -147,7 +147,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       sets: workoutExercise.sets,
       rest: workoutExercise.rest,
       weight: workoutExercise.weight,
-      progress: (workoutExercise.progress ?? 0).toString(),
+      progress: workoutExercise.progress.toString(),
       notes: '',
       // Default
       accentColorHex: '#2196F3',

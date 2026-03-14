@@ -103,7 +103,7 @@ Either<Failure, T> tryCatch<T>(
 }) {
   try {
     return Either.right(operation());
-  } catch (e, stackTrace) {
+  } catch (e) {
     final failure = onError?.call(e) ?? UnknownFailure(e.toString());
     return Either.left(failure);
   }
@@ -117,7 +117,7 @@ Future<Either<Failure, T>> tryCatchAsync<T>(
   try {
     final result = await operation();
     return Either.right(result);
-  } catch (e, stackTrace) {
+  } catch (e) {
     final failure = onError?.call(e) ?? UnknownFailure(e.toString());
     return Either.left(failure);
   }

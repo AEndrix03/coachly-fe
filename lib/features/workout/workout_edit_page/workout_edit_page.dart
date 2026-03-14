@@ -105,7 +105,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
 
     return PopScope(
       canPop: !state.isDirty,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final shouldPop = await _showExitDialog();
         if (shouldPop ?? false) {
@@ -158,7 +158,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             ),
             if (state.isLoading && state.exercises.isEmpty)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 child: const Center(child: CircularProgressIndicator()),
               ),
           ],
@@ -177,7 +177,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           color: const Color(0xFF1A1A2E),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0xFF2196F3).withOpacity(0.3),
+            color: const Color(0xFF2196F3).withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -196,13 +196,13 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             TextField(
               controller: _descriptionController,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 14,
               ),
               maxLines: null,
               decoration: InputDecoration(
                 hintText: 'Aggiungi una descrizione...',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
               ),
@@ -265,7 +265,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: const Color(0xFF1A1A2E),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -305,7 +305,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 11,
             ),
             maxLines: 1,
@@ -364,8 +364,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF2196F3).withOpacity(0.2),
-                  const Color(0xFF8E29EC).withOpacity(0.2),
+                  const Color(0xFF2196F3).withValues(alpha: 0.2),
+                  const Color(0xFF8E29EC).withValues(alpha: 0.2),
                 ],
               ),
               shape: BoxShape.circle,
@@ -373,14 +373,14 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             child: Icon(
               Icons.fitness_center,
               size: 64,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
             ),
           ),
           const SizedBox(height: 24),
           Text(
             'Nessun esercizio',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
@@ -389,7 +389,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           Text(
             'Aggiungi il primo esercizio per iniziare',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               fontSize: 14,
             ),
           ),

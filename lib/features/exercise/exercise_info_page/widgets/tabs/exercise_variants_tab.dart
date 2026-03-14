@@ -58,7 +58,7 @@ class ExerciseVariantsTab extends ConsumerWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A2E),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
         ),
         child: Row(
           children: [
@@ -66,7 +66,7 @@ class ExerciseVariantsTab extends ConsumerWidget {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: const Color(0xFF2196F3).withOpacity(0.15),
+                color: const Color(0xFF2196F3).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -102,14 +102,14 @@ class ExerciseVariantsTab extends ConsumerWidget {
                           color: const Color(0xFF1A1A2E),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
                         child: Text(
                           variant.difficultyLevel ?? 'N/A',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
+                            color: Colors.white.withValues(alpha: 0.6),
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                           ),
@@ -131,7 +131,7 @@ class ExerciseVariantsTab extends ConsumerWidget {
             ),
             Icon(
               Icons.chevron_right,
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               size: 24,
             ),
           ],

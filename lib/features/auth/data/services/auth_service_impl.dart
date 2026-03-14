@@ -24,9 +24,7 @@ class AuthServiceImpl implements AuthService {
         ),
       );
 
-      if (response == null ||
-          response.accessToken == null ||
-          response.refreshToken == null) {
+      if (response.accessToken == null || response.refreshToken == null) {
         throw const ServerFailure(
           'Keycloak ha completato il login ma non ha restituito i token attesi.',
         );
@@ -65,9 +63,7 @@ class AuthServiceImpl implements AuthService {
         ),
       );
 
-      if (response == null ||
-          response.accessToken == null ||
-          response.refreshToken == null) {
+      if (response.accessToken == null || response.refreshToken == null) {
         throw const ServerFailure(
           'Keycloak non ha restituito i token aggiornati.',
         );

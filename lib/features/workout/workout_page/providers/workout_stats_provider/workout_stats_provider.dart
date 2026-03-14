@@ -2,7 +2,6 @@ import 'package:coachly/features/workout/workout_page/data/repositories/workout_
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../workout_list_provider/workout_list_provider.dart';
 
 part 'workout_stats_provider.g.dart';
 

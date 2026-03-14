@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:coachly/core/network/api_endpoints.dart';
 import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -42,7 +43,7 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(endpoint, queryParameters);
-      print('📡 GET: $uri');
+      debugPrint('📡 GET: $uri');
 
       final response = await _client
           .get(uri, headers: defaultHeaders)
@@ -62,8 +63,8 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(endpoint, queryParameters);
-      print('📡 POST: $uri');
-      print('📦 Body: ${jsonEncode(body)}');
+      debugPrint('📡 POST: $uri');
+      debugPrint('📦 Body: ${jsonEncode(body)}');
 
       final response = await _client
           .post(
@@ -87,7 +88,7 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(endpoint, queryParameters);
-      print('📡 PUT: $uri');
+      debugPrint('📡 PUT: $uri');
 
       final response = await _client
           .put(
@@ -110,7 +111,7 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(endpoint, queryParameters);
-      print('📡 DELETE: $uri');
+      debugPrint('📡 DELETE: $uri');
 
       final response = await _client
           .delete(uri, headers: defaultHeaders)
@@ -131,7 +132,7 @@ class ApiClient {
     http.Response response,
     T Function(dynamic)? fromJson,
   ) {
-    print('📥 Response ${response.statusCode}: ${response.body}');
+    debugPrint('📥 Response ${response.statusCode}: ${response.body}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       // Handle empty response body for success codes like 204 No Content
@@ -177,7 +178,7 @@ class ApiClient {
   }
 
   ApiResponse<T> _handleError<T>(dynamic error) {
-    print('❌ Error: $error');
+    debugPrint('❌ Error: $error');
 
     if (error is TimeoutException) {
       return ApiResponse.error(

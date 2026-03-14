@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 
 import 'local_database_service.dart';
 
@@ -82,12 +83,12 @@ class EnhancedSyncManager {
       final isConnected =
           results.isNotEmpty && !results.contains(ConnectivityResult.none);
       if (isConnected && _db.isSyncEnabled) {
-        print('🌐 Connectivity restored - triggering sync');
+        debugPrint('🌐 Connectivity restored - triggering sync');
         syncAll();
       }
     });
 
-    print('🔄 Enhanced Sync Manager initialized');
+    debugPrint('🔄 Enhanced Sync Manager initialized');
   }
 
   /// Start periodic sync
@@ -95,18 +96,18 @@ class EnhancedSyncManager {
     _periodicSyncTimer?.cancel();
     _periodicSyncTimer = Timer.periodic(syncInterval, (_) {
       if (_db.isSyncEnabled) {
-        print('⏰ Periodic sync triggered');
+        debugPrint('⏰ Periodic sync triggered');
         syncAll();
       }
     });
-    print('⏰ Periodic sync started (every ${syncInterval.inMinutes} minutes)');
+    debugPrint('⏰ Periodic sync started (every ${syncInterval.inMinutes} minutes)');
   }
 
   /// Stop periodic sync
   void stopPeriodicSync() {
     _periodicSyncTimer?.cancel();
     _periodicSyncTimer = null;
-    print('⏰ Periodic sync stopped');
+    debugPrint('⏰ Periodic sync stopped');
   }
 
   /// Enable/disable sync
@@ -126,17 +127,17 @@ class EnhancedSyncManager {
   /// Sync all dirty items
   Future<SyncResult> syncAll() async {
     if (_isSyncing) {
-      print('⚠️  Sync already in progress, skipping');
+      debugPrint('⚠️  Sync already in progress, skipping');
       return SyncResult(success: false, message: 'Sync already in progress');
     }
 
     if (!_db.isSyncEnabled) {
-      print('⚠️  Sync disabled, skipping');
+      debugPrint('⚠️  Sync disabled, skipping');
       return SyncResult(success: false, message: 'Sync is disabled');
     }
 
     _isSyncing = true;
-    print('🔄 Starting sync...');
+    debugPrint('🔄 Starting sync...');
 
     try {
       int totalSynced = 0;
@@ -154,7 +155,7 @@ class EnhancedSyncManager {
 
       await _db.updateLastSyncTime();
 
-      print('✅ Sync completed: $totalSynced synced, $totalFailed failed');
+      debugPrint('✅ Sync completed: $totalSynced synced, $totalFailed failed');
 
       return SyncResult(
         success: totalFailed == 0,
@@ -164,7 +165,7 @@ class EnhancedSyncManager {
         failedCount: totalFailed,
       );
     } catch (e) {
-      print('❌ Sync error: $e');
+      debugPrint('❌ Sync error: $e');
       return SyncResult(success: false, message: 'Sync failed: $e');
     } finally {
       _isSyncing = false;
@@ -176,11 +177,11 @@ class EnhancedSyncManager {
     final dirtyItems = await _db.getDirtyItems(boxName);
 
     if (dirtyItems.isEmpty) {
-      print('✓ No dirty items in $boxName');
+      debugPrint('✓ No dirty items in $boxName');
       return _EntitySyncResult(synced: 0, failed: 0);
     }
 
-    print('📤 Syncing ${dirtyItems.length} items from $boxName');
+    debugPrint('📤 Syncing ${dirtyItems.length} items from $boxName');
 
     int synced = 0;
     int failed = 0;
@@ -197,7 +198,7 @@ class EnhancedSyncManager {
           failed++;
         }
       } catch (e) {
-        print('❌ Failed to sync ${item['localId']}: $e');
+        debugPrint('❌ Failed to sync ${item['localId']}: $e');
         failed++;
       }
     }
@@ -214,7 +215,7 @@ class EnhancedSyncManager {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 100));
 
-    print('📤 Syncing $entityType: ${item['localId']}');
+    debugPrint('📤 Syncing $entityType: ${item['localId']}');
 
     // TODO: Call actual API based on entity type
     // Example:
@@ -282,7 +283,7 @@ class EnhancedSyncManager {
 
   /// Force sync now (manually triggered)
   Future<SyncResult> forceSyncNow() async {
-    print('🔄 Force sync triggered by user');
+    debugPrint('🔄 Force sync triggered by user');
     return await syncAll();
   }
 
@@ -290,7 +291,7 @@ class EnhancedSyncManager {
   void dispose() {
     _periodicSyncTimer?.cancel();
     _connectivitySubscription?.cancel();
-    print('🛑 Sync Manager disposed');
+    debugPrint('🛑 Sync Manager disposed');
   }
 }
 

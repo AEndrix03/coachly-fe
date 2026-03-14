@@ -4,19 +4,14 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LoginPage extends ConsumerStatefulWidget {
+class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends ConsumerState<LoginPage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
     final authState = ref.watch(authProvider);
-    final authValue = authState.valueOrNull;
+    final authValue = authState.value;
     final isLoading = authState.isLoading || authValue?.isLoading == true;
     final errorMessage = authValue?.errorMessage;
 
@@ -28,7 +23,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             'assets/images/auth_page_background.jpg',
             fit: BoxFit.cover,
           ),
-          Container(color: Colors.black.withOpacity(0.5)),
+          Container(color: Colors.black.withValues(alpha: 0.5)),
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -59,7 +54,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.35),
+                        color: Colors.black.withValues(alpha: 0.35),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: Colors.white24),
                       ),
@@ -87,7 +82,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.08),
+                              color: Colors.white.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: Colors.white12),
                             ),

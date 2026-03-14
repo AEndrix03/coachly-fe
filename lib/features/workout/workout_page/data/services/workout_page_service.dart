@@ -59,7 +59,7 @@ class WorkoutPageService {
     return await _apiClient.post<void>(
       '/workouts/sync',
       body: {'workouts': dirtyWorkouts.map((w) => w.toJson()).toList()},
-      fromJson: (_) => null,
+      fromJson: (_) {},
     );
   }
 
@@ -70,7 +70,7 @@ class WorkoutPageService {
     return await _apiClient.post<void>(
       '/workouts',
       body: data,
-      fromJson: (_) => null,
+      fromJson: (_) {},
     );
   }
 }

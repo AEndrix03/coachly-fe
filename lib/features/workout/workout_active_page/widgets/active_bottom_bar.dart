@@ -36,10 +36,10 @@ class ActiveBottomBar extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(colors: gradient),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withOpacity(0.2), width: 2),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
           boxShadow: [
             BoxShadow(
-              color: glowColor.withOpacity(0.4),
+              color: glowColor.withValues(alpha: 0.4),
               blurRadius: 16,
               spreadRadius: 2,
               offset: const Offset(0, 4),

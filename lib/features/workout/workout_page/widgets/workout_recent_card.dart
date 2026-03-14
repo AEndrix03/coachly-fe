@@ -34,6 +34,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
 
   void _onTapUp(TapUpDetails details) async {
     await Future.delayed(const Duration(milliseconds: 120));
+    if (!mounted) return;
     setState(() {
       _scale = 1.0;
       _showSparkle = false;
@@ -65,13 +66,13 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
             Container(
               constraints: const BoxConstraints(minHeight: 220, maxWidth: 320),
               decoration: BoxDecoration(
-                color: scheme.surface.withOpacity(0.98),
+                color: scheme.surface.withValues(alpha: 0.98),
                 // Elegante, leggermente staccato dal bg
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: scheme.outline.withOpacity(0.08)),
+                border: Border.all(color: scheme.outline.withValues(alpha: 0.08)),
                 boxShadow: [
                   BoxShadow(
-                    color: scheme.shadow.withOpacity(0.12),
+                    color: scheme.shadow.withValues(alpha: 0.12),
                     blurRadius: 18,
                     offset: const Offset(0, 6),
                   ),
@@ -178,9 +179,9 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: scheme.primaryContainer.withOpacity(0.12),
+        color: scheme.primaryContainer.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: scheme.primary.withOpacity(0.12)),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.12)),
       ),
       child: Column(
         children: [
@@ -210,7 +211,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
             borderRadius: BorderRadius.circular(6),
             child: LinearProgressIndicator(
               value: widget.workout.progress / 100,
-              backgroundColor: scheme.primaryContainer.withOpacity(0.18),
+              backgroundColor: scheme.primaryContainer.withValues(alpha: 0.18),
               valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
               minHeight: 6,
             ),
@@ -256,7 +257,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
           'Ultima: ${DateFormat('dd/MM/yyyy').format(widget.workout.lastUsed)}',
           style: TextStyle(
             fontSize: 11,
-            color: scheme.onSurface.withOpacity(0.7),
+            color: scheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -306,7 +307,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: scheme.outline.withOpacity(0.10)),
+        border: Border.all(color: scheme.outline.withValues(alpha: 0.10)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

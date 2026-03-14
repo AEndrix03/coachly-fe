@@ -113,7 +113,7 @@ class WorkoutDetailHeader extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.25),
+        color: Colors.white.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -149,7 +149,7 @@ class WorkoutDetailHeader extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -165,7 +165,7 @@ class WorkoutDetailHeader extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -185,7 +185,7 @@ class WorkoutDetailHeader extends ConsumerWidget {
               Text(
                 '$progressPercent%',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Colors.white.withValues(alpha: 0.95),
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -197,7 +197,7 @@ class WorkoutDetailHeader extends ConsumerWidget {
             borderRadius: BorderRadius.circular(10),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.black.withOpacity(0.3),
+              backgroundColor: Colors.black.withValues(alpha: 0.3),
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
               minHeight: 10,
             ),

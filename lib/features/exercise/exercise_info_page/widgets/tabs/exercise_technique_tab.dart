@@ -61,7 +61,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,14 +78,14 @@ class ExerciseTechniqueTab extends ConsumerWidget {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 width: 2,
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
               ),
             ),
             child: Center(
               child: Text(
                 order.toString(),
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
                 ),
@@ -97,7 +97,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
             child: Text(
               description,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontSize: 14,
                 height: 1.5,
               ),
@@ -118,7 +118,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
         color: const Color(0xFF2D1B1B),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFF5252).withOpacity(0.3),
+          color: const Color(0xFFFF5252).withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -130,7 +130,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF5252).withOpacity(0.2),
+                  color: const Color(0xFFFF5252).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -179,7 +179,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
             child: Text(
               text,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 fontSize: 14,
                 height: 1.5,
               ),
@@ -199,7 +199,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,10 +233,10 @@ class ExerciseTechniqueTab extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF2196F3).withOpacity(0.15),
+        color: const Color(0xFF2196F3).withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF2196F3).withOpacity(0.3),
+          color: const Color(0xFF2196F3).withValues(alpha: 0.3),
           width: 1,
         ),
       ),

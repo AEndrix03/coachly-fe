@@ -39,7 +39,7 @@ class CounterBadgeWidget extends StatelessWidget {
               labelStyle ??
               TextStyle(
                 fontSize: 13,
-                color: scheme.onPrimary.withOpacity(0.7),
+                color: scheme.onPrimary.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.2,
               ),

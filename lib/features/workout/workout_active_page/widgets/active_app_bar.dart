@@ -96,7 +96,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
                             Icon(
                               Icons.timer_outlined,
                               size: 18,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -120,13 +120,13 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                const Color(0xFF3B82F6).withOpacity(0.3),
-                                const Color(0xFF2563EB).withOpacity(0.2),
+                                const Color(0xFF3B82F6).withValues(alpha: 0.3),
+                                const Color(0xFF2563EB).withValues(alpha: 0.2),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: const Color(0xFF3B82F6).withOpacity(0.5),
+                              color: const Color(0xFF3B82F6).withValues(alpha: 0.5),
                               width: 1,
                             ),
                           ),
@@ -191,7 +191,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
@@ -229,10 +229,10 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFF991B1B).withOpacity(0.2),
+              color: const Color(0xFF991B1B).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: const Color(0xFFDC2626).withOpacity(0.3),
+                color: const Color(0xFFDC2626).withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -256,9 +256,9 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15), // STILE COPIATO
+        color: Colors.white.withValues(alpha: 0.15), // STILE COPIATO
         borderRadius: BorderRadius.circular(14), // STILE COPIATO (non cerchio!)
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: IconButton(
         icon: Icon(icon, color: Colors.white, size: 22),
@@ -273,9 +273,9 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15), // STILE COPIATO
+        color: Colors.white.withValues(alpha: 0.15), // STILE COPIATO
         borderRadius: BorderRadius.circular(14), // STILE COPIATO (non cerchio!)
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       child: PopupMenuButton<String>(
         icon: const Icon(
@@ -311,7 +311,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
               children: [
                 Icon(
                   Icons.edit_note_outlined,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -332,7 +332,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
               children: [
                 Icon(
                   Icons.history_rounded,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -404,7 +404,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(
-              backgroundColor: Colors.red.shade400.withOpacity(0.15),
+              backgroundColor: Colors.red.shade400.withValues(alpha: 0.15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -457,7 +457,7 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(
-              backgroundColor: Colors.red.shade400.withOpacity(0.15),
+              backgroundColor: Colors.red.shade400.withValues(alpha: 0.15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),

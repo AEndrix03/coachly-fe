@@ -144,7 +144,7 @@ class ExerciseMusclesTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  exerciseMuscle.muscle?.nameI18n?.fromI18n(locale) ?? 'N/A',
+                  exerciseMuscle.muscle?.nameI18n.fromI18n(locale) ?? 'N/A',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -182,7 +182,7 @@ class ExerciseMusclesTab extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.lightbulb, color: Colors.white, size: 24),
@@ -204,7 +204,7 @@ class ExerciseMusclesTab extends StatelessWidget {
                 Text(
                   'Dati non ancora disponibili. Il coach AI sta analizzando il tuo profilo per fornire consigli personalizzati.',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 13,
                     height: 1.5,
                   ),

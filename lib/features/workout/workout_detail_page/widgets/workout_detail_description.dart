@@ -14,20 +14,20 @@ class WorkoutDetailDescription extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color(0xFF1A1A2E).withOpacity(0.95),
-              const Color(0xFF16213E).withOpacity(0.9),
+              const Color(0xFF1A1A2E).withValues(alpha: 0.95),
+              const Color(0xFF16213E).withValues(alpha: 0.9),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: const Color(0xFF2196F3).withOpacity(0.3),
+            color: const Color(0xFF2196F3).withValues(alpha: 0.3),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -50,7 +50,7 @@ class WorkoutDetailDescription extends StatelessWidget {
                     borderRadius: BorderRadius.circular(2),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF2196F3).withOpacity(0.5),
+                        color: const Color(0xFF2196F3).withValues(alpha: 0.5),
                         blurRadius: 4,
                         offset: const Offset(0, 0),
                       ),
@@ -73,7 +73,7 @@ class WorkoutDetailDescription extends StatelessWidget {
             Text(
               description,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 14,
                 height: 1.6,
                 letterSpacing: 0.2,

@@ -30,8 +30,8 @@ GoRouter router(Ref ref) {
     redirect: (context, state) {
       final isLoading = authState.isLoading;
       final isAuthenticated =
-          authState.valueOrNull?.isAuthenticated == true &&
-          authState.valueOrNull?.isTokenValid == true;
+          authState.value?.isAuthenticated == true &&
+          authState.value?.isTokenValid == true;
       final isOnLogin = state.matchedLocation == '/login';
       final isOnLoading = state.matchedLocation == '/loading';
 

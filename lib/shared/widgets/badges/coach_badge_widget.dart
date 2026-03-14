@@ -21,12 +21,12 @@ class CoachBadgeWidget extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFFFF9800).withOpacity(0.3),
-            const Color(0xFFFF5722).withOpacity(0.3),
+            const Color(0xFFFF9800).withValues(alpha: 0.3),
+            const Color(0xFFFF5722).withValues(alpha: 0.3),
           ],
         ),
         borderRadius: BorderRadius.circular(7),
-        border: Border.all(color: const Color(0xFFFF9800).withOpacity(0.5)),
+        border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

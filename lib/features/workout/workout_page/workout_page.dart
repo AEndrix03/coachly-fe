@@ -34,7 +34,6 @@ class WorkoutPage extends ConsumerWidget {
         onRefresh: () async {
           ref.invalidate(workoutListProvider);
           ref.invalidate(recentWorkoutsProvider);
-          // ref.invalidate(workoutStatsProvider);
           await ref.read(workoutListProvider.future);
         },
         child: workoutState.when(
@@ -150,7 +149,7 @@ class WorkoutPage extends ConsumerWidget {
     return Center(
       child: Shimmer.fromColors(
         baseColor: scheme.surface,
-        highlightColor: scheme.primary.withOpacity(0.2),
+        highlightColor: scheme.primary.withValues(alpha: 0.2),
         child: Container(
           width: 120,
           height: 120,
@@ -168,7 +167,7 @@ class WorkoutPage extends ConsumerWidget {
       height: 365,
       child: Shimmer.fromColors(
         baseColor: scheme.surface,
-        highlightColor: scheme.primary.withOpacity(0.2),
+        highlightColor: scheme.primary.withValues(alpha: 0.2),
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: List.generate(

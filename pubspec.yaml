@@ -61,6 +61,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   intl: ^0.20.2
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:
@@ -73,8 +74,6 @@ dev_dependencies:
   json_serializable: ^6.7.1
   riverpod_generator: ^3.0.3
   freezed: ^3.2.3
-
-  jwt_decoder: ^2.0.1
 
 flutter:
   uses-material-design: true

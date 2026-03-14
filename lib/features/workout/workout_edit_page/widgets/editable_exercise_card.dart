@@ -132,8 +132,8 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF2A2A3E).withOpacity(widget.isDragging ? 0.8 : 0.6),
-            const Color(0xFF1A1A2E).withOpacity(widget.isDragging ? 0.95 : 0.8),
+            const Color(0xFF2A2A3E).withValues(alpha: widget.isDragging ? 0.8 : 0.6),
+            const Color(0xFF1A1A2E).withValues(alpha: widget.isDragging ? 0.95 : 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -141,14 +141,14 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         border: Border.all(
           width: widget.isDragging ? 2 : 1.5,
           color: widget.isDragging
-              ? widget.exercise.accentColor.withOpacity(0.5)
-              : Colors.white.withOpacity(0.1),
+              ? widget.exercise.accentColor.withValues(alpha: 0.5)
+              : Colors.white.withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
             color: widget.isDragging
-                ? widget.exercise.accentColor.withOpacity(0.3)
-                : Colors.black.withOpacity(0.3),
+                ? widget.exercise.accentColor.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.3),
             blurRadius: widget.isDragging ? 25 : 20,
             offset: Offset(0, widget.isDragging ? 12 : 8),
             spreadRadius: widget.isDragging ? 2 : -4,
@@ -164,7 +164,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  Colors.white.withOpacity(0.1),
+                  Colors.white.withValues(alpha: 0.1),
                   Colors.transparent,
                 ],
               ),
@@ -241,10 +241,10 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(width: 2, color: Colors.white.withOpacity(0.15)),
+          border: Border.all(width: 2, color: Colors.white.withValues(alpha: 0.15)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -254,7 +254,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
           child: Text(
             widget.exercise.number.toString(),
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontSize: 18,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.5,
@@ -292,10 +292,10 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+            colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
           ),
           shape: BoxShape.circle,
-          border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
         ),
         child: Icon(icon, color: color, size: 18),
       ),
@@ -306,7 +306,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(19),
           bottomRight: Radius.circular(19),
@@ -370,7 +370,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
             fontSize: 11,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
@@ -381,12 +381,12 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.white.withOpacity(0.08),
-                Colors.white.withOpacity(0.04),
+                Colors.white.withValues(alpha: 0.08),
+                Colors.white.withValues(alpha: 0.04),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min, // Use min to wrap content
@@ -406,7 +406,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
                   decoration: InputDecoration(
                     hintText: hint,
                     hintStyle: TextStyle(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       fontSize: 14,
                     ),
                     border: InputBorder.none,
@@ -425,7 +425,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
                   child: Text(
                     suffix,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Colors.white.withValues(alpha: 0.4),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -445,7 +445,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         Text(
           'Note',
           style: TextStyle(
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
             fontSize: 11,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
@@ -456,12 +456,12 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.white.withOpacity(0.08),
-                Colors.white.withOpacity(0.04),
+                Colors.white.withValues(alpha: 0.08),
+                Colors.white.withValues(alpha: 0.04),
               ],
             ),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
           ),
           child: TextField(
             controller: _notesController,
@@ -471,7 +471,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
             decoration: InputDecoration(
               hintText: 'Aggiungi note...',
               hintStyle: TextStyle(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 fontSize: 13,
               ),
               border: InputBorder.none,
@@ -488,10 +488,10 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
         ),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.35), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.35), width: 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

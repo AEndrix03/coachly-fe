@@ -23,7 +23,7 @@ class AICoachWidget extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -68,7 +68,7 @@ class AICoachWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF6366F1).withOpacity(0.4),
+                  color: const Color(0xFF6366F1).withValues(alpha: 0.4),
                   blurRadius: 12,
                   spreadRadius: 2,
                 ),
@@ -188,10 +188,10 @@ class AICoachWidget extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: gradient),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
             boxShadow: [
               BoxShadow(
-                color: gradient[0].withOpacity(0.3),
+                color: gradient[0].withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -289,7 +289,7 @@ class AICoachWidget extends StatelessWidget {
                 style: const TextStyle(color: Colors.white, fontSize: 15),
                 decoration: InputDecoration(
                   hintText: 'Scrivi il tuo messaggio...',
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -312,7 +312,7 @@ class AICoachWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF6366F1).withOpacity(0.4),
+                  color: const Color(0xFF6366F1).withValues(alpha: 0.4),
                   blurRadius: 8,
                   spreadRadius: 1,
                 ),
@@ -371,7 +371,7 @@ class _ChatBubble extends StatelessWidget {
               ? null
               : [
                   BoxShadow(
-                    color: const Color(0xFF6366F1).withOpacity(0.3),
+                    color: const Color(0xFF6366F1).withValues(alpha: 0.3),
                     blurRadius: 8,
                     spreadRadius: 1,
                   ),
