@@ -14,7 +14,7 @@ class ApiEndpoints {
   // --dart-define=KEYCLOAK_CLIENT_ID=<client-id-reale>.
   static const String keycloakClientId = String.fromEnvironment(
     'KEYCLOAK_CLIENT_ID',
-    defaultValue: 'coachly-app',
+    defaultValue: 'coachly-mobile',
   );
 
   static const String keycloakRedirectScheme = 'it.coachly.coachly';
