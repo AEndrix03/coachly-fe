@@ -51,10 +51,12 @@ class AppDataSyncService {
     try {
       final workoutResult = await _workoutRepository.refreshFromRemote();
       final exerciseResult = await _exerciseRepository.refreshFromRemote();
-      final hasErrors = !workoutResult.success || !exerciseResult.success;
+      final success = workoutResult.success && exerciseResult.success;
 
-      _hasSyncedCurrentSession = true;
-      if (!hasErrors) {
+      if (success) {
+        // Mark session as synced only on full success so a partial failure
+        // will be retried on the next authenticated access.
+        _hasSyncedCurrentSession = true;
         _ref.invalidate(workoutListProvider);
         _ref.invalidate(recentWorkoutsProvider);
         _ref.invalidate(exerciseInfoProvider);
