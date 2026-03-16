@@ -13,7 +13,6 @@ class ExerciseInfoPageService {
   Future<ApiResponse<ExerciseDetailModel>> fetchExerciseDetails(
     String exerciseId,
   ) async {
-    // Assuming the endpoint for the full detail model is now /details
     return await _apiClient.get<ExerciseDetailModel>(
       '/exercises/$exerciseId/details',
       fromJson: (json) => ExerciseDetailModel.fromJson(json),

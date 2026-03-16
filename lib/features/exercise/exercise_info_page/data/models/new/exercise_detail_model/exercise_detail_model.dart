@@ -1,15 +1,11 @@
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_variant_model/exercise_variant_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_category_model/exercise_category_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_environment_model/exercise_environment_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_equipment_model/exercise_equipment_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_instruction_model/exercise_instruction_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_media_model/exercise_media_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_movement_pattern_model/exercise_movement_pattern_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_muscle_model/exercise_muscle_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_safety_contraindication_model/exercise_safety_contraindication_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_safety_model/exercise_safety_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/tag_model/tag_model.dart';
-import 'package:coachly/shared/json_converters/map_converter.dart'; // Import MapConverter
+import 'package:coachly/shared/json_converters/map_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'exercise_detail_model.freezed.dart';
@@ -27,14 +23,10 @@ abstract class ExerciseDetailModel with _$ExerciseDetailModel {
     @Default(null) String? forceType,
     @Default(null) bool? isUnilateral,
     @Default(null) bool? isBodyweight,
-    @Default(null) ExerciseEnvironmentModel? environment,
-    @Default(null) List<ExerciseInstructionModel>? instructions,
-    @Default(null) ExerciseMovementPatternModel? movementPattern,
     @Default(null) List<ExerciseVariantModel>? variants,
     @Default(null) List<ExerciseMediaModel>? media,
     @Default(null) List<ExerciseCategoryModel>? categories,
     @Default(null) List<ExerciseSafetyModel>? safety,
-    @Default(null) List<ExerciseSafetyContraindicationModel>? safetyContraindications,
     @Default(null) List<ExerciseMuscleModel>? muscles,
     @Default(null) List<ExerciseEquipmentModel>? equipments,
     @Default(null) List<TagModel>? tags,

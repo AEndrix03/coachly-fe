@@ -5,8 +5,8 @@ import 'package:coachly/features/exercise/exercise_info_page/widgets/exercise_vi
 import 'package:coachly/features/exercise/exercise_info_page/widgets/tabs/exercise_muscles_tab.dart';
 import 'package:coachly/features/exercise/exercise_info_page/widgets/tabs/exercise_technique_tab.dart';
 import 'package:coachly/features/exercise/exercise_info_page/widgets/tabs/exercise_variants_tab.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
-import 'package:collection/collection.dart'; // Import for firstWhereOrNull
+import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -47,10 +47,8 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: Container(
-        color: const Color(0xFF0F0F1E),
-        child: _buildBody(context, state, scheme),
-      ),
+      backgroundColor: const Color(0xFF0F0F1E),
+      body: _buildBody(context, state, scheme),
     );
   }
 
@@ -221,7 +219,6 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
             children: [
               ExerciseTechniqueTab(
                 description: exercise.descriptionI18n?.fromI18n(locale) ?? '',
-                instructions: exercise.instructions ?? const [],
                 safety: exercise.safety ?? const [],
                 equipments: exercise.equipments ?? const [],
               ),
