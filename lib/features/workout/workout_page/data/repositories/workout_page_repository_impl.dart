@@ -21,25 +21,12 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
   @override
   Future<ApiResponse<List<WorkoutModel>>> getWorkouts() async {
-    try {
-      final localWorkouts = await _hiveService.getWorkouts();
-      if (localWorkouts.isNotEmpty) {
-        return ApiResponse.success(data: localWorkouts);
-      }
-
-      return refreshFromRemote();
-    } catch (e) {
-      final localWorkouts = await _hiveService.getWorkouts();
-      if (localWorkouts.isNotEmpty) {
-        return ApiResponse.success(
-          data: localWorkouts,
-          message: "API failed, showing local data.",
-        );
-      }
-      return ApiResponse.error(
-        message: "Failed to fetch workouts: ${e.toString()}",
-      );
+    final localWorkouts = await _hiveService.getWorkouts();
+    if (localWorkouts.isNotEmpty) {
+      return ApiResponse.success(data: localWorkouts);
     }
+    // Cache empty — populate from remote.
+    return refreshFromRemote();
   }
 
   @override
