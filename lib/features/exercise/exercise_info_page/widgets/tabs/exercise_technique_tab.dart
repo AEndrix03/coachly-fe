@@ -19,7 +19,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final locale = ref.watch(languageProvider); // Use languageProvider
+    final locale = ref.watch(languageProvider);
     final hasDescription = description.trim().isNotEmpty;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),

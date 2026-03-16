@@ -1,6 +1,6 @@
-import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart'; // Import for TagDto
+import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
-import 'package:coachly/shared/json_converters/map_converter.dart'; // Import MapConverter
+import 'package:coachly/shared/json_converters/map_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'workout_model.freezed.dart';
@@ -18,7 +18,7 @@ abstract class WorkoutModel with _$WorkoutModel {
     @Default(0) int durationMinutes,
     required String goal,
     required DateTime lastUsed,
-    @Default([]) List<TagDto> muscleTags, // Changed to List<TagDto>
+    @Default([]) List<TagDto> muscleTags,
     @Default(0) int exercises,
     @Default(0) int sessionsCount,
     @Default(0) int lastSessionDays,

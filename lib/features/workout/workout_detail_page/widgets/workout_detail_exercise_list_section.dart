@@ -1,8 +1,8 @@
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import for ConsumerWidget
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
@@ -80,13 +80,12 @@ class WorkoutDetailExerciseListSection extends StatelessWidget {
 }
 
 class _ExerciseCard extends ConsumerWidget {
-  // Changed to ConsumerWidget
   final WorkoutExerciseModel workoutExercise;
   final String workoutId;
   final int exerciseNumber;
 
   const _ExerciseCard({
-    super.key, // Added super.key
+    super.key,
     required this.workoutExercise,
     required this.workoutId,
     required this.exerciseNumber,
@@ -94,8 +93,7 @@ class _ExerciseCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Added WidgetRef ref
-    final locale = ref.watch(languageProvider); // Use languageProvider
+    final locale = ref.watch(languageProvider);
     return InkWell(
       onTap: () {
         context.push(

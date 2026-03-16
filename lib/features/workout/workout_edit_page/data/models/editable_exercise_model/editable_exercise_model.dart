@@ -21,7 +21,7 @@ class EditableExerciseModel with _$EditableExerciseModel {
   final String progress;
   final String notes;
   final String accentColorHex;
-  final List<ExerciseVariantModel> variants; // Changed to List
+  final List<ExerciseVariantModel> variants;
 
   const EditableExerciseModel({
     required this.id,

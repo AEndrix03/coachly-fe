@@ -143,7 +143,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
     List<WorkoutModel> workouts,
     ColorScheme scheme,
   ) {
-    final locale = ref.watch(languageProvider); // Use languageProvider
+    final locale = ref.watch(languageProvider);
     if (workouts.isEmpty) {
       return const Center(
         child: Padding(

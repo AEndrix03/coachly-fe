@@ -1,15 +1,14 @@
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
-import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart'; // Import for TagDto
-import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
+import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import for ConsumerWidget
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class WorkoutDetailHeader extends ConsumerWidget {
-  // Changed to ConsumerWidget
   final String title;
   final String coachName;
-  final List<TagDto> muscleTags; // Changed to List<TagDto>
+  final List<TagDto> muscleTags;
   final double progress;
   final int sessionsCount;
   final int lastSessionDays;
@@ -32,8 +31,7 @@ class WorkoutDetailHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Added WidgetRef ref
-    final locale = ref.watch(languageProvider); // Use languageProvider
+    final locale = ref.watch(languageProvider);
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -54,7 +52,7 @@ class WorkoutDetailHeader extends ConsumerWidget {
           children: [
             _buildAppBar(),
             _buildContent(locale),
-          ], // Pass locale to _buildContent
+          ],
         ),
       ),
     );
@@ -83,7 +81,6 @@ class WorkoutDetailHeader extends ConsumerWidget {
   }
 
   Widget _buildContent(Locale locale) {
-    // Accept locale
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
       child: Column(
@@ -101,7 +98,7 @@ class WorkoutDetailHeader extends ConsumerWidget {
           const SizedBox(height: 16),
           _buildCoachBadge(),
           const SizedBox(height: 16),
-          _buildMuscleTags(locale), // Pass locale
+          _buildMuscleTags(locale),
           const SizedBox(height: 24),
           _buildProgressSection(),
         ],
@@ -135,7 +132,6 @@ class WorkoutDetailHeader extends ConsumerWidget {
   }
 
   Widget _buildMuscleTags(Locale locale) {
-    // Accept locale
     return Wrap(
       spacing: 8,
       runSpacing: 8,
