@@ -67,7 +67,7 @@ class ExerciseMusclesTab extends StatelessWidget {
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFF2196F3).withAlpha((255 * 0.2).toInt()),
+          color: const Color(0xFF2196F3).withValues(alpha: 0.2),
           width: 1,
         ),
       ),
