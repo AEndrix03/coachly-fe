@@ -43,7 +43,7 @@ class OfflineModeBanner extends ConsumerWidget {
           ),
           if (authState.needsReLogin)
             TextButton(
-              onPressed: () => ref.read(authProvider.notifier).forceReLogin(),
+              onPressed: () => ref.read(authProvider.notifier).logout(),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(

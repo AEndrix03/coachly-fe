@@ -61,10 +61,6 @@ class Auth extends _$Auth {
     );
   }
 
-  Future<void> forceReLogin() async {
-    await logout();
-  }
-
   Future<AuthState> _restoreSession() async {
     final authService = ref.read(authServiceProvider);
     final accessToken = await authService.getAccessToken();
