@@ -29,9 +29,7 @@ GoRouter router(Ref ref) {
     initialLocation: '/loading',
     redirect: (context, state) {
       final isLoading = authState.isLoading;
-      final isAuthenticated =
-          authState.value?.isAuthenticated == true &&
-          authState.value?.isTokenValid == true;
+      final canAccessApp = authState.value?.canAccessApp == true;
       final isOnLogin = state.matchedLocation == '/login';
       final isOnLoading = state.matchedLocation == '/loading';
 
@@ -39,7 +37,7 @@ GoRouter router(Ref ref) {
         return isOnLoading ? null : '/loading';
       }
 
-      if (!isAuthenticated) {
+      if (!canAccessApp) {
         return isOnLogin ? null : '/login';
       }
 

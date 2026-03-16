@@ -7,6 +7,7 @@ import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service_impl.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
@@ -65,20 +66,9 @@ class Auth extends _$Auth {
     final accessToken = await authService.getAccessToken();
     final refreshToken = await authService.getRefreshToken();
 
-    if (accessToken == null) {
-      await authService.clearTokens();
-      return _unauthenticated;
-    }
-
-    if (JwtValidator.isTokenValid(accessToken)) {
-      return _authenticatedStateFromTokens(
-        LoginResponseDto.fromTokens(
-          accessToken: accessToken,
-          refreshToken: refreshToken ?? '',
-        ),
-      );
-    }
-
+    // Session policy:
+    // - refresh token missing/invalid => force login
+    // - refresh token valid => always refresh tokens and skip login
     if (refreshToken == null || refreshToken.isEmpty) {
       await authService.clearTokens();
       return _unauthenticated;
@@ -87,6 +77,23 @@ class Auth extends _$Auth {
     if (!JwtValidator.isTokenValid(refreshToken)) {
       await authService.clearTokens();
       return _unauthenticated;
+    }
+
+    final connectivityResults = await Connectivity().checkConnectivity();
+    final isOnline = connectivityResults.any(
+      (result) => result != ConnectivityResult.none,
+    );
+    if (!isOnline) {
+      return AuthState(
+        isAuthenticated: true,
+        isTokenValid:
+            accessToken != null && JwtValidator.isTokenValid(accessToken),
+        isOfflineMode: true,
+        tokens: LoginResponseDto.fromTokens(
+          accessToken: accessToken ?? '',
+          refreshToken: refreshToken,
+        ),
+      );
     }
 
     final refreshResult = await ref

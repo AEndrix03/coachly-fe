@@ -16,7 +16,7 @@ abstract class AuthState with _$AuthState {
 
   const AuthState._();
 
-  bool get canAccessApp => isAuthenticated;
+  bool get canAccessApp => isAuthenticated && (isTokenValid || isOfflineMode);
 
   bool get needsReLogin => isAuthenticated && !isTokenValid && !isOfflineMode;
 
