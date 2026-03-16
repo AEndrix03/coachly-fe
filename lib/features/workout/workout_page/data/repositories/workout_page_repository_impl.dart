@@ -110,35 +110,27 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
   @override
   Future<ApiResponse<void>> enableWorkout(String workoutId) async {
-    return ApiResponse.success(
-      data: _hiveService.enableWorkout(workoutId),
-      message: "Enabled workout $workoutId",
-    );
+    await _hiveService.enableWorkout(workoutId);
+    return ApiResponse.success(message: 'Enabled workout $workoutId');
   }
 
   @override
   Future<ApiResponse<void>> disableWorkout(String workoutId) async {
-    return ApiResponse.success(
-      data: _hiveService.disableWorkout(workoutId),
-      message: "Disabled workout $workoutId",
-    );
+    await _hiveService.disableWorkout(workoutId);
+    return ApiResponse.success(message: 'Disabled workout $workoutId');
   }
 
   @override
   Future<ApiResponse<void>> deleteWorkout(String workoutId) async {
-    return ApiResponse.success(
-      data: _hiveService.deleteWorkout(workoutId),
-      message: "Deleted workout $workoutId",
-    );
+    await _hiveService.deleteWorkout(workoutId);
+    return ApiResponse.success(message: 'Deleted workout $workoutId');
   }
 
+  /// Patches workout locally and marks it dirty for later sync.
   @override
   Future<ApiResponse<void>> updateWorkout(WorkoutModel updatedWorkout) async {
-    // TODO: Implement logic to mark workout as dirty and sync later.
-    return ApiResponse.success(
-      data: _hiveService.patchWorkout(updatedWorkout),
-      message: "Updated workout ${updatedWorkout.id}",
-    );
+    await _hiveService.patchWorkout(updatedWorkout);
+    return ApiResponse.success(message: 'Updated workout ${updatedWorkout.id}');
   }
 
   @override
