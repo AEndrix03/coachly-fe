@@ -41,7 +41,7 @@ class ExerciseMusclesTab extends StatelessWidget {
         Text(
           'Muscoli Coinvolti',
           style: TextStyle(
-            color: Colors.white.withAlpha((255 * 0.5).toInt()),
+            color: Colors.white.withValues(alpha: 0.5),
             fontSize: 12,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,

@@ -81,7 +81,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
                 state.errorMessage ?? 'Unknown error',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: scheme.onSurface.withAlpha((255 * 0.7).toInt()),
+                  color: scheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 24),
@@ -103,9 +103,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
       return Center(
         child: Shimmer.fromColors(
           baseColor: const Color(0xFF1A1A2E),
-          highlightColor: const Color(
-            0xFF6C5CE7,
-          ).withAlpha((255 * 0.2).toInt()),
+          highlightColor: const Color(0xFF6C5CE7).withValues(alpha: 0.2),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -183,7 +181,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: scheme.primary.withAlpha((255 * 0.3).toInt()),
+                    color: scheme.primary.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -192,9 +190,7 @@ class _ExercisePageState extends ConsumerState<ExercisePage>
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
               labelColor: scheme.onPrimary,
-              unselectedLabelColor: scheme.onSurface.withAlpha(
-                (255 * 0.5).toInt(),
-              ),
+              unselectedLabelColor: scheme.onSurface.withValues(alpha: 0.5),
               labelStyle: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -255,10 +251,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
       color: const Color(0xFF0F0F1E),
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withAlpha((255 * 0.5).toInt()),
+          color: theme.colorScheme.surface.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: theme.colorScheme.onSurface.withAlpha((255 * 0.1).toInt()),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
