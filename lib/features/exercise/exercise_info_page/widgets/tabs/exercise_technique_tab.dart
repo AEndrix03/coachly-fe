@@ -1,61 +1,48 @@
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_equipment_model/exercise_equipment_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_instruction_model/exercise_instruction_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_safety_model/exercise_safety_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import for ConsumerWidget
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ExerciseTechniqueTab extends ConsumerWidget {
-  // Changed to ConsumerWidget
   final String description;
-  final List<ExerciseInstructionModel> instructions;
   final List<ExerciseSafetyModel> safety;
   final List<ExerciseEquipmentModel> equipments;
 
   const ExerciseTechniqueTab({
     super.key,
     required this.description,
-    required this.instructions,
     required this.safety,
     required this.equipments,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Added WidgetRef ref
     final locale = ref.watch(languageProvider); // Use languageProvider
+    final hasDescription = description.trim().isNotEmpty;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...instructions.map(
-            (step) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: _buildTechniqueCard(
-                order: step.stepNumber,
-                description: step.instructionTextI18n.fromI18n(locale),
-              ),
-            ),
-          ),
+          if (hasDescription) _buildDescriptionCard(description),
           if (safety.isNotEmpty) ...[
-            const SizedBox(height: 20),
+            SizedBox(height: hasDescription ? 20 : 0),
             _buildSafetySection(safety, locale),
           ],
           if (equipments.isNotEmpty) ...[
             const SizedBox(height: 20),
             _buildEquipmentSection(equipments, locale),
           ],
+          if (!hasDescription && safety.isEmpty && equipments.isEmpty)
+            _buildEmptyState(),
         ],
       ),
     );
   }
 
-  Widget _buildTechniqueCard({
-    required int order,
-    required String description,
-  }) {
+  Widget _buildDescriptionCard(String description) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -63,47 +50,45 @@ class ExerciseTechniqueTab extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF4A4A5E), Color(0xFF2A2A3E)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                width: 2,
-                color: Colors.white.withValues(alpha: 0.15),
-              ),
-            ),
-            child: Center(
-              child: Text(
-                order.toString(),
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
+          const Text(
+            'Descrizione',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              description,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.85),
-                fontSize: 14,
-                height: 1.5,
-              ),
+          const SizedBox(height: 12),
+          Text(
+            description,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.85),
+              fontSize: 14,
+              height: 1.5,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A2E),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+      ),
+      child: Text(
+        'Nessun dato tecnico disponibile.',
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.7),
+          fontSize: 14,
+        ),
       ),
     );
   }
