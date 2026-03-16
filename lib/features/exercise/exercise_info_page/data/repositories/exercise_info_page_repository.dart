@@ -9,6 +9,9 @@ abstract class IExerciseInfoPageRepository {
   Future<ApiResponse<List<ExerciseModel>>> getAllExercises();
 
   Future<ApiResponse<List<ExerciseDetailModel>>> getFilteredExercises(
-    ExerciseFilterModel filter,
-  );
+    ExerciseFilterModel filter, {
+    Set<String> excludedExerciseIds = const {},
+  });
+
+  Future<ApiResponse<List<ExerciseDetailModel>>> refreshFromRemote();
 }

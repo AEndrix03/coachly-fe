@@ -399,11 +399,19 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   void _handleAddExercise() {
+    final selectedExerciseIds = ref
+        .read(workoutEditPageProvider(widget.workoutId))
+        .exercises
+        .map((exercise) => exercise.exerciseId)
+        .where((id) => id.isNotEmpty)
+        .toSet();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ExercisePickerSheet(
+        excludedExerciseIds: selectedExerciseIds,
         onExerciseSelected: (exercise) {
           final state = ref.read(workoutEditPageProvider(widget.workoutId));
           final newNumber = state.exercises.length + 1;

@@ -9,7 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 class LocalDatabaseService {
   // Box version
   static const int _dbVersion = 1;
-  static const bool devMode = true;
+  static const bool devMode = false;
 
   // Box names
   static String get workoutsBox => 'workouts_v$_dbVersion';

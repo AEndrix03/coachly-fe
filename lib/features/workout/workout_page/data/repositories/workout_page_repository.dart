@@ -6,6 +6,8 @@ import 'package:coachly/features/workout/workout_page/data/models/workout_stats_
 abstract class IWorkoutPageRepository {
   Future<ApiResponse<List<WorkoutModel>>> getWorkouts();
 
+  Future<ApiResponse<List<WorkoutModel>>> refreshFromRemote();
+
   Future<ApiResponse<List<WorkoutModel>>> getRecentWorkouts();
 
   Future<ApiResponse<WorkoutModel?>> getWorkout(String workoutId);

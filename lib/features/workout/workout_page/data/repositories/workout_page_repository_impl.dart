@@ -22,18 +22,44 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   @override
   Future<ApiResponse<List<WorkoutModel>>> getWorkouts() async {
     try {
-      // Fetch remote workouts first.
-      final remoteResponse = await _apiService.fetchWorkouts();
-      if (remoteResponse.success && remoteResponse.data != null) {
-        // If successful, add any new workouts to the local hive box.
-        await _hiveService.patchWorkouts(remoteResponse.data!);
+      final localWorkouts = await _hiveService.getWorkouts();
+      if (localWorkouts.isNotEmpty) {
+        return ApiResponse.success(data: localWorkouts);
       }
 
-      // Always return the data from hive as the source of truth.
+      return refreshFromRemote();
+    } catch (e) {
+      final localWorkouts = await _hiveService.getWorkouts();
+      if (localWorkouts.isNotEmpty) {
+        return ApiResponse.success(
+          data: localWorkouts,
+          message: "API failed, showing local data.",
+        );
+      }
+      return ApiResponse.error(
+        message: "Failed to fetch workouts: ${e.toString()}",
+      );
+    }
+  }
+
+  @override
+  Future<ApiResponse<List<WorkoutModel>>> refreshFromRemote() async {
+    try {
+      final remoteResponse = await _apiService.fetchWorkouts();
+      if (remoteResponse.success && remoteResponse.data != null) {
+        await _hiveService.patchWorkouts(remoteResponse.data!);
+      } else {
+        return ApiResponse.error(
+          message:
+              remoteResponse.message ?? 'Failed to refresh workouts from remote',
+          statusCode: remoteResponse.statusCode,
+          errors: remoteResponse.errors,
+        );
+      }
+
       final localWorkouts = await _hiveService.getWorkouts();
       return ApiResponse.success(data: localWorkouts);
     } catch (e) {
-      // If API fails, still try to return local data.
       final localWorkouts = await _hiveService.getWorkouts();
       if (localWorkouts.isNotEmpty) {
         return ApiResponse.success(
@@ -61,7 +87,12 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   @override
   Future<ApiResponse<WorkoutModel?>> getWorkout(String workoutId) async {
     try {
-      final workout = await _hiveService.getWorkout(workoutId);
+      var workout = await _hiveService.getWorkout(workoutId);
+      if (workout == null) {
+        await refreshFromRemote();
+        workout = await _hiveService.getWorkout(workoutId);
+      }
+
       if (workout != null) {
         return ApiResponse.success(data: workout);
       } else {
@@ -115,8 +146,10 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
     String workoutId,
     WorkoutWriteCommand command,
   ) async {
-    // TODO: After patching, the local HIVE data will be stale.
-    // We need a way to get the updated model and save it to Hive.
-    return await _apiService.patchWorkout(workoutId, command);
+    final response = await _apiService.patchWorkout(workoutId, command);
+    if (response.success) {
+      await refreshFromRemote();
+    }
+    return response;
   }
 }
