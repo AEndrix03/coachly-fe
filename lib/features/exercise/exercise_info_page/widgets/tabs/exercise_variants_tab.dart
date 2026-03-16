@@ -1,18 +1,16 @@
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_variant_model/exercise_variant_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart'; // Import for fromI18n
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import for ConsumerWidget
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ExerciseVariantsTab extends ConsumerWidget {
-  // Changed to ConsumerWidget
   final List<ExerciseVariantModel> variants;
 
   const ExerciseVariantsTab({super.key, required this.variants});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Added WidgetRef ref
     if (variants.isEmpty) {
       return const Center(
         child: Text(
@@ -22,6 +20,8 @@ class ExerciseVariantsTab extends ConsumerWidget {
       );
     }
 
+    final locale = ref.watch(languageProvider);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: Column(
@@ -30,13 +30,7 @@ class ExerciseVariantsTab extends ConsumerWidget {
           ...variants.map(
             (variant) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _buildVariantCard(
-                variant: variant,
-                onTap: () {
-                  // TODO: Navigate to variant detail page
-                },
-                ref: ref, // Pass ref to _buildVariantCard
-              ),
+              child: _buildVariantCard(variant: variant, locale: locale),
             ),
           ),
         ],
@@ -46,12 +40,12 @@ class ExerciseVariantsTab extends ConsumerWidget {
 
   Widget _buildVariantCard({
     required ExerciseVariantModel variant,
-    required VoidCallback onTap,
-    required WidgetRef ref, // Accept WidgetRef
+    required Locale locale,
   }) {
-    final locale = ref.watch(languageProvider); // Use languageProvider
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        // TODO: Navigate to variant detail page
+      },
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -91,40 +85,27 @@ class ExerciseVariantsTab extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A2E),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Text(
-                          variant.difficultyLevel ?? 'N/A',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A2E),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        width: 1,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        variant.variationType ?? 'N/A',
-                        style: const TextStyle(
-                          color: Color(0xFF2196F3),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    ),
+                    child: Text(
+                      variant.difficultyLevel ?? 'N/A',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
