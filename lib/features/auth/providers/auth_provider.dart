@@ -1,3 +1,4 @@
+import 'package:coachly/core/sync/local_database_service.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/models/auth_state/auth_state.dart';
 import 'package:coachly/features/auth/data/repositories/auth_repository.dart';
@@ -55,6 +56,7 @@ class Auth extends _$Auth {
     final authService = ref.read(authServiceProvider);
     await authService.endSession();
     await authService.clearTokens();
+    await LocalDatabaseService().clearAll();
     state = const AsyncData(_unauthenticated);
   }
 
