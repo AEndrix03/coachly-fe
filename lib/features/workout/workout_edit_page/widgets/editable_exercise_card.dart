@@ -389,7 +389,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
             border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.min, // Use min to wrap content
+            mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
                 child: TextField(
