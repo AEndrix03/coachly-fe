@@ -1,5 +1,4 @@
-/// Wrapper per le response API
-/// Simile al pattern ApiResponse<T> che useresti in Angular
+/// Wrapper generico per le response API.
 class ApiResponse<T> {
   final bool success;
   final String? message;
