@@ -1,5 +1,3 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository.dart';
-import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
@@ -9,23 +7,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
   final workoutRepository = ref.watch(workoutPageRepositoryProvider);
-  final exerciseRepository = ref.watch(exerciseInfoPageRepositoryProvider);
-  return AppDataSyncService(ref, workoutRepository, exerciseRepository);
+  return AppDataSyncService(ref, workoutRepository);
 });
 
 class AppDataSyncService {
   final Ref _ref;
   final IWorkoutPageRepository _workoutRepository;
-  final IExerciseInfoPageRepository _exerciseRepository;
 
   bool _hasSyncedCurrentSession = false;
   bool _isSyncing = false;
 
-  AppDataSyncService(
-    this._ref,
-    this._workoutRepository,
-    this._exerciseRepository,
-  );
+  AppDataSyncService(this._ref, this._workoutRepository);
 
   Future<void> syncOnAuthenticatedAccess({bool force = false}) async {
     if (_isSyncing) {
@@ -50,16 +42,12 @@ class AppDataSyncService {
 
     try {
       final workoutResult = await _workoutRepository.refreshFromRemote();
-      final exerciseResult = await _exerciseRepository.refreshFromRemote();
-      final success = workoutResult.success && exerciseResult.success;
+      final success = workoutResult.success;
 
       if (success) {
-        // Mark session as synced only on full success so a partial failure
-        // will be retried on the next authenticated access.
         _hasSyncedCurrentSession = true;
         _ref.invalidate(workoutListProvider);
         _ref.invalidate(recentWorkoutsProvider);
-        _ref.invalidate(exerciseInfoProvider);
       }
     } finally {
       _isSyncing = false;
