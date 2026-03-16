@@ -13,31 +13,44 @@ class WorkoutWriteCommand {
     required this.blocks,
   });
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'translations': translations.map(
-      (key, value) => MapEntry(key, value.toJson()),
-    ),
-    'status': status,
-    'blocks': blocks.map((block) => block.toJson()).toList(),
-  };
+  Map<String, dynamic> toJson({bool includeId = true}) {
+    final payload = <String, dynamic>{
+      'name': name,
+      'translations': translations.map(
+        (key, value) => MapEntry(key, value.toJson()),
+      ),
+      'status': status,
+      'blocks': blocks.map((block) => block.toJson()).toList(),
+    };
+
+    if (includeId && id != null && id!.isNotEmpty) {
+      payload['id'] = id;
+    }
+
+    return payload;
+  }
 }
 
 class WorkoutTranslationWritePayload {
-  final String name;
+  final String title;
   final String? description;
 
   const WorkoutTranslationWritePayload({
-    required this.name,
+    required this.title,
     required this.description,
   });
 
-  Map<String, dynamic> toJson() => {'name': name, 'description': description};
+  Map<String, dynamic> toJson() {
+    final payload = <String, dynamic>{'title': title};
+    if (description != null) {
+      payload['description'] = description;
+    }
+    return payload;
+  }
 }
 
 class WorkoutBlockWritePayload {
-  final String id;
+  final String? id;
   final int position;
   final String? label;
   final int? restSeconds;
@@ -53,18 +66,29 @@ class WorkoutBlockWritePayload {
     required this.entries,
   });
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'position': position,
-    'label': label,
-    'restSeconds': restSeconds,
-    'notes': notes,
-    'entries': entries.map((entry) => entry.toJson()).toList(),
-  };
+  Map<String, dynamic> toJson() {
+    final payload = <String, dynamic>{
+      'position': position,
+      'entries': entries.map((entry) => entry.toJson()).toList(),
+    };
+    if (id != null) {
+      payload['id'] = id;
+    }
+    if (label != null) {
+      payload['label'] = label;
+    }
+    if (restSeconds != null) {
+      payload['restSeconds'] = restSeconds;
+    }
+    if (notes != null) {
+      payload['notes'] = notes;
+    }
+    return payload;
+  }
 }
 
 class WorkoutEntryWritePayload {
-  final String id;
+  final String? id;
   final String exerciseId;
   final int position;
   final List<WorkoutSetWritePayload> sets;
@@ -76,16 +100,21 @@ class WorkoutEntryWritePayload {
     required this.sets,
   });
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'exerciseId': exerciseId,
-    'position': position,
-    'sets': sets.map((set) => set.toJson()).toList(),
-  };
+  Map<String, dynamic> toJson() {
+    final payload = <String, dynamic>{
+      'exerciseId': exerciseId,
+      'position': position,
+      'sets': sets.map((set) => set.toJson()).toList(),
+    };
+    if (id != null) {
+      payload['id'] = id;
+    }
+    return payload;
+  }
 }
 
 class WorkoutSetWritePayload {
-  final String id;
+  final String? id;
   final int position;
   final String setType;
   final int? reps;
@@ -105,14 +134,29 @@ class WorkoutSetWritePayload {
     required this.notes,
   });
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'position': position,
-    'setType': setType,
-    'reps': reps,
-    'load': load,
-    'loadUnit': loadUnit,
-    'restSeconds': restSeconds,
-    'notes': notes,
-  };
+  Map<String, dynamic> toJson() {
+    final payload = <String, dynamic>{
+      'position': position,
+      'setType': setType,
+    };
+    if (id != null) {
+      payload['id'] = id;
+    }
+    if (reps != null) {
+      payload['reps'] = reps;
+    }
+    if (load != null) {
+      payload['load'] = load;
+    }
+    if (loadUnit != null) {
+      payload['loadUnit'] = loadUnit;
+    }
+    if (restSeconds != null) {
+      payload['restSeconds'] = restSeconds;
+    }
+    if (notes != null) {
+      payload['notes'] = notes;
+    }
+    return payload;
+  }
 }

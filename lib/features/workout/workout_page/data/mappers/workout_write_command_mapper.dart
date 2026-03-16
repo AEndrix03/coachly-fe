@@ -16,25 +16,24 @@ class WorkoutWriteCommandMapper {
     Locale locale,
   ) {
     final workoutId = state.workoutId == 'new' ? null : state.workoutId;
-    final localeKey = locale.languageCode;
     final name = state.title.trim();
     final description = _nullIfBlank(state.description);
 
     _validateName(name);
+    final translations = _buildDefaultTranslations(
+      title: name,
+      description: description,
+      preferredLocale: locale.languageCode,
+    );
 
     return WorkoutWriteCommand(
       id: workoutId,
       name: name,
-      translations: {
-        localeKey: WorkoutTranslationWritePayload(
-          name: name,
-          description: description,
-        ),
-      },
+      translations: translations,
       status: 'active',
       blocks: [
         WorkoutBlockWritePayload(
-          id: '${workoutId ?? 'new'}-block-0',
+          id: null,
           position: 0,
           label: _nullIfBlank(state.type),
           restSeconds: null,
@@ -64,15 +63,15 @@ class WorkoutWriteCommandMapper {
       }
 
       translations[key] = WorkoutTranslationWritePayload(
-        name: translatedName,
+        title: translatedName,
         description: _nullIfBlank(workout.descriptionI18n?[key]),
       );
     }
 
     final fallbackName =
-        translations['it']?.name ??
-        translations['en']?.name ??
-        translations.values.firstOrNull?.name ??
+        translations['it']?.title ??
+        translations['en']?.title ??
+        translations.values.firstOrNull?.title ??
         workout.id;
 
     return WorkoutWriteCommand(
@@ -80,13 +79,13 @@ class WorkoutWriteCommandMapper {
       name: fallbackName,
       translations: translations,
       status: workout.delete
-          ? 'deleted'
+          ? 'archived'
           : workout.active
           ? 'active'
-          : 'inactive',
+          : 'draft',
       blocks: [
         WorkoutBlockWritePayload(
-          id: '${workout.id}-block-0',
+          id: _optionalUuid(workout.id),
           position: 0,
           label: _nullIfBlank(workout.type),
           restSeconds: null,
@@ -115,14 +114,14 @@ class WorkoutWriteCommandMapper {
     final notes = _nullIfBlank(exercise.notes);
 
     return WorkoutEntryWritePayload(
-      id: exercise.id,
+      id: _optionalUuid(exercise.id),
       exerciseId: exercise.exerciseId,
       position: position,
       sets: List.generate(setCount, (index) {
         return WorkoutSetWritePayload(
-          id: '${exercise.id}-set-$index',
+          id: null,
           position: index,
-          setType: 'standard',
+          setType: 'normal',
           reps: reps,
           load: load,
           loadUnit: load != null ? 'kg' : null,
@@ -153,14 +152,14 @@ class WorkoutWriteCommandMapper {
     final restSeconds = _parseSeconds(exercise.rest);
 
     return WorkoutEntryWritePayload(
-      id: exercise.id,
+      id: _optionalUuid(exercise.id),
       exerciseId: exerciseId,
       position: position,
       sets: List.generate(setCount, (index) {
         return WorkoutSetWritePayload(
-          id: '${exercise.id}-set-$index',
+          id: null,
           position: index,
-          setType: 'standard',
+          setType: 'normal',
           reps: reps,
           load: load,
           loadUnit: load != null ? 'kg' : null,
@@ -241,5 +240,38 @@ class WorkoutWriteCommandMapper {
 
     final trimmed = value.trim();
     return trimmed.isEmpty ? null : trimmed;
+  }
+
+  static String? _optionalUuid(String? rawValue) {
+    if (rawValue == null || rawValue.isEmpty) {
+      return null;
+    }
+    return _uuidPattern.hasMatch(rawValue) ? rawValue : null;
+  }
+
+  static Map<String, WorkoutTranslationWritePayload> _buildDefaultTranslations({
+    required String title,
+    required String? description,
+    required String preferredLocale,
+  }) {
+    final translations = <String, WorkoutTranslationWritePayload>{
+      'it': WorkoutTranslationWritePayload(
+        title: title,
+        description: description,
+      ),
+      'en': WorkoutTranslationWritePayload(
+        title: title,
+        description: description,
+      ),
+    };
+
+    if (preferredLocale != 'it' && preferredLocale != 'en') {
+      translations[preferredLocale] = WorkoutTranslationWritePayload(
+        title: title,
+        description: description,
+      );
+    }
+
+    return translations;
   }
 }

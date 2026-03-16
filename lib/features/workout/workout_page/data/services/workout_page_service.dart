@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
@@ -23,7 +25,9 @@ class WorkoutPageService {
         if (json is List) {
           return json
               .map(
-                (item) => WorkoutModel.fromJson(item as Map<String, dynamic>),
+                (item) => WorkoutModel.fromJson(
+                  _normalizeWorkoutJson(item as Map<String, dynamic>),
+                ),
               )
               .toList();
         }
@@ -74,10 +78,82 @@ class WorkoutPageService {
     String workoutId,
     WorkoutWriteCommand command,
   ) async {
-    return await _apiClient.post<void>(
-      '/workouts',
-      body: command.toJson(),
+    final isCreate = workoutId == 'new' || workoutId.trim().isEmpty;
+
+    if (isCreate) {
+      return await _apiClient.post<void>(
+        '/workouts',
+        body: command.toJson(includeId: true),
+        fromJson: (_) {},
+      );
+    }
+
+    return await _apiClient.put<void>(
+      '/workouts/$workoutId',
+      body: command.toJson(includeId: false),
       fromJson: (_) {},
     );
+  }
+
+  Map<String, dynamic> _normalizeWorkoutJson(Map<String, dynamic> rawJson) {
+    final normalized = Map<String, dynamic>.from(rawJson);
+    final parsedTranslations = _parseTranslations(normalized['translations']);
+
+    if (parsedTranslations != null) {
+      final titleI18n = <String, String>{};
+      final descriptionI18n = <String, String>{};
+
+      for (final entry in parsedTranslations.entries) {
+        final locale = entry.key;
+        final value = entry.value;
+        if (value is! Map) {
+          continue;
+        }
+
+        final translation = Map<String, dynamic>.from(value);
+        final title =
+            (translation['title'] ?? translation['name'])?.toString().trim();
+        final description = translation['description']?.toString().trim();
+
+        if (title != null && title.isNotEmpty) {
+          titleI18n[locale] = title;
+        }
+        if (description != null && description.isNotEmpty) {
+          descriptionI18n[locale] = description;
+        }
+      }
+
+      if (titleI18n.isNotEmpty) {
+        normalized['titleI18n'] = titleI18n;
+      }
+      if (descriptionI18n.isNotEmpty) {
+        normalized['descriptionI18n'] = descriptionI18n;
+      }
+    }
+
+    return normalized;
+  }
+
+  Map<String, dynamic>? _parseTranslations(dynamic rawTranslations) {
+    if (rawTranslations is Map<String, dynamic>) {
+      return rawTranslations;
+    }
+
+    if (rawTranslations is String && rawTranslations.trim().isNotEmpty) {
+      try {
+        final decoded = jsonDecode(rawTranslations);
+        if (decoded is Map<String, dynamic>) {
+          return decoded;
+        }
+      } catch (_) {
+        return null;
+      }
+    }
+
+    if (rawTranslations is Map) {
+      return Map<String, dynamic>.from(rawTranslations);
+    }
+
+    return null;
   }
 }
