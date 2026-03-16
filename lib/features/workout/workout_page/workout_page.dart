@@ -12,6 +12,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'widgets/workout_card.dart';
+import 'widgets/workout_empty_state.dart';
 import 'widgets/workout_header.dart';
 import 'widgets/workout_recent_card.dart';
 
@@ -123,25 +124,7 @@ class WorkoutPage extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context, ColorScheme scheme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Crea la tua prima scheda!',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const Gap(16),
-          ShadButton(
-            onPressed: () {
-              context.push('/workouts/workout/new/edit');
-            },
-            backgroundColor: scheme.primary,
-            child: const Text('Iniziamo'),
-          ),
-        ],
-      ),
-    );
+    return const WorkoutEmptyState();
   }
 
   Widget _buildLoading(ColorScheme scheme) {
