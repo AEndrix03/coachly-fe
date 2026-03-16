@@ -16,6 +16,7 @@ final workoutPageRepositoryProvider = Provider<IWorkoutPageRepository>((ref) {
 class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   final WorkoutPageService _apiService;
   final WorkoutHiveService _hiveService;
+  Future<ApiResponse<List<WorkoutModel>>>? _ongoingRefresh;
 
   WorkoutPageRepositoryImpl(this._apiService, this._hiveService);
 
@@ -26,11 +27,31 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       return ApiResponse.success(data: localWorkouts);
     }
     // Cache empty — populate from remote.
-    return refreshFromRemote();
+    return _refreshFromRemoteDeduplicated();
   }
 
   @override
   Future<ApiResponse<List<WorkoutModel>>> refreshFromRemote() async {
+    return _refreshFromRemoteDeduplicated();
+  }
+
+  Future<ApiResponse<List<WorkoutModel>>> _refreshFromRemoteDeduplicated() {
+    final ongoingRefresh = _ongoingRefresh;
+    if (ongoingRefresh != null) {
+      return ongoingRefresh;
+    }
+
+    final refreshFuture = _performRefreshFromRemote();
+    _ongoingRefresh = refreshFuture;
+    refreshFuture.whenComplete(() {
+      if (identical(_ongoingRefresh, refreshFuture)) {
+        _ongoingRefresh = null;
+      }
+    });
+    return refreshFuture;
+  }
+
+  Future<ApiResponse<List<WorkoutModel>>> _performRefreshFromRemote() async {
     try {
       final remoteResponse = await _apiService.fetchWorkouts();
       if (remoteResponse.success && remoteResponse.data != null) {

@@ -45,11 +45,8 @@ class WorkoutList extends _$WorkoutList {
 final recentWorkoutsProvider = FutureProvider.autoDispose<List<WorkoutModel>>((
   ref,
 ) async {
-  final repository = ref.watch(workoutPageRepositoryProvider);
-  final response = await repository.getRecentWorkouts();
-  if (response.success) {
-    return response.data!;
-  } else {
-    throw Exception(response.message ?? 'Failed to fetch recent workouts');
-  }
+  final allWorkouts = await ref.watch(workoutListProvider.future);
+  final sortedWorkouts = [...allWorkouts]
+    ..sort((a, b) => b.lastUsed.compareTo(a.lastUsed));
+  return sortedWorkouts.take(3).toList();
 });

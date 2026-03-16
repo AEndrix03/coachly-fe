@@ -63,7 +63,7 @@ class Auth extends _$Auth {
     final accessToken = await authService.getAccessToken();
     final refreshToken = await authService.getRefreshToken();
 
-    if (accessToken == null || refreshToken == null) {
+    if (accessToken == null) {
       await authService.clearTokens();
       return _unauthenticated;
     }
@@ -72,9 +72,14 @@ class Auth extends _$Auth {
       return _authenticatedStateFromTokens(
         LoginResponseDto.fromTokens(
           accessToken: accessToken,
-          refreshToken: refreshToken,
+          refreshToken: refreshToken ?? '',
         ),
       );
+    }
+
+    if (refreshToken == null || refreshToken.isEmpty) {
+      await authService.clearTokens();
+      return _unauthenticated;
     }
 
     if (!JwtValidator.isTokenValid(refreshToken)) {
