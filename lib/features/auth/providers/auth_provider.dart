@@ -79,20 +79,23 @@ class Auth extends _$Auth {
       return _unauthenticated;
     }
 
+    if (accessToken != null && JwtValidator.isTokenValid(accessToken)) {
+      return _authenticatedStateFromTokens(
+        LoginResponseDto.fromTokens(
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        ),
+      );
+    }
+
     final connectivityResults = await Connectivity().checkConnectivity();
     final isOnline = connectivityResults.any(
       (result) => result != ConnectivityResult.none,
     );
     if (!isOnline) {
-      return AuthState(
-        isAuthenticated: true,
-        isTokenValid:
-            accessToken != null && JwtValidator.isTokenValid(accessToken),
-        isOfflineMode: true,
-        tokens: LoginResponseDto.fromTokens(
-          accessToken: accessToken ?? '',
-          refreshToken: refreshToken,
-        ),
+      return _offlineAuthenticatedState(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
       );
     }
 
@@ -101,10 +104,11 @@ class Auth extends _$Auth {
         .refreshToken(refreshToken);
 
     return refreshResult.fold(
-      (failure) async {
-        await authService.clearTokens();
-        return _unauthenticated.copyWith(errorMessage: failure.message);
-      },
+      (failure) => _offlineAuthenticatedState(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        errorMessage: failure.message,
+      ),
       _authenticatedStateFromTokens,
     );
   }
@@ -115,6 +119,24 @@ class Auth extends _$Auth {
       isTokenValid: JwtValidator.isTokenValid(tokens.accessToken),
       isOfflineMode: false,
       tokens: tokens,
+    );
+  }
+
+  AuthState _offlineAuthenticatedState({
+    required String? accessToken,
+    required String refreshToken,
+    String? errorMessage,
+  }) {
+    return AuthState(
+      isAuthenticated: true,
+      isTokenValid:
+          accessToken != null && JwtValidator.isTokenValid(accessToken),
+      isOfflineMode: true,
+      tokens: LoginResponseDto.fromTokens(
+        accessToken: accessToken ?? '',
+        refreshToken: refreshToken,
+      ),
+      errorMessage: errorMessage,
     );
   }
 }
