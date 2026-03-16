@@ -26,6 +26,13 @@ AuthRepository authRepository(Ref ref) {
 
 @riverpod
 class Auth extends _$Auth {
+  // Default unauthenticated state — isTokenValid must be false (field defaults to true).
+  static const _unauthenticated = AuthState(
+    isAuthenticated: false,
+    isTokenValid: false,
+    isOfflineMode: false,
+  );
+
   @override
   Future<AuthState> build() async {
     return _restoreSession();
@@ -38,27 +45,17 @@ class Auth extends _$Auth {
 
     state = AsyncData(
       result.fold(
-        (failure) => AuthState(
-          isAuthenticated: false,
-          isTokenValid: false,
-          isOfflineMode: false,
-          errorMessage: failure.message,
-        ),
+        (failure) => _unauthenticated.copyWith(errorMessage: failure.message),
         _authenticatedStateFromTokens,
       ),
     );
   }
 
   Future<void> logout() async {
-    await ref.read(authServiceProvider).endSession();
-    await ref.read(authServiceProvider).clearTokens();
-    state = const AsyncData(
-      AuthState(
-        isAuthenticated: false,
-        isTokenValid: false,
-        isOfflineMode: false,
-      ),
-    );
+    final authService = ref.read(authServiceProvider);
+    await authService.endSession();
+    await authService.clearTokens();
+    state = const AsyncData(_unauthenticated);
   }
 
   Future<AuthState> _restoreSession() async {
@@ -68,11 +65,7 @@ class Auth extends _$Auth {
 
     if (accessToken == null || refreshToken == null) {
       await authService.clearTokens();
-      return const AuthState(
-        isAuthenticated: false,
-        isTokenValid: false,
-        isOfflineMode: false,
-      );
+      return _unauthenticated;
     }
 
     if (JwtValidator.isTokenValid(accessToken)) {
@@ -86,11 +79,7 @@ class Auth extends _$Auth {
 
     if (!JwtValidator.isTokenValid(refreshToken)) {
       await authService.clearTokens();
-      return const AuthState(
-        isAuthenticated: false,
-        isTokenValid: false,
-        isOfflineMode: false,
-      );
+      return _unauthenticated;
     }
 
     final refreshResult = await ref
@@ -100,16 +89,9 @@ class Auth extends _$Auth {
     return refreshResult.fold(
       (failure) async {
         await authService.clearTokens();
-        return AuthState(
-          isAuthenticated: false,
-          isTokenValid: false,
-          isOfflineMode: false,
-          errorMessage: failure.message,
-        );
+        return _unauthenticated.copyWith(errorMessage: failure.message);
       },
-      (tokens) async {
-        return _authenticatedStateFromTokens(tokens);
-      },
+      _authenticatedStateFromTokens,
     );
   }
 
