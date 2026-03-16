@@ -28,7 +28,7 @@ final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
 /// both repositories succeed, so a partial failure is automatically retried
 /// on the next access.
 class AppDataSyncService {
-  static const Duration _cacheTtl = Duration(hours: 12);
+  static const Duration _cacheTtl = Duration(hours: 72);
 
   final Ref _ref;
   final IWorkoutPageRepository _workoutRepository;
