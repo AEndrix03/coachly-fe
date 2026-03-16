@@ -24,23 +24,6 @@ _ExerciseDetailModel _$ExerciseDetailModelFromJson(
   forceType: json['forceType'] as String? ?? null,
   isUnilateral: json['isUnilateral'] as bool? ?? null,
   isBodyweight: json['isBodyweight'] as bool? ?? null,
-  environment: json['environment'] == null
-      ? null
-      : ExerciseEnvironmentModel.fromJson(
-          json['environment'] as Map<String, dynamic>,
-        ),
-  instructions:
-      (json['instructions'] as List<dynamic>?)
-          ?.map(
-            (e) => ExerciseInstructionModel.fromJson(e as Map<String, dynamic>),
-          )
-          .toList() ??
-      null,
-  movementPattern: json['movementPattern'] == null
-      ? null
-      : ExerciseMovementPatternModel.fromJson(
-          json['movementPattern'] as Map<String, dynamic>,
-        ),
   variants:
       (json['variants'] as List<dynamic>?)
           ?.map((e) => ExerciseVariantModel.fromJson(e as Map<String, dynamic>))
@@ -61,15 +44,6 @@ _ExerciseDetailModel _$ExerciseDetailModelFromJson(
   safety:
       (json['safety'] as List<dynamic>?)
           ?.map((e) => ExerciseSafetyModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      null,
-  safetyContraindications:
-      (json['safetyContraindications'] as List<dynamic>?)
-          ?.map(
-            (e) => ExerciseSafetyContraindicationModel.fromJson(
-              e as Map<String, dynamic>,
-            ),
-          )
           .toList() ??
       null,
   muscles:
@@ -103,14 +77,10 @@ Map<String, dynamic> _$ExerciseDetailModelToJson(
   'forceType': instance.forceType,
   'isUnilateral': instance.isUnilateral,
   'isBodyweight': instance.isBodyweight,
-  'environment': instance.environment,
-  'instructions': instance.instructions,
-  'movementPattern': instance.movementPattern,
   'variants': instance.variants,
   'media': instance.media,
   'categories': instance.categories,
   'safety': instance.safety,
-  'safetyContraindications': instance.safetyContraindications,
   'muscles': instance.muscles,
   'equipments': instance.equipments,
   'tags': instance.tags,

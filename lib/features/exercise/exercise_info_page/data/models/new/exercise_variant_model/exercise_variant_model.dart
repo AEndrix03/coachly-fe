@@ -16,7 +16,6 @@ abstract class ExerciseVariantModel with _$ExerciseVariantModel {
     @Default(null) String? forceType,
     @Default(null) bool? isUnilateral,
     @Default(null) bool? isBodyweight,
-    @Default(null) String? variationType,
     @Default(null) int? difficultyDelta,
   }) = _ExerciseVariantModel;
 

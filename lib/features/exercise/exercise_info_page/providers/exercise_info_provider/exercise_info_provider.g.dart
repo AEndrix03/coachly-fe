@@ -104,7 +104,7 @@ final class ExerciseInfoPageRepositoryProvider
 }
 
 String _$exerciseInfoPageRepositoryHash() =>
-    r'815da93e37a586975e4a51ca56cfd4fe8205fbf2';
+    r'4d3e341e53f6b738c3b4bf0c55d1dda2c9163c39';
 
 @ProviderFor(ExerciseInfoNotifier)
 const exerciseInfoProvider = ExerciseInfoNotifierProvider._();
