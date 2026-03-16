@@ -343,13 +343,43 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Widget _buildFAB() {
-    return FloatingActionButton.extended(
-      onPressed: _handleAddExercise,
-      backgroundColor: const Color(0xFF2196F3),
-      icon: const Icon(Icons.add, color: Colors.white),
-      label: const Text(
-        'Aggiungi Esercizio',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+    return GestureDetector(
+      onTap: _handleAddExercise,
+      child: Container(
+        height: 52,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(26),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2196F3).withValues(alpha: 0.45),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+              spreadRadius: -4,
+            ),
+          ],
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add_rounded, color: Colors.white, size: 22),
+            SizedBox(width: 8),
+            Text(
+              'Aggiungi Esercizio',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
