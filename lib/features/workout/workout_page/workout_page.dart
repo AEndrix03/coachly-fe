@@ -26,9 +26,8 @@ class WorkoutPage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: scheme.surface,
       floatingActionButton: workoutState.maybeWhen(
-        data: (workouts) =>
-            workouts.isEmpty ? null : _buildFAB(context, scheme),
-        orElse: () => _buildFAB(context, scheme),
+        data: (workouts) => workouts.isEmpty ? null : _buildFAB(context),
+        orElse: () => _buildFAB(context),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -189,9 +188,6 @@ class WorkoutPage extends ConsumerWidget {
   }
 
   Widget _buildRecentWorkouts(List<WorkoutModel> workouts, ColorScheme scheme) {
-    if (workouts.isEmpty) {
-      return const SizedBox.shrink();
-    }
     return SizedBox(
       height: 365,
       child: ListView.builder(
@@ -228,7 +224,7 @@ class WorkoutPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildFAB(BuildContext context, ColorScheme scheme) {
+  Widget _buildFAB(BuildContext context) {
     return AddFabButton(
       onPressed: () {
         context.push('/workouts/workout/new/edit');
