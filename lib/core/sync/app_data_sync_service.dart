@@ -1,3 +1,4 @@
+import 'package:coachly/core/sync/local_database_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
@@ -16,19 +17,24 @@ final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
     ref.watch(workoutPageRepositoryProvider),
     ref.watch(exerciseInfoPageRepositoryProvider),
     ref.watch(authServiceProvider),
+    LocalDatabaseService(),
   );
 });
 
 /// Orchestrates full-app data sync on authenticated access.
 ///
-/// Sync runs at most once per session unless [force] is passed.
-/// The session is marked as synced only when both repositories succeed,
-/// so a partial failure is automatically retried on the next access.
+/// Sync runs at most once per session unless [force] is passed, or the cache
+/// TTL has expired ([_cacheTtl]). The session is marked as synced only when
+/// both repositories succeed, so a partial failure is automatically retried
+/// on the next access.
 class AppDataSyncService {
+  static const Duration _cacheTtl = Duration(hours: 12);
+
   final Ref _ref;
   final IWorkoutPageRepository _workoutRepository;
   final IExerciseInfoPageRepository _exerciseRepository;
   final AuthService _authService;
+  final LocalDatabaseService _localDb;
 
   bool _hasSyncedCurrentSession = false;
   bool _isSyncing = false;
@@ -38,11 +44,19 @@ class AppDataSyncService {
     this._workoutRepository,
     this._exerciseRepository,
     this._authService,
+    this._localDb,
   );
+
+  /// Returns true if the last successful sync is older than [_cacheTtl].
+  bool get _isCacheStale {
+    final lastSync = _localDb.lastSyncTime;
+    if (lastSync == null) return true;
+    return DateTime.now().difference(lastSync) > _cacheTtl;
+  }
 
   Future<void> syncOnAuthenticatedAccess({bool force = false}) async {
     if (_isSyncing) return;
-    if (_hasSyncedCurrentSession && !force) return;
+    if (_hasSyncedCurrentSession && !force && !_isCacheStale) return;
 
     final connectivityResults = await Connectivity().checkConnectivity();
     final isOnline = connectivityResults.any(
@@ -67,6 +81,7 @@ class AppDataSyncService {
 
       if (success) {
         _hasSyncedCurrentSession = true;
+        await _localDb.updateLastSyncTime();
         _ref.invalidate(workoutListProvider);
         _ref.invalidate(recentWorkoutsProvider);
         _ref.invalidate(exerciseInfoProvider);
