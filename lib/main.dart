@@ -62,36 +62,38 @@ class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap> {
         authState.value?.isTokenValid == true;
   }
 
-  Future<void> _syncIfAuthenticated() async {
-    final authState = ref.read(authProvider);
-    if (_isAuthenticated(authState)) {
-      await ref.read(appDataSyncServiceProvider).syncOnAuthenticatedAccess();
+  Future<void> _handleAuthState(
+    AsyncValue? previous,
+    AsyncValue next,
+  ) async {
+    final syncService = ref.read(appDataSyncServiceProvider);
+    final isAuthenticated = _isAuthenticated(next);
+    final wasAuthenticated = previous != null && _isAuthenticated(previous);
+
+    if (!isAuthenticated) {
+      syncService.resetSession();
+      return;
+    }
+
+    if (!wasAuthenticated && isAuthenticated) {
+      await syncService.syncOnAuthenticatedAccess(force: true);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(_syncIfAuthenticated);
+    ref.listenManual(authProvider, (previous, next) {
+      _handleAuthState(previous, next);
+    });
+
+    Future.microtask(() {
+      _handleAuthState(null, ref.read(authProvider));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(authProvider, (previous, next) {
-      final syncService = ref.read(appDataSyncServiceProvider);
-      final isAuthenticated = _isAuthenticated(next);
-      final wasAuthenticated = previous != null && _isAuthenticated(previous);
-
-      if (!isAuthenticated) {
-        syncService.resetSession();
-        return;
-      }
-
-      if (!wasAuthenticated && isAuthenticated) {
-        syncService.syncOnAuthenticatedAccess(force: true);
-      }
-    });
-
     return widget.child;
   }
 }
