@@ -475,7 +475,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   Widget _buildExerciseCard(ExerciseDetailModel exercise) {
     final locale = ref.watch(languageProvider);
-    final accentColor = Color(int.parse('0xFF2196F3'));
+    const accentColor = Color(0xFF2196F3);
 
     return GestureDetector(
       onTap: () {
