@@ -3,21 +3,26 @@ import 'package:coachly/features/workout/workout_edit_page/data/models/editable_
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class EditableExerciseCard extends StatefulWidget {
   final EditableExerciseModel exercise;
   final VoidCallback onRemove;
   final VoidCallback onFindVariant;
+  final VoidCallback onPreview;
   final Function(EditableExerciseModel) onUpdate;
   final bool isDragging;
+  final bool initiallyExpanded;
 
   const EditableExerciseCard({
     super.key,
     required this.exercise,
     required this.onRemove,
     required this.onFindVariant,
+    required this.onPreview,
     required this.onUpdate,
     this.isDragging = false,
+    this.initiallyExpanded = false,
   });
 
   @override
@@ -32,11 +37,12 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
   late TextEditingController _notesController;
 
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 300));
-  bool _isExpanded = false;
+  late bool _isExpanded;
 
   @override
   void initState() {
     super.initState();
+    _isExpanded = widget.initiallyExpanded;
     _initializeControllers();
 
     _setsController.addListener(() => _debouncer.run(_updateExercise));
@@ -167,19 +173,33 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
       child: Column(
         children: [
           _buildMainContent(),
-          Container(
-            height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  Colors.white.withValues(alpha: 0.1),
-                  Colors.transparent,
-                ],
-              ),
+          // Summary bar: visible only when collapsed (non-redundant)
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 220),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            firstChild: const SizedBox.shrink(),
+            secondChild: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        Colors.white.withValues(alpha: 0.1),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+                _buildSummaryBar(),
+              ],
             ),
           ),
-          _buildSummaryBar(),
+          // Editable fields: visible only when expanded
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 220),
             crossFadeState: _isExpanded
@@ -295,6 +315,12 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
           _toggleExpanded,
         ),
         const SizedBox(height: 8),
+        _buildIconButton(
+          LucideIcons.eye,
+          const Color(0xFF2196F3),
+          widget.onPreview,
+        ),
+        const SizedBox(height: 8),
         if (widget.exercise.variants.isNotEmpty) ...[
           _buildIconButton(
             Icons.swap_horiz,
@@ -406,7 +432,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildNumericField(
-                  label: 'Peso',
+                  label: 'Carico',
                   controller: _weightController,
                   suffix: 'kg',
                   hint: '80',

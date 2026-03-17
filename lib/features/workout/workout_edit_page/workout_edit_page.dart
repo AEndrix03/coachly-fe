@@ -28,6 +28,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   final _durationController = TextEditingController();
   final _typeController = TextEditingController();
 
+  // IDs of exercises just added in this session — open expanded by default
+  final Set<String> _justAddedIds = {};
+
   // Debouncer per ritardare l'aggiornamento dello stato durante la digitazione
   final _debouncer = Debouncer(delay: Duration(milliseconds: 300));
 
@@ -336,9 +339,13 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             exercise: exercise,
             onRemove: () => _handleRemoveExercise(exercise.id),
             onFindVariant: () => _handleFindVariant(exercise),
+            onPreview: () => context.push(
+              '/workouts/workout/${widget.workoutId}/workout_exercise_page/${exercise.exerciseId}',
+            ),
             onUpdate: (updated) => ref
                 .read(workoutEditPageProvider(widget.workoutId).notifier)
                 .updateExercise(exercise.id, updated),
+            initiallyExpanded: _justAddedIds.contains(exercise.id),
           ),
         );
       },
@@ -452,10 +459,12 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         onExerciseSelected: (exercise) {
           final state = ref.read(workoutEditPageProvider(widget.workoutId));
           final newNumber = state.exercises.length + 1;
+          final newId = 'exercise_${DateTime.now().millisecondsSinceEpoch}';
           final newExercise = exercise.copyWith(
-            id: 'exercise_${DateTime.now().millisecondsSinceEpoch}',
+            id: newId,
             number: newNumber,
           );
+          setState(() => _justAddedIds.add(newId));
           ref
               .read(workoutEditPageProvider(widget.workoutId).notifier)
               .addExercise(newExercise);
