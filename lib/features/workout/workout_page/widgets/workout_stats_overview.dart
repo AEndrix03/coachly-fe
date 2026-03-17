@@ -49,9 +49,9 @@ class WorkoutStatsOverview extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: StatCard(
-              icon: Icons.show_chart,
-              value: '+${data.progressPercentage.toStringAsFixed(0)}%',
-              label: 'Progresso',
+              icon: Icons.local_fire_department_outlined,
+              value: '${data.currentStreak}',
+              label: 'Streak\n(giorni)',
               borderColor: scheme.tertiary,
             ),
           ),

@@ -111,8 +111,6 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
                           const SizedBox(height: 14),
                         ] else
                           const SizedBox(height: 4),
-                        _buildProgressSection(context, scheme),
-                        const SizedBox(height: 14),
                         _buildStats(context, scheme),
                         const SizedBox(height: 10),
                         _buildLastUsed(context, scheme),
@@ -195,52 +193,6 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildProgressSection(BuildContext context, ColorScheme scheme) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: scheme.primaryContainer.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: scheme.primary.withValues(alpha: 0.12)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Progresso',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: scheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                '${widget.workout.progress}%',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: scheme.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: widget.workout.progress / 100,
-              backgroundColor: scheme.primaryContainer.withValues(alpha: 0.18),
-              valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
-              minHeight: 6,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
