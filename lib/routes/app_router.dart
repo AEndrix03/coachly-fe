@@ -9,6 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../features/auth/pages/login_page/login_page.dart';
 import '../features/common/navigation/widgets/navigation_bar.dart';
 import '../features/exercise/exercise_info_page/exercise_info_page.dart';
+import '../features/feedback/feedback_page.dart';
 import '../features/home/home.dart';
 import '../features/user_settings/pages/user_settings_page.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
@@ -125,8 +126,16 @@ GoRouter router(Ref ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/home',
+                path: '/coach',
                 builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/feedback',
+                builder: (context, state) => const FeedbackPage(),
               ),
             ],
           ),
@@ -135,14 +144,6 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: '/settings',
                 builder: (context, state) => const UserSettingsPage(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/coach',
-                builder: (context, state) => const HomeScreen(),
               ),
             ],
           ),

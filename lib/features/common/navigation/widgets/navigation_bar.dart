@@ -18,9 +18,9 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar>
   static const _tabs = [
     _NavTab(icon: Icons.people, label: 'Community', route: '/community'),
     _NavTab(icon: Icons.fitness_center, label: 'Workouts', route: '/workouts'),
-    _NavTab(icon: Icons.home, label: 'Home', route: '/home'),
+    _NavTab(icon: Icons.psychology_rounded, label: 'Coach', route: '/coach'),
+    _NavTab(icon: Icons.tips_and_updates_rounded, label: 'Idee', route: '/feedback'),
     _NavTab(icon: Icons.tune, label: 'Settings', route: '/settings'),
-    _NavTab(icon: Icons.person, label: 'Coach', route: '/coach'),
   ];
 
   late final List<AnimationController> _bounceControllers;
