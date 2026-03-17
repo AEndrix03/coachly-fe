@@ -52,14 +52,17 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   }
 
   Future<ApiResponse<List<WorkoutModel>>> _performRefreshFromRemote() async {
+    List<WorkoutModel>? remoteWorkouts;
     try {
       final remoteResponse = await _apiService.fetchWorkouts();
       if (remoteResponse.success && remoteResponse.data != null) {
-        await _hiveService.patchWorkouts(remoteResponse.data!);
+        remoteWorkouts = remoteResponse.data!;
+        await _hiveService.patchWorkouts(remoteWorkouts);
       } else {
         return ApiResponse.error(
           message:
-              remoteResponse.message ?? 'Failed to refresh workouts from remote',
+              remoteResponse.message ??
+              'Failed to refresh workouts from remote',
           statusCode: remoteResponse.statusCode,
           errors: remoteResponse.errors,
         );
@@ -75,6 +78,14 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
           message: "API failed, showing local data.",
         );
       }
+
+      if (remoteWorkouts != null && remoteWorkouts.isNotEmpty) {
+        return ApiResponse.success(
+          data: remoteWorkouts,
+          message: 'Local cache failed, showing remote data.',
+        );
+      }
+
       return ApiResponse.error(
         message: "Failed to fetch workouts: ${e.toString()}",
       );
