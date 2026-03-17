@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:hive/hive.dart';
 
@@ -14,7 +16,9 @@ class WorkoutAdapter extends TypeAdapter<WorkoutModel> {
 
   @override
   void write(BinaryWriter writer, WorkoutModel obj) {
-    writer.writeMap(obj.toJson());
+    final normalizedJson =
+        jsonDecode(jsonEncode(obj.toJson())) as Map<String, dynamic>;
+    writer.writeMap(normalizedJson);
   }
 
   Map<String, dynamic> _convertMap(dynamic map) {
