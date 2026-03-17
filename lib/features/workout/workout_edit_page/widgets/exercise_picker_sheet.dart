@@ -1,9 +1,11 @@
+import 'package:coachly/core/sync/local_database_service.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -709,6 +711,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
     return GestureDetector(
       onTap: () {
+        final defaults = _lastSessionDefaults(exercise.id ?? '');
         widget.onExerciseSelected(EditableExerciseModel(
           id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
           exerciseId: exercise.id ?? '',
@@ -718,9 +721,9 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? 'N/A')
               .toList(),
           difficulty: difficulty ?? 'N/A',
-          sets: '3',
+          sets: defaults.sets,
           rest: '60s',
-          weight: '',
+          weight: defaults.weight,
           progress: '0',
           notes: '',
           accentColorHex: '#2196F3',
@@ -838,6 +841,46 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   }
 
   // ── helpers ───────────────────────────────────────────────────────────────
+
+  /// Reads the last recorded session entry for [exerciseId] from Hive and
+  /// returns pre-filled defaults for Serie x Ripetizioni and Carico.
+  /// Falls back to generic defaults if no session data is found.
+  ({String sets, String weight}) _lastSessionDefaults(String exerciseId) {
+    try {
+      final db = ref.read(localDatabaseServiceProvider);
+      LocalWorkoutSessionEntry? bestEntry;
+      DateTime? bestDate;
+
+      for (final raw in db.workoutSessions.values) {
+        final session = LocalWorkoutSession.fromJson(
+          raw.map((k, v) => MapEntry(k.toString(), v)),
+        );
+        final date = session.completedAt ?? session.updatedAt;
+        for (final entry in session.entries) {
+          if (entry.exerciseId != exerciseId) continue;
+          if (bestDate == null || date.isAfter(bestDate)) {
+            bestDate = date;
+            bestEntry = entry;
+          }
+        }
+      }
+
+      if (bestEntry == null || bestEntry.sets.isEmpty) {
+        // TODO: no previous session data found for this exercise
+        return (sets: '3', weight: '');
+      }
+
+      final setsCount = bestEntry.sets.length;
+      final reps = bestEntry.sets.first.reps ?? 0;
+      final load = bestEntry.sets.first.load;
+      final setsStr = '$setsCount x $reps';
+      final weightStr = (load != null && load > 0) ? '$load' : '';
+      return (sets: setsStr, weight: weightStr);
+    } catch (_) {
+      // TODO: failed to read Hive session data for exercise $exerciseId
+      return (sets: '3', weight: '');
+    }
+  }
 
   List<ExerciseDetailModel> _excludeSelected(List<ExerciseDetailModel> list) {
     if (widget.excludedExerciseIds.isEmpty) return list;
