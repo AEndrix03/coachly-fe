@@ -53,6 +53,12 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
   Widget build(BuildContext context) {
     final language = ref.watch(languageProvider);
     final scheme = Theme.of(context).colorScheme;
+    final coachName = widget.workout.coachName?.trim();
+    final hasCoachName =
+        coachName != null &&
+        coachName.isNotEmpty &&
+        coachName.toLowerCase() != 'n/a';
+
     return AnimatedScale(
       scale: _scale,
       duration: const Duration(milliseconds: 120),
@@ -69,7 +75,9 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
                 color: scheme.surface.withValues(alpha: 0.98),
                 // Elegante, leggermente staccato dal bg
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: scheme.outline.withValues(alpha: 0.08)),
+                border: Border.all(
+                  color: scheme.outline.withValues(alpha: 0.08),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: scheme.shadow.withValues(alpha: 0.12),
@@ -91,10 +99,18 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildHeader(context, scheme, language),
+                        _buildHeader(
+                          context,
+                          scheme,
+                          language,
+                          hasCoachName: hasCoachName,
+                        ),
                         const SizedBox(height: 10),
-                        _buildCoachInfo(context, scheme),
-                        const SizedBox(height: 14),
+                        if (hasCoachName) ...[
+                          _buildCoachInfo(context, scheme, coachName!),
+                          const SizedBox(height: 14),
+                        ] else
+                          const SizedBox(height: 4),
                         _buildProgressSection(context, scheme),
                         const SizedBox(height: 14),
                         _buildStats(context, scheme),
@@ -123,8 +139,9 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
   Widget _buildHeader(
     BuildContext context,
     ColorScheme scheme,
-    Locale language,
-  ) {
+    Locale language, {
+    required bool hasCoachName,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -142,18 +159,24 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        const SizedBox(width: 8),
-        CoachBadgeWidget(
-          label: 'Coach',
-          fontSize: 11,
-          iconSize: 13,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        ),
+        if (hasCoachName) ...[
+          const SizedBox(width: 8),
+          CoachBadgeWidget(
+            label: 'Coach',
+            fontSize: 11,
+            iconSize: 13,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          ),
+        ],
       ],
     );
   }
 
-  Widget _buildCoachInfo(BuildContext context, ColorScheme scheme) {
+  Widget _buildCoachInfo(
+    BuildContext context,
+    ColorScheme scheme,
+    String coachName,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -161,7 +184,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
         const SizedBox(width: 6),
         Flexible(
           child: Text(
-            'Coach ${widget.workout.coachName ?? 'N/A'}',
+            'Coach $coachName',
             style: TextStyle(
               fontSize: 13,
               color: scheme.onSurface,

@@ -18,6 +18,9 @@ import 'widgets/workout_header.dart';
 import 'widgets/workout_recent_card.dart';
 
 class WorkoutPage extends ConsumerWidget {
+  static const double _fabSize = 56;
+  static const double _listBottomSpacerHeight = _fabSize + 10;
+
   const WorkoutPage({super.key});
 
   @override
@@ -120,7 +123,7 @@ class WorkoutPage extends ConsumerWidget {
             ],
           ),
           _buildAllWorkouts(workouts, scheme),
-          const Gap(32),
+          const SizedBox(height: _listBottomSpacerHeight),
         ],
       ),
     );
@@ -212,6 +215,7 @@ class WorkoutPage extends ConsumerWidget {
 
   Widget _buildFAB(BuildContext context) {
     return AddFabButton(
+      size: _fabSize,
       onPressed: () => context.push('/workouts/workout/new/edit'),
     );
   }

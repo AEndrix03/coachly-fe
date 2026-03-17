@@ -52,6 +52,12 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
   @override
   Widget build(BuildContext context) {
     final language = ref.watch(languageProvider);
+    final coachName = widget.workout.coachName?.trim();
+    final hasCoachName =
+        coachName != null &&
+        coachName.isNotEmpty &&
+        coachName.toLowerCase() != 'n/a';
+
     return AnimatedScale(
       scale: _scale,
       duration: const Duration(milliseconds: 120),
@@ -122,15 +128,17 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    const SizedBox(width: 6),
-                                    const CoachBadgeWidget(
-                                      fontSize: 9,
-                                      iconSize: 10,
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 3,
+                                    if (hasCoachName) ...[
+                                      const SizedBox(width: 6),
+                                      const CoachBadgeWidget(
+                                        fontSize: 9,
+                                        iconSize: 10,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 3,
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ],
                                 ),
                                 const SizedBox(height: 6),
@@ -142,10 +150,11 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
                                       Icons.fitness_center,
                                       '${widget.workout.workoutExercises.length} esercizi',
                                     ),
-                                    _buildInfoChip(
-                                      Icons.person_outline,
-                                      'Coach ${widget.workout.coachName ?? 'N/A'}',
-                                    ),
+                                    if (hasCoachName)
+                                      _buildInfoChip(
+                                        Icons.person_outline,
+                                        'Coach $coachName',
+                                      ),
                                   ],
                                 ),
                               ],
