@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:coachly/core/network/api_client.dart';
+import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -88,10 +89,7 @@ void main() {
       expect(response.data!.length, 1);
       expect(response.data!.first.titleI18n?['it'], 'Scheda Petto');
       expect(response.data!.first.titleI18n?['en'], 'Chest Day');
-      expect(
-        response.data!.first.descriptionI18n?['it'],
-        'Descrizione IT',
-      );
+      expect(response.data!.first.descriptionI18n?['it'], 'Descrizione IT');
     });
 
     test(
@@ -155,6 +153,39 @@ void main() {
       },
     );
   });
+
+  group('WorkoutPageService.saveWorkoutSession', () {
+    test(
+      'uses POST /api/workouts/{id}/sessions and sends per-set reps/load',
+      () async {
+        final client = _RecordingHttpClient(
+          responder: (_) => http.Response('', 200),
+        );
+        final service = WorkoutPageService(
+          ApiClient(client: client, baseUrl: 'https://localhost:8800/api'),
+        );
+
+        await service.saveWorkoutSession('w-123', _sampleSessionCommand());
+
+        expect(client.lastRequest, isNotNull);
+        expect(client.lastRequest!.method, 'POST');
+        expect(client.lastRequest!.url.path, '/api/workouts/w-123/sessions');
+        expect(client.lastRequest!.headers['Content-Type'], 'application/json');
+        expect(client.lastRequest!.headers['Accept'], 'application/json');
+
+        final body = jsonDecode(client.lastBody!) as Map<String, dynamic>;
+        expect(body['entries'], isA<List<dynamic>>());
+        expect(
+          body['entries'][0]['exerciseId'],
+          '33ab4fac-bf4f-4f4d-b1d2-f2cb6b5674ff',
+        );
+        expect(body['entries'][0]['sets'][0]['reps'], 10);
+        expect(body['entries'][0]['sets'][0]['load'], 85);
+        expect(body['entries'][0]['sets'][1]['reps'], 9);
+        expect(body['entries'][0]['sets'][1]['load'], 87.5);
+      },
+    );
+  });
 }
 
 WorkoutWriteCommand _sampleCommand() {
@@ -196,6 +227,42 @@ WorkoutWriteCommand _sampleCommand() {
                 notes: null,
               ),
             ],
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+WorkoutSessionWriteCommand _sampleSessionCommand() {
+  return WorkoutSessionWriteCommand(
+    startedAt: DateTime.parse('2026-03-17T10:00:00.000Z'),
+    completedAt: DateTime.parse('2026-03-17T10:45:00.000Z'),
+    notes: 'Sessione intensa',
+    entries: const [
+      WorkoutSessionEntryWritePayload(
+        exerciseId: '33ab4fac-bf4f-4f4d-b1d2-f2cb6b5674ff',
+        position: 0,
+        completed: true,
+        notes: null,
+        sets: [
+          WorkoutSessionSetWritePayload(
+            position: 0,
+            setType: 'normal',
+            reps: 10,
+            load: 85,
+            loadUnit: 'kg',
+            completed: true,
+            notes: null,
+          ),
+          WorkoutSessionSetWritePayload(
+            position: 1,
+            setType: 'normal',
+            reps: 9,
+            load: 87.5,
+            loadUnit: 'kg',
+            completed: true,
+            notes: null,
           ),
         ],
       ),

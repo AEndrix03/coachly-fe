@@ -1,5 +1,6 @@
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
+import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_remote_mapper.dart';
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
@@ -102,6 +103,17 @@ class WorkoutPageService {
     return await _apiClient.put<void>(
       '/workouts/$workoutId',
       body: command.toJson(includeId: false),
+      fromJson: (_) {},
+    );
+  }
+
+  Future<ApiResponse<void>> saveWorkoutSession(
+    String workoutId,
+    WorkoutSessionWriteCommand command,
+  ) async {
+    return await _apiClient.post<void>(
+      '/workouts/$workoutId/sessions',
+      body: command.toJson(),
       fromJson: (_) {},
     );
   }

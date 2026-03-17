@@ -1,5 +1,8 @@
 import 'package:coachly/core/network/api_response.dart';
+import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
+import 'package:coachly/features/workout/workout_page/data/mappers/workout_session_write_command_mapper.dart';
+import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
@@ -162,5 +165,57 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       await refreshFromRemote();
     }
     return response;
+  }
+
+  @override
+  Future<ApiResponse<void>> saveSession(
+    String workoutId,
+    WorkoutSessionWriteCommand sessionCommand,
+  ) async {
+    final uploadResponse = await _apiService.saveWorkoutSession(
+      workoutId,
+      sessionCommand,
+    );
+    if (!uploadResponse.success) {
+      return uploadResponse;
+    }
+
+    final workoutResponse = await getWorkout(workoutId);
+    final workout = workoutResponse.data;
+    if (!workoutResponse.success || workout == null) {
+      return ApiResponse.error(
+        message:
+            workoutResponse.message ??
+            'Workout not found after session upload.',
+        statusCode: workoutResponse.statusCode,
+        errors: workoutResponse.errors,
+      );
+    }
+
+    final currentWorkoutCommand = WorkoutWriteCommandMapper.fromWorkoutModel(
+      workout,
+    );
+    final updatedWorkoutCommand =
+        WorkoutSessionWriteCommandMapper.applySessionToWorkoutCommand(
+          workoutCommand: currentWorkoutCommand,
+          sessionCommand: sessionCommand,
+        );
+
+    final patchResponse = await _apiService.patchWorkout(
+      workoutId,
+      updatedWorkoutCommand,
+    );
+    if (!patchResponse.success) {
+      return ApiResponse.error(
+        message:
+            patchResponse.message ??
+            'Session uploaded, but workout update failed.',
+        statusCode: patchResponse.statusCode,
+        errors: patchResponse.errors,
+      );
+    }
+
+    await refreshFromRemote();
+    return uploadResponse;
   }
 }
