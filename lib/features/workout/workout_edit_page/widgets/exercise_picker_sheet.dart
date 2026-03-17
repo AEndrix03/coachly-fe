@@ -733,89 +733,128 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.07), width: 1),
+          borderRadius: BorderRadius.circular(18),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFF2A2A3E).withValues(alpha: 0.75),
+              const Color(0xFF1A1A2E).withValues(alpha: 0.90),
+            ],
+          ),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.09),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.25),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+              spreadRadius: -4,
+            ),
+          ],
         ),
-        child: Row(
-          children: [
-            // Accent dot
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF2196F3).withValues(alpha: 0.25),
-                    const Color(0xFF7B4BC1).withValues(alpha: 0.15),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              // Icon badge
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(13),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF2196F3).withValues(alpha: 0.30),
+                      blurRadius: 12,
+                      spreadRadius: -3,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  isBodyweight
+                      ? Icons.self_improvement_rounded
+                      : Icons.fitness_center_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              // Name + tags
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        height: 1.3,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    if (muscles.isNotEmpty ||
+                        difficulty != null ||
+                        mechanics != null) ...[
+                      const SizedBox(height: 7),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          if (muscles.isNotEmpty)
+                            _cardTag(muscles, const Color(0xFF2196F3)),
+                          if (difficulty != null)
+                            _cardTag(
+                              _difficultyLabel(difficulty),
+                              _difficultyColor(difficulty),
+                            ),
+                          if (mechanics != null)
+                            _cardTag(
+                              _mechanicsLabel(mechanics),
+                              const Color(0xFF00BCD4),
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
-              child: Icon(
-                isBodyweight ? Icons.self_improvement_rounded : Icons.fitness_center_rounded,
-                color: const Color(0xFF2196F3),
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            // Name + tags
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      height: 1.3,
+              const SizedBox(width: 10),
+              // Add button
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF2196F3).withValues(alpha: 0.40),
+                      blurRadius: 10,
+                      spreadRadius: -3,
+                      offset: const Offset(0, 3),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 4,
-                    children: [
-                      if (muscles.isNotEmpty)
-                        _cardTag(muscles, const Color(0xFF2196F3)),
-                      if (difficulty != null)
-                        _cardTag(_difficultyLabel(difficulty), _difficultyColor(difficulty)),
-                      if (mechanics != null)
-                        _cardTag(_mechanicsLabel(mechanics), const Color(0xFF00BCD4)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
-            // Add icon
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+                  ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF2196F3).withValues(alpha: 0.35),
-                    blurRadius: 8,
-                    spreadRadius: -2,
-                  ),
-                ],
+                child: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
               ),
-              child: const Icon(Icons.add_rounded, color: Colors.white, size: 18),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -823,18 +862,21 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   Widget _cardTag(String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(6),
-        color: color.withValues(alpha: 0.12),
-        border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
+        borderRadius: BorderRadius.circular(8),
+        gradient: LinearGradient(
+          colors: [color.withValues(alpha: 0.18), color.withValues(alpha: 0.08)],
+        ),
+        border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
       ),
       child: Text(
         label,
         style: TextStyle(
           color: color,
           fontSize: 10,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.2,
         ),
       ),
     );
