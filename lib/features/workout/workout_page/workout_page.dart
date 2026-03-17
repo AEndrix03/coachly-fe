@@ -20,6 +20,7 @@ import 'widgets/workout_recent_card.dart';
 class WorkoutPage extends ConsumerWidget {
   static const double _fabSize = 56;
   static const double _listBottomSpacerHeight = _fabSize + 10;
+  static const double _recentCardsHeight = 304;
 
   const WorkoutPage({super.key});
 
@@ -152,7 +153,7 @@ class WorkoutPage extends ConsumerWidget {
 
   Widget _buildRecentLoading(ColorScheme scheme) {
     return SizedBox(
-      height: 365,
+      height: _recentCardsHeight,
       child: Shimmer.fromColors(
         baseColor: scheme.surface,
         highlightColor: scheme.primary.withValues(alpha: 0.2),
@@ -160,7 +161,11 @@ class WorkoutPage extends ConsumerWidget {
           scrollDirection: Axis.horizontal,
           children: List.generate(
             3,
-            (index) => const SizedBox(width: 290, child: Card()),
+            (index) => const SizedBox(
+              width: 290,
+              height: _recentCardsHeight,
+              child: Card(),
+            ),
           ),
         ),
       ),
@@ -178,22 +183,17 @@ class WorkoutPage extends ConsumerWidget {
 
   Widget _buildRecentWorkouts(List<WorkoutModel> workouts, ColorScheme scheme) {
     return SizedBox(
-      height: 365,
-      child: ListView.builder(
+      height: _recentCardsHeight,
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         physics: const BouncingScrollPhysics(),
         itemCount: workouts.length,
+        separatorBuilder: (_, __) => const Gap(16),
         itemBuilder: (context, index) {
-          final bool isLast = index == workouts.length - 1;
-          return Row(
-            children: [
-              SizedBox(
-                width: 290,
-                child: WorkoutRecentCard(workout: workouts[index]),
-              ),
-              if (!isLast) const Gap(16),
-            ],
+          return SizedBox(
+            width: 290,
+            child: WorkoutRecentCard(workout: workouts[index]),
           );
         },
       ),

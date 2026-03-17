@@ -70,7 +70,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
         child: Stack(
           children: [
             Container(
-              constraints: const BoxConstraints(minHeight: 220, maxWidth: 320),
+              constraints: const BoxConstraints(maxWidth: 320),
               decoration: BoxDecoration(
                 color: scheme.surface.withValues(alpha: 0.98),
                 // Elegante, leggermente staccato dal bg
@@ -107,7 +107,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
                         ),
                         const SizedBox(height: 10),
                         if (hasCoachName) ...[
-                          _buildCoachInfo(context, scheme, coachName!),
+                          _buildCoachInfo(context, scheme, coachName),
                           const SizedBox(height: 14),
                         ] else
                           const SizedBox(height: 4),
