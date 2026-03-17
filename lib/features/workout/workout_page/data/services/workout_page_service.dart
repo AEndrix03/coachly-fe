@@ -107,13 +107,31 @@ class WorkoutPageService {
     );
   }
 
+  Future<ApiResponse<void>> patchWorkoutPayload(
+    String workoutId,
+    Map<String, dynamic> commandPayload,
+  ) async {
+    return await _apiClient.put<void>(
+      '/workouts/$workoutId',
+      body: commandPayload,
+      fromJson: (_) {},
+    );
+  }
+
   Future<ApiResponse<void>> saveWorkoutSession(
     String workoutId,
     WorkoutSessionWriteCommand command,
   ) async {
+    return saveWorkoutSessionPayload(workoutId, command.toJson());
+  }
+
+  Future<ApiResponse<void>> saveWorkoutSessionPayload(
+    String workoutId,
+    Map<String, dynamic> payload,
+  ) async {
     return await _apiClient.post<void>(
       '/workouts/$workoutId/sessions',
-      body: command.toJson(),
+      body: payload,
       fromJson: (_) {},
     );
   }

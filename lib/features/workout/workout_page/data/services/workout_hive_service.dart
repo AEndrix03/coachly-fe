@@ -1,40 +1,40 @@
 import 'package:coachly/core/sync/local_database_service.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 
 final workoutHiveServiceProvider = Provider<WorkoutHiveService>((ref) {
-  return WorkoutHiveService(LocalDatabaseService());
+  final localDbService = ref.watch(localDatabaseServiceProvider);
+  return WorkoutHiveService(localDbService);
 });
 
 class WorkoutHiveService {
-  final LocalDatabaseService _localDbService;
+  final Box<WorkoutModel> _workoutsBox;
 
-  WorkoutHiveService(this._localDbService);
+  WorkoutHiveService(LocalDatabaseService localDbService)
+    : this.fromBox(localDbService.workouts);
+
+  WorkoutHiveService.fromBox(this._workoutsBox);
 
   Future<List<WorkoutModel>> getWorkouts() async {
-    final box = _localDbService.workouts;
-    return box.values.toList();
+    return _workoutsBox.values.toList();
   }
 
   Future<WorkoutModel?> getWorkout(String workoutId) async {
-    final box = _localDbService.workouts;
-    return box.get(workoutId);
+    return _workoutsBox.get(workoutId);
   }
 
   Future<void> saveWorkouts(List<WorkoutModel> workouts) async {
-    final box = _localDbService.workouts;
-    await box.clear();
+    await _workoutsBox.clear();
     for (final workout in workouts) {
-      await box.put(workout.id, workout);
+      await _workoutsBox.put(workout.id, workout);
     }
   }
 
   Future<void> patchWorkouts(List<WorkoutModel> workouts) async {
-    final box = _localDbService.workouts;
-
     final localDirtyIds = <String>{};
-    for (final key in box.keys) {
-      final workout = box.get(key);
+    for (final key in _workoutsBox.keys) {
+      final workout = _workoutsBox.get(key);
       if (workout != null && workout.dirty) {
         localDirtyIds.add(workout.id);
       }
@@ -43,33 +43,31 @@ class WorkoutHiveService {
     final incomingIds = workouts.map((w) => w.id).toSet();
     final keysToDelete = <dynamic>[];
 
-    for (final key in box.keys) {
-      final workout = box.get(key);
+    for (final key in _workoutsBox.keys) {
+      final workout = _workoutsBox.get(key);
       if (workout != null) {
         if (!incomingIds.contains(workout.id) && !workout.dirty) {
           keysToDelete.add(key);
         }
       }
     }
-    await box.deleteAll(keysToDelete);
+    await _workoutsBox.deleteAll(keysToDelete);
 
     for (final workout in workouts) {
       if (!localDirtyIds.contains(workout.id) || workout.dirty) {
-        await box.put(workout.id, workout);
+        await _workoutsBox.put(workout.id, workout);
       }
     }
   }
 
   Future<void> patchWorkout(WorkoutModel workout) async {
-    final box = _localDbService.workouts;
     final dirtyWorkout = workout.copyWith(dirty: true);
-    await box.put(dirtyWorkout.id, dirtyWorkout);
+    await _workoutsBox.put(dirtyWorkout.id, dirtyWorkout);
   }
 
   // Modifica locale: enable
   Future<void> enableWorkout(String workoutId) async {
-    final box = _localDbService.workouts;
-    final workout = box.get(workoutId);
+    final workout = _workoutsBox.get(workoutId);
     if (workout != null) {
       await patchWorkout(workout.copyWith(active: true));
     }
@@ -77,8 +75,7 @@ class WorkoutHiveService {
 
   // Modifica locale: disable
   Future<void> disableWorkout(String workoutId) async {
-    final box = _localDbService.workouts;
-    final workout = box.get(workoutId);
+    final workout = _workoutsBox.get(workoutId);
     if (workout != null) {
       await patchWorkout(workout.copyWith(active: false));
     }
@@ -86,8 +83,7 @@ class WorkoutHiveService {
 
   // Modifica locale: delete (soft delete)
   Future<void> deleteWorkout(String workoutId) async {
-    final box = _localDbService.workouts;
-    final workout = box.get(workoutId);
+    final workout = _workoutsBox.get(workoutId);
     if (workout != null) {
       await patchWorkout(workout.copyWith(delete: true));
     }
@@ -100,11 +96,10 @@ class WorkoutHiveService {
 
   // Marca workout come sincronizzato (rimuove dirty flag)
   Future<void> markWorkoutSynced(String workoutId) async {
-    final box = _localDbService.workouts;
-    final workout = box.get(workoutId);
+    final workout = _workoutsBox.get(workoutId);
     if (workout != null) {
       final cleanWorkout = workout.copyWith(dirty: false);
-      await box.put(workoutId, cleanWorkout);
+      await _workoutsBox.put(workoutId, cleanWorkout);
     }
   }
 
@@ -113,7 +108,6 @@ class WorkoutHiveService {
   }
 
   Future<int> countWorkouts() async {
-    final box = _localDbService.workouts;
-    return box.length;
+    return _workoutsBox.length;
   }
 }

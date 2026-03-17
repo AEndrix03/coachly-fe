@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:coachly/core/sync/local_database_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
@@ -6,6 +8,7 @@ import 'package:coachly/features/exercise/exercise_info_page/data/repositories/e
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
+import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +18,7 @@ final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
   return AppDataSyncService(
     ref,
     ref.watch(workoutPageRepositoryProvider),
+    ref.watch(workoutSessionSyncServiceProvider),
     ref.watch(exerciseInfoPageRepositoryProvider),
     ref.watch(authServiceProvider),
     LocalDatabaseService(),
@@ -32,6 +36,7 @@ class AppDataSyncService {
 
   final Ref _ref;
   final IWorkoutPageRepository _workoutRepository;
+  final WorkoutSessionSyncService _sessionSyncService;
   final IExerciseInfoPageRepository _exerciseRepository;
   final AuthService _authService;
   final LocalDatabaseService _localDb;
@@ -42,6 +47,7 @@ class AppDataSyncService {
   AppDataSyncService(
     this._ref,
     this._workoutRepository,
+    this._sessionSyncService,
     this._exerciseRepository,
     this._authService,
     this._localDb,
@@ -72,6 +78,10 @@ class AppDataSyncService {
       debugPrint('Sync skipped: JWT missing or invalid');
       return;
     }
+
+    unawaited(
+      _sessionSyncService.syncPendingSessions(trigger: 'authenticated_access'),
+    );
 
     _isSyncing = true;
     try {

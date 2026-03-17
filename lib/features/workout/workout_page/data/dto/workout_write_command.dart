@@ -13,6 +13,38 @@ class WorkoutWriteCommand {
     required this.blocks,
   });
 
+  factory WorkoutWriteCommand.fromJson(Map<String, dynamic> json) {
+    final rawTranslations =
+        json['translations'] as Map<String, dynamic>? ?? const {};
+    final translations = rawTranslations.map((key, value) {
+      final translationMap = value is Map
+          ? value.map((k, v) => MapEntry(k.toString(), v))
+          : const <String, dynamic>{};
+      return MapEntry(
+        key,
+        WorkoutTranslationWritePayload.fromJson(translationMap),
+      );
+    });
+
+    final rawBlocks = json['blocks'] as List<dynamic>? ?? const [];
+    final blocks = rawBlocks
+        .whereType<Map>()
+        .map(
+          (rawBlock) => WorkoutBlockWritePayload.fromJson(
+            rawBlock.map((key, value) => MapEntry(key.toString(), value)),
+          ),
+        )
+        .toList();
+
+    return WorkoutWriteCommand(
+      id: json['id'] as String?,
+      name: json['name'] as String? ?? '',
+      translations: translations,
+      status: json['status'] as String? ?? 'active',
+      blocks: blocks,
+    );
+  }
+
   Map<String, dynamic> toJson({bool includeId = true}) {
     final payload = <String, dynamic>{
       'name': name,
@@ -40,6 +72,13 @@ class WorkoutTranslationWritePayload {
     required this.description,
   });
 
+  factory WorkoutTranslationWritePayload.fromJson(Map<String, dynamic> json) {
+    return WorkoutTranslationWritePayload(
+      title: json['title'] as String? ?? '',
+      description: json['description'] as String?,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     final payload = <String, dynamic>{'title': title};
     if (description != null) {
@@ -65,6 +104,25 @@ class WorkoutBlockWritePayload {
     required this.notes,
     required this.entries,
   });
+
+  factory WorkoutBlockWritePayload.fromJson(Map<String, dynamic> json) {
+    final rawEntries = json['entries'] as List<dynamic>? ?? const [];
+    return WorkoutBlockWritePayload(
+      id: json['id'] as String?,
+      position: (json['position'] as num?)?.toInt() ?? 0,
+      label: json['label'] as String?,
+      restSeconds: (json['restSeconds'] as num?)?.toInt(),
+      notes: json['notes'] as String?,
+      entries: rawEntries
+          .whereType<Map>()
+          .map(
+            (rawEntry) => WorkoutEntryWritePayload.fromJson(
+              rawEntry.map((key, value) => MapEntry(key.toString(), value)),
+            ),
+          )
+          .toList(),
+    );
+  }
 
   Map<String, dynamic> toJson() {
     final payload = <String, dynamic>{
@@ -100,6 +158,23 @@ class WorkoutEntryWritePayload {
     required this.sets,
   });
 
+  factory WorkoutEntryWritePayload.fromJson(Map<String, dynamic> json) {
+    final rawSets = json['sets'] as List<dynamic>? ?? const [];
+    return WorkoutEntryWritePayload(
+      id: json['id'] as String?,
+      exerciseId: json['exerciseId'] as String? ?? '',
+      position: (json['position'] as num?)?.toInt() ?? 0,
+      sets: rawSets
+          .whereType<Map>()
+          .map(
+            (rawSet) => WorkoutSetWritePayload.fromJson(
+              rawSet.map((key, value) => MapEntry(key.toString(), value)),
+            ),
+          )
+          .toList(),
+    );
+  }
+
   Map<String, dynamic> toJson() {
     final payload = <String, dynamic>{
       'exerciseId': exerciseId,
@@ -134,11 +209,21 @@ class WorkoutSetWritePayload {
     required this.notes,
   });
 
+  factory WorkoutSetWritePayload.fromJson(Map<String, dynamic> json) {
+    return WorkoutSetWritePayload(
+      id: json['id'] as String?,
+      position: (json['position'] as num?)?.toInt() ?? 0,
+      setType: json['setType'] as String? ?? 'normal',
+      reps: (json['reps'] as num?)?.toInt(),
+      load: json['load'] as num?,
+      loadUnit: json['loadUnit'] as String?,
+      restSeconds: (json['restSeconds'] as num?)?.toInt(),
+      notes: json['notes'] as String?,
+    );
+  }
+
   Map<String, dynamic> toJson() {
-    final payload = <String, dynamic>{
-      'position': position,
-      'setType': setType,
-    };
+    final payload = <String, dynamic>{'position': position, 'setType': setType};
     if (id != null) {
       payload['id'] = id;
     }
