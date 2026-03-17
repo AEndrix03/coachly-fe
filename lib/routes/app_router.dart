@@ -11,7 +11,7 @@ import '../features/common/navigation/widgets/navigation_bar.dart';
 import '../features/exercise/exercise_info_page/exercise_info_page.dart';
 import '../features/feedback/feedback_page.dart';
 import '../features/home/home.dart';
-import '../features/user_settings/pages/user_settings_page.dart';
+import '../features/profile/profile_page.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
 import '../features/workout/workout_detail_page/workout_detail_page.dart';
 import '../features/workout/workout_edit_page/workout_edit_page.dart';
@@ -142,8 +142,8 @@ GoRouter router(Ref ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/settings',
-                builder: (context, state) => const UserSettingsPage(),
+                path: '/profile',
+                builder: (context, state) => const ProfilePage(),
               ),
             ],
           ),

@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ionicons/ionicons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../providers/navigation_provider.dart';
 
@@ -18,9 +20,9 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar>
   static const _tabs = [
     _NavTab(icon: Icons.people, label: 'Community', route: '/community'),
     _NavTab(icon: Icons.fitness_center, label: 'Workouts', route: '/workouts'),
-    _NavTab(icon: Icons.psychology_rounded, label: 'Coach', route: '/coach'),
+    _NavTab(icon: LucideIcons.target, label: 'Coach', route: '/coach'),
     _NavTab(icon: Icons.tips_and_updates_rounded, label: 'Idee', route: '/feedback'),
-    _NavTab(icon: Icons.tune, label: 'Settings', route: '/settings'),
+    _NavTab(icon: Ionicons.person_circle_outline, label: 'Profilo', route: '/profile'),
   ];
 
   late final List<AnimationController> _bounceControllers;
