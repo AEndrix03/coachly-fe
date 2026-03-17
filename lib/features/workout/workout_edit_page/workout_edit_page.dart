@@ -114,7 +114,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F0F1E),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Stack(
           children: [
             CustomScrollView(
@@ -170,41 +170,84 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Widget _buildDescriptionCard() {
+    const accent = Color(0xFF2196F3);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A2E),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              accent.withValues(alpha: 0.10),
+              const Color(0xFF1A1A2E),
+            ],
+          ),
           border: Border.all(
-            color: const Color(0xFF2196F3).withValues(alpha: 0.3),
+            color: accent.withValues(alpha: 0.25),
             width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: accent.withValues(alpha: 0.10),
+              blurRadius: 18,
+              spreadRadius: -4,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Descrizione',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(7),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.notes_rounded,
+                    color: accent,
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  'Descrizione',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
+            Divider(
+              color: Colors.white.withValues(alpha: 0.07),
+              height: 1,
+              thickness: 1,
+            ),
+            const SizedBox(height: 12),
             TextField(
               controller: _descriptionController,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.8),
+                color: Colors.white.withValues(alpha: 0.75),
                 fontSize: 14,
+                height: 1.55,
               ),
               maxLines: null,
               decoration: InputDecoration(
                 hintText: 'Aggiungi una descrizione...',
                 hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: Colors.white.withValues(alpha: 0.22),
+                  fontSize: 14,
+                  height: 1.55,
                 ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
@@ -264,52 +307,84 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   ) {
     final isReadonly = controller == null;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: const Color(0xFF1A1A2E),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withValues(alpha: 0.14),
+            const Color(0xFF1A1A2E),
+          ],
+        ),
+        border: Border.all(
+          color: color.withValues(alpha: 0.30),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.14),
+            blurRadius: 18,
+            spreadRadius: -4,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          const SizedBox(height: 12),
           if (isReadonly)
             Text(
               value,
-              textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 14,
+                fontSize: 22,
                 fontWeight: FontWeight.w700,
+                height: 1,
               ),
             )
           else
-            SizedBox(
-              height: 20,
-              child: TextField(
-                controller: controller,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
+            TextField(
+              controller: controller,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                height: 1,
+              ),
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+                isDense: true,
+                hintText: '–',
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.25),
+                  fontSize: 22,
                   fontWeight: FontWeight.w700,
-                ),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                  isDense: true,
+                  height: 1,
                 ),
               ),
             ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             label,
-            textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
+              color: color.withValues(alpha: 0.85),
               fontSize: 11,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.4,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
