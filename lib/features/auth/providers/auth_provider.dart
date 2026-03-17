@@ -103,14 +103,14 @@ class Auth extends _$Auth {
         .read(authRepositoryProvider)
         .refreshToken(refreshToken);
 
-    return refreshResult.fold(
-      (failure) => _offlineAuthenticatedState(
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        errorMessage: failure.message,
-      ),
-      _authenticatedStateFromTokens,
-    );
+    // Online but Keycloak rejected (or failed to renew) the refresh token —
+    // the session is definitively dead. Clear tokens and force re-login.
+    if (refreshResult.isLeft) {
+      await authService.clearTokens();
+      return _unauthenticated;
+    }
+
+    return _authenticatedStateFromTokens(refreshResult.rightOrNull!);
   }
 
   AuthState _authenticatedStateFromTokens(LoginResponseDto tokens) {
@@ -125,18 +125,15 @@ class Auth extends _$Auth {
   AuthState _offlineAuthenticatedState({
     required String? accessToken,
     required String refreshToken,
-    String? errorMessage,
   }) {
     return AuthState(
       isAuthenticated: true,
-      isTokenValid:
-          accessToken != null && JwtValidator.isTokenValid(accessToken),
+      isTokenValid: accessToken != null && JwtValidator.isTokenValid(accessToken),
       isOfflineMode: true,
       tokens: LoginResponseDto.fromTokens(
         accessToken: accessToken ?? '',
         refreshToken: refreshToken,
       ),
-      errorMessage: errorMessage,
     );
   }
 }
