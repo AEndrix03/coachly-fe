@@ -5,6 +5,7 @@ import 'package:coachly/features/workout/workout_page/data/mappers/workout_remot
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final workoutPageServiceProvider = Provider<WorkoutPageService>((ref) {
@@ -28,10 +29,16 @@ class WorkoutPageService {
               continue;
             }
 
-            final payload = item.map(
-              (key, value) => MapEntry(key.toString(), value),
-            );
-            workouts.add(WorkoutRemoteMapper.fromApiJson(payload));
+            try {
+              final payload = item.map(
+                (key, value) => MapEntry(key.toString(), value),
+              );
+              workouts.add(WorkoutRemoteMapper.fromApiJson(payload));
+            } catch (error) {
+              debugPrint(
+                'Skipping invalid workout payload in fetchWorkouts: $error',
+              );
+            }
           }
           return workouts;
         }
