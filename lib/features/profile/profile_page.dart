@@ -1,6 +1,7 @@
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/auth/providers/user_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/shared/widgets/headers/page_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ionicons/ionicons.dart';
@@ -21,96 +22,84 @@ class ProfilePage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: scheme.surface,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildAvatar(initials, fullName),
-              const SizedBox(height: 32),
-              _buildSection(
-                icon: Ionicons.settings_outline,
-                color: const Color(0xFF2196F3),
-                title: 'Preferenze',
-                child: _buildLanguageSetting(context, ref),
-              ),
-              const SizedBox(height: 16),
-              _buildSection(
-                icon: Ionicons.information_circle_outline,
-                color: const Color(0xFF9C27B0),
-                title: 'App',
-                child: _buildAppInfo(),
-              ),
-              const SizedBox(height: 32),
-              _buildLogoutButton(context, ref),
-            ],
+      body: Column(
+        children: [
+          PageHeader(
+            badgeIcon: Ionicons.person_circle_outline,
+            badgeLabel: 'Profilo',
+            title: fullName.isEmpty ? 'Il tuo profilo' : fullName,
+            bottom: _buildAvatarInHeader(initials),
           ),
-        ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                      _buildSection(
+                    icon: Ionicons.settings_outline,
+                    color: const Color(0xFF2196F3),
+                    title: 'Preferenze',
+                    child: _buildLanguageSetting(context, ref),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSection(
+                    icon: Ionicons.information_circle_outline,
+                    color: const Color(0xFF9C27B0),
+                    title: 'App',
+                    child: _buildAppInfo(),
+                  ),
+                  const SizedBox(height: 32),
+                  _buildLogoutButton(context, ref),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildAvatar(String initials, String fullName) {
-    return Row(
-      children: [
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+  Widget _buildAvatarInHeader(String initials) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          const SizedBox(width: 12),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.25),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF2196F3).withValues(alpha: 0.35),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-                spreadRadius: -4,
-              ),
-            ],
-          ),
-          child: Center(
-            child: Text(
-              initials,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 26,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 18),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                fullName.isEmpty ? 'Utente' : fullName,
+            child: Center(
+              child: Text(
+                initials,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 22,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                'Coachly Member',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.40),
-                  fontSize: 13,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 12),
+          Text(
+            'Coachly Member',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.80),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
