@@ -173,12 +173,9 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // extendBody: true lets the body render behind the bottomNavigationBar.
-    // Flutter automatically sets MediaQuery.padding.bottom = navbar height for
-    // all inner pages, so Scaffolds, SafeAreas, FABs and ListViews reserve the
-    // correct space — while the glass bar still blurs content scrolling behind it.
+    // Static layout: body is constrained above the navbar — no content overlap.
+    // Flutter automatically positions FABs and handles safe-area insets.
     return Scaffold(
-      extendBody: true,
       body: navigationShell,
       bottomNavigationBar: const AppNavigationBar(),
     );

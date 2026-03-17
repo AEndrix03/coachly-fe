@@ -76,68 +76,79 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar>
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(navigationIndexProvider);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    return _buildBar(currentIndex, bottomPadding);
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 10, 20, bottomPadding + 14),
+      child: SizedBox(
+        height: 64,
+        child: _buildBar(currentIndex),
+      ),
+    );
   }
 
-  Widget _buildBar(int currentIndex, double bottomPadding) {
-    return ClipRect(
+  Widget _buildBar(int currentIndex) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(32),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
         child: Container(
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.black.withValues(alpha: 0.30),
-                Colors.black.withValues(alpha: 0.45),
+                Colors.black.withValues(alpha: 0.35),
+                Colors.black.withValues(alpha: 0.50),
               ],
             ),
-            border: Border(
-              top: BorderSide(
-                color: Colors.white.withValues(alpha: 0.10),
-                width: 1,
-              ),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.10),
+              width: 1,
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: 64,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        _buildIndicator(constraints.maxWidth, currentIndex),
-                        Row(
-                          children: List.generate(_tabs.length, (index) {
-                            return Expanded(
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () => _onTap(index, currentIndex),
-                                child: AnimatedBuilder(
-                                  animation: _bounceAnimations[index],
-                                  builder: (_, __) => Transform.scale(
-                                    scale: _bounceAnimations[index].value,
-                                    child: _NavItem(
-                                      tab: _tabs[index],
-                                      isSelected: index == currentIndex,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2196F3).withValues(alpha: 0.15),
+                blurRadius: 28,
+                spreadRadius: -6,
+                offset: const Offset(0, 6),
               ),
-              SizedBox(height: bottomPadding),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.45),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
             ],
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  _buildIndicator(constraints.maxWidth, currentIndex),
+                  Row(
+                    children: List.generate(_tabs.length, (index) {
+                      return Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => _onTap(index, currentIndex),
+                          child: AnimatedBuilder(
+                            animation: _bounceAnimations[index],
+                            builder: (_, __) => Transform.scale(
+                              scale: _bounceAnimations[index].value,
+                              child: _NavItem(
+                                tab: _tabs[index],
+                                isSelected: index == currentIndex,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
