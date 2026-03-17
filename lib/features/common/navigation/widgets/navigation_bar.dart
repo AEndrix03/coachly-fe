@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,7 +23,6 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar>
     _NavTab(icon: Icons.person, label: 'Coach', route: '/coach'),
   ];
 
-  // Per-item bounce controllers
   late final List<AnimationController> _bounceControllers;
   late final List<Animation<double>> _bounceAnimations;
 
@@ -38,17 +39,17 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar>
     _bounceAnimations = _bounceControllers.map((c) {
       return TweenSequence<double>([
         TweenSequenceItem(
-          tween: Tween(begin: 1.0, end: 0.75)
+          tween: Tween(begin: 1.0, end: 0.72)
               .chain(CurveTween(curve: Curves.easeOut)),
           weight: 30,
         ),
         TweenSequenceItem(
-          tween: Tween(begin: 0.75, end: 1.15)
+          tween: Tween(begin: 0.72, end: 1.18)
               .chain(CurveTween(curve: Curves.easeOut)),
           weight: 35,
         ),
         TweenSequenceItem(
-          tween: Tween(begin: 1.15, end: 1.0)
+          tween: Tween(begin: 1.18, end: 1.0)
               .chain(CurveTween(curve: Curves.elasticOut)),
           weight: 35,
         ),
@@ -86,61 +87,71 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar>
   }
 
   Widget _buildBar(int currentIndex) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1E1E3A), Color(0xFF0D0D1F)],
-        ),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.09),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF2196F3).withValues(alpha: 0.18),
-            blurRadius: 28,
-            spreadRadius: -6,
-            offset: const Offset(0, 6),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.55),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              _buildIndicator(constraints.maxWidth, currentIndex),
-              Row(
-                children: List.generate(_tabs.length, (index) {
-                  return Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => _onTap(index, currentIndex),
-                      child: AnimatedBuilder(
-                        animation: _bounceAnimations[index],
-                        builder: (_, __) => Transform.scale(
-                          scale: _bounceAnimations[index].value,
-                          child: _NavItem(
-                            tab: _tabs[index],
-                            isSelected: index == currentIndex,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(32),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+            // semi-transparent fill so content behind shows through the blur
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.black.withValues(alpha: 0.35),
+                Colors.black.withValues(alpha: 0.50),
+              ],
+            ),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.10),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2196F3).withValues(alpha: 0.15),
+                blurRadius: 28,
+                spreadRadius: -6,
+                offset: const Offset(0, 6),
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.45),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
               ),
             ],
-          );
-        },
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  _buildIndicator(constraints.maxWidth, currentIndex),
+                  Row(
+                    children: List.generate(_tabs.length, (index) {
+                      return Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => _onTap(index, currentIndex),
+                          child: AnimatedBuilder(
+                            animation: _bounceAnimations[index],
+                            builder: (_, __) => Transform.scale(
+                              scale: _bounceAnimations[index].value,
+                              child: _NavItem(
+                                tab: _tabs[index],
+                                isSelected: index == currentIndex,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -200,16 +211,10 @@ class _NavItem extends StatelessWidget {
         duration: const Duration(milliseconds: 220),
         curve: Curves.easeOut,
         scale: isSelected ? 1.0 : 0.88,
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 180),
-          child: Icon(
-            tab.icon,
-            key: ValueKey(isSelected),
-            color: isSelected
-                ? Colors.white
-                : Colors.white.withValues(alpha: 0.38),
-            size: isSelected ? 24 : 21,
-          ),
+        child: Icon(
+          tab.icon,
+          color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.38),
+          size: isSelected ? 24 : 21,
         ),
       ),
     );

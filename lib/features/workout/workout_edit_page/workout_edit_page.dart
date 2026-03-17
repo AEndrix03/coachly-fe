@@ -343,6 +343,14 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Widget _buildFAB() {
+    final extra = MediaQuery.of(context).viewPadding.bottom + 78;
+    return Padding(
+      padding: EdgeInsets.only(bottom: extra),
+      child: _buildFABContent(),
+    );
+  }
+
+  Widget _buildFABContent() {
     return GestureDetector(
       onTap: _handleAddExercise,
       child: Container(

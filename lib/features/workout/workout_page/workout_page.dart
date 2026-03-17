@@ -208,10 +208,16 @@ class WorkoutPage extends ConsumerWidget {
   }
 
   Widget _buildFAB(BuildContext context) {
-    return AddFabButton(
-      onPressed: () {
-        context.push('/workouts/workout/new/edit');
-      },
+    // With extendBody:true on the outer shell, Flutter zeros MediaQuery.padding.bottom
+    // inside the body, so the FAB sits at 16px from the screen bottom.
+    // We add viewPadding.bottom (real safe-area) + 78 (navbar 64 + margin 14)
+    // so the button lands 16px above the navbar top edge.
+    final extra = MediaQuery.of(context).viewPadding.bottom + 78;
+    return Padding(
+      padding: EdgeInsets.only(bottom: extra),
+      child: AddFabButton(
+        onPressed: () => context.push('/workouts/workout/new/edit'),
+      ),
     );
   }
 
