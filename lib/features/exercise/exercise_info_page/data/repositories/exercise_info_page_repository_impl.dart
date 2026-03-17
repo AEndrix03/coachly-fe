@@ -18,7 +18,19 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   ) async {
     try {
       await _ensureLocalCache();
-      final exercise = await _hiveService.getExercise(exerciseId);
+      var exercise = await _hiveService.getExercise(exerciseId);
+
+      if (exercise == null) {
+        final syncResponse = await refreshFromRemote();
+        if (!syncResponse.success) {
+          return ApiResponse.error(
+            message: syncResponse.message ?? 'Failed to sync exercise cache',
+            statusCode: syncResponse.statusCode,
+            errors: syncResponse.errors,
+          );
+        }
+        exercise = await _hiveService.getExercise(exerciseId);
+      }
 
       if (exercise == null) {
         return ApiResponse.error(message: 'Exercise not found in local cache');

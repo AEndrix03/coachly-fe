@@ -8,10 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class WorkoutDetailHeader extends ConsumerWidget {
   final String title;
   final String coachName;
+  final bool showCoach;
   final List<TagDto> muscleTags;
-  final double progress;
-  final int sessionsCount;
-  final int lastSessionDays;
   final VoidCallback onBack;
   final VoidCallback onShare;
   final VoidCallback onEdit;
@@ -20,10 +18,8 @@ class WorkoutDetailHeader extends ConsumerWidget {
     super.key,
     required this.title,
     required this.coachName,
+    required this.showCoach,
     required this.muscleTags,
-    required this.progress,
-    required this.sessionsCount,
-    required this.lastSessionDays,
     required this.onBack,
     required this.onShare,
     required this.onEdit,
@@ -49,10 +45,7 @@ class WorkoutDetailHeader extends ConsumerWidget {
         bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildAppBar(),
-            _buildContent(locale),
-          ],
+          children: [_buildAppBar(), _buildContent(locale)],
         ),
       ),
     );
@@ -81,6 +74,8 @@ class WorkoutDetailHeader extends ConsumerWidget {
   }
 
   Widget _buildContent(Locale locale) {
+    final shouldShowCoach = showCoach && coachName.trim().isNotEmpty;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
       child: Column(
@@ -95,12 +90,14 @@ class WorkoutDetailHeader extends ConsumerWidget {
               letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: 16),
-          _buildCoachBadge(),
-          const SizedBox(height: 16),
-          _buildMuscleTags(locale),
-          const SizedBox(height: 24),
-          _buildProgressSection(),
+          if (shouldShowCoach) ...[
+            const SizedBox(height: 16),
+            _buildCoachBadge(),
+          ],
+          if (muscleTags.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            _buildMuscleTags(locale),
+          ],
         ],
       ),
     );
@@ -151,76 +148,6 @@ class WorkoutDetailHeader extends ConsumerWidget {
       child: Text(
         label,
         style: const TextStyle(color: Colors.white, fontSize: 12),
-      ),
-    );
-  }
-
-  Widget _buildProgressSection() {
-    final progressPercent = (progress * 100).toInt();
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Progresso',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                '$progressPercent%',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.95),
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: Colors.black.withValues(alpha: 0.3),
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
-              minHeight: 10,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              const Icon(
-                Icons.calendar_today_outlined,
-                color: Colors.white,
-                size: 16,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '$sessionsCount sessioni',
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-              ),
-              const SizedBox(width: 16),
-              const Icon(Icons.access_time, color: Colors.white, size: 16),
-              const SizedBox(width: 6),
-              Text(
-                'Ultimo: $lastSessionDays giorni fa',
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

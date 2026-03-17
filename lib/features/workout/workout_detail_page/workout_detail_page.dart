@@ -1,10 +1,10 @@
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
-import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_exercise_list_section.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_header.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_stats_cards.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/widgets/cards/border_card.dart';
 import 'package:flutter/material.dart';
@@ -18,29 +18,21 @@ class WorkoutDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       body: Container(
         color: const Color(0xFF0F0F1E),
-        child: _buildBody(context, ref, workout, scheme),
+        child: _buildBody(context, ref, workout),
       ),
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    WidgetRef ref,
-    WorkoutModel workout,
-    ColorScheme scheme,
-  ) {
+  Widget _buildBody(BuildContext context, WidgetRef ref, WorkoutModel workout) {
     final locale = ref.watch(languageProvider);
+    final isPersonalWorkout = (workout.coachId?.trim().isEmpty ?? true);
 
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(workoutListProvider);
-        // We might need to pop and let the workout page rebuild, or find a way
-        // to get the updated workout model here. For now, just invalidating.
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -50,10 +42,8 @@ class WorkoutDetailPage extends ConsumerWidget {
             WorkoutDetailHeader(
               title: workout.titleI18n?.fromI18n(locale) ?? '',
               coachName: workout.coachName ?? '',
+              showCoach: !isPersonalWorkout,
               muscleTags: workout.muscleTags,
-              progress: workout.progress,
-              sessionsCount: workout.sessionsCount,
-              lastSessionDays: workout.lastSessionDays,
               onBack: () => context.pop(),
               onShare: () => _showShareToast(context, ref),
               onEdit: () => context.push(

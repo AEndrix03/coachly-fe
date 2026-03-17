@@ -25,7 +25,6 @@ class EditableExerciseCard extends StatefulWidget {
 }
 
 class _EditableExerciseCardState extends State<EditableExerciseCard> {
-  // Controllers for each editable part
   late TextEditingController _setsController;
   late TextEditingController _repsController;
   late TextEditingController _restController;
@@ -33,6 +32,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
   late TextEditingController _notesController;
 
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 300));
+  bool _isExpanded = false;
 
   @override
   void initState() {
@@ -55,33 +55,25 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
   }
 
   void _initializeControllers() {
-    // Parsing logic
-    final setsParts = widget.exercise.sets
-        .split('×')
-        .map((e) => e.trim())
-        .toList();
+    final parts = _extractSetParts(widget.exercise.sets);
     final restValue = widget.exercise.rest.replaceAll(RegExp(r'[^0-9]'), '');
     final weightValue = widget.exercise.weight.replaceAll(
       RegExp(r'[^0-9.]'),
       '',
     );
 
-    _setsController = TextEditingController(text: setsParts.first);
-    _repsController = TextEditingController(
-      text: setsParts.length > 1 ? setsParts.last : '',
-    );
+    _setsController = TextEditingController(text: parts.$1);
+    _repsController = TextEditingController(text: parts.$2);
     _restController = TextEditingController(text: restValue);
     _weightController = TextEditingController(text: weightValue);
     _notesController = TextEditingController(text: widget.exercise.notes);
   }
 
   void _updateControllers() {
-    final setsParts = widget.exercise.sets
-        .split('×')
-        .map((e) => e.trim())
-        .toList();
-    _setsController.text = setsParts.first;
-    _repsController.text = setsParts.length > 1 ? setsParts.last : '';
+    final parts = _extractSetParts(widget.exercise.sets);
+
+    _setsController.text = parts.$1;
+    _repsController.text = parts.$2;
     _restController.text = widget.exercise.rest.replaceAll(
       RegExp(r'[^0-9]'),
       '',
@@ -104,8 +96,21 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     super.dispose();
   }
 
+  (String, String) _extractSetParts(String rawSets) {
+    final matches = RegExp(
+      r'\d+',
+    ).allMatches(rawSets).map((m) => m.group(0)!).toList();
+    if (matches.length >= 2) {
+      return (matches[0], matches[1]);
+    }
+    if (matches.length == 1) {
+      return (matches[0], '');
+    }
+    return ('', '');
+  }
+
   void _updateExercise() {
-    final sets = '${_setsController.text} × ${_repsController.text}';
+    final sets = '${_setsController.text} x ${_repsController.text}';
     final rest = '${_restController.text}s';
     final weight = '${_weightController.text}kg';
 
@@ -132,8 +137,12 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF2A2A3E).withValues(alpha: widget.isDragging ? 0.8 : 0.6),
-            const Color(0xFF1A1A2E).withValues(alpha: widget.isDragging ? 0.95 : 0.8),
+            const Color(
+              0xFF2A2A3E,
+            ).withValues(alpha: widget.isDragging ? 0.8 : 0.6),
+            const Color(
+              0xFF1A1A2E,
+            ).withValues(alpha: widget.isDragging ? 0.95 : 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -170,7 +179,15 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
               ),
             ),
           ),
-          _buildEditableFields(),
+          _buildSummaryBar(),
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 220),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: const SizedBox.shrink(),
+            secondChild: _buildEditableFields(),
+          ),
         ],
       ),
     );
@@ -207,9 +224,9 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
                     _buildTag(
                       widget.exercise.muscles.isNotEmpty
                           ? widget.exercise.muscles.first
-                          : 'N/A', // Provide a fallback if muscles list is empty
+                          : 'N/A',
                       widget.exercise.accentColor,
-                      Icons.fitbit,
+                      Icons.fitness_center,
                     ),
                     _buildTag(
                       widget.exercise.difficulty,
@@ -241,7 +258,10 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(width: 2, color: Colors.white.withValues(alpha: 0.15)),
+          border: Border.all(
+            width: 2,
+            color: Colors.white.withValues(alpha: 0.15),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.3),
@@ -269,13 +289,20 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (widget.exercise.variants.isNotEmpty)
+        _buildIconButton(
+          _isExpanded ? Icons.expand_less : Icons.expand_more,
+          Colors.white,
+          _toggleExpanded,
+        ),
+        const SizedBox(height: 8),
+        if (widget.exercise.variants.isNotEmpty) ...[
           _buildIconButton(
             Icons.swap_horiz,
             widget.exercise.accentColor,
             widget.onFindVariant,
           ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         _buildIconButton(
           Icons.delete_outline,
           const Color(0xFFFF5252),
@@ -292,7 +319,10 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
+            colors: [
+              color.withValues(alpha: 0.2),
+              color.withValues(alpha: 0.1),
+            ],
           ),
           shape: BoxShape.circle,
           border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
@@ -302,11 +332,52 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     );
   }
 
+  Widget _buildSummaryBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.only(
+          bottomLeft: const Radius.circular(19),
+          bottomRight: _isExpanded ? Radius.zero : const Radius.circular(19),
+        ),
+      ),
+      child: Row(
+        children: [
+          _buildSummaryChip(Icons.repeat, widget.exercise.sets),
+          const SizedBox(width: 10),
+          _buildSummaryChip(Icons.timer_outlined, widget.exercise.rest),
+          const Spacer(),
+          _buildSummaryChip(Icons.fitness_center, widget.exercise.weight),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryChip(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: Colors.white.withValues(alpha: 0.6), size: 16),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.75),
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildEditableFields() {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.3),
+        color: Colors.black.withValues(alpha: 0.34),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(19),
           bottomRight: Radius.circular(19),
@@ -314,7 +385,6 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        // Align fields to the left
         children: [
           Row(
             children: [
@@ -365,7 +435,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     String? hint,
   }) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start, // Align label to the left
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
@@ -386,7 +456,10 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
               ],
             ),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.15),
+              width: 1,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -395,7 +468,6 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
                 child: TextField(
                   controller: controller,
                   textAlign: TextAlign.start,
-                  // Align text to the left
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -413,7 +485,7 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 10,
-                    ), // Adjust padding
+                    ),
                   ),
                   dragStartBehavior: DragStartBehavior.down,
                 ),
@@ -421,7 +493,6 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
               if (suffix != null)
                 Padding(
                   padding: const EdgeInsets.only(right: 12.0),
-                  // Adjust padding for suffix
                   child: Text(
                     suffix,
                     style: TextStyle(
@@ -461,7 +532,10 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
               ],
             ),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.15),
+              width: 1,
+            ),
           ),
           child: TextField(
             controller: _notesController,
@@ -510,5 +584,14 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
         ],
       ),
     );
+  }
+
+  void _toggleExpanded() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
   }
 }
