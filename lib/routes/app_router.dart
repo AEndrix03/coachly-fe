@@ -176,6 +176,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
     // Static layout: body is constrained above the navbar — no content overlap.
     // Flutter automatically positions FABs and handles safe-area insets.
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: navigationShell,
       bottomNavigationBar: const AppNavigationBar(),
     );
