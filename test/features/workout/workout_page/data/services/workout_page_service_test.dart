@@ -93,6 +93,67 @@ void main() {
         'Descrizione IT',
       );
     });
+
+    test(
+      'maps gateway blocks payload to legacy workout model without null cast errors',
+      () async {
+        final client = _RecordingHttpClient(
+          responder: (_) => http.Response(
+            jsonEncode([
+              {
+                'id': '0142e601-b8a7-44e8-adff-0e2f24dc4a1b',
+                'name': 'Nuova Scheda',
+                'status': 'active',
+                'translations':
+                    '{"it":{"title":"Nuova Scheda","description":"Descrizione"}}',
+                'blocks': [
+                  {
+                    'id': '686de52e-ddba-41d3-afa8-1f1dfe8f908a',
+                    'label': 'Ipertrofia',
+                    'position': 0,
+                    'entries': [
+                      {
+                        'id': '63302367-33f6-4fd8-b01e-3dfc93733590',
+                        'exerciseId': '00b8ff85-f4ec-45fc-a02e-7d143f7457d3',
+                        'position': 0,
+                        'sets': [
+                          {
+                            'id': 'fa2a65a0-9bcc-48bd-8cfa-51f39160119a',
+                            'position': 0,
+                            'setType': null,
+                            'reps': 10,
+                            'load': 10.0,
+                            'loadUnit': 'kg',
+                            'restSeconds': 60,
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ]),
+            200,
+          ),
+        );
+
+        final service = WorkoutPageService(
+          ApiClient(client: client, baseUrl: 'https://localhost:8800/api'),
+        );
+
+        final response = await service.fetchWorkouts();
+
+        expect(response.success, isTrue);
+        final workout = response.data!.single;
+        expect(workout.id, '0142e601-b8a7-44e8-adff-0e2f24dc4a1b');
+        expect(workout.type, 'Ipertrofia');
+        expect(workout.workoutExercises.length, 1);
+        expect(
+          workout.workoutExercises.first.exercise.id,
+          '00b8ff85-f4ec-45fc-a02e-7d143f7457d3',
+        );
+      },
+    );
   });
 }
 
