@@ -1,3 +1,4 @@
+import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
@@ -54,7 +55,7 @@ class WorkoutDetailPage extends ConsumerWidget {
               sessionsCount: workout.sessionsCount,
               lastSessionDays: workout.lastSessionDays,
               onBack: () => context.pop(),
-              onShare: () => _showShareSnackbar(context),
+              onShare: () => _showShareToast(context, ref),
               onEdit: () => context.push(
                 '/workouts/workout/${workout.id}/edit',
                 extra: workout,
@@ -135,12 +136,14 @@ class WorkoutDetailPage extends ConsumerWidget {
     );
   }
 
-  void _showShareSnackbar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Condividi workout'),
-        duration: Duration(seconds: 1),
-      ),
-    );
+  void _showShareToast(BuildContext context, WidgetRef ref) {
+    ref
+        .read(appToastServiceProvider)
+        .showInfo(
+          context,
+          'Condivisione workout in arrivo',
+          title: 'Condividi',
+          duration: const Duration(seconds: 2),
+        );
   }
 }

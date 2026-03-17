@@ -1,3 +1,4 @@
+import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
@@ -202,7 +203,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               maxLines: null,
               decoration: InputDecoration(
                 hintText: 'Aggiungi una descrizione...',
-                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.3),
+                ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
               ),
@@ -343,11 +346,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Widget _buildFAB() {
-    final extra = MediaQuery.of(context).viewPadding.bottom + 78;
-    return Padding(
-      padding: EdgeInsets.only(bottom: extra),
-      child: _buildFABContent(),
-    );
+    return _buildFABContent();
   }
 
   Widget _buildFABContent() {
@@ -501,12 +500,14 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   void _handleFindVariant(EditableExerciseModel exercise) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Cerca variante per: ${exercise.name}'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    ref
+        .read(appToastServiceProvider)
+        .showInfo(
+          context,
+          'Cerca variante per: ${exercise.name}',
+          title: 'Varianti esercizio',
+          duration: const Duration(seconds: 2),
+        );
   }
 
   Future<void> _handleSave() async {
@@ -515,21 +516,23 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         .save();
     if (!mounted) return;
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Scheda salvata con successo'),
-          backgroundColor: Color(0xFF4CAF50),
-        ),
-      );
+      ref
+          .read(appToastServiceProvider)
+          .showSuccess(
+            context,
+            'Scheda salvata con successo',
+            title: 'Salvataggio completato',
+          );
       context.pop();
     } else {
       final error = ref.read(workoutEditPageProvider(widget.workoutId)).error;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error ?? 'Errore durante il salvataggio'),
-          backgroundColor: const Color(0xFFFF5252),
-        ),
-      );
+      ref
+          .read(appToastServiceProvider)
+          .showError(
+            context,
+            error ?? 'Errore durante il salvataggio',
+            title: 'Salvataggio non riuscito',
+          );
     }
   }
 

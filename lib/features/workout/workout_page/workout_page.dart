@@ -1,3 +1,4 @@
+import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
@@ -44,6 +45,7 @@ class WorkoutPage extends ConsumerWidget {
             final statsState = ref.watch(workoutStatsProvider);
             return _buildBody(
               context,
+              ref,
               workouts,
               recentWorkoutsState,
               statsState,
@@ -57,6 +59,7 @@ class WorkoutPage extends ConsumerWidget {
 
   Widget _buildBody(
     BuildContext context,
+    WidgetRef ref,
     List<WorkoutModel> workouts,
     AsyncValue<List<WorkoutModel>> recentWorkoutsState,
     WorkoutStatsState statsState,
@@ -73,7 +76,7 @@ class WorkoutPage extends ConsumerWidget {
           WorkoutHeader(
             stats: statsState.stats,
             isLoading: statsState.isLoading,
-            onNotifications: () => _showNotifications(context),
+            onNotifications: () => _showNotifications(context, ref),
           ),
           const Gap(18),
           recentWorkoutsState.when(
@@ -208,25 +211,19 @@ class WorkoutPage extends ConsumerWidget {
   }
 
   Widget _buildFAB(BuildContext context) {
-    // With extendBody:true on the outer shell, Flutter zeros MediaQuery.padding.bottom
-    // inside the body, so the FAB sits at 16px from the screen bottom.
-    // We add viewPadding.bottom (real safe-area) + 78 (navbar 64 + margin 14)
-    // so the button lands 16px above the navbar top edge.
-    final extra = MediaQuery.of(context).viewPadding.bottom + 78;
-    return Padding(
-      padding: EdgeInsets.only(bottom: extra),
-      child: AddFabButton(
-        onPressed: () => context.push('/workouts/workout/new/edit'),
-      ),
+    return AddFabButton(
+      onPressed: () => context.push('/workouts/workout/new/edit'),
     );
   }
 
-  void _showNotifications(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Notifiche'),
-        duration: Duration(seconds: 1),
-      ),
-    );
+  void _showNotifications(BuildContext context, WidgetRef ref) {
+    ref
+        .read(appToastServiceProvider)
+        .showInfo(
+          context,
+          'Funzionalita notifiche in arrivo',
+          title: 'Notifiche',
+          duration: const Duration(seconds: 2),
+        );
   }
 }
