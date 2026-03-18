@@ -502,26 +502,9 @@ class _WorkoutExerciseViewCardState
     setState(() => _isExpanded = !_isExpanded);
   }
 
-  Future<void> _openExerciseDetail() async {
+  void _openExerciseDetail() {
     final exerciseId = _exerciseId;
     if (exerciseId == null || exerciseId.isEmpty) return;
-
-    final repository = ref.read(exerciseInfoPageRepositoryProvider);
-    final response = await repository.getExerciseDetail(exerciseId);
-
-    if (!mounted) return;
-
-    if (!response.success || response.data == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Impossibile caricare il dettaglio esercizio. Riprova.',
-          ),
-        ),
-      );
-      return;
-    }
-
     context.push(
       '/workouts/workout/${widget.workoutId}/workout_exercise_page/$exerciseId',
     );
