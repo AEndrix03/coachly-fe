@@ -1,11 +1,15 @@
 import 'package:coachly/core/utils/debouncer.dart';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class EditableExerciseCard extends StatefulWidget {
+class EditableExerciseCard extends ConsumerStatefulWidget {
   final EditableExerciseModel exercise;
   final VoidCallback onRemove;
   final VoidCallback onFindVariant;
@@ -26,10 +30,11 @@ class EditableExerciseCard extends StatefulWidget {
   });
 
   @override
-  State<EditableExerciseCard> createState() => _EditableExerciseCardState();
+  ConsumerState<EditableExerciseCard> createState() =>
+      _EditableExerciseCardState();
 }
 
-class _EditableExerciseCardState extends State<EditableExerciseCard> {
+class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
   late TextEditingController _setsController;
   late TextEditingController _repsController;
   late TextEditingController _restController;
@@ -38,6 +43,10 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
 
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 300));
   late bool _isExpanded;
+
+  String? _resolvedName;
+  bool _isResolvingName = false;
+  bool _triedNameResolution = false;
 
   @override
   void initState() {
@@ -50,6 +59,8 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     _restController.addListener(() => _debouncer.run(_updateExercise));
     _weightController.addListener(() => _debouncer.run(_updateExercise));
     _notesController.addListener(() => _debouncer.run(_updateExercise));
+
+    _resolveNameIfNeeded();
   }
 
   @override
@@ -224,17 +235,31 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  widget.exercise.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
-                    height: 1.3,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _displayName(),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                    if (_isResolvingName) ...[
+                      const SizedBox(width: 8),
+                      const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 10),
                 Wrap(
@@ -619,5 +644,51 @@ class _EditableExerciseCardState extends State<EditableExerciseCard> {
     setState(() {
       _isExpanded = !_isExpanded;
     });
+  }
+
+  String _displayName() {
+    final name = widget.exercise.name.trim();
+    final exerciseId = widget.exercise.exerciseId.trim();
+    // If we have a resolved name from API, prefer it
+    if (_resolvedName != null && _resolvedName!.isNotEmpty) {
+      return _resolvedName!;
+    }
+    // Use embedded name only if it's not just the raw ID
+    if (name.isNotEmpty && name != exerciseId) {
+      return name;
+    }
+    return 'Esercizio ${widget.exercise.number}';
+  }
+
+  Future<void> _resolveNameIfNeeded() async {
+    final name = widget.exercise.name.trim();
+    final exerciseId = widget.exercise.exerciseId.trim();
+    // Name is fine — no need to fetch
+    if (name.isNotEmpty && name != exerciseId) {
+      return;
+    }
+    if (_triedNameResolution || exerciseId.isEmpty) {
+      return;
+    }
+    _triedNameResolution = true;
+    if (mounted) setState(() => _isResolvingName = true);
+
+    try {
+      final repository = ref.read(exerciseInfoPageRepositoryProvider);
+      final response = await repository.getExerciseDetail(exerciseId);
+      if (!mounted) return;
+      final locale = ref.read(languageProvider);
+      final resolved = response.data?.nameI18n?.fromI18n(locale);
+      setState(() {
+        _isResolvingName = false;
+        if (resolved != null &&
+            resolved.isNotEmpty &&
+            resolved != exerciseId) {
+          _resolvedName = resolved;
+        }
+      });
+    } catch (_) {
+      if (mounted) setState(() => _isResolvingName = false);
+    }
   }
 }
