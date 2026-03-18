@@ -11,7 +11,6 @@ part of 'workout_exercise_model.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$WorkoutExerciseModel {
 
@@ -22,8 +21,6 @@ mixin _$WorkoutExerciseModel {
 @pragma('vm:prefer-inline')
 $WorkoutExerciseModelCopyWith<WorkoutExerciseModel> get copyWith => _$WorkoutExerciseModelCopyWithImpl<WorkoutExerciseModel>(this as WorkoutExerciseModel, _$identity);
 
-  /// Serializes this WorkoutExerciseModel to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -31,7 +28,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutExerciseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.exercise, exercise) || other.exercise == exercise)&&(identical(other.sets, sets) || other.sets == sets)&&(identical(other.rest, rest) || other.rest == rest)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.progress, progress) || other.progress == progress));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,id,exercise,sets,rest,weight,progress);
 
@@ -220,11 +217,11 @@ return $default(_that.id,_that.exercise,_that.sets,_that.rest,_that.weight,_that
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _WorkoutExerciseModel implements WorkoutExerciseModel {
   const _WorkoutExerciseModel({required this.id, required this.exercise, required this.sets, required this.rest, required this.weight, required this.progress});
-  factory _WorkoutExerciseModel.fromJson(Map<String, dynamic> json) => _$WorkoutExerciseModelFromJson(json);
+  
 
 @override final  String id;
 @override final  ExerciseDetailModel exercise;
@@ -239,17 +236,14 @@ class _WorkoutExerciseModel implements WorkoutExerciseModel {
 @pragma('vm:prefer-inline')
 _$WorkoutExerciseModelCopyWith<_WorkoutExerciseModel> get copyWith => __$WorkoutExerciseModelCopyWithImpl<_WorkoutExerciseModel>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$WorkoutExerciseModelToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutExerciseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.exercise, exercise) || other.exercise == exercise)&&(identical(other.sets, sets) || other.sets == sets)&&(identical(other.rest, rest) || other.rest == rest)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.progress, progress) || other.progress == progress));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,id,exercise,sets,rest,weight,progress);
 

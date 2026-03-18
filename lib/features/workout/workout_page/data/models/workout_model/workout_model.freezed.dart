@@ -11,20 +11,16 @@ part of 'workout_model.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$WorkoutModel {
 
- String get id;@MapConverter() Map<String, String>? get titleI18n;@MapConverter() Map<String, String>? get descriptionI18n; String? get coachId; String? get coachName; double get progress; int get durationMinutes; String get goal; DateTime get lastUsed; List<TagDto> get muscleTags;// Changed to List<TagDto>
- int get exercises; int get sessionsCount; int get lastSessionDays; String get type; List<WorkoutExerciseModel> get workoutExercises; bool get active; bool get dirty; bool get delete;
+ String get id;@MapConverter() Map<String, String>? get titleI18n;@MapConverter() Map<String, String>? get descriptionI18n; String? get coachId; String? get coachName; double get progress; int get durationMinutes; String get goal; DateTime get lastUsed; List<TagDto> get muscleTags; int get exercises; int get sessionsCount; int get lastSessionDays; String get type; List<WorkoutExerciseModel> get workoutExercises; bool get active; bool get dirty; bool get delete;
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $WorkoutModelCopyWith<WorkoutModel> get copyWith => _$WorkoutModelCopyWithImpl<WorkoutModel>(this as WorkoutModel, _$identity);
 
-  /// Serializes this WorkoutModel to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -32,7 +28,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other.titleI18n, titleI18n)&&const DeepCollectionEquality().equals(other.descriptionI18n, descriptionI18n)&&(identical(other.coachId, coachId) || other.coachId == coachId)&&(identical(other.coachName, coachName) || other.coachName == coachName)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&const DeepCollectionEquality().equals(other.muscleTags, muscleTags)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.sessionsCount, sessionsCount) || other.sessionsCount == sessionsCount)&&(identical(other.lastSessionDays, lastSessionDays) || other.lastSessionDays == lastSessionDays)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other.workoutExercises, workoutExercises)&&(identical(other.active, active) || other.active == active)&&(identical(other.dirty, dirty) || other.dirty == dirty)&&(identical(other.delete, delete) || other.delete == delete));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(titleI18n),const DeepCollectionEquality().hash(descriptionI18n),coachId,coachName,progress,durationMinutes,goal,lastUsed,const DeepCollectionEquality().hash(muscleTags),exercises,sessionsCount,lastSessionDays,type,const DeepCollectionEquality().hash(workoutExercises),active,dirty,delete);
 
@@ -224,11 +220,11 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _WorkoutModel implements WorkoutModel {
   const _WorkoutModel({required this.id, @MapConverter() required final  Map<String, String>? titleI18n, @MapConverter() required final  Map<String, String>? descriptionI18n, this.coachId, this.coachName, this.progress = 0.0, this.durationMinutes = 0, required this.goal, required this.lastUsed, final  List<TagDto> muscleTags = const [], this.exercises = 0, this.sessionsCount = 0, this.lastSessionDays = 0, required this.type, final  List<WorkoutExerciseModel> workoutExercises = const [], this.active = true, this.dirty = false, this.delete = false}): _titleI18n = titleI18n,_descriptionI18n = descriptionI18n,_muscleTags = muscleTags,_workoutExercises = workoutExercises;
-  factory _WorkoutModel.fromJson(Map<String, dynamic> json) => _$WorkoutModelFromJson(json);
+  
 
 @override final  String id;
  final  Map<String, String>? _titleI18n;
@@ -262,7 +258,6 @@ class _WorkoutModel implements WorkoutModel {
   return EqualUnmodifiableListView(_muscleTags);
 }
 
-// Changed to List<TagDto>
 @override@JsonKey() final  int exercises;
 @override@JsonKey() final  int sessionsCount;
 @override@JsonKey() final  int lastSessionDays;
@@ -284,17 +279,14 @@ class _WorkoutModel implements WorkoutModel {
 @pragma('vm:prefer-inline')
 _$WorkoutModelCopyWith<_WorkoutModel> get copyWith => __$WorkoutModelCopyWithImpl<_WorkoutModel>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$WorkoutModelToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other._titleI18n, _titleI18n)&&const DeepCollectionEquality().equals(other._descriptionI18n, _descriptionI18n)&&(identical(other.coachId, coachId) || other.coachId == coachId)&&(identical(other.coachName, coachName) || other.coachName == coachName)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&const DeepCollectionEquality().equals(other._muscleTags, _muscleTags)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.sessionsCount, sessionsCount) || other.sessionsCount == sessionsCount)&&(identical(other.lastSessionDays, lastSessionDays) || other.lastSessionDays == lastSessionDays)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other._workoutExercises, _workoutExercises)&&(identical(other.active, active) || other.active == active)&&(identical(other.dirty, dirty) || other.dirty == dirty)&&(identical(other.delete, delete) || other.delete == delete));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(_titleI18n),const DeepCollectionEquality().hash(_descriptionI18n),coachId,coachName,progress,durationMinutes,goal,lastUsed,const DeepCollectionEquality().hash(_muscleTags),exercises,sessionsCount,lastSessionDays,type,const DeepCollectionEquality().hash(_workoutExercises),active,dirty,delete);
 

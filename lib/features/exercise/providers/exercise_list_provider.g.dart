@@ -40,7 +40,7 @@ final class ExerciseListProvider
   String toString() {
     return r'exerciseListProvider'
         ''
-        '$argument';
+        '($argument)';
   }
 
   @$internal
