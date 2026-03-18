@@ -1,3 +1,5 @@
+import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
+import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/widgets/active_app_bar.dart';
 import 'package:coachly/features/workout/workout_active_page/widgets/active_bottom_bar.dart';
@@ -16,13 +18,9 @@ class WorkoutActivePage extends ConsumerStatefulWidget {
 }
 
 class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
-  void _startRestTimer() {
-    ref.read(restTimerProvider.notifier).startTimer(90);
-  }
-
   @override
   Widget build(BuildContext context) {
-    // Listen per dialog quando timer finisce
+    // Rest timer dialog
     ref.listen<RestTimerState>(restTimerProvider, (previous, next) {
       if (previous != null &&
           previous.isActive &&
@@ -37,80 +35,163 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
       }
     });
 
-    // TODO: Implementare provider per stato workout attivo
-    // final workoutState = ref.watch(activeWorkoutProvider(workoutId));
+    final workoutState = ref.watch(activeWorkoutProvider(widget.workoutId));
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0F),
       body: SafeArea(
-        child: Stack(
-          children: [
-            // Main content
-            Column(
-              children: [
-                const ActiveAppBar(currentExercise: 2, totalExercises: 11),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                    itemCount: 3, // TODO: Da provider
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: ExerciseCard(
-                          exerciseNumber: index + 1,
-                          title: _getExerciseTitle(index),
-                          setsRange: _getSetsRange(index),
-                          repsRange: _getRepsRange(index),
-                          sets: _getSets(index),
-                          isExpanded: index == 0,
-                          restSeconds: 90,
-                          onSetCompleted: _startRestTimer,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+        child: switch (workoutState.status) {
+          ActiveWorkoutStatus.loading => _buildLoading(),
+          ActiveWorkoutStatus.error => _buildError(workoutState.errorMessage),
+          _ => _buildContent(workoutState),
+        },
+      ),
+    );
+  }
 
-            // Floating buttons
-            const ActiveBottomBar(),
+  Widget _buildLoading() {
+    return const Center(
+      child: CircularProgressIndicator(color: Color(0xFF3B82F6)),
+    );
+  }
+
+  Widget _buildError(String? message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Color(0xFFEF4444),
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              message ?? 'Errore nel caricamento.',
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            OutlinedButton(
+              onPressed: () => Navigator.pop(context),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: const BorderSide(color: Color(0xFF374151)),
+              ),
+              child: const Text('Torna indietro'),
+            ),
           ],
         ),
       ),
     );
   }
 
-  String _getExerciseTitle(int index) {
-    // TODO: Da provider
-    final titles = [
-      'Panca Piana Bilanciere',
-      'Panca Inclinata Manubri',
-      'Croci ai Cavi',
-    ];
-    return titles[index];
+  Widget _buildContent(ActiveWorkoutState workoutState) {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            ActiveAppBar(workoutId: widget.workoutId),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                itemCount: workoutState.exercises.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: ExerciseCard(
+                      workoutId: widget.workoutId,
+                      exerciseIndex: index,
+                      isInitiallyExpanded: index == 0,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        ActiveBottomBar(
+          workoutId: widget.workoutId,
+          onComplete: _showCompleteDialog,
+        ),
+      ],
+    );
   }
 
-  String _getSetsRange(int index) {
-    // TODO: Da provider
-    return index == 0 ? '2/4' : '0/4';
-  }
+  Future<void> _showCompleteDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1F2937),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFF374151), width: 1.5),
+        ),
+        title: const Text(
+          'Completa allenamento?',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+        content: const Text(
+          'Tutti i dati verranno salvati e la sessione registrata.',
+          style: TextStyle(color: Colors.white70, fontSize: 15),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text(
+              'Annulla',
+              style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'Completa',
+              style: TextStyle(
+                color: Color(0xFF10B981),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
 
-  String _getRepsRange(int index) {
-    // TODO: Da provider
-    return index == 0 ? '8-10' : '10-12';
-  }
+    if (result != true || !mounted) return;
 
-  List<Map<String, dynamic>> _getSets(int index) {
-    // TODO: Da provider
-    if (index == 0) {
-      return [
-        {'type': 'Normale', 'weight': 85, 'reps': 10, 'completed': true},
-        {'type': 'Normale', 'weight': 85, 'reps': 9, 'completed': true},
-        {'type': 'Normale', 'weight': 85, 'reps': 8, 'completed': false},
-        {'type': 'Normale', 'weight': 80, 'reps': 10, 'completed': false},
-      ];
+    final notifier = ref.read(
+      activeWorkoutProvider(widget.workoutId).notifier,
+    );
+    final success = await notifier.completeWorkout();
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Allenamento completato e salvato!'),
+          backgroundColor: Color(0xFF10B981),
+        ),
+      );
+    } else {
+      final errorMessage = ref
+          .read(activeWorkoutProvider(widget.workoutId))
+          .errorMessage;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage ?? 'Errore nel salvataggio.'),
+          backgroundColor: const Color(0xFFEF4444),
+        ),
+      );
     }
-    return [];
   }
 }

@@ -1,17 +1,13 @@
+import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 import '../providers/rest_timer_provider.dart';
 
 class ActiveAppBar extends ConsumerStatefulWidget {
-  final int currentExercise;
-  final int totalExercises;
+  final String workoutId;
 
-  const ActiveAppBar({
-    super.key,
-    required this.currentExercise,
-    required this.totalExercises,
-  });
+  const ActiveAppBar({super.key, required this.workoutId});
 
   @override
   ConsumerState<ActiveAppBar> createState() => _ActiveAppBarState();
@@ -130,14 +126,21 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
                               width: 1,
                             ),
                           ),
-                          child: Text(
-                            'Esercizio ${widget.currentExercise}/${widget.totalExercises}',
-                            style: const TextStyle(
-                              color: Color(0xFF60A5FA),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.3,
-                            ),
+                          child: Builder(
+                            builder: (context) {
+                              final total = ref
+                                  .watch(activeWorkoutProvider(widget.workoutId))
+                                  .totalExercises;
+                              return Text(
+                                '$total esercizi',
+                                style: const TextStyle(
+                                  color: Color(0xFF60A5FA),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.3,
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
