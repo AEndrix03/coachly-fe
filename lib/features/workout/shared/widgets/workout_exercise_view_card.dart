@@ -5,10 +5,10 @@ import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Read-only exercise card used in workout detail (and wherever a non-edit
-/// view of a workout exercise is needed).
+/// Read-only exercise card — same visual style as EditableExerciseCard but
+/// without drag handle, edit fields, delete and variant buttons.
 class WorkoutExerciseViewCard extends ConsumerStatefulWidget {
   final WorkoutExerciseModel workoutExercise;
   final String workoutId;
@@ -34,7 +34,6 @@ class _WorkoutExerciseViewCardState
   String? _resolvedExerciseName;
 
   String? get _exerciseId => widget.workoutExercise.exercise.id?.trim();
-
   bool get _hasExerciseId => (_exerciseId?.isNotEmpty ?? false);
 
   @override
@@ -54,70 +53,83 @@ class _WorkoutExerciseViewCardState
     }
   }
 
+  // ─── Build ────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
-    final locale = ref.watch(languageProvider);
-
-    return InkWell(
-      onTap: _toggleExpanded,
-      borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xFF2A2A3E).withValues(alpha: 0.6),
-              const Color(0xFF1A1A2E).withValues(alpha: 0.8),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          border: Border.all(
-            width: 1.5,
-            color: Colors.white.withValues(alpha: _isExpanded ? 0.2 : 0.1),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-              spreadRadius: -4,
-            ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF2A2A3E).withValues(alpha: 0.6),
+            const Color(0xFF1A1A2E).withValues(alpha: 0.8),
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Column(
-          children: [
-            _buildMainContent(locale),
-            Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.transparent,
-                    Colors.white.withValues(alpha: 0.1),
-                    Colors.transparent,
-                  ],
+        border: Border.all(
+          width: 1.5,
+          color: Colors.white.withValues(alpha: 0.1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+            spreadRadius: -4,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildMainContent(),
+          // Summary bar — visible only when collapsed
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 220),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            firstChild: const SizedBox.shrink(),
+            secondChild: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        Colors.white.withValues(alpha: 0.1),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                _buildSummaryBar(),
+              ],
             ),
-            _buildBottomBar(),
-            AnimatedCrossFade(
-              duration: const Duration(milliseconds: 220),
-              crossFadeState: _isExpanded
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              firstChild: const SizedBox.shrink(),
-              secondChild: _buildExpandedContent(locale),
-            ),
-          ],
-        ),
+          ),
+          // Read-only detail — visible only when expanded
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 220),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: const SizedBox.shrink(),
+            secondChild: _buildReadOnlyFields(),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildMainContent(Locale locale) {
+  // ─── Header ───────────────────────────────────────────────────────────────
+
+  Widget _buildMainContent() {
+    final locale = ref.watch(languageProvider);
     final exercise = widget.workoutExercise.exercise;
 
     return Padding(
@@ -157,198 +169,29 @@ class _WorkoutExerciseViewCardState
                   ],
                 ),
                 const SizedBox(height: 10),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildTag(
-                        exercise.muscles?.firstOrNull?.muscle?.nameI18n
-                                .fromI18n(locale) ??
-                            'N/A',
-                        const Color(0xFF2196F3),
-                        Icons.fitness_center,
-                      ),
-                      const SizedBox(width: 8),
-                      _buildTag(
-                        exercise.difficultyLevel ?? 'N/A',
-                        const Color(0xFFFF9800),
-                        Icons.whatshot,
-                      ),
-                    ],
-                  ),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildTag(
+                      exercise.muscles?.firstOrNull?.muscle?.nameI18n
+                              .fromI18n(locale) ??
+                          'N/A',
+                      const Color(0xFF2196F3),
+                      Icons.fitness_center,
+                    ),
+                    _buildTag(
+                      exercise.difficultyLevel ?? 'N/A',
+                      const Color(0xFFFF9800),
+                      Icons.whatshot,
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          _buildHeaderActions(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeaderActions() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildActionButton(
-          icon: Icons.open_in_new,
-          onTap: _hasExerciseId ? _openExerciseDetail : null,
-          color: const Color(0xFF2196F3),
-          tooltip: 'Apri dettaglio esercizio',
-        ),
-        const SizedBox(width: 8),
-        _buildActionButton(
-          icon: _isExpanded ? Icons.expand_less : Icons.expand_more,
-          onTap: _toggleExpanded,
-          color: Colors.white,
-          tooltip: _isExpanded ? 'Collassa' : 'Espandi',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionButton({
-    required IconData icon,
-    required VoidCallback? onTap,
-    required Color color,
-    required String tooltip,
-  }) {
-    final isEnabled = onTap != null;
-
-    return Tooltip(
-      message: tooltip,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                color.withValues(alpha: isEnabled ? 0.18 : 0.08),
-                color.withValues(alpha: isEnabled ? 0.08 : 0.03),
-              ],
-            ),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: color.withValues(alpha: isEnabled ? 0.35 : 0.15),
-              width: 1.2,
-            ),
-          ),
-          child: Icon(
-            icon,
-            color: isEnabled
-                ? color.withValues(alpha: 0.9)
-                : Colors.white.withValues(alpha: 0.3),
-            size: 18,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomBar() {
-    final progressFormat = NumberFormat.percentPattern();
-    final progressText = widget.workoutExercise.progress > 0
-        ? '+${progressFormat.format(widget.workoutExercise.progress)}'
-        : '';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.only(
-          bottomLeft: const Radius.circular(19),
-          bottomRight: _isExpanded ? Radius.zero : const Radius.circular(19),
-        ),
-      ),
-      child: Row(
-        children: [
-          _buildInfoChip(Icons.repeat, widget.workoutExercise.sets),
-          const SizedBox(width: 12),
-          _buildInfoChip(Icons.timer_outlined, widget.workoutExercise.rest),
-          const Spacer(),
-          _buildWeightChip(),
-          if (progressText.isNotEmpty) ...[
-            const SizedBox(width: 8),
-            _buildProgressChip(progressText),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExpandedContent(Locale locale) {
-    final description = widget.workoutExercise.exercise.descriptionI18n
-        ?.fromI18n(locale)
-        .trim();
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.35),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(19),
-          bottomRight: Radius.circular(19),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _buildTag(
-                'Serie ${widget.workoutExercise.sets}',
-                const Color(0xFF2196F3),
-                Icons.repeat,
-              ),
-              _buildTag(
-                'Recupero ${widget.workoutExercise.rest}',
-                const Color(0xFF7B4BC1),
-                Icons.timer_outlined,
-              ),
-              _buildTag(
-                'Carico ${widget.workoutExercise.weight}',
-                const Color(0xFF00BCD4),
-                Icons.fitness_center,
-              ),
-            ],
-          ),
-          if (description != null && description.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Text(
-              description,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.82),
-                fontSize: 13,
-                height: 1.4,
-              ),
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-          const SizedBox(height: 10),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: _hasExerciseId ? _openExerciseDetail : null,
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF90CAF9),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-              ),
-              icon: const Icon(Icons.open_in_new, size: 18),
-              label: const Text(
-                'Dettaglio esercizio',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-          ),
+          _buildActionButtons(),
         ],
       ),
     );
@@ -391,7 +234,78 @@ class _WorkoutExerciseViewCardState
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String text) {
+  Widget _buildActionButtons() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildIconButton(
+          _isExpanded ? Icons.expand_less : Icons.expand_more,
+          Colors.white,
+          _toggleExpanded,
+        ),
+        if (_hasExerciseId) ...[
+          const SizedBox(height: 8),
+          _buildIconButton(
+            LucideIcons.eye,
+            const Color(0xFF2196F3),
+            _openExerciseDetail,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildIconButton(IconData icon, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              color.withValues(alpha: 0.2),
+              color.withValues(alpha: 0.1),
+            ],
+          ),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: color.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+        ),
+        child: Icon(icon, color: color, size: 18),
+      ),
+    );
+  }
+
+  // ─── Summary bar (collapsed) ───────────────────────────────────────────────
+
+  Widget _buildSummaryBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.only(
+          bottomLeft: const Radius.circular(19),
+          bottomRight: _isExpanded ? Radius.zero : const Radius.circular(19),
+        ),
+      ),
+      child: Row(
+        children: [
+          _buildSummaryChip(Icons.repeat, widget.workoutExercise.sets),
+          const SizedBox(width: 10),
+          _buildSummaryChip(Icons.timer_outlined, widget.workoutExercise.rest),
+          const Spacer(),
+          _buildSummaryChip(
+            Icons.fitness_center,
+            widget.workoutExercise.weight,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryChip(IconData icon, String text) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -410,60 +324,126 @@ class _WorkoutExerciseViewCardState
     );
   }
 
-  Widget _buildWeightChip() {
+  // ─── Expanded read-only fields ─────────────────────────────────────────────
+
+  Widget _buildReadOnlyFields() {
+    final locale = ref.read(languageProvider);
+    final ex = widget.workoutExercise;
+    final sets = _extractSetParts(ex.sets);
+    final restValue = ex.rest.replaceAll(RegExp(r'[^0-9]'), '');
+    final weightValue = ex.weight.replaceAll(RegExp(r'[^0-9.]'), '');
+    final description =
+        ex.exercise.descriptionI18n?.fromI18n(locale).trim() ?? '';
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withValues(alpha: 0.12),
-            Colors.white.withValues(alpha: 0.06),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.15),
-          width: 1,
+        color: Colors.black.withValues(alpha: 0.34),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(19),
+          bottomRight: Radius.circular(19),
         ),
       ),
-      child: Text(
-        widget.workoutExercise.weight,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.3,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: _buildReadOnlyField('Serie', sets.$1)),
+              const SizedBox(width: 12),
+              Expanded(child: _buildReadOnlyField('Rep', sets.$2)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildReadOnlyField('Carico', weightValue, suffix: 'kg'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildReadOnlyField('Rest', restValue, suffix: 's'),
+          if (description.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _buildReadOnlyField('Descrizione', description, multiline: true),
+          ],
+        ],
       ),
     );
   }
 
-  Widget _buildProgressChip(String progressText) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF4CAF50).withValues(alpha: 0.25),
-            const Color(0xFF4CAF50).withValues(alpha: 0.15),
-          ],
+  Widget _buildReadOnlyField(
+    String label,
+    String value, {
+    String? suffix,
+    bool multiline = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.6),
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
         ),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
-          width: 1.5,
+        const SizedBox(height: 6),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.08),
+                Colors.white.withValues(alpha: 0.04),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.15),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  value.isNotEmpty ? value : '—',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: multiline ? 5 : 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (suffix != null && value.isNotEmpty) ...[
+                const SizedBox(width: 4),
+                Text(
+                  suffix,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
-      ),
-      child: Text(
-        progressText,
-        style: const TextStyle(
-          color: Color(0xFF4CAF50),
-          fontSize: 11,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.2,
-        ),
-      ),
+      ],
     );
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  (String, String) _extractSetParts(String rawSets) {
+    final matches =
+        RegExp(r'\d+').allMatches(rawSets).map((m) => m.group(0)!).toList();
+    if (matches.length >= 2) return (matches[0], matches[1]);
+    if (matches.length == 1) return (matches[0], '');
+    return ('', '');
   }
 
   Widget _buildTag(String label, Color color, IconData icon) {
@@ -471,7 +451,10 @@ class _WorkoutExerciseViewCardState
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
+          colors: [
+            color.withValues(alpha: 0.2),
+            color.withValues(alpha: 0.1),
+          ],
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: color.withValues(alpha: 0.35), width: 1.5),
@@ -483,8 +466,6 @@ class _WorkoutExerciseViewCardState
           const SizedBox(width: 5),
           Text(
             label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: color,
               fontSize: 11,
@@ -511,17 +492,12 @@ class _WorkoutExerciseViewCardState
   }
 
   String _displayName(Locale locale) {
-    final localName = widget.workoutExercise.exercise.nameI18n?.fromI18n(
-      locale,
-    );
-    if (_isValidDisplayName(localName)) {
-      return localName!.trim();
-    }
-
+    final localName =
+        widget.workoutExercise.exercise.nameI18n?.fromI18n(locale);
+    if (_isValidDisplayName(localName)) return localName!.trim();
     if (_isValidDisplayName(_resolvedExerciseName)) {
       return _resolvedExerciseName!.trim();
     }
-
     return 'Esercizio ${widget.exerciseNumber}';
   }
 
@@ -559,9 +535,8 @@ class _WorkoutExerciseViewCardState
 
     setState(() {
       _isResolvingName = false;
-      _resolvedExerciseName = _isValidDisplayName(resolvedName)
-          ? resolvedName
-          : null;
+      _resolvedExerciseName =
+          _isValidDisplayName(resolvedName) ? resolvedName : null;
     });
   }
 }
