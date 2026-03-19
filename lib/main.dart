@@ -1,5 +1,6 @@
 import 'package:coachly/core/sync/app_data_sync_service.dart';
 import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/features/ai_coach/ai_coach.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
@@ -97,6 +98,22 @@ class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap> {
 
     Future.microtask(() {
       _handleAuthState(null, ref.read(authProvider));
+    });
+
+    Future<void>.microtask(() async {
+      final stopwatch = Stopwatch()..start();
+      debugPrint('[AI_WARMUP] App bootstrap warmup requested.');
+      try {
+        final ready = await ref.read(aiCoachModelWarmupProvider.future);
+        if (!mounted) return;
+        debugPrint(
+          '[AI_WARMUP] App bootstrap warmup completed: ready=$ready in ${stopwatch.elapsedMilliseconds}ms.',
+        );
+      } catch (e) {
+        debugPrint(
+          '[AI_WARMUP] App bootstrap warmup failed after ${stopwatch.elapsedMilliseconds}ms: $e',
+        );
+      }
     });
   }
 

@@ -20,27 +20,27 @@ class _QuickActionsRowState extends ConsumerState<QuickActionsRow> {
   Widget build(BuildContext context) {
     final actions = <({String icon, String label, QuickActionType type})>[
       (
-        icon: '??',
+        icon: '\u2696\uFE0F',
         label: context.tr('ai.quick.adjust'),
         type: QuickActionType.adjustWeight,
       ),
       (
-        icon: '??',
+        icon: '\uD83D\uDCC8',
         label: context.tr('ai.quick.progress'),
         type: QuickActionType.showProgress,
       ),
       (
-        icon: '??',
+        icon: '\uD83D\uDD25',
         label: context.tr('ai.quick.fatigue'),
         type: QuickActionType.fatigueCheck,
       ),
       (
-        icon: '?',
+        icon: '\u26A1',
         label: context.tr('ai.quick.next'),
         type: QuickActionType.nextExercise,
       ),
       (
-        icon: '??',
+        icon: '\uD83E\uDD57',
         label: context.tr('ai.quick.nutrition'),
         type: QuickActionType.nutrition,
       ),
@@ -70,7 +70,7 @@ class _QuickActionsRowState extends ConsumerState<QuickActionsRow> {
                     onTap: widget.enabled
                         ? () {
                             ref
-                                .read(aiCoachNotifierProvider.notifier)
+                                .read(aiCoachProvider.notifier)
                                 .tapQuickAction(action.type);
                           }
                         : null,

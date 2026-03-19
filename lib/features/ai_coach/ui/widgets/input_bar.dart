@@ -36,7 +36,7 @@ class _InputBarState extends ConsumerState<InputBar> {
 
   @override
   Widget build(BuildContext context) {
-    final notifier = ref.read(aiCoachNotifierProvider.notifier);
+    final notifier = ref.read(aiCoachProvider.notifier);
 
     return Container(
       color: AiCoachTheme.bgPrimary,

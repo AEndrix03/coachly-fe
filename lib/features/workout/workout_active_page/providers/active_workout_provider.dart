@@ -8,17 +8,23 @@ part 'active_workout_provider.g.dart';
 
 @riverpod
 class ActiveWorkout extends _$ActiveWorkout {
+  int _loadToken = 0;
+
   @override
   ActiveWorkoutState build(String workoutId) {
-    _loadWorkout(workoutId);
+    final token = ++_loadToken;
+    _loadWorkout(workoutId, token);
     return ActiveWorkoutState.loading();
   }
 
   // ─── Load ──────────────────────────────────────────────────────────────────
 
-  Future<void> _loadWorkout(String workoutId) async {
+  Future<void> _loadWorkout(String workoutId, int token) async {
     final repo = ref.read(workoutPageRepositoryProvider);
     final response = await repo.getWorkout(workoutId);
+    if (!ref.mounted || token != _loadToken) {
+      return;
+    }
 
     if (response.success && response.data != null) {
       final workout = response.data!;
@@ -152,6 +158,9 @@ class ActiveWorkout extends _$ActiveWorkout {
     final command = _buildSessionCommand(startedAt);
     final repo = ref.read(workoutPageRepositoryProvider);
     final response = await repo.saveSession(workout.id, command);
+    if (!ref.mounted) {
+      return false;
+    }
 
     if (response.success) {
       state = state.copyWith(status: ActiveWorkoutStatus.saved);

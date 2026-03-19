@@ -27,7 +27,7 @@ class SuggestionsRow extends ConsumerWidget {
                   child: GestureDetector(
                     onTap: () {
                       final notifier = ref.read(
-                        aiCoachNotifierProvider.notifier,
+                        aiCoachProvider.notifier,
                       );
                       notifier.clearSuggestions();
                       notifier.sendMessage(suggestion);

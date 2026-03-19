@@ -4,7 +4,7 @@ part 'insight_card.freezed.dart';
 part 'insight_card.g.dart';
 
 @freezed
-class InsightCard with _$InsightCard {
+abstract class InsightCard with _$InsightCard {
   const factory InsightCard({
     required String icon,
     required String label,

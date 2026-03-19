@@ -7,7 +7,7 @@ part 'coach_message.g.dart';
 enum MessageSender { user, ai }
 
 @freezed
-class CoachMessage with _$CoachMessage {
+abstract class CoachMessage with _$CoachMessage {
   const factory CoachMessage({
     required String id,
     required String text,

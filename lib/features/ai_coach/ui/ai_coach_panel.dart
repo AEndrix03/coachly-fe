@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:coachly/features/ai_coach/application/ai_coach_notifier.dart';
 import 'package:coachly/features/ai_coach/data/services/context_assembler_service.dart';
 import 'package:coachly/features/ai_coach/domain/models/coach_message.dart';
@@ -33,7 +31,7 @@ class _AiCoachPanelState extends ConsumerState<AiCoachPanel> {
     _messagesController = ScrollController();
 
     _subscription = ref.listenManual<AsyncValue<AiCoachState>>(
-      aiCoachNotifierProvider,
+      aiCoachProvider,
       (previous, next) {
         final previousState = previous?.value;
         final nextState = next.value;
@@ -78,7 +76,7 @@ class _AiCoachPanelState extends ConsumerState<AiCoachPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final asyncState = ref.watch(aiCoachNotifierProvider);
+    final asyncState = ref.watch(aiCoachProvider);
     final workoutContext = ref.watch(currentWorkoutContextProvider);
     final coachState = asyncState.value ?? const AiCoachState();
 
@@ -165,11 +163,11 @@ class _AiCoachPanelState extends ConsumerState<AiCoachPanel> {
                   visible: coachState.isListening,
                   voiceTranscript: coachState.voiceTranscript,
                   onCancel: () {
-                    ref.read(aiCoachNotifierProvider.notifier).stopVoiceInput();
+                    ref.read(aiCoachProvider.notifier).stopVoiceInput();
                   },
                   onSend: () {
                     ref
-                        .read(aiCoachNotifierProvider.notifier)
+                        .read(aiCoachProvider.notifier)
                         .sendVoiceTranscript();
                   },
                 ),

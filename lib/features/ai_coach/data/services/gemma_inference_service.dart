@@ -1,48 +1,42 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:coachly/features/ai_coach/domain/models/workout_context.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'gemma_inference_service.g.dart';
 
 class GemmaInferenceService {
-  dynamic _model;
+  final FlutterGemmaPlugin _gemma = FlutterGemmaPlugin.instance;
   bool _isModelReady = false;
-  bool _isInitializing = false;
+  Future<bool>? _warmupFuture;
+  static const int _warmupSteps = 5;
 
   bool get isModelReady => _isModelReady;
+  bool get isWarmingUp => _warmupFuture != null && !_isModelReady;
 
   Future<bool> ensureInitialized() async {
-    if (_isModelReady && _model != null) {
+    if (_isModelReady) {
+      _log('Warmup skipped: model already ready.');
       return true;
     }
 
-    if (_isInitializing) {
-      while (_isInitializing) {
-        await Future<void>.delayed(const Duration(milliseconds: 120));
-      }
-      return _isModelReady;
+    if (_warmupFuture != null) {
+      _log('Warmup already in progress, joining existing future.');
+      return _warmupFuture!;
     }
 
-    _isInitializing = true;
+    _warmupFuture = _runWarmup();
     try {
-      _model = await FlutterGemmaPlugin.instance.createModel(
-        modelType: ModelType.gemmaIt,
-        preferredBackend: PreferredBackend.cpu,
-        maxTokens: 768,
-      );
-      _isModelReady = true;
-    } catch (_) {
-      _model = null;
-      _isModelReady = false;
+      return await _warmupFuture!;
     } finally {
-      _isInitializing = false;
+      _warmupFuture = null;
     }
-
-    return _isModelReady;
   }
 
   Stream<String> generate({
@@ -51,37 +45,42 @@ class GemmaInferenceService {
     required String languageCode,
   }) async* {
     final locale = _localeFromLanguageCode(languageCode);
+    if (isWarmingUp && !_isModelReady) {
+      _log('Generation requested while warmup in progress.');
+      yield _modelLoadingFallback(locale);
+      return;
+    }
+
     final prompt = _buildPrompt(
       context: context,
       userMessage: userMessage,
       locale: locale,
     );
-    final ready = await ensureInitialized();
+    final ready = await ensureInitialized().timeout(
+      const Duration(seconds: 8),
+      onTimeout: () {
+        _log('Warmup timeout reached for generation request.');
+        return false;
+      },
+    );
 
-    if (!ready || _model == null) {
-      yield _offlineFallback(context, userMessage, locale);
+    if (!ready) {
+      _log(
+        'Generation fallback: model not ready in time, returning loading notice.',
+      );
+      yield _modelLoadingFallback(locale);
       return;
     }
 
-    dynamic session;
     try {
-      session = await _model.createSession(temperature: 0.45, topK: 40);
-
-      await session.addQueryChunk(Message.text(text: prompt, isUser: true));
-
-      await for (final token in session.getResponseAsync()) {
+      await for (final token in _gemma.getResponseAsync(prompt: prompt)) {
         if (token is String && token.isNotEmpty) {
           yield token;
         }
       }
     } catch (_) {
+      _log('Generation error: using offline fallback response.');
       yield _offlineFallback(context, userMessage, locale);
-    } finally {
-      try {
-        await session?.close();
-      } catch (_) {
-        // No-op.
-      }
     }
   }
 
@@ -189,11 +188,88 @@ class GemmaInferenceService {
         '}';
   }
 
+  Future<bool> _runWarmup() async {
+    final stopwatch = Stopwatch()..start();
+    _log('Warmup start.');
+
+    Timer? heartbeat;
+    try {
+      heartbeat = Timer.periodic(const Duration(seconds: 1), (_) {
+        _log(
+          'Warmup in progress... ${stopwatch.elapsedMilliseconds}ms elapsed.',
+        );
+      });
+
+      _log('Step 1/$_warmupSteps: reading plugin init status.');
+      final alreadyInitialized = await _gemma.isInitialized;
+      _log(
+        'Step 1/$_warmupSteps done: alreadyInitialized=$alreadyInitialized.',
+      );
+
+      _log('Step 2/$_warmupSteps: checking local model availability.');
+      final isLoaded = await _gemma.isLoaded;
+      _log('Step 2/$_warmupSteps done: isLoaded=$isLoaded.');
+
+      if (!isLoaded) {
+        _log('Step 3/$_warmupSteps aborted: model not loaded on device.');
+        _isModelReady = false;
+        return false;
+      }
+
+      _log('Step 3/$_warmupSteps: init check.');
+      if (!alreadyInitialized) {
+        _log('Step 4/$_warmupSteps: initializing Gemma runtime...');
+        await _gemma.init(
+          maxTokens: 384,
+          temperature: 0.35,
+          topK: 24,
+          randomSeed: 1,
+        );
+        _log('Step 4/$_warmupSteps done: runtime init completed.');
+      } else {
+        _log('Step 4/$_warmupSteps skipped: runtime already initialized.');
+      }
+
+      _log('Step 5/$_warmupSteps: final readiness verification.');
+      _isModelReady = await _gemma.isInitialized;
+      _log(
+        'Step 5/$_warmupSteps done: isModelReady=$_isModelReady (total ${stopwatch.elapsedMilliseconds}ms).',
+      );
+      return _isModelReady;
+    } catch (e) {
+      _isModelReady = false;
+      _log('Warmup failed after ${stopwatch.elapsedMilliseconds}ms: $e');
+      return false;
+    } finally {
+      heartbeat?.cancel();
+      stopwatch.stop();
+    }
+  }
+
+  String _modelLoadingFallback(Locale locale) {
+    final message = AppStrings.translate(
+      'ai.model_loading_retry',
+      locale: locale,
+    ).replaceAll('"', '\\"');
+
+    return '{'
+        '"message":"$message",'
+        '"insight_card":null'
+        '}';
+  }
+
   Locale _localeFromLanguageCode(String languageCode) {
     if (languageCode.toLowerCase() == 'it') {
       return const Locale('it');
     }
     return const Locale('en');
+  }
+
+  void _log(String message) {
+    if (!kDebugMode) {
+      return;
+    }
+    debugPrint('[AI_WARMUP] $message');
   }
 }
 
@@ -201,3 +277,18 @@ class GemmaInferenceService {
 GemmaInferenceService gemmaInferenceService(Ref ref) {
   return GemmaInferenceService();
 }
+
+final aiCoachModelWarmupProvider = FutureProvider<bool>((ref) async {
+  final stopwatch = Stopwatch()..start();
+  if (kDebugMode) {
+    debugPrint('[AI_WARMUP] Provider warmup requested.');
+  }
+  final service = ref.watch(gemmaInferenceServiceProvider);
+  final ready = await service.ensureInitialized();
+  if (kDebugMode) {
+    debugPrint(
+      '[AI_WARMUP] Provider warmup completed: ready=$ready in ${stopwatch.elapsedMilliseconds}ms.',
+    );
+  }
+  return ready;
+});

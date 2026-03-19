@@ -41,13 +41,16 @@ class SttService {
     _lastTranscript = '';
     _finalEmitted = false;
     _silenceTimer?.cancel();
+    final resolvedLocaleId = await _resolveLocaleId(localeId);
 
     await _speech.listen(
-      partialResults: true,
-      cancelOnError: true,
       pauseFor: const Duration(milliseconds: 2500),
       listenFor: const Duration(minutes: 2),
-      localeId: localeId,
+      localeId: resolvedLocaleId,
+      listenOptions: SpeechListenOptions(
+        partialResults: true,
+        cancelOnError: true,
+      ),
       onResult: (result) {
         final words = result.recognizedWords.trim();
         if (words.isNotEmpty) {
@@ -98,6 +101,31 @@ class SttService {
     }
     _finalEmitted = true;
     onFinalResult(finalTranscript);
+  }
+
+  Future<String> _resolveLocaleId(String preferredLocaleId) async {
+    try {
+      final locales = await _speech.locales();
+      for (final locale in locales) {
+        if (locale.localeId.toLowerCase() == preferredLocaleId.toLowerCase()) {
+          return locale.localeId;
+        }
+      }
+
+      final preferredLanguageCode = preferredLocaleId
+          .split(RegExp(r'[-_]'))
+          .first
+          .toLowerCase();
+      for (final locale in locales) {
+        if (locale.localeId.toLowerCase().startsWith(preferredLanguageCode)) {
+          return locale.localeId;
+        }
+      }
+    } catch (_) {
+      // Keep preferred locale id.
+    }
+
+    return preferredLocaleId;
   }
 }
 

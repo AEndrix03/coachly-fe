@@ -4,7 +4,7 @@ part 'workout_context.freezed.dart';
 part 'workout_context.g.dart';
 
 @freezed
-class WorkoutContext with _$WorkoutContext {
+abstract class WorkoutContext with _$WorkoutContext {
   const factory WorkoutContext({
     required String exerciseName,
     required int currentSet,

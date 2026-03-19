@@ -461,6 +461,10 @@ class AppStrings {
       'it':
           'Modello non disponibile ora. Uso risposte locali semplificate offline.',
     },
+    'ai.model_loading_retry': {
+      'en': 'AI model is still warming up. Retry in a few seconds.',
+      'it': 'Il modello AI sta ancora caricando. Riprova tra pochi secondi.',
+    },
     'ai.retry_short': {
       'en': 'I did not complete the answer. Try again with a shorter request.',
       'it':
