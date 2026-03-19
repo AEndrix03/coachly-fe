@@ -12,8 +12,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'gemma_inference_service.g.dart';
 
 const _kModelUrl =
-    'https://huggingface.co/litert-community/Qwen3-0.6B/resolve/main/Qwen3-0.6B.litertlm';
-const _kModelId = 'Qwen3-0.6B';
+    'https://huggingface.co/litert-community/Qwen2.5-1.5B-Instruct/resolve/main/Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv4096.litertlm';
+const _kModelId =
+    'Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv4096.litertlm';
 
 class GemmaInferenceService {
   InferenceModel? _model;

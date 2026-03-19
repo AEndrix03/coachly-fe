@@ -536,8 +536,8 @@ class AppStrings {
       'it': 'Modello AI Richiesto',
     },
     'ai.download.subtitle': {
-      'en': 'Qwen3 0.6B · 586 MB · runs fully offline',
-      'it': 'Qwen3 0.6B · 586 MB · gira completamente offline',
+      'en': 'Qwen2.5 1.5B · 1.5 GB · runs fully offline',
+      'it': 'Qwen2.5 1.5B · 1.5 GB · gira completamente offline',
     },
     'ai.download.description': {
       'en':
