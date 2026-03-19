@@ -346,10 +346,11 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
   Future<void> _showCancelDialog(BuildContext context) async {
     final result = await showAppConfirmationDialog(
       context,
-      title: 'Annulla allenamento?',
-      content: 'I progressi attuali non verranno salvati.',
-      cancelLabel: 'Continua',
-      confirmLabel: 'Annulla',
+      title: 'Vuoi uscire dalla sessione?',
+      content:
+          'Se esci ora, i progressi della sessione corrente non verranno salvati.',
+      cancelLabel: 'Resta nella sessione',
+      confirmLabel: 'Esci senza salvare',
       destructive: true,
       icon: Icons.warning_amber_rounded,
     );
