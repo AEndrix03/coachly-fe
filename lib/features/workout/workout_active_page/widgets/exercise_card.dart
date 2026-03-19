@@ -1,8 +1,8 @@
-import 'package:coachly/features/exercise/exercise_info_page/widgets/exercise_info_widget.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'set_row.dart';
 
@@ -178,7 +178,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
           _roundActionIcon(
             scheme: scheme,
             icon: Icons.info_rounded,
-            onTap: () => _showExerciseInfo(context, exercise.displayName),
+            onTap: () => _openExerciseDetail(context, exercise),
             tooltip: 'Info esercizio',
           ),
           const SizedBox(width: 4),
@@ -372,15 +372,14 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
     }
   }
 
-  void _showExerciseInfo(BuildContext context, String name) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ExerciseInfoWidget(
-        exerciseName: name,
-        onClose: () => Navigator.pop(context),
-      ),
+  void _openExerciseDetail(BuildContext context, ActiveExerciseState exercise) {
+    final exerciseId = exercise.exercise.exercise.id?.trim();
+    if (exerciseId == null || exerciseId.isEmpty) {
+      return;
+    }
+
+    context.push(
+      '/workouts/workout/${widget.workoutId}/workout_exercise_page/$exerciseId',
     );
   }
 }
