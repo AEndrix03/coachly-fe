@@ -5,9 +5,12 @@ import 'package:coachly/features/workout/workout_active_page/widgets/active_app_
 import 'package:coachly/features/workout/workout_active_page/widgets/active_bottom_bar.dart';
 import 'package:coachly/features/workout/workout_active_page/widgets/exercise_card.dart';
 import 'package:coachly/features/workout/workout_active_page/widgets/rest_complete_dialog.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 class WorkoutActivePage extends ConsumerStatefulWidget {
   final String workoutId;
@@ -30,6 +33,9 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
           previous.remainingSeconds > 0 &&
           next.remainingSeconds == 0 &&
           !next.isActive) {
+        if (next.isBellEnabled) {
+          _playRestCompleteAlert();
+        }
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -42,28 +48,12 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
 
     return Scaffold(
       backgroundColor: scheme.surface,
-      body: Container(
-        decoration: BoxDecoration(
-          color: scheme.surface,
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              scheme.surface,
-              Color.alphaBlend(
-                scheme.primary.withValues(alpha: 0.07),
-                scheme.surface,
-              ),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: switch (workoutState.status) {
-            ActiveWorkoutStatus.loading => _buildLoading(scheme),
-            ActiveWorkoutStatus.error => _buildError(workoutState.errorMessage),
-            _ => _buildContent(workoutState),
-          },
-        ),
+      body: SafeArea(
+        child: switch (workoutState.status) {
+          ActiveWorkoutStatus.loading => _buildLoading(scheme),
+          ActiveWorkoutStatus.error => _buildError(workoutState.errorMessage),
+          _ => _buildContent(workoutState),
+        },
       ),
     );
   }
@@ -84,7 +74,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
             Icon(Icons.error_outline_rounded, color: scheme.error, size: 48),
             const SizedBox(height: 16),
             Text(
-              message ?? 'Errore nel caricamento.',
+              message ?? context.tr('workout.load_error'),
               style: TextStyle(
                 color: scheme.onSurface.withValues(alpha: 0.8),
                 fontSize: 16,
@@ -98,7 +88,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
                 foregroundColor: scheme.onSurface,
                 side: BorderSide(color: scheme.outlineVariant),
               ),
-              child: const Text('Torna indietro'),
+              child: Text(context.tr('common.go_back')),
             ),
           ],
         ),
@@ -143,9 +133,9 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
 
     final result = await showAppConfirmationDialog(
       context,
-      title: 'Completa allenamento?',
-      content: 'Tutti i dati verranno salvati e la sessione registrata.',
-      confirmLabel: 'Completa',
+      title: context.tr('workout.complete_title'),
+      content: context.tr('workout.complete_content'),
+      confirmLabel: context.tr('workout.complete_confirm'),
       icon: Icons.flag_circle_rounded,
     );
 
@@ -160,7 +150,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Allenamento completato e salvato!'),
+          content: Text(context.tr('workout.completed_saved')),
           backgroundColor: scheme.primary,
         ),
       );
@@ -170,10 +160,27 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
           .errorMessage;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(errorMessage ?? 'Errore nel salvataggio.'),
+          content: Text(errorMessage ?? context.tr('workout.save_error')),
           backgroundColor: scheme.error,
         ),
       );
     }
+  }
+
+  void _playRestCompleteAlert() {
+    final player = FlutterRingtonePlayer();
+    try {
+      player.stop();
+      player.play(
+        android: AndroidSounds.alarm,
+        ios: IosSounds.alarm,
+        looping: false,
+        volume: 1.0,
+        asAlarm: true,
+      );
+    } catch (_) {
+      SystemSound.play(SystemSoundType.alert);
+    }
+    HapticFeedback.mediumImpact();
   }
 }

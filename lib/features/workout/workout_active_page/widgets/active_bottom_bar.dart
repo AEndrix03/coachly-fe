@@ -1,4 +1,4 @@
-import 'package:coachly/features/common/ai/ai_coach_widget.dart';
+import 'package:coachly/features/ai_coach/ai_coach.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:flutter/material.dart';
@@ -86,13 +86,11 @@ class ActiveBottomBar extends ConsumerWidget {
               height: 50,
               child: IconButton.filledTonal(
                 tooltip: 'AI Coach',
-                onPressed: () => _showAICoach(context),
+                onPressed: () => _showAICoach(context, ref),
                 icon: const Icon(Icons.auto_awesome_rounded, size: 22),
                 style: IconButton.styleFrom(
-                  backgroundColor: scheme.secondaryContainer.withValues(
-                    alpha: 0.68,
-                  ),
-                  foregroundColor: scheme.onSecondaryContainer,
+                  backgroundColor: AiCoachTheme.accentPurple,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -105,15 +103,67 @@ class ActiveBottomBar extends ConsumerWidget {
     );
   }
 
-  void _showAICoach(BuildContext context) {
+  void _showAICoach(BuildContext context, WidgetRef ref) {
+    final workoutState = ref.read(activeWorkoutProvider(workoutId));
+    final workoutContext = _buildOverrideContext(workoutState);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AICoachWidget(
-        onClose: () => Navigator.pop(context),
-        showQuickActions: false,
+      enableDrag: true,
+      builder: (_) => ProviderScope(
+        overrides: [
+          aiCoachWorkoutIdProvider.overrideWithValue(workoutId),
+          currentWorkoutContextProvider.overrideWithValue(workoutContext),
+        ],
+        child: const AiCoachPanel(),
       ),
+    );
+  }
+
+  WorkoutContext _buildOverrideContext(ActiveWorkoutState state) {
+    if (state.exercises.isEmpty) {
+      return WorkoutContext(
+        exerciseName: 'Workout attivo',
+        currentSet: 1,
+        totalSets: 1,
+        weightKg: 0,
+        targetReps: 0,
+        fatigueIndex: 0,
+        recentWeights: const [],
+        sessionStart: state.startedAt ?? DateTime.now(),
+      );
+    }
+
+    final exercise = state.exercises.firstWhere(
+      (item) => item.sets.any((set) => !set.completed),
+      orElse: () => state.exercises.first,
+    );
+
+    final currentSetIndex = exercise.sets.indexWhere((set) => !set.completed);
+    final resolvedSetIndex = currentSetIndex == -1
+        ? (exercise.sets.isEmpty ? 0 : exercise.sets.length - 1)
+        : currentSetIndex;
+    final resolvedSet = exercise.sets[resolvedSetIndex];
+
+    final completedSets = state.exercises
+        .expand((item) => item.sets)
+        .where((set) => set.completed)
+        .length;
+    final totalSets = state.exercises.expand((item) => item.sets).length;
+    final fatigueIndex = totalSets == 0 ? 0.0 : completedSets / totalSets;
+
+    return WorkoutContext(
+      exerciseName: exercise.displayName,
+      currentSet: resolvedSetIndex + 1,
+      totalSets: exercise.sets.length,
+      weightKg: resolvedSet.weight,
+      targetReps: resolvedSet.reps,
+      completedReps: resolvedSet.completed ? resolvedSet.reps : null,
+      fatigueIndex: fatigueIndex.clamp(0.0, 1.0),
+      recentWeights: const [],
+      sessionStart: state.startedAt ?? DateTime.now(),
     );
   }
 }

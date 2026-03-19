@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # ==================== STATE MANAGEMENT ====================
   riverpod: ^3.0.3
@@ -44,7 +46,7 @@ dependencies:
   flutter_animate: ^4.5.2             # Animazioni fluide dichiarative
   flutter_staggered_animations: ^1.1.1 # Effetti cascata per liste
   lottie: ^3.3.2                      # Animazioni After Effects (JSON)
-
+  flutter_ringtone_player: ^4.0.0+4
   # ==================== UI UTILITIES ====================
   gap: ^3.0.1                         # Spacing pulito e moderno
   shimmer: ^3.0.0                     # Skeleton loaders eleganti
@@ -52,6 +54,7 @@ dependencies:
   # ==================== EFFETTI GLASSMORPHISM ====================
   glass_kit: ^4.0.2                   # Effetti vetro moderni
   google_fonts: ^6.3.3
+  collection: ^1.19.1
 
   shared_preferences: ^2.5.4
   flutter_secure_storage: ^10.0.0
@@ -62,6 +65,8 @@ dependencies:
   hive_flutter: ^1.1.0
   intl: ^0.20.2
   jwt_decoder: ^2.0.1
+  flutter_gemma: ^0.3.0
+  speech_to_text: ^6.6.0
 
 dev_dependencies:
   flutter_test:
