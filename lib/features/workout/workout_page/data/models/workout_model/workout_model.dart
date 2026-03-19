@@ -31,11 +31,14 @@ abstract class WorkoutModel with _$WorkoutModel {
     @Default(false) bool delete,
   }) = _WorkoutModel;
 
-  factory WorkoutModel.fromJson(Map<String, dynamic> json) {
+  factory WorkoutModel.fromJson(Map<String, dynamic> json) =>
+      _$WorkoutModelFromJson(json);
+
+  static WorkoutModel fromJsonSafe(Map<String, dynamic> json) {
     try {
-      return _$WorkoutModelFromJson(json);
+      return WorkoutModel.fromJson(json);
     } catch (_) {
-      return _$WorkoutModelFromJson(_sanitizeWorkoutJson(json));
+      return WorkoutModel.fromJson(_sanitizeWorkoutJson(json));
     }
   }
 }

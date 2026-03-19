@@ -11,7 +11,7 @@ class WorkoutAdapter extends TypeAdapter<WorkoutModel> {
   WorkoutModel read(BinaryReader reader) {
     final map = reader.readMap();
     final json = _convertMap(map);
-    return WorkoutModel.fromJson(json);
+    return WorkoutModel.fromJsonSafe(json);
   }
 
   @override

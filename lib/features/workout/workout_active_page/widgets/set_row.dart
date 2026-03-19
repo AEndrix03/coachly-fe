@@ -29,70 +29,51 @@ class SetRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 130),
       curve: Curves.easeOut,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        gradient: completed
-            ? const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF10B981), Color(0xFF059669)],
+        color: completed
+            ? Color.alphaBlend(
+                scheme.primary.withValues(alpha: 0.2),
+                scheme.surfaceContainerHigh,
               )
-            : const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF1F2937), Color(0xFF111827)],
-              ),
-        borderRadius: BorderRadius.circular(16),
+            : scheme.surfaceContainerHigh.withValues(alpha: 0.82),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: completed ? const Color(0xFF34D399) : const Color(0xFF374151),
-          width: completed ? 2 : 1.5,
+          color: completed
+              ? scheme.primary.withValues(alpha: 0.55)
+              : scheme.outlineVariant.withValues(alpha: 0.75),
+          width: 1.2,
         ),
-        boxShadow: completed
-            ? [
-                BoxShadow(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.5),
-                  blurRadius: 12,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
       ),
       child: Row(
         children: [
-          _buildTypeDropdown(),
-          const SizedBox(width: 10),
-          Flexible(flex: 3, child: _buildWeightInput()),
+          _buildTypeDropdown(scheme),
+          const SizedBox(width: 8),
+          Flexible(flex: 3, child: _buildWeightInput(scheme)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6),
             child: Icon(
-              Icons.close,
-              color: completed
-                  ? Colors.white.withValues(alpha: 0.9)
-                  : Colors.white.withValues(alpha: 0.4),
+              Icons.close_rounded,
+              color: scheme.onSurface.withValues(alpha: completed ? 0.75 : 0.4),
               size: 14,
             ),
           ),
-          Flexible(flex: 2, child: _buildRepsInput()),
+          Flexible(flex: 2, child: _buildRepsInput(scheme)),
+          const SizedBox(width: 4),
+          _buildMenu(context, scheme),
           const SizedBox(width: 6),
-          _buildMenu(context),
-          const SizedBox(width: 8),
-          _buildModernCheckbox(),
+          _buildModernCheckbox(scheme),
         ],
       ),
     );
   }
 
-  Widget _buildTypeDropdown() {
+  Widget _buildTypeDropdown(ColorScheme scheme) {
     final typeMap = {
       'Normale': 'N',
       'Riscaldamento': 'R',
@@ -104,80 +85,58 @@ class SetRow extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-      decoration: BoxDecoration(
-        color: completed
-            ? Colors.white.withValues(alpha: 0.15)
-            : const Color(0xFF1F2937),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: completed
-              ? Colors.white.withValues(alpha: 0.3)
-              : const Color(0xFF374151),
-          width: 1.5,
-        ),
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: _fieldDecoration(scheme),
       child: DropdownButton<String>(
         value: type,
         underline: const SizedBox.shrink(),
-        dropdownColor: const Color(0xFF1F2937),
+        dropdownColor: scheme.surfaceContainerHigh,
         isDense: true,
         icon: const SizedBox.shrink(),
         menuMaxHeight: 320,
         borderRadius: BorderRadius.circular(12),
         style: TextStyle(
-          color: completed ? Colors.white : Colors.white70,
+          color: scheme.onSurface.withValues(alpha: 0.82),
           fontSize: 15,
           fontWeight: FontWeight.w800,
-          letterSpacing: 0.5,
         ),
         items: typeMap.entries.map((entry) {
           return DropdownMenuItem(
             value: entry.key,
             child: SizedBox(
-              width: 160, // ✅ LARGHEZZA FISSA per menu leggibile
+              width: 160,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   vertical: 8,
-                  horizontal: 12,
+                  horizontal: 10,
                 ),
                 child: Row(
                   children: [
-                    // Badge con lettera
                     Container(
-                      width: 28,
-                      height: 28,
+                      width: 26,
+                      height: 26,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF374151), Color(0xFF1F2937)],
-                        ),
+                        color: scheme.primary.withValues(alpha: 0.16),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: const Color(0xFF4B5563),
-                          width: 1,
-                        ),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         entry.value,
-                        style: const TextStyle(
-                          fontSize: 13,
+                        style: TextStyle(
+                          fontSize: 12,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 0.3,
+                          color: scheme.primary,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    // Nome completo
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         entry.key,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          letterSpacing: 0.2,
+                          color: scheme.onSurface,
                         ),
                       ),
                     ),
@@ -195,35 +154,26 @@ class SetRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
-                  color: completed ? Colors.white : Colors.white70,
+                  color: scheme.onSurface.withValues(alpha: 0.82),
                 ),
               ),
             );
           }).toList();
         },
         onChanged: (value) {
-          if (value != null) onTypeChanged(value);
+          if (value != null) {
+            onTypeChanged(value);
+          }
         },
       ),
     );
   }
 
-  Widget _buildWeightInput() {
+  Widget _buildWeightInput(ColorScheme scheme) {
     return Container(
-      constraints: const BoxConstraints(minWidth: 75, maxWidth: 100),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(
-        color: completed
-            ? Colors.white.withValues(alpha: 0.15)
-            : const Color(0xFF1F2937),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: completed
-              ? Colors.white.withValues(alpha: 0.3)
-              : const Color(0xFF374151),
-          width: 1.5,
-        ),
-      ),
+      constraints: const BoxConstraints(minWidth: 76, maxWidth: 102),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: _fieldDecoration(scheme),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -239,10 +189,9 @@ class SetRow extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: completed ? Colors.white : Colors.white70,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.3,
+                color: scheme.onSurface.withValues(alpha: 0.84),
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
               ),
               decoration: const InputDecoration(
                 border: InputBorder.none,
@@ -254,7 +203,9 @@ class SetRow extends StatelessWidget {
               ],
               onChanged: (value) {
                 final parsed = double.tryParse(value);
-                if (parsed != null) onWeightChanged(parsed);
+                if (parsed != null) {
+                  onWeightChanged(parsed);
+                }
               },
             ),
           ),
@@ -262,12 +213,9 @@ class SetRow extends StatelessWidget {
           Text(
             'kg',
             style: TextStyle(
-              color: completed
-                  ? Colors.white.withValues(alpha: 0.7)
-                  : Colors.white.withValues(alpha: 0.4),
+              color: scheme.onSurface.withValues(alpha: 0.5),
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              letterSpacing: 0.2,
             ),
           ),
         ],
@@ -275,31 +223,19 @@ class SetRow extends StatelessWidget {
     );
   }
 
-  Widget _buildRepsInput() {
+  Widget _buildRepsInput(ColorScheme scheme) {
     return Container(
-      constraints: const BoxConstraints(minWidth: 55, maxWidth: 70),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(
-        color: completed
-            ? Colors.white.withValues(alpha: 0.15)
-            : const Color(0xFF1F2937),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: completed
-              ? Colors.white.withValues(alpha: 0.3)
-              : const Color(0xFF374151),
-          width: 1.5,
-        ),
-      ),
+      constraints: const BoxConstraints(minWidth: 56, maxWidth: 72),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: _fieldDecoration(scheme),
       child: TextField(
         controller: TextEditingController(text: reps.toString()),
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: completed ? Colors.white : Colors.white70,
-          fontSize: 16,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.3,
+          color: scheme.onSurface.withValues(alpha: 0.84),
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
         ),
         decoration: const InputDecoration(
           border: InputBorder.none,
@@ -312,29 +248,29 @@ class SetRow extends StatelessWidget {
         ],
         onChanged: (value) {
           final parsed = int.tryParse(value);
-          if (parsed != null) onRepsChanged(parsed);
+          if (parsed != null) {
+            onRepsChanged(parsed);
+          }
         },
       ),
     );
   }
 
-  Widget _buildMenu(BuildContext context) {
+  Widget _buildMenu(BuildContext context, ColorScheme scheme) {
     return SizedBox(
-      width: 32,
-      height: 32,
+      width: 30,
+      height: 30,
       child: IconButton(
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(),
         icon: Icon(
-          Icons.more_vert,
-          color: completed
-              ? Colors.white.withValues(alpha: 0.8)
-              : Colors.white.withValues(alpha: 0.4),
+          Icons.more_horiz_rounded,
+          color: scheme.onSurface.withValues(alpha: 0.6),
           size: 20,
         ),
         onPressed: () {
-          final RenderBox button = context.findRenderObject() as RenderBox;
-          final RenderBox overlay =
+          final button = context.findRenderObject() as RenderBox;
+          final overlay =
               Overlay.of(context).context.findRenderObject() as RenderBox;
           final position = button.localToGlobal(Offset.zero, ancestor: overlay);
 
@@ -346,14 +282,14 @@ class SetRow extends StatelessWidget {
               overlay.size.width - position.dx - button.size.width,
               0,
             ),
-            color: const Color(0xFF1F2937),
+            color: scheme.surfaceContainerHigh,
             elevation: 8,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Color(0xFF374151), width: 1),
+              side: BorderSide(color: scheme.outlineVariant, width: 1),
             ),
             items: <PopupMenuEntry<String>>[
-              PopupMenuItem<String>(
+              PopupMenuItem(
                 value: 'notes',
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -362,15 +298,15 @@ class SetRow extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.edit_note_outlined,
-                      color: Colors.white70,
+                      Icons.sticky_note_2_outlined,
+                      color: scheme.onSurface.withValues(alpha: 0.75),
                       size: 20,
                     ),
-                    const SizedBox(width: 12),
-                    const Text(
+                    const SizedBox(width: 10),
+                    Text(
                       'Note serie',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: scheme.onSurface,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -378,7 +314,7 @@ class SetRow extends StatelessWidget {
                   ],
                 ),
               ),
-              PopupMenuItem<String>(
+              PopupMenuItem(
                 value: 'duplicate',
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -387,15 +323,15 @@ class SetRow extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.content_copy_outlined,
-                      color: Colors.white70,
+                      Icons.copy_all_rounded,
+                      color: scheme.onSurface.withValues(alpha: 0.75),
                       size: 20,
                     ),
-                    const SizedBox(width: 12),
-                    const Text(
+                    const SizedBox(width: 10),
+                    Text(
                       'Duplica',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: scheme.onSurface,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -404,7 +340,7 @@ class SetRow extends StatelessWidget {
                 ),
               ),
               const PopupMenuDivider(),
-              PopupMenuItem<String>(
+              PopupMenuItem(
                 value: 'delete',
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -413,17 +349,17 @@ class SetRow extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.delete_outline,
-                      color: Colors.red.shade400,
+                      Icons.delete_outline_rounded,
+                      color: scheme.error,
                       size: 20,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Text(
                       'Elimina',
                       style: TextStyle(
-                        color: Colors.red.shade400,
+                        color: scheme.error,
                         fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -433,7 +369,6 @@ class SetRow extends StatelessWidget {
           ).then((value) {
             switch (value) {
               case 'notes':
-                // TODO: Note serie
                 break;
               case 'duplicate':
                 onDuplicate();
@@ -448,50 +383,47 @@ class SetRow extends StatelessWidget {
     );
   }
 
-  Widget _buildModernCheckbox() {
+  Widget _buildModernCheckbox(ColorScheme scheme) {
     return GestureDetector(
       onTap: () => onCompleteToggle(!completed),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
+        duration: const Duration(milliseconds: 120),
         curve: Curves.easeOut,
-        width: 34,
-        height: 34,
+        width: 32,
+        height: 32,
         decoration: BoxDecoration(
-          gradient: completed
-              ? const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF059669), // Emerald 600 SCURO
-                    Color(0xFF047857), // Emerald 700 PIÙ SCURO
-                  ],
-                )
-              : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [const Color(0xFF374151), const Color(0xFF1F2937)],
-                ),
+          color: completed
+              ? scheme.primary
+              : scheme.surfaceContainerHighest.withValues(alpha: 0.72),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: completed
-                ? const Color(0xFF34D399)
-                : const Color(0xFF4B5563),
-            width: 2,
+                ? scheme.primary.withValues(alpha: 0.9)
+                : scheme.outlineVariant.withValues(alpha: 0.9),
+            width: 1.5,
           ),
           boxShadow: completed
               ? [
                   BoxShadow(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.5),
-                    blurRadius: 8,
-                    spreadRadius: 1,
+                    color: scheme.primary.withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    spreadRadius: 0.5,
                   ),
                 ]
               : null,
         ),
         child: completed
-            ? const Icon(Icons.check_rounded, color: Colors.white, size: 22)
+            ? Icon(Icons.check_rounded, color: scheme.onPrimary, size: 20)
             : null,
       ),
+    );
+  }
+
+  BoxDecoration _fieldDecoration(ColorScheme scheme) {
+    return BoxDecoration(
+      color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+      borderRadius: BorderRadius.circular(11),
+      border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.72)),
     );
   }
 }

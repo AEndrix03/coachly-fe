@@ -76,19 +76,9 @@ class WorkoutRemoteMapper {
           continue;
         }
 
-        try {
-          parsedLegacyExercises.add(WorkoutExerciseModel.fromJson(exerciseMap));
-        } catch (_) {
-          final fallbackExercise = _mapBlockEntryToWorkoutExercise(
-            workoutId: _asString(json['id']) ?? 'workout',
-            block: const <String, dynamic>{},
-            entry: exerciseMap,
-            position: index,
-          );
-          if (fallbackExercise != null) {
-            parsedLegacyExercises.add(fallbackExercise);
-          }
-        }
+        parsedLegacyExercises.add(
+          WorkoutExerciseModel.fromJsonSafe(exerciseMap),
+        );
         index += 1;
       }
 

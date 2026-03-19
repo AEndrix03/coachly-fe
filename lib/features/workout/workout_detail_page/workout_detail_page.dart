@@ -67,7 +67,7 @@ class WorkoutDetailPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 20),
-            _buildStartButton(context, workout.id),
+            _buildStartButton(context, workout),
             const SizedBox(height: 20),
             WorkoutDetailExerciseListSection(
               exercises: workout.workoutExercises,
@@ -80,7 +80,7 @@ class WorkoutDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildStartButton(BuildContext context, String workoutId) {
+  Widget _buildStartButton(BuildContext context, WorkoutModel workout) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Container(
@@ -101,7 +101,10 @@ class WorkoutDetailPage extends ConsumerWidget {
           ],
         ),
         child: ElevatedButton.icon(
-          onPressed: () => context.go('/workouts/workout/$workoutId/active'),
+          onPressed: () => context.go(
+            '/workouts/workout/${workout.id}/active',
+            extra: workout,
+          ),
           icon: const Icon(Icons.play_arrow, size: 22),
           label: const Text(
             'Inizia Allenamento',

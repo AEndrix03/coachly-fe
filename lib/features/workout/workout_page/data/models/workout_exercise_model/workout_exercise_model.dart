@@ -15,9 +15,12 @@ abstract class WorkoutExerciseModel with _$WorkoutExerciseModel {
     required double progress,
   }) = _WorkoutExerciseModel;
 
-  factory WorkoutExerciseModel.fromJson(Map<String, dynamic> json) {
+  factory WorkoutExerciseModel.fromJson(Map<String, dynamic> json) =>
+      _$WorkoutExerciseModelFromJson(json);
+
+  static WorkoutExerciseModel fromJsonSafe(Map<String, dynamic> json) {
     try {
-      return _$WorkoutExerciseModelFromJson(json);
+      return WorkoutExerciseModel.fromJson(json);
     } catch (_) {
       final exerciseJson = _toJsonMap(json['exercise']);
       final exerciseId =

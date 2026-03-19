@@ -5,93 +5,85 @@ class RestCompleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
-          ),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFF334155), width: 2),
+          color: scheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: scheme.outlineVariant, width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
-              blurRadius: 30,
-              spreadRadius: 5,
+              color: scheme.shadow.withValues(alpha: 0.22),
+              blurRadius: 28,
+              offset: const Offset(0, 12),
             ),
           ],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Icona campanella animata
             TweenAnimationBuilder<double>(
               tween: Tween(begin: 0.0, end: 1.0),
-              duration: const Duration(milliseconds: 600),
-              curve: Curves.elasticOut,
+              duration: const Duration(milliseconds: 520),
+              curve: Curves.easeOutBack,
               builder: (context, value, child) {
                 return Transform.scale(
                   scale: value,
                   child: Container(
-                    width: 80,
-                    height: 80,
+                    width: 72,
+                    height: 72,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF10B981), Color(0xFF059669)],
-                      ),
+                      color: scheme.primary.withValues(alpha: 0.16),
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF10B981).withValues(alpha: 0.5),
-                          blurRadius: 20,
-                          spreadRadius: 3,
-                        ),
-                      ],
                     ),
-                    child: const Icon(
-                      Icons.notifications_active,
-                      color: Colors.white,
-                      size: 40,
+                    child: Icon(
+                      Icons.alarm_on_rounded,
+                      color: scheme.primary,
+                      size: 36,
                     ),
                   ),
                 );
               },
             ),
-            const SizedBox(height: 24),
-
-            const Text(
-              'Il riposo è terminato',
+            const SizedBox(height: 18),
+            Text(
+              'Riposo terminato',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white,
+                color: scheme.onSurface,
                 fontSize: 22,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 32),
-
-            // Pulsante chiudi
+            const SizedBox(height: 8),
+            Text(
+              'Sei pronto per la prossima serie.',
+              style: TextStyle(
+                color: scheme.onSurface.withValues(alpha: 0.72),
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 22),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: FilledButton.icon(
                 onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF10B981),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                icon: const Icon(Icons.play_circle_fill_rounded, size: 20),
+                label: const Text(
+                  'Continua',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
-                child: const Text(
-                  'Chiudi',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
+                style: FilledButton.styleFrom(
+                  backgroundColor: scheme.primary,
+                  foregroundColor: scheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
               ),

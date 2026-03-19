@@ -16,121 +16,91 @@ class ActiveBottomBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
     final status = ref.watch(
       activeWorkoutProvider(workoutId).select((s) => s.status),
     );
     final isSaving = status == ActiveWorkoutStatus.saving;
 
     return Positioned(
-      left: 20,
-      right: 20,
-      bottom: 20,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Complete button
-          GestureDetector(
-            onTap: isSaving ? null : onComplete,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              height: 56,
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isSaving
-                      ? [const Color(0xFF374151), const Color(0xFF1F2937)]
-                      : [
-                          const Color(0xFF10B981),
-                          const Color(0xFF059669),
-                        ],
-                ),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: isSaving
-                        ? Colors.transparent
-                        : const Color(0xFF10B981).withValues(alpha: 0.4),
-                    blurRadius: 16,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (isSaving)
-                    const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: Colors.white54,
-                      ),
-                    )
-                  else
-                    const Icon(Icons.check_rounded, color: Colors.white, size: 24),
-                  const SizedBox(width: 10),
-                  Text(
-                    isSaving ? 'Salvataggio...' : 'Completa',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // AI Coach button
-          _buildFloatingButton(
-            context: context,
-            icon: Icons.smart_toy_outlined,
-            gradient: [const Color(0xFF9333EA), const Color(0xFF7C3AED)],
-            glowColor: const Color(0xFF9333EA),
-            onTap: () => _showAICoach(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFloatingButton({
-    required BuildContext context,
-    required IconData icon,
-    required List<Color> gradient,
-    required Color glowColor,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
+      left: 16,
+      right: 16,
+      bottom: 16,
       child: Container(
-        width: 56,
-        height: 56,
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: gradient),
-          borderRadius: BorderRadius.circular(18),
+          color: Color.alphaBlend(
+            scheme.surfaceContainerHighest.withValues(alpha: 0.88),
+            scheme.surface,
+          ),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2),
-            width: 2,
+            color: scheme.outlineVariant.withValues(alpha: 0.75),
           ),
           boxShadow: [
             BoxShadow(
-              color: glowColor.withValues(alpha: 0.4),
-              blurRadius: 16,
-              spreadRadius: 2,
-              offset: const Offset(0, 4),
+              color: scheme.shadow.withValues(alpha: 0.14),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: Icon(icon, color: Colors.white, size: 26),
+        child: Row(
+          children: [
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: isSaving ? null : onComplete,
+                icon: isSaving
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          color: scheme.onPrimary,
+                        ),
+                      )
+                    : const Icon(Icons.flag_rounded, size: 20),
+                label: Text(isSaving ? 'Salvataggio...' : 'Completa sessione'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: scheme.primary,
+                  foregroundColor: scheme.onPrimary,
+                  disabledBackgroundColor: scheme.surfaceContainerHighest,
+                  disabledForegroundColor: scheme.onSurface.withValues(
+                    alpha: 0.6,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  textStyle: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: 50,
+              height: 50,
+              child: IconButton.filledTonal(
+                tooltip: 'AI Coach',
+                onPressed: () => _showAICoach(context),
+                icon: const Icon(Icons.auto_awesome_rounded, size: 22),
+                style: IconButton.styleFrom(
+                  backgroundColor: scheme.secondaryContainer.withValues(
+                    alpha: 0.68,
+                  ),
+                  foregroundColor: scheme.onSecondaryContainer,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

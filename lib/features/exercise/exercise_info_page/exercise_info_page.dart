@@ -22,17 +22,18 @@ class ExercisePage extends ConsumerStatefulWidget {
 }
 
 class _ExercisePageState extends ConsumerState<ExercisePage> {
+  late final ExerciseInfoNotifier _exerciseInfoNotifier;
+
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref.read(exerciseInfoProvider.notifier).loadExerciseDetail(widget.id),
-    );
+    _exerciseInfoNotifier = ref.read(exerciseInfoProvider.notifier);
+    Future.microtask(() => _exerciseInfoNotifier.loadExerciseDetail(widget.id));
   }
 
   @override
   void dispose() {
-    ref.read(exerciseInfoProvider.notifier).clearSelectedExercise();
+    _exerciseInfoNotifier.clearSelectedExercise();
     super.dispose();
   }
 
@@ -54,11 +55,11 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
                 onBack: () => context.pop(),
               )
             : state.isLoadingDetail || !state.hasSelectedExercise
-                ? const _SkeletonState(key: ValueKey('loading'))
-                : _ContentState(
-                    key: ValueKey(state.selectedExercise!.id),
-                    exercise: state.selectedExercise!,
-                  ),
+            ? const _SkeletonState(key: ValueKey('loading'))
+            : _ContentState(
+                key: ValueKey(state.selectedExercise!.id),
+                exercise: state.selectedExercise!,
+              ),
       ),
     );
   }
@@ -236,8 +237,11 @@ class _ContentState extends ConsumerWidget {
     final locale = ref.watch(languageProvider);
     final name =
         exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? 'Esercizio';
-    final description = exercise.descriptionI18n?.fromI18n(locale)?.trim() ?? '';
-    final video = exercise.media?.firstWhereOrNull((m) => m.mediaType == 'video');
+    final description =
+        exercise.descriptionI18n?.fromI18n(locale)?.trim() ?? '';
+    final video = exercise.media?.firstWhereOrNull(
+      (m) => m.mediaType == 'video',
+    );
     final muscles = exercise.muscles ?? const [];
     final safety = exercise.safety ?? const [];
     final equipments = exercise.equipments ?? const [];
@@ -284,10 +288,7 @@ class _ContentState extends ConsumerWidget {
                     icon: Icons.fitness_center_rounded,
                     color: const Color(0xFF9C27B0),
                     title: 'Muscoli coinvolti',
-                    child: _MusclesList(
-                      muscles: muscles,
-                      locale: locale,
-                    ),
+                    child: _MusclesList(muscles: muscles, locale: locale),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -296,10 +297,7 @@ class _ContentState extends ConsumerWidget {
                     icon: Icons.warning_rounded,
                     color: const Color(0xFFFF9800),
                     title: 'Consigli di sicurezza',
-                    child: _SafetyList(
-                      safety: safety,
-                      locale: locale,
-                    ),
+                    child: _SafetyList(safety: safety, locale: locale),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -320,10 +318,7 @@ class _ContentState extends ConsumerWidget {
                     icon: Icons.swap_horiz_rounded,
                     color: const Color(0xFF4CAF50),
                     title: 'Varianti',
-                    child: _VariantsList(
-                      variants: variants,
-                      locale: locale,
-                    ),
+                    child: _VariantsList(variants: variants, locale: locale),
                   ),
                 ],
                 if (description.isEmpty &&
@@ -473,33 +468,33 @@ class _ExerciseHero extends StatelessWidget {
   }
 
   String _difficultyLabel(String raw) => switch (raw.toLowerCase()) {
-        'beginner' => 'Principiante',
-        'intermediate' => 'Intermedio',
-        'advanced' => 'Avanzato',
-        _ => raw,
-      };
+    'beginner' => 'Principiante',
+    'intermediate' => 'Intermedio',
+    'advanced' => 'Avanzato',
+    _ => raw,
+  };
 
   Color _difficultyColor(String raw) => switch (raw.toLowerCase()) {
-        'beginner' => const Color(0xFF69F0AE),
-        'intermediate' => const Color(0xFFFFB300),
-        'advanced' => const Color(0xFFFF5252),
-        _ => Colors.white70,
-      };
+    'beginner' => const Color(0xFF69F0AE),
+    'intermediate' => const Color(0xFFFFB300),
+    'advanced' => const Color(0xFFFF5252),
+    _ => Colors.white70,
+  };
 
   String _mechanicsLabel(String raw) => switch (raw.toLowerCase()) {
-        'compound' => 'Composto',
-        'isolation' => 'Isolamento',
-        _ => raw,
-      };
+    'compound' => 'Composto',
+    'isolation' => 'Isolamento',
+    _ => raw,
+  };
 
   String _forceLabel(String raw) => switch (raw.toLowerCase()) {
-        'push' => 'Spinta',
-        'pull' => 'Trazione',
-        'legs' => 'Gambe',
-        'core' => 'Core',
-        'static' => 'Statico',
-        _ => raw,
-      };
+    'push' => 'Spinta',
+    'pull' => 'Trazione',
+    'legs' => 'Gambe',
+    'core' => 'Core',
+    'static' => 'Statico',
+    _ => raw,
+  };
 }
 
 class _HeroChip extends StatelessWidget {
@@ -618,8 +613,11 @@ class _MusclesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sorted = [...muscles]
-      ..sort((a, b) =>
-          (b.activationPercentage ?? 0).compareTo(a.activationPercentage ?? 0));
+      ..sort(
+        (a, b) => (b.activationPercentage ?? 0).compareTo(
+          a.activationPercentage ?? 0,
+        ),
+      );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -840,10 +838,7 @@ class _VariantsList extends StatelessWidget {
             ),
             if (!isLast) ...[
               const SizedBox(height: 12),
-              Divider(
-                color: Colors.white.withValues(alpha: 0.06),
-                height: 1,
-              ),
+              Divider(color: Colors.white.withValues(alpha: 0.06), height: 1),
               const SizedBox(height: 12),
             ],
           ],

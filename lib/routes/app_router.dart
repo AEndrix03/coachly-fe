@@ -81,7 +81,10 @@ GoRouter router(Ref ref) {
                   GoRoute(
                     path: 'workout/:id',
                     pageBuilder: (context, state) {
-                      final workout = state.extra as WorkoutModel;
+                      final workout = state.extra as WorkoutModel?;
+                      if (workout == null) {
+                        return _fadeTransition(state, const WorkoutPage());
+                      }
                       return _fadeTransition(
                         state,
                         WorkoutDetailPage(workout: workout),
