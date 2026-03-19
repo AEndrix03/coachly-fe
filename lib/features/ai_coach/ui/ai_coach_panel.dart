@@ -113,12 +113,27 @@ class _AiCoachPanelState extends ConsumerState<AiCoachPanel> {
                       isModelLoading: coachState.isModelLoading,
                     ),
                     ContextPill(context: workoutContext),
-                    QuickActionsRow(enabled: !coachState.isGenerating),
-                    const SizedBox(height: 6),
+                    if (!coachState.isModelLoading &&
+                        coachState.isModelInstalled) ...[
+                      QuickActionsRow(enabled: !coachState.isGenerating),
+                      const SizedBox(height: 6),
+                    ],
                     Expanded(
                       child: asyncState.isLoading && asyncState.value == null
                           ? _LoadingMessages(
                               scrollController: sheetScrollController,
+                            )
+                          : coachState.isModelLoading
+                          ? _LoadingMessages(
+                              scrollController: sheetScrollController,
+                            )
+                          : !coachState.isModelInstalled
+                          ? _ModelDownloadPrompt(
+                              isDownloading: coachState.isDownloading,
+                              progress: coachState.downloadProgress,
+                              onDownload: () => ref
+                                  .read(aiCoachProvider.notifier)
+                                  .startModelDownload(),
                             )
                           : ListView.builder(
                               controller: _messagesController,
@@ -150,11 +165,14 @@ class _AiCoachPanelState extends ConsumerState<AiCoachPanel> {
                               },
                             ),
                     ),
-                    SuggestionsRow(suggestions: coachState.suggestions),
-                    InputBar(
-                      isListening: coachState.isListening,
-                      isGenerating: coachState.isGenerating,
-                    ),
+                    if (!coachState.isModelLoading &&
+                        coachState.isModelInstalled) ...[
+                      SuggestionsRow(suggestions: coachState.suggestions),
+                      InputBar(
+                        isListening: coachState.isListening,
+                        isGenerating: coachState.isGenerating,
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -175,6 +193,120 @@ class _AiCoachPanelState extends ConsumerState<AiCoachPanel> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _ModelDownloadPrompt extends StatelessWidget {
+  const _ModelDownloadPrompt({
+    required this.isDownloading,
+    required this.progress,
+    required this.onDownload,
+  });
+
+  final bool isDownloading;
+  final double progress;
+  final VoidCallback onDownload;
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = (progress * 100).round();
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [AiCoachTheme.accentBlue, AiCoachTheme.accentPurple],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AiCoachTheme.accentBlue.withAlpha(60),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.download_rounded, color: Colors.white, size: 26),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              context.tr('ai.download.title'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              context.tr('ai.download.subtitle'),
+              style: const TextStyle(
+                color: AiCoachTheme.accentBlue,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 14),
+            Text(
+              context.tr('ai.download.description'),
+              style: const TextStyle(
+                color: AiCoachTheme.textSecondary,
+                fontSize: 13,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 28),
+            if (isDownloading) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress > 0 ? progress : null,
+                  minHeight: 6,
+                  backgroundColor: AiCoachTheme.bgSurface,
+                  valueColor: const AlwaysStoppedAnimation(AiCoachTheme.accentBlue),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                context.tr('ai.download.progress', params: {'progress': '$pct'}),
+                style: const TextStyle(
+                  color: AiCoachTheme.textSecondary,
+                  fontSize: 12,
+                ),
+              ),
+            ] else
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: onDownload,
+                  icon: const Icon(Icons.download_rounded, size: 18),
+                  label: Text(context.tr('ai.download.button')),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AiCoachTheme.accentBlue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

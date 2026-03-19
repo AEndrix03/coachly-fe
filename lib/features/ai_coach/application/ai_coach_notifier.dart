@@ -29,6 +29,9 @@ class AiCoachState {
     this.voiceTranscript = '',
     this.suggestions = const [],
     this.isModelLoading = true,
+    this.isModelInstalled = true,
+    this.isDownloading = false,
+    this.downloadProgress = 0.0,
   });
 
   final List<CoachMessage> messages;
@@ -36,7 +39,13 @@ class AiCoachState {
   final bool isListening;
   final String voiceTranscript;
   final List<String> suggestions;
+  /// True while checking installation or loading model into memory.
   final bool isModelLoading;
+  /// False when the model file is not yet downloaded to the device.
+  final bool isModelInstalled;
+  final bool isDownloading;
+  /// Download progress from 0.0 to 1.0.
+  final double downloadProgress;
 
   AiCoachState copyWith({
     List<CoachMessage>? messages,
@@ -45,6 +54,9 @@ class AiCoachState {
     String? voiceTranscript,
     List<String>? suggestions,
     bool? isModelLoading,
+    bool? isModelInstalled,
+    bool? isDownloading,
+    double? downloadProgress,
   }) {
     return AiCoachState(
       messages: messages ?? this.messages,
@@ -53,6 +65,9 @@ class AiCoachState {
       voiceTranscript: voiceTranscript ?? this.voiceTranscript,
       suggestions: suggestions ?? this.suggestions,
       isModelLoading: isModelLoading ?? this.isModelLoading,
+      isModelInstalled: isModelInstalled ?? this.isModelInstalled,
+      isDownloading: isDownloading ?? this.isDownloading,
+      downloadProgress: downloadProgress ?? this.downloadProgress,
     );
   }
 }
@@ -79,12 +94,24 @@ class AiCoachNotifier extends _$AiCoachNotifier {
 
   Future<void> _bootstrap() async {
     final repository = ref.read(aiCoachRepositoryProvider);
-    final ready = await repository.ensureModelReady();
-    if (!ref.mounted) {
+
+    final installed = await repository.isModelInstalled();
+    if (!ref.mounted) return;
+
+    if (!installed) {
+      state = AsyncData(
+        _current.copyWith(isModelLoading: false, isModelInstalled: false),
+      );
       return;
     }
 
-    var updated = _current.copyWith(isModelLoading: false);
+    final ready = await repository.ensureModelReady();
+    if (!ref.mounted) return;
+
+    var updated = _current.copyWith(
+      isModelLoading: false,
+      isModelInstalled: true,
+    );
     if (!ready) {
       final warning = CoachMessage(
         id: _nextId('ai'),
@@ -96,6 +123,59 @@ class AiCoachNotifier extends _$AiCoachNotifier {
     }
 
     state = AsyncData(updated);
+  }
+
+  Future<void> startModelDownload() async {
+    if (_current.isDownloading) return;
+
+    state = AsyncData(
+      _current.copyWith(isDownloading: true, downloadProgress: 0.0),
+    );
+
+    final repository = ref.read(aiCoachRepositoryProvider);
+
+    try {
+      await for (final progress in repository.downloadModel()) {
+        if (!ref.mounted) return;
+        state = AsyncData(_current.copyWith(downloadProgress: progress));
+      }
+
+      if (!ref.mounted) return;
+
+      // Download complete — load model into memory.
+      state = AsyncData(
+        _current.copyWith(
+          isDownloading: false,
+          isModelInstalled: true,
+          isModelLoading: true,
+          downloadProgress: 1.0,
+        ),
+      );
+
+      final ready = await repository.ensureModelReady();
+      if (!ref.mounted) return;
+
+      var updated = _current.copyWith(isModelLoading: false);
+      if (!ready) {
+        final warning = CoachMessage(
+          id: _nextId('ai'),
+          text: _tr('ai.model_unavailable'),
+          sender: MessageSender.ai,
+          timestamp: DateTime.now(),
+        );
+        updated = updated.copyWith(messages: [...updated.messages, warning]);
+      }
+      state = AsyncData(updated);
+    } catch (_) {
+      if (!ref.mounted) return;
+      state = AsyncData(
+        _current.copyWith(
+          isDownloading: false,
+          isModelInstalled: false,
+          downloadProgress: 0.0,
+        ),
+      );
+    }
   }
 
   Future<void> sendMessage(String text) async {

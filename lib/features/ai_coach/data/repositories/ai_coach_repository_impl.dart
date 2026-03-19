@@ -17,6 +17,16 @@ class AiCoachRepositoryImpl implements AiCoachRepository {
   final GemmaInferenceService _gemmaService;
 
   @override
+  Future<bool> isModelInstalled() {
+    return _gemmaService.isModelInstalled();
+  }
+
+  @override
+  Stream<double> downloadModel() {
+    return _gemmaService.downloadModel();
+  }
+
+  @override
   Future<bool> ensureModelReady() {
     return _gemmaService.ensureInitialized();
   }

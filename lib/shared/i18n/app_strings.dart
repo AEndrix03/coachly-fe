@@ -530,6 +530,30 @@ class AppStrings {
           'Ho letto: {message}. Ora mantieni ritmo controllato e forma stabile.',
     },
     'ai.offline.label': {'en': 'QUICK CHECK', 'it': 'CHECK RAPIDO'},
+
+    'ai.download.title': {
+      'en': 'AI Model Required',
+      'it': 'Modello AI Richiesto',
+    },
+    'ai.download.subtitle': {
+      'en': 'Qwen3 0.6B · 586 MB · runs fully offline',
+      'it': 'Qwen3 0.6B · 586 MB · gira completamente offline',
+    },
+    'ai.download.description': {
+      'en':
+          'The AI coach needs to download a model once. After that it runs entirely on your device with no internet required.',
+      'it':
+          "Il coach AI deve scaricare un modello una volta. Dopodichè gira completamente sul tuo dispositivo senza connessione.",
+    },
+    'ai.download.button': {'en': 'Download', 'it': 'Scarica'},
+    'ai.download.progress': {
+      'en': 'Downloading... {progress}%',
+      'it': 'Download... {progress}%',
+    },
+    'ai.download.error': {
+      'en': 'Download failed. Tap to retry.',
+      'it': 'Download fallito. Tocca per riprovare.',
+    },
   };
 
   static Locale normalizeLocale(Locale locale) {

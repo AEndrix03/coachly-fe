@@ -20,9 +20,7 @@ class ActiveBottomBar extends ConsumerWidget {
     final status = ref.watch(
       activeWorkoutProvider(workoutId).select((s) => s.status),
     );
-    final aiWarmup = ref.watch(aiCoachModelWarmupProvider);
     final isSaving = status == ActiveWorkoutStatus.saving;
-    final isAiLoading = aiWarmup.isLoading;
 
     return Positioned(
       left: 16,
@@ -89,16 +87,7 @@ class ActiveBottomBar extends ConsumerWidget {
               child: IconButton.filledTonal(
                 tooltip: 'AI Coach',
                 onPressed: () => _showAICoach(context, ref),
-                icon: isAiLoading
-                    ? SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.2,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                      )
-                    : const Icon(Icons.auto_awesome_rounded, size: 22),
+                icon: const Icon(Icons.auto_awesome_rounded, size: 22),
                 style: IconButton.styleFrom(
                   backgroundColor: AiCoachTheme.accentPurple,
                   foregroundColor: Colors.white,
