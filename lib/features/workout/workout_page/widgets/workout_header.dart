@@ -1,4 +1,5 @@
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
+import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,7 +53,9 @@ class WorkoutHeader extends ConsumerWidget {
             decoration: BoxDecoration(
               color: scheme.onPrimary.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: scheme.onPrimary.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: scheme.onPrimary.withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -102,24 +105,12 @@ class WorkoutHeader extends ConsumerWidget {
   }
 
   Future<void> _showAuthDisabledDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Autenticazione disabilitata'),
-          content: const Text(
-            'Login, logout e gestione token sono temporaneamente scollegati durante il refactor del backend.',
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Chiudi'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+    return showAppNoticeDialog(
+      context,
+      title: 'Autenticazione disabilitata',
+      content:
+          'Login, logout e gestione token sono temporaneamente scollegati durante il refactor del backend.',
+      icon: Icons.info_outline_rounded,
     );
   }
 

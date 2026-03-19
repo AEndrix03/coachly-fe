@@ -4,6 +4,7 @@ import 'package:coachly/features/user_settings/providers/settings_provider.dart'
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_edit_page/providers/workout_edit_provider/workout_edit_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -112,7 +113,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final shouldPop = await _showExitDialog();
-        if (shouldPop ?? false) {
+        if (shouldPop) {
           context.pop();
         }
       },
@@ -460,10 +461,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           final state = ref.read(workoutEditPageProvider(widget.workoutId));
           final newNumber = state.exercises.length + 1;
           final newId = 'exercise_${DateTime.now().millisecondsSinceEpoch}';
-          final newExercise = exercise.copyWith(
-            id: newId,
-            number: newNumber,
-          );
+          final newExercise = exercise.copyWith(id: newId, number: newNumber);
           setState(() => _justAddedIds.add(newId));
           ref
               .read(workoutEditPageProvider(widget.workoutId).notifier)
@@ -473,39 +471,22 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     );
   }
 
-  void _handleRemoveExercise(String exerciseId) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text(
-          'Rimuovi esercizio',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: const Text(
-          'Sei sicuro di voler rimuovere questo esercizio?',
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annulla'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ref
-                  .read(workoutEditPageProvider(widget.workoutId).notifier)
-                  .removeExercise(exerciseId);
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFFFF5252),
-            ),
-            child: const Text('Rimuovi'),
-          ),
-        ],
-      ),
+  Future<void> _handleRemoveExercise(String exerciseId) async {
+    final shouldRemove = await showAppConfirmationDialog(
+      context,
+      title: 'Rimuovi esercizio',
+      content: 'Sei sicuro di voler rimuovere questo esercizio?',
+      confirmLabel: 'Rimuovi',
+      destructive: true,
+      icon: Icons.remove_circle_outline_rounded,
     );
+    if (!shouldRemove) {
+      return;
+    }
+
+    ref
+        .read(workoutEditPageProvider(widget.workoutId).notifier)
+        .removeExercise(exerciseId);
   }
 
   void _handleFindVariant(EditableExerciseModel exercise) {
@@ -545,38 +526,18 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     }
   }
 
-  Future<bool?> _showExitDialog() async {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text(
-          'Modifiche non salvate',
-          style: TextStyle(color: Colors.white),
-        ),
-        content: const Text(
-          'Hai modifiche non salvate. Vuoi uscire senza salvare?',
-          style: TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Annulla'),
-          ),
-          TextButton(
-            onPressed: () {
-              ref
-                  .read(workoutEditPageProvider(widget.workoutId).notifier)
-                  .resetDirty();
-              Navigator.of(context).pop(true);
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFFFF5252),
-            ),
-            child: const Text('Esci'),
-          ),
-        ],
-      ),
+  Future<bool> _showExitDialog() async {
+    final shouldExit = await showAppConfirmationDialog(
+      context,
+      title: 'Modifiche non salvate',
+      content: 'Hai modifiche non salvate. Vuoi uscire senza salvare?',
+      confirmLabel: 'Esci',
+      destructive: true,
+      icon: Icons.warning_amber_rounded,
     );
+    if (shouldExit) {
+      ref.read(workoutEditPageProvider(widget.workoutId).notifier).resetDirty();
+    }
+    return shouldExit;
   }
 }

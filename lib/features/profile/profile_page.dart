@@ -1,6 +1,8 @@
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/auth/providers/user_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/headers/page_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,9 +18,10 @@ class ProfilePage extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
 
     final initials = _initials(user?.firstName, user?.lastName);
-    final fullName = [user?.firstName, user?.lastName]
-        .where((s) => s != null && s.isNotEmpty)
-        .join(' ');
+    final fullName = [
+      user?.firstName,
+      user?.lastName,
+    ].where((s) => s != null && s.isNotEmpty).join(' ');
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -26,9 +29,9 @@ class ProfilePage extends ConsumerWidget {
         children: [
           PageHeader(
             badgeIcon: Ionicons.person_circle_outline,
-            badgeLabel: 'Profilo',
-            title: fullName.isEmpty ? 'Il tuo profilo' : fullName,
-            bottom: _buildAvatarInHeader(initials),
+            badgeLabel: context.tr('profile.profile'),
+            title: fullName.isEmpty ? context.tr('profile.your_profile') : fullName,
+            bottom: _buildAvatarInHeader(context, initials),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -39,15 +42,15 @@ class ProfilePage extends ConsumerWidget {
                       _buildSection(
                     icon: Ionicons.settings_outline,
                     color: const Color(0xFF2196F3),
-                    title: 'Preferenze',
+                    title: context.tr('profile.preferences'),
                     child: _buildLanguageSetting(context, ref),
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
                     icon: Ionicons.information_circle_outline,
                     color: const Color(0xFF9C27B0),
-                    title: 'App',
-                    child: _buildAppInfo(),
+                    title: context.tr('profile.app_section'),
+                    child: _buildAppInfo(context),
                   ),
                   const SizedBox(height: 32),
                   _buildLogoutButton(context, ref),
@@ -60,7 +63,7 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildAvatarInHeader(String initials) {
+  Widget _buildAvatarInHeader(BuildContext context, String initials) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
@@ -91,7 +94,7 @@ class ProfilePage extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            'Coachly Member',
+            context.tr('profile.member'),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.80),
               fontSize: 13,
@@ -154,6 +157,8 @@ class ProfilePage extends ConsumerWidget {
 
   Widget _buildLanguageSetting(BuildContext context, WidgetRef ref) {
     final language = ref.watch(languageProvider);
+    final currentLocale =
+        Localizations.maybeLocaleOf(context) ?? AppStrings.defaultLocale;
 
     return Row(
       children: [
@@ -164,7 +169,7 @@ class ProfilePage extends ConsumerWidget {
         ),
         const SizedBox(width: 12),
         Text(
-          'Lingua',
+          context.tr('common.language'),
           style: const TextStyle(
             color: Colors.white,
             fontSize: 14,
@@ -174,14 +179,19 @@ class ProfilePage extends ConsumerWidget {
         const Spacer(),
         ShadSelect<Locale>(
           placeholder: Text(
-            language.languageCode == 'it' ? 'Italiano' : 'English',
+            AppStrings.languageDisplayName(
+              language,
+              displayLocale: currentLocale,
+            ),
             style: const TextStyle(color: Colors.white, fontSize: 13),
           ),
           initialValue: language,
-          options: const [Locale('it', 'IT'), Locale('en', 'EN')].map((l) {
+          options: AppStrings.languageOptions.map((l) {
             return ShadOption(
               value: l,
-              child: Text(l.languageCode == 'it' ? 'Italiano' : 'English'),
+              child: Text(
+                AppStrings.languageDisplayName(l, displayLocale: currentLocale),
+              ),
             );
           }).toList(),
           onChanged: (value) {
@@ -190,7 +200,7 @@ class ProfilePage extends ConsumerWidget {
             }
           },
           selectedOptionBuilder: (context, value) => Text(
-            value.languageCode == 'it' ? 'Italiano' : 'English',
+            AppStrings.languageDisplayName(value, displayLocale: currentLocale),
             style: const TextStyle(color: Colors.white, fontSize: 13),
           ),
         ),
@@ -198,12 +208,12 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildAppInfo() {
+  Widget _buildAppInfo(BuildContext context) {
     return Column(
       children: [
-        _infoRow(label: 'Versione', value: '1.0.0 MVP'),
+        _infoRow(label: context.tr('common.version'), value: '1.0.0 MVP'),
         Divider(color: Colors.white.withValues(alpha: 0.07), height: 24),
-        _infoRow(label: 'Build', value: 'alpha'),
+        _infoRow(label: context.tr('common.build'), value: 'alpha'),
       ],
     );
   }
@@ -234,29 +244,13 @@ class ProfilePage extends ConsumerWidget {
   Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () async {
-        final confirm = await showDialog<bool>(
-          context: context,
-          builder: (_) => AlertDialog(
-            backgroundColor: const Color(0xFF1A1A2E),
-            title: const Text('Logout', style: TextStyle(color: Colors.white)),
-            content: const Text(
-              'Sei sicuro di voler uscire?',
-              style: TextStyle(color: Colors.white70),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Annulla'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFFFF5252),
-                ),
-                child: const Text('Esci'),
-              ),
-            ],
-          ),
+        final confirm = await showAppConfirmationDialog(
+          context,
+          title: context.tr('profile.logout_title'),
+          content: context.tr('profile.logout_content'),
+          confirmLabel: context.tr('profile.logout_confirm'),
+          destructive: true,
+          icon: Ionicons.log_out_outline,
         );
         if (confirm == true) {
           ref.read(authProvider.notifier).logout();
@@ -283,7 +277,7 @@ class ProfilePage extends ConsumerWidget {
             ),
             const SizedBox(width: 10),
             Text(
-              'Logout',
+              context.tr('profile.logout'),
               style: TextStyle(
                 color: const Color(0xFFFF5252).withValues(alpha: 0.85),
                 fontSize: 14,

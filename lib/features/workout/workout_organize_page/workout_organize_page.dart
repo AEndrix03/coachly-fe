@@ -3,6 +3,7 @@ import 'package:coachly/features/workout/workout_organize_page/widgets/organize_
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -167,6 +168,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
               context,
               'Conferma Eliminazione',
               'Sei sicuro di voler eliminare la scheda "${workout.titleI18n?.fromI18n(locale) ?? ''}"?',
+              destructive: true,
             );
             if (confirmed) {
               ref.read(workoutListProvider.notifier).deleteWorkout(workout.id);
@@ -237,26 +239,17 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
 Future<bool> _showConfirmationDialog(
   BuildContext context,
   String title,
-  String content,
-) async {
-  return await showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(title),
-            content: Text(content),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Annulla'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Conferma'),
-              ),
-            ],
-          );
-        },
-      ) ??
-      false;
+  String content, {
+  bool destructive = false,
+}) async {
+  return showAppConfirmationDialog(
+    context,
+    title: title,
+    content: content,
+    confirmLabel: 'Conferma',
+    destructive: destructive,
+    icon: destructive
+        ? Icons.delete_outline_rounded
+        : Icons.help_outline_rounded,
+  );
 }

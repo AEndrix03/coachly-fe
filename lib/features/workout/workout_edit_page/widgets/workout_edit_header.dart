@@ -1,3 +1,4 @@
+import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
 
@@ -121,39 +122,22 @@ class WorkoutEditHeader extends StatelessWidget {
     );
   }
 
-  void _handleBack(BuildContext context) {
-    if (isDirty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: const Color(0xFF1A1A2E),
-          title: const Text(
-            'Modifiche non salvate',
-            style: TextStyle(color: Colors.white),
-          ),
-          content: const Text(
-            'Hai modifiche non salvate. Vuoi uscire senza salvare?',
-            style: TextStyle(color: Colors.white70),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Annulla'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onBack();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFFF5252),
-              ),
-              child: const Text('Esci'),
-            ),
-          ],
-        ),
-      );
-    } else {
+  Future<void> _handleBack(BuildContext context) async {
+    if (!isDirty) {
+      onBack();
+      return;
+    }
+
+    final shouldExit = await showAppConfirmationDialog(
+      context,
+      title: 'Modifiche non salvate',
+      content: 'Hai modifiche non salvate. Vuoi uscire senza salvare?',
+      confirmLabel: 'Esci',
+      destructive: true,
+      icon: Icons.warning_amber_rounded,
+    );
+
+    if (shouldExit && context.mounted) {
       onBack();
     }
   }
