@@ -19,10 +19,22 @@ class WorkoutDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final resolvedWorkout = ref.watch(workoutListProvider).maybeWhen(
+      data: (workouts) {
+        for (final item in workouts) {
+          if (item.id == workout.id) {
+            return item;
+          }
+        }
+        return workout;
+      },
+      orElse: () => workout,
+    );
+
     return Scaffold(
       body: Container(
         color: const Color(0xFF0F0F1E),
-        child: _buildBody(context, ref, workout),
+        child: _buildBody(context, ref, resolvedWorkout),
       ),
     );
   }

@@ -76,7 +76,7 @@ class GemmaInferenceService {
       _log('Loading $_kModelId into memory...');
       final stopwatch = Stopwatch()..start();
       _model = await FlutterGemma.getActiveModel(
-        maxTokens: 384,
+        maxTokens: 1024,
         preferredBackend: PreferredBackend.gpu,
       );
       _log('Model loaded in ${stopwatch.elapsedMilliseconds}ms.');

@@ -62,6 +62,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
 
   @override
   void dispose() {
+    _debouncer.dispose();
     _scrollController.dispose();
     _descriptionController.dispose();
     _durationController.dispose();
@@ -502,9 +503,13 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Future<void> _handleSave() async {
-    final success = await ref
-        .read(workoutEditPageProvider(widget.workoutId).notifier)
-        .save();
+    _debouncer.cancel();
+    final notifier = ref.read(workoutEditPageProvider(widget.workoutId).notifier)
+      ..updateDescription(_descriptionController.text)
+      ..updateDuration(_durationController.text)
+      ..updateType(_typeController.text);
+
+    final success = await notifier.save();
     if (!mounted) return;
     if (success) {
       ref

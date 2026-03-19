@@ -217,7 +217,8 @@ class AiCoachNotifier extends _$AiCoachNotifier {
         languageCode: _languageCode,
       )) {
         streamBuffer.write(token);
-        _replaceMessageText(aiPlaceholder.id, streamBuffer.toString());
+        // Do not update the bubble with raw JSON during streaming;
+        // the typing indicator stays visible until parsing is complete.
       }
 
       final parsed = repository.parseAiMessage(
@@ -286,10 +287,11 @@ class AiCoachNotifier extends _$AiCoachNotifier {
         if (!ref.mounted) {
           return;
         }
+        // Keep transcript in state; InputBar will consume it and populate
+        // the text field, letting the user review before sending.
         state = AsyncData(
           _current.copyWith(isListening: false, voiceTranscript: finalText),
         );
-        unawaited(sendVoiceTranscript());
       },
       onError: () {
         if (!ref.mounted) {
@@ -312,16 +314,17 @@ class AiCoachNotifier extends _$AiCoachNotifier {
     state = AsyncData(_current.copyWith(isListening: false));
   }
 
+  /// Called by the VoiceOverlay "Send" button: stops listening and leaves
+  /// the transcript in state so InputBar can populate the text field.
   Future<void> sendVoiceTranscript() async {
-    final transcript = _current.voiceTranscript.trim();
-    if (transcript.isEmpty) {
-      return;
-    }
+    final stt = ref.read(sttServiceProvider);
+    await stt.stopListening();
+    if (!ref.mounted) return;
+    state = AsyncData(_current.copyWith(isListening: false));
+  }
 
-    state = AsyncData(
-      _current.copyWith(voiceTranscript: '', isListening: false),
-    );
-    await sendMessage(transcript);
+  void clearVoiceTranscript() {
+    state = AsyncData(_current.copyWith(voiceTranscript: ''));
   }
 
   void tapQuickAction(QuickActionType action) {

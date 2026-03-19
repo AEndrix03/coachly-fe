@@ -206,11 +206,9 @@ class SetRow extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Expanded(
-            child: TextField(
-              controller: TextEditingController(
-                text: weight.toStringAsFixed(
-                  weight.truncateToDouble() == weight ? 0 : 1,
-                ),
+            child: TextFormField(
+              initialValue: weight.toStringAsFixed(
+                weight.truncateToDouble() == weight ? 0 : 1,
               ),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
@@ -256,8 +254,8 @@ class SetRow extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 56, maxWidth: 72),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
       decoration: _fieldDecoration(scheme),
-      child: TextField(
-        controller: TextEditingController(text: reps.toString()),
+      child: TextFormField(
+        initialValue: reps.toString(),
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         style: TextStyle(

@@ -56,6 +56,7 @@ class WorkoutSessionWriteCommandMapper {
     return WorkoutWriteCommand(
       id: workoutCommand.id,
       name: workoutCommand.name,
+      description: workoutCommand.description,
       translations: workoutCommand.translations,
       status: workoutCommand.status,
       blocks: updatedBlocks,

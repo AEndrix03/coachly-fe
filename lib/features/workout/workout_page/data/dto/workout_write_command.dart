@@ -1,6 +1,7 @@
 class WorkoutWriteCommand {
   final String? id;
   final String name;
+  final String? description;
   final Map<String, WorkoutTranslationWritePayload> translations;
   final String status;
   final List<WorkoutBlockWritePayload> blocks;
@@ -8,6 +9,7 @@ class WorkoutWriteCommand {
   const WorkoutWriteCommand({
     required this.id,
     required this.name,
+    required this.description,
     required this.translations,
     required this.status,
     required this.blocks,
@@ -39,6 +41,7 @@ class WorkoutWriteCommand {
     return WorkoutWriteCommand(
       id: json['id'] as String?,
       name: json['name'] as String? ?? '',
+      description: json['description'] as String?,
       translations: translations,
       status: json['status'] as String? ?? 'active',
       blocks: blocks,
@@ -54,6 +57,10 @@ class WorkoutWriteCommand {
       'status': status,
       'blocks': blocks.map((block) => block.toJson()).toList(),
     };
+
+    if (description != null && description!.isNotEmpty) {
+      payload['description'] = description;
+    }
 
     if (includeId && id != null && id!.isNotEmpty) {
       payload['id'] = id;

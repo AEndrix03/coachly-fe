@@ -29,6 +29,7 @@ class WorkoutWriteCommandMapper {
     return WorkoutWriteCommand(
       id: workoutId,
       name: name,
+      description: description,
       translations: translations,
       status: 'active',
       blocks: [
@@ -73,10 +74,15 @@ class WorkoutWriteCommandMapper {
         translations['it']?.title ??
         translations.values.firstOrNull?.title ??
         workout.id;
+    final fallbackDescription =
+        _nullIfBlank(workout.descriptionI18n?['en']) ??
+        _nullIfBlank(workout.descriptionI18n?['it']) ??
+        _nullIfBlank(workout.descriptionI18n?.values.firstOrNull);
 
     return WorkoutWriteCommand(
       id: workout.id,
       name: fallbackName,
+      description: fallbackDescription,
       translations: translations,
       status: workout.delete
           ? 'archived'

@@ -21,22 +21,42 @@ class InputBar extends ConsumerStatefulWidget {
 
 class _InputBarState extends ConsumerState<InputBar> {
   late final TextEditingController _controller;
+  late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _focusNode = FocusNode();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final notifier = ref.read(aiCoachProvider.notifier);
+
+    // When voice listening ends with a transcript, populate the text field.
+    ref.listen<AsyncValue<AiCoachState>>(aiCoachProvider, (prev, next) {
+      final prevState = prev?.value;
+      final nextState = next.value;
+      if (nextState == null) return;
+      final justFinished =
+          (prevState?.isListening ?? false) && !nextState.isListening;
+      if (justFinished && nextState.voiceTranscript.isNotEmpty) {
+        _controller.text = nextState.voiceTranscript;
+        _controller.selection = TextSelection.fromPosition(
+          TextPosition(offset: _controller.text.length),
+        );
+        notifier.clearVoiceTranscript();
+        _focusNode.requestFocus();
+      }
+    });
 
     return Container(
       color: AiCoachTheme.bgPrimary,
@@ -121,6 +141,7 @@ class _InputBarState extends ConsumerState<InputBar> {
                   ),
                   child: TextField(
                     controller: _controller,
+                    focusNode: _focusNode,
                     enabled: !widget.isGenerating,
                     style: const TextStyle(
                       fontSize: 13,

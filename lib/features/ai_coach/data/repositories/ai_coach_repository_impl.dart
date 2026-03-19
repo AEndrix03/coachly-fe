@@ -103,26 +103,75 @@ class AiCoachRepositoryImpl implements AiCoachRepository {
         .replaceAll('```', '')
         .trim();
 
-    try {
-      final dynamic parsed = jsonDecode(sanitized);
-      if (parsed is Map<String, dynamic>) {
-        return parsed;
-      }
-    } catch (_) {
-      // Try extracting the first valid JSON object.
+    // 1. Direct parse (happy path).
+    var result = _tryDecode(sanitized);
+    if (result != null) return result;
+
+    // 2. Extract the first {...} block and try again.
+    final blockMatch =
+        RegExp(r'\{[\s\S]*\}', multiLine: true).firstMatch(sanitized);
+    if (blockMatch != null) {
+      final block = blockMatch.group(0)!;
+
+      result = _tryDecode(block);
+      if (result != null) return result;
+
+      // 3. Fix unquoted keys (e.g. {message: "..."} → {"message": "..."}).
+      result = _tryDecode(_fixUnquotedKeys(block));
+      if (result != null) return result;
+
+      // 4. Truncated JSON: close any unclosed objects and try once more.
+      result = _tryDecode(_closeJson(block));
+      if (result != null) return result;
     }
 
-    final match = RegExp(r'\{[\s\S]*\}', multiLine: true).firstMatch(sanitized);
-    if (match == null) {
-      return null;
+    // 5. Last resort: pull the message value directly via regex so the
+    //    user at least sees a response even when the JSON is mangled.
+    final msgMatch =
+        RegExp(r'"message"\s*:\s*"((?:[^"\\]|\\.)*)"').firstMatch(sanitized);
+    if (msgMatch != null) {
+      return {'message': msgMatch.group(1)!, 'insight_card': null};
     }
 
+    return null;
+  }
+
+  Map<String, dynamic>? _tryDecode(String json) {
     try {
-      final dynamic parsed = jsonDecode(match.group(0)!);
+      final dynamic parsed = jsonDecode(json);
       return parsed is Map<String, dynamic> ? parsed : null;
     } catch (_) {
       return null;
     }
+  }
+
+  /// Adds double-quotes around bareword JSON keys.
+  String _fixUnquotedKeys(String json) {
+    return json.replaceAllMapped(
+      RegExp(r'([\{,])\s*([A-Za-z_][A-Za-z0-9_]*)\s*:'),
+      (m) => '${m.group(1)}"${m.group(2)}":',
+    );
+  }
+
+  /// Attempts to close truncated JSON by counting braces.
+  String _closeJson(String json) {
+    var open = 0;
+    for (final ch in json.runes) {
+      if (ch == 0x7B) open++; // '{'
+      if (ch == 0x7D) open--; // '}'
+    }
+    if (open <= 0) return json;
+    final buf = StringBuffer(json);
+    // Close any open string first (model may have been cut mid-value).
+    if (!json.trimRight().endsWith('"') &&
+        !json.trimRight().endsWith('}') &&
+        !json.trimRight().endsWith('null')) {
+      buf.write('"');
+    }
+    for (var i = 0; i < open; i++) {
+      buf.write('}');
+    }
+    return buf.toString();
   }
 }
 
