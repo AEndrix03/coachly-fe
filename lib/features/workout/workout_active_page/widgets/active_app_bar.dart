@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,6 +75,9 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
     final totalExercises = ref.watch(
       activeWorkoutProvider(widget.workoutId).select((s) => s.totalExercises),
     );
+    final isBellEnabled = ref.watch(
+      restTimerProvider.select((timer) => timer.isBellEnabled),
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -144,11 +148,37 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
                                   ],
                                 ),
                               ),
+                              const Spacer(),
+                              IconButton(
+                                tooltip: isBellEnabled
+                                    ? context.tr('session.bell_on')
+                                    : context.tr('session.bell_off'),
+                                visualDensity: VisualDensity.compact,
+                                onPressed: () {
+                                  ref
+                                      .read(restTimerProvider.notifier)
+                                      .toggleBell();
+                                },
+                                icon: Icon(
+                                  isBellEnabled
+                                      ? Icons.notifications_active_rounded
+                                      : Icons.notifications_off_rounded,
+                                  size: 20,
+                                  color: isBellEnabled
+                                      ? scheme.primary
+                                      : scheme.onSurface.withValues(
+                                          alpha: 0.55,
+                                        ),
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '$totalExercises esercizi',
+                            context.tr(
+                              'session.exercise_count',
+                              params: {'count': '$totalExercises'},
+                            ),
                             style: TextStyle(
                               color: scheme.onSurface.withValues(alpha: 0.68),
                               fontSize: 12,
@@ -221,19 +251,30 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
             ),
           ),
           const SizedBox(width: 10),
-          OutlinedButton.icon(
-            onPressed: () => ref.read(restTimerProvider.notifier).addTime(15),
-            icon: const Icon(Icons.add_rounded, size: 16),
-            label: const Text('+15s'),
+          OutlinedButton(
+            onPressed: () => ref.read(restTimerProvider.notifier).addTime(-10),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: scheme.onSurface.withValues(alpha: 0.82),
+              side: BorderSide(
+                color: scheme.outlineVariant.withValues(alpha: 0.8),
+              ),
+              visualDensity: VisualDensity.compact,
+            ),
+            child: const Text('-10s'),
+          ),
+          const SizedBox(width: 6),
+          OutlinedButton(
+            onPressed: () => ref.read(restTimerProvider.notifier).addTime(10),
             style: OutlinedButton.styleFrom(
               foregroundColor: scheme.primary,
               side: BorderSide(color: scheme.primary.withValues(alpha: 0.5)),
               visualDensity: VisualDensity.compact,
             ),
+            child: const Text('+10s'),
           ),
           const Spacer(),
           IconButton(
-            tooltip: 'Ferma timer',
+            tooltip: context.tr('session.stop_timer'),
             onPressed: () => ref.read(restTimerProvider.notifier).stopTimer(),
             icon: Icon(
               Icons.close_rounded,
@@ -300,20 +341,20 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
           _menuItem(
             value: 'notes',
             icon: Icons.sticky_note_2_outlined,
-            label: 'Note allenamento',
+            label: context.tr('session.notes'),
             color: scheme.onSurface,
           ),
           _menuItem(
             value: 'history',
             icon: Icons.history_toggle_off_rounded,
-            label: 'Storico scheda',
+            label: context.tr('session.history'),
             color: scheme.onSurface,
           ),
           const PopupMenuDivider(height: 1),
           _menuItem(
             value: 'discard',
             icon: Icons.delete_sweep_rounded,
-            label: 'Termina e scarta',
+            label: context.tr('session.finish_discard'),
             color: scheme.error,
           ),
         ],
@@ -346,11 +387,10 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
   Future<void> _showCancelDialog(BuildContext context) async {
     final result = await showAppConfirmationDialog(
       context,
-      title: 'Vuoi uscire dalla sessione?',
-      content:
-          'Se esci ora, i progressi della sessione corrente non verranno salvati.',
-      cancelLabel: 'Resta nella sessione',
-      confirmLabel: 'Esci senza salvare',
+      title: context.tr('session.exit_title'),
+      content: context.tr('session.exit_content'),
+      cancelLabel: context.tr('session.stay'),
+      confirmLabel: context.tr('session.exit_without_save'),
       destructive: true,
       icon: Icons.warning_amber_rounded,
     );
@@ -363,9 +403,9 @@ class _ActiveAppBarState extends ConsumerState<ActiveAppBar> {
   Future<void> _showDiscardDialog(BuildContext context) async {
     final result = await showAppConfirmationDialog(
       context,
-      title: 'Terminare e scartare?',
-      content: 'Tutti i dati di questo allenamento verranno eliminati.',
-      confirmLabel: 'Scarta',
+      title: context.tr('session.discard_title'),
+      content: context.tr('session.discard_content'),
+      confirmLabel: context.tr('session.discard_confirm'),
       destructive: true,
       icon: Icons.delete_sweep_rounded,
     );

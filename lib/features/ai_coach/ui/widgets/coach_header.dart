@@ -1,4 +1,5 @@
 import 'package:coachly/features/ai_coach/ui/theme/ai_coach_theme.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class CoachHeader extends StatefulWidget {
@@ -44,8 +45,8 @@ class _CoachHeaderState extends State<CoachHeader>
   @override
   Widget build(BuildContext context) {
     final statusText = widget.isModelLoading
-        ? 'Caricamento AI Coach...'
-        : 'Monitora il tuo workout';
+        ? context.tr('ai.loading')
+        : context.tr('ai.monitor_workout');
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 6, 12, 8),
@@ -104,8 +105,8 @@ class _CoachHeaderState extends State<CoachHeader>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'AI Coach',
+                Text(
+                  context.tr('nav.coach'),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,

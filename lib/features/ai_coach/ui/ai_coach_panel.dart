@@ -12,6 +12,7 @@ import 'package:coachly/features/ai_coach/ui/widgets/message_bubble.dart';
 import 'package:coachly/features/ai_coach/ui/widgets/quick_actions_row.dart';
 import 'package:coachly/features/ai_coach/ui/widgets/suggestions_row.dart';
 import 'package:coachly/features/ai_coach/ui/widgets/voice_overlay.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -197,10 +198,13 @@ class _LoadingMessages extends StatelessWidget {
           child: CircularProgressIndicator(color: AiCoachTheme.accentBlue),
         ),
         const SizedBox(height: 12),
-        const Center(
+        Center(
           child: Text(
-            'Caricamento AI Coach...',
-            style: TextStyle(color: AiCoachTheme.textSecondary, fontSize: 12),
+            context.tr('ai.loading'),
+            style: const TextStyle(
+              color: AiCoachTheme.textSecondary,
+              fontSize: 12,
+            ),
           ),
         ),
         const SizedBox(height: 16),

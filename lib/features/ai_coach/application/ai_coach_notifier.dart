@@ -5,6 +5,9 @@ import 'package:coachly/features/ai_coach/data/services/context_assembler_servic
 import 'package:coachly/features/ai_coach/data/services/stt_service.dart';
 import 'package:coachly/features/ai_coach/domain/models/coach_message.dart';
 import 'package:coachly/features/ai_coach/domain/models/workout_context.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -65,8 +68,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
       messages: [
         CoachMessage(
           id: _nextId('ai'),
-          text:
-              'Sono pronto. Dimmi come ti senti in questo set e ti guido subito.',
+          text: _tr('ai.default_opening'),
           sender: MessageSender.ai,
           timestamp: DateTime.now(),
         ),
@@ -86,8 +88,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
     if (!ready) {
       final warning = CoachMessage(
         id: _nextId('ai'),
-        text:
-            'Modello non disponibile ora. Uso risposte locali semplificate offline.',
+        text: _tr('ai.model_unavailable'),
         sender: MessageSender.ai,
         timestamp: DateTime.now(),
       );
@@ -133,6 +134,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
       await for (final token in repository.streamResponse(
         context: context,
         userMessage: trimmed,
+        languageCode: _languageCode,
       )) {
         streamBuffer.write(token);
         _replaceMessageText(aiPlaceholder.id, streamBuffer.toString());
@@ -142,6 +144,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
         raw: streamBuffer.toString(),
         id: aiPlaceholder.id,
         timestamp: DateTime.now(),
+        languageCode: _languageCode,
       );
 
       final messages = _current.messages
@@ -159,8 +162,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
     } catch (_) {
       final fallback = CoachMessage(
         id: aiPlaceholder.id,
-        text:
-            'Non ho completato la risposta. Riprova con una richiesta piu breve.',
+        text: _tr('ai.retry_short'),
         sender: MessageSender.ai,
         timestamp: DateTime.now(),
       );
@@ -193,6 +195,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
     final stt = ref.read(sttServiceProvider);
 
     await stt.startListening(
+      localeId: _speechLocaleId,
       onPartialResult: (partial) {
         if (!ref.mounted) {
           return;
@@ -270,43 +273,89 @@ class AiCoachNotifier extends _$AiCoachNotifier {
 
   List<String> _buildSuggestions(CoachMessage message, WorkoutContext context) {
     final text = message.text.toLowerCase();
+    final italian = _isItalian;
 
-    if (text.contains('fatica') || text.contains('recupero')) {
-      return const [
-        'Taglio 2.5 kg nel prossimo set?',
-        'Quanto recupero mi consigli adesso?',
-        'Meglio chiudere con back-off set?',
-      ];
+    if (text.contains('fatica') ||
+        text.contains('recupero') ||
+        text.contains('fatigue') ||
+        text.contains('recovery')) {
+      return italian
+          ? const [
+              'Taglio 2.5 kg nel prossimo set?',
+              'Quanto recupero mi consigli adesso?',
+              'Meglio chiudere con back-off set?',
+            ]
+          : const [
+              'Should I drop 2.5 kg in the next set?',
+              'How much rest do you suggest now?',
+              'Should I finish with a back-off set?',
+            ];
     }
 
-    if (text.contains('tecnica') || text.contains('forma')) {
-      return const [
-        'Dammi 3 cue tecnici rapidi',
-        'Meglio rallentare eccentrica?',
-        'Posso aumentare ROM in sicurezza?',
-      ];
+    if (text.contains('tecnica') ||
+        text.contains('forma') ||
+        text.contains('technique') ||
+        text.contains('form')) {
+      return italian
+          ? const [
+              'Dammi 3 cue tecnici rapidi',
+              'Meglio rallentare eccentrica?',
+              'Posso aumentare ROM in sicurezza?',
+            ]
+          : const [
+              'Give me 3 quick technique cues',
+              'Should I slow down the eccentric?',
+              'Can I increase ROM safely?',
+            ];
     }
 
-    return [
-      'Come ottimizzo il prossimo set di ${context.exerciseName}?',
-      'Mostrami trend carichi ultime sessioni',
-      'Indicami un target reps realistico ora',
-    ];
+    return italian
+        ? [
+            'Come ottimizzo il prossimo set di ${context.exerciseName}?',
+            'Mostrami trend carichi ultime sessioni',
+            'Indicami un target reps realistico ora',
+          ]
+        : [
+            'How do I optimize the next set on ${context.exerciseName}?',
+            'Show me the load trend from recent sessions',
+            'Suggest a realistic reps target now',
+          ];
   }
 
   String _templateFor(QuickActionType action, WorkoutContext context) {
+    final italian = _isItalian;
     switch (action) {
       case QuickActionType.adjustWeight:
-        return 'Devo aggiustare il peso nel set ${context.currentSet}/${context.totalSets}?';
+        return italian
+            ? 'Devo aggiustare il peso nel set ${context.currentSet}/${context.totalSets}?'
+            : 'Should I adjust the load on set ${context.currentSet}/${context.totalSets}?';
       case QuickActionType.showProgress:
-        return 'Fammi un recap dei progressi su ${context.exerciseName}.';
+        return italian
+            ? 'Fammi un recap dei progressi su ${context.exerciseName}.'
+            : 'Give me a quick progress recap on ${context.exerciseName}.';
       case QuickActionType.fatigueCheck:
-        return 'Valuta la mia fatica adesso e suggerisci recupero.';
+        return italian
+            ? 'Valuta la mia fatica adesso e suggerisci recupero.'
+            : 'Assess my fatigue now and suggest recovery.';
       case QuickActionType.nextExercise:
-        return 'Sono pronto al prossimo esercizio o faccio un altro set?';
+        return italian
+            ? 'Sono pronto al prossimo esercizio o faccio un altro set?'
+            : 'Am I ready for the next exercise or should I do another set?';
       case QuickActionType.nutrition:
-        return 'Consiglio nutrizione post workout rapido in base a questa sessione.';
+        return italian
+            ? 'Consiglio nutrizione post workout rapido in base a questa sessione.'
+            : 'Give me a quick post-workout nutrition tip based on this session.';
     }
+  }
+
+  String get _languageCode =>
+      ref.read(languageProvider).languageCode.toLowerCase();
+  bool get _isItalian => _languageCode == 'it';
+  String get _speechLocaleId => _isItalian ? 'it_IT' : 'en_US';
+  Locale get _locale => _isItalian ? const Locale('it') : const Locale('en');
+
+  String _tr(String key, {Map<String, String> params = const {}}) {
+    return AppStrings.translate(key, locale: _locale, params: params);
   }
 
   String _nextId(String prefix) {

@@ -4,8 +4,8 @@ Future<bool> showAppConfirmationDialog(
   BuildContext context, {
   required String title,
   required String content,
-  String cancelLabel = 'Annulla',
-  String confirmLabel = 'Conferma',
+  String cancelLabel = 'Cancel',
+  String confirmLabel = 'Confirm',
   bool destructive = false,
   IconData? icon,
   bool barrierDismissible = true,
@@ -90,7 +90,7 @@ Future<void> showAppNoticeDialog(
   BuildContext context, {
   required String title,
   required String content,
-  String actionLabel = 'Chiudi',
+  String actionLabel = 'Close',
   IconData? icon,
 }) async {
   final scheme = Theme.of(context).colorScheme;

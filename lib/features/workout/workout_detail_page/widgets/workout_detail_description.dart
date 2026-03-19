@@ -1,3 +1,4 @@
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutDetailDescription extends StatelessWidget {
@@ -58,9 +59,9 @@ class WorkoutDetailDescription extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
-                  'Descrizione',
-                  style: TextStyle(
+                Text(
+                  context.tr('workout.description'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

@@ -1,4 +1,5 @@
 import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,7 +40,7 @@ class LoginPage extends ConsumerWidget {
                     ).animate().fade(duration: 900.ms).slideY(begin: -0.5),
                     const SizedBox(height: 16),
                     Text(
-                          'Coachly',
+                          context.tr('common.app_name'),
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                             textStyle: textTheme.displaySmall,
@@ -62,7 +63,7 @@ class LoginPage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Accedi con Keycloak',
+                            context.tr('auth.login.title'),
                             style: textTheme.titleLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -71,7 +72,7 @@ class LoginPage extends ConsumerWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Il login avviene nel browser di sistema con Authorization Code Flow e PKCE. L app non gestisce direttamente username e password.',
+                            context.tr('auth.login.description'),
                             style: textTheme.bodyMedium?.copyWith(
                               color: Colors.white70,
                               height: 1.5,
@@ -87,7 +88,7 @@ class LoginPage extends ConsumerWidget {
                               border: Border.all(color: Colors.white12),
                             ),
                             child: Text(
-                              'Se il client Keycloak e le redirect URI sono configurati correttamente, dopo il login torni automaticamente nell app.',
+                              context.tr('auth.login.configuration_hint'),
                               style: textTheme.bodyMedium?.copyWith(
                                 color: Colors.white70,
                                 height: 1.45,
@@ -126,7 +127,7 @@ class LoginPage extends ConsumerWidget {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text('Continua con Keycloak'),
+                                : Text(context.tr('auth.login.cta')),
                           ),
                         ],
                       ),

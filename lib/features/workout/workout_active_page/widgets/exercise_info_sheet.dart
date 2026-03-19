@@ -1,3 +1,4 @@
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseInfoSheet extends StatelessWidget {
@@ -63,9 +64,9 @@ class ExerciseInfoSheet extends StatelessWidget {
                   ],
                 ),
 
-                const Text(
-                  'Informazioni dettagliate sull\'esercizio.',
-                  style: TextStyle(
+                Text(
+                  context.tr('exercise.detail_info'),
+                  style: const TextStyle(
                     color: Colors.white54,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -104,9 +105,9 @@ class ExerciseInfoSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Tecnica',
-                        style: TextStyle(
+                      Text(
+                        context.tr('exercise.technique'),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -145,9 +146,9 @@ class ExerciseInfoSheet extends StatelessWidget {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        child: const Text(
-                          'Video Tutorial',
-                          style: TextStyle(
+                        child: Text(
+                          context.tr('exercise.video_tutorial'),
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -167,9 +168,9 @@ class ExerciseInfoSheet extends StatelessWidget {
                           ),
                           elevation: 0,
                         ),
-                        child: const Text(
-                          'Dettagli Completi',
-                          style: TextStyle(
+                        child: Text(
+                          context.tr('exercise.full_details'),
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),

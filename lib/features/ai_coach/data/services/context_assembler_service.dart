@@ -5,6 +5,7 @@ import 'package:coachly/features/workout/workout_active_page/providers/active_wo
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'context_assembler_service.g.dart';
@@ -19,7 +20,10 @@ WorkoutContext currentWorkoutContext(Ref ref) {
 
   if (activeState.exercises.isEmpty) {
     return WorkoutContext(
-      exerciseName: 'Esercizio in caricamento',
+      exerciseName: AppStrings.translate(
+        'ai.context_loading_exercise',
+        locale: locale,
+      ),
       currentSet: 1,
       totalSets: 1,
       weightKg: 0,

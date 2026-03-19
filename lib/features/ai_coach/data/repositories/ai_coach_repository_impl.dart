@@ -5,6 +5,8 @@ import 'package:coachly/features/ai_coach/domain/models/coach_message.dart';
 import 'package:coachly/features/ai_coach/domain/models/insight_card.dart';
 import 'package:coachly/features/ai_coach/domain/models/workout_context.dart';
 import 'package:coachly/features/ai_coach/domain/repositories/ai_coach_repository.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'ai_coach_repository_impl.g.dart';
@@ -23,8 +25,13 @@ class AiCoachRepositoryImpl implements AiCoachRepository {
   Stream<String> streamResponse({
     required WorkoutContext context,
     required String userMessage,
+    required String languageCode,
   }) {
-    return _gemmaService.generate(context: context, userMessage: userMessage);
+    return _gemmaService.generate(
+      context: context,
+      userMessage: userMessage,
+      languageCode: languageCode,
+    );
   }
 
   @override
@@ -32,13 +39,17 @@ class AiCoachRepositoryImpl implements AiCoachRepository {
     required String raw,
     required String id,
     required DateTime timestamp,
+    required String languageCode,
   }) {
+    final locale = languageCode.toLowerCase() == 'it'
+        ? const Locale('it')
+        : const Locale('en');
     final decoded = _decodeJson(raw);
     if (decoded == null) {
       return CoachMessage(
         id: id,
         text: raw.trim().isEmpty
-            ? 'Riformula in breve: posso darti un consiglio pratico adesso.'
+            ? AppStrings.translate('ai.json_fallback', locale: locale)
             : raw.trim(),
         sender: MessageSender.ai,
         timestamp: timestamp,
@@ -69,7 +80,7 @@ class AiCoachRepositoryImpl implements AiCoachRepository {
       id: id,
       text: message?.isNotEmpty == true
           ? message!
-          : 'Ti seguo in tempo reale: mantieni controllo e qualita tecnica.',
+          : AppStrings.translate('ai.message_fallback', locale: locale),
       sender: MessageSender.ai,
       timestamp: timestamp,
       insightCard: insight,

@@ -1,5 +1,6 @@
 import 'package:coachly/features/workout/shared/widgets/workout_exercise_view_card.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutDetailExerciseListSection extends StatelessWidget {
@@ -41,10 +42,10 @@ class WorkoutDetailExerciseListSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Esercizi',
-                  style: TextStyle(
+                  context.tr('common.exercises'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
@@ -71,7 +72,10 @@ class WorkoutDetailExerciseListSection extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  '${exercises.length} esercizi',
+                  context.tr(
+                    'workout.organize.exercises_count',
+                    params: {'count': '${exercises.length}'},
+                  ),
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 12,

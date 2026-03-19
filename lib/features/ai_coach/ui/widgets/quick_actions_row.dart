@@ -1,5 +1,6 @@
 import 'package:coachly/features/ai_coach/application/ai_coach_notifier.dart';
 import 'package:coachly/features/ai_coach/ui/theme/ai_coach_theme.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,11 +19,31 @@ class _QuickActionsRowState extends ConsumerState<QuickActionsRow> {
   @override
   Widget build(BuildContext context) {
     final actions = <({String icon, String label, QuickActionType type})>[
-      (icon: '??', label: 'AGGIUSTA', type: QuickActionType.adjustWeight),
-      (icon: '??', label: 'PROGRESSI', type: QuickActionType.showProgress),
-      (icon: '??', label: 'FATICA', type: QuickActionType.fatigueCheck),
-      (icon: '?', label: 'PROSSIMO', type: QuickActionType.nextExercise),
-      (icon: '??', label: 'NUTRIZIONE', type: QuickActionType.nutrition),
+      (
+        icon: '??',
+        label: context.tr('ai.quick.adjust'),
+        type: QuickActionType.adjustWeight,
+      ),
+      (
+        icon: '??',
+        label: context.tr('ai.quick.progress'),
+        type: QuickActionType.showProgress,
+      ),
+      (
+        icon: '??',
+        label: context.tr('ai.quick.fatigue'),
+        type: QuickActionType.fatigueCheck,
+      ),
+      (
+        icon: '?',
+        label: context.tr('ai.quick.next'),
+        type: QuickActionType.nextExercise,
+      ),
+      (
+        icon: '??',
+        label: context.tr('ai.quick.nutrition'),
+        type: QuickActionType.nutrition,
+      ),
     ];
 
     return SizedBox(

@@ -1,3 +1,4 @@
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class RestCompleteDialog extends StatelessWidget {
@@ -51,7 +52,7 @@ class RestCompleteDialog extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             Text(
-              'Riposo terminato',
+              context.tr('session.rest_complete_title'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: scheme.onSurface,
@@ -61,7 +62,7 @@ class RestCompleteDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Sei pronto per la prossima serie.',
+              context.tr('session.rest_complete_body'),
               style: TextStyle(
                 color: scheme.onSurface.withValues(alpha: 0.72),
                 fontSize: 14,
@@ -74,9 +75,12 @@ class RestCompleteDialog extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.play_circle_fill_rounded, size: 20),
-                label: const Text(
-                  'Continua',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                label: Text(
+                  context.tr('session.continue'),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: scheme.primary,

@@ -1,4 +1,5 @@
 import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,18 +26,18 @@ class OfflineModeBanner extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Modalità Offline',
-                  style: TextStyle(
+                Text(
+                  context.tr('offline.mode'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                   ),
                 ),
                 if (!authState!.isTokenValid)
-                  const Text(
-                    'Sessione scaduta. Riconnettiti per sincronizzare.',
-                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                  Text(
+                    context.tr('offline.session_expired'),
+                    style: const TextStyle(color: Colors.white70, fontSize: 11),
                   ),
               ],
             ),

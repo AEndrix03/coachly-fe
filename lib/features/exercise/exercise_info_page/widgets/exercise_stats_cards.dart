@@ -1,3 +1,4 @@
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseStatsCards extends StatelessWidget {
@@ -21,7 +22,7 @@ class ExerciseStatsCards extends StatelessWidget {
           Expanded(
             child: _buildStatCard(
               icon: Icons.fitness_center,
-              label: 'Difficoltà',
+              label: context.tr('exercise.difficulty'),
               value: difficulty,
               color: const Color(0xFF2196F3),
               gradientColors: [
@@ -34,7 +35,7 @@ class ExerciseStatsCards extends StatelessWidget {
           Expanded(
             child: _buildStatCard(
               icon: Icons.sync_alt,
-              label: 'Meccanica',
+              label: context.tr('exercise.mechanics'),
               value: mechanics,
               color: const Color(0xFF9C27B0),
               gradientColors: [
@@ -47,7 +48,7 @@ class ExerciseStatsCards extends StatelessWidget {
           Expanded(
             child: _buildStatCard(
               icon: Icons.bolt,
-              label: 'Tipo',
+              label: context.tr('exercise.type'),
               value: type,
               color: const Color(0xFFFF5252),
               gradientColors: [
@@ -73,7 +74,10 @@ class ExerciseStatsCards extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [

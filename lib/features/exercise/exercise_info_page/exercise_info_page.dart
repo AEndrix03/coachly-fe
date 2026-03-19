@@ -6,6 +6,7 @@ import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exe
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,7 +49,8 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
         child: state.hasError
             ? _ErrorState(
                 key: const ValueKey('error'),
-                message: state.errorMessage ?? 'Errore sconosciuto',
+                message:
+                    state.errorMessage ?? context.tr('exercise.unknown_error'),
                 onRetry: () => ref
                     .read(exerciseInfoProvider.notifier)
                     .loadExerciseDetail(widget.id),
@@ -172,9 +174,9 @@ class _ErrorState extends StatelessWidget {
                       color: Color(0xFFFF5252),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Impossibile caricare',
-                      style: TextStyle(
+                    Text(
+                      context.tr('exercise.load_failed'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
@@ -204,9 +206,9 @@ class _ErrorState extends StatelessWidget {
                             colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
                           ),
                         ),
-                        child: const Text(
-                          'Riprova',
-                          style: TextStyle(
+                        child: Text(
+                          context.tr('exercise.retry'),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -236,9 +238,10 @@ class _ContentState extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final locale = ref.watch(languageProvider);
     final name =
-        exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? 'Esercizio';
-    final description =
-        exercise.descriptionI18n?.fromI18n(locale)?.trim() ?? '';
+        exercise.nameI18n?.fromI18n(locale) ??
+        exercise.id ??
+        context.tr('exercise.fallback_name');
+    final description = exercise.descriptionI18n?.fromI18n(locale).trim() ?? '';
     final video = exercise.media?.firstWhereOrNull(
       (m) => m.mediaType == 'video',
     );
@@ -271,7 +274,7 @@ class _ContentState extends ConsumerWidget {
                   _SectionBlock(
                     icon: Icons.menu_book_rounded,
                     color: const Color(0xFF2196F3),
-                    title: 'Descrizione',
+                    title: context.tr('workout.description'),
                     child: Text(
                       description,
                       style: TextStyle(
@@ -287,7 +290,7 @@ class _ContentState extends ConsumerWidget {
                   _SectionBlock(
                     icon: Icons.fitness_center_rounded,
                     color: const Color(0xFF9C27B0),
-                    title: 'Muscoli coinvolti',
+                    title: context.tr('exercise.muscles_involved'),
                     child: _MusclesList(muscles: muscles, locale: locale),
                   ),
                   const SizedBox(height: 20),
@@ -296,7 +299,7 @@ class _ContentState extends ConsumerWidget {
                   _SectionBlock(
                     icon: Icons.warning_rounded,
                     color: const Color(0xFFFF9800),
-                    title: 'Consigli di sicurezza',
+                    title: context.tr('exercise.safety_tips'),
                     child: _SafetyList(safety: safety, locale: locale),
                   ),
                   const SizedBox(height: 20),
@@ -305,7 +308,7 @@ class _ContentState extends ConsumerWidget {
                   _SectionBlock(
                     icon: Icons.build_rounded,
                     color: const Color(0xFF00BCD4),
-                    title: 'Attrezzatura',
+                    title: context.tr('exercise.equipment'),
                     child: _EquipmentList(
                       equipments: equipments,
                       locale: locale,
@@ -317,7 +320,7 @@ class _ContentState extends ConsumerWidget {
                   _SectionBlock(
                     icon: Icons.swap_horiz_rounded,
                     color: const Color(0xFF4CAF50),
-                    title: 'Varianti',
+                    title: context.tr('exercise.variants'),
                     child: _VariantsList(variants: variants, locale: locale),
                   ),
                 ],
@@ -330,7 +333,7 @@ class _ContentState extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 48),
                       child: Text(
-                        'Nessuna informazione disponibile.',
+                        context.tr('exercise.no_information'),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.4),
                           fontSize: 14,
@@ -436,25 +439,25 @@ class _ExerciseHero extends StatelessWidget {
                 children: [
                   if (difficulty != null)
                     _HeroChip(
-                      label: _difficultyLabel(difficulty!),
+                      label: _difficultyLabel(context, difficulty!),
                       icon: Icons.whatshot_rounded,
                       color: _difficultyColor(difficulty!),
                     ),
                   if (mechanics != null)
                     _HeroChip(
-                      label: _mechanicsLabel(mechanics!),
+                      label: _mechanicsLabel(context, mechanics!),
                       icon: Icons.sync_alt_rounded,
                       color: Colors.white.withValues(alpha: 0.85),
                     ),
                   if (forceType != null)
                     _HeroChip(
-                      label: _forceLabel(forceType!),
+                      label: _forceLabel(context, forceType!),
                       icon: Icons.bolt_rounded,
                       color: const Color(0xFFFFD740),
                     ),
                   if (isBodyweight)
                     _HeroChip(
-                      label: 'Corpo libero',
+                      label: context.tr('exercise.bodyweight'),
                       icon: Icons.self_improvement_rounded,
                       color: const Color(0xFF69F0AE),
                     ),
@@ -467,12 +470,13 @@ class _ExerciseHero extends StatelessWidget {
     );
   }
 
-  String _difficultyLabel(String raw) => switch (raw.toLowerCase()) {
-    'beginner' => 'Principiante',
-    'intermediate' => 'Intermedio',
-    'advanced' => 'Avanzato',
-    _ => raw,
-  };
+  String _difficultyLabel(BuildContext context, String raw) =>
+      switch (raw.toLowerCase()) {
+        'beginner' => context.tr('exercise.difficulty.beginner'),
+        'intermediate' => context.tr('exercise.difficulty.intermediate'),
+        'advanced' => context.tr('exercise.difficulty.advanced'),
+        _ => raw,
+      };
 
   Color _difficultyColor(String raw) => switch (raw.toLowerCase()) {
     'beginner' => const Color(0xFF69F0AE),
@@ -481,20 +485,22 @@ class _ExerciseHero extends StatelessWidget {
     _ => Colors.white70,
   };
 
-  String _mechanicsLabel(String raw) => switch (raw.toLowerCase()) {
-    'compound' => 'Composto',
-    'isolation' => 'Isolamento',
-    _ => raw,
-  };
+  String _mechanicsLabel(BuildContext context, String raw) =>
+      switch (raw.toLowerCase()) {
+        'compound' => context.tr('exercise.mechanics.compound'),
+        'isolation' => context.tr('exercise.mechanics.isolation'),
+        _ => raw,
+      };
 
-  String _forceLabel(String raw) => switch (raw.toLowerCase()) {
-    'push' => 'Spinta',
-    'pull' => 'Trazione',
-    'legs' => 'Gambe',
-    'core' => 'Core',
-    'static' => 'Statico',
-    _ => raw,
-  };
+  String _forceLabel(BuildContext context, String raw) =>
+      switch (raw.toLowerCase()) {
+        'push' => context.tr('exercise.force.push'),
+        'pull' => context.tr('exercise.force.pull'),
+        'legs' => context.tr('exercise.force.legs'),
+        'core' => context.tr('exercise.force.core'),
+        'static' => context.tr('exercise.force.static'),
+        _ => raw,
+      };
 }
 
 class _HeroChip extends StatelessWidget {
@@ -623,7 +629,8 @@ class _MusclesList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: sorted.asMap().entries.map((entry) {
         final m = entry.value;
-        final name = m.muscle?.nameI18n.fromI18n(locale) ?? 'N/A';
+        final name =
+            m.muscle?.nameI18n.fromI18n(locale) ?? context.tr('common.na');
         final activation = m.activationPercentage ?? 0;
         final isLast = entry.key == sorted.length - 1;
         return Padding(
@@ -781,7 +788,8 @@ class _VariantsList extends StatelessWidget {
       children: variants.asMap().entries.map((entry) {
         final v = entry.value;
         final isLast = entry.key == variants.length - 1;
-        final name = v.nameI18n?.fromI18n(locale) ?? v.id ?? 'N/A';
+        final name =
+            v.nameI18n?.fromI18n(locale) ?? v.id ?? context.tr('common.na');
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

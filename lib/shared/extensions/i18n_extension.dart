@@ -2,20 +2,44 @@ import 'package:flutter/material.dart';
 
 extension I18nExtension on Map<String, String> {
   String fromI18n(Locale locale) {
-    final languageCodeWithCountry =
-        '${locale.languageCode}_${locale.countryCode}';
-    if (this[languageCodeWithCountry] != null) {
-      return this[languageCodeWithCountry]!;
+    if (isEmpty) {
+      return '';
     }
-    if (this['en_EN'] != null) {
-      return this['en_EN']!;
+
+    final normalized = <String, String>{};
+    for (final entry in entries) {
+      final key = entry.key.toLowerCase().replaceAll('-', '_').trim();
+      final value = entry.value.trim();
+      if (value.isNotEmpty) {
+        normalized[key] = value;
+      }
     }
-    if (this['en_US'] != null) {
-      return this['en_US']!;
+
+    if (normalized.isEmpty) {
+      return '';
     }
-    if (values.isNotEmpty) {
-      return values.first;
+
+    final languageCode = locale.languageCode.toLowerCase();
+    final countryCode = locale.countryCode?.toLowerCase();
+    final fullLocaleKey = countryCode != null && countryCode.isNotEmpty
+        ? '${languageCode}_$countryCode'
+        : null;
+
+    final candidates = <String>[
+      if (fullLocaleKey != null) fullLocaleKey,
+      languageCode,
+      'en',
+      'en_us',
+      'en_en',
+    ];
+
+    for (final key in candidates) {
+      final resolved = normalized[key];
+      if (resolved != null && resolved.isNotEmpty) {
+        return resolved;
+      }
     }
-    return ''; // Fallback to an empty string if map is empty
+
+    return normalized.values.first;
   }
 }

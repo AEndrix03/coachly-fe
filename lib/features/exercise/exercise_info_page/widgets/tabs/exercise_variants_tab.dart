@@ -1,6 +1,7 @@
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_variant_model/exercise_variant_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,10 +13,10 @@ class ExerciseVariantsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (variants.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'Nessuna variante disponibile.',
-          style: TextStyle(color: Colors.white70),
+          context.tr('exercise.no_variants'),
+          style: const TextStyle(color: Colors.white70),
         ),
       );
     }
@@ -30,7 +31,11 @@ class ExerciseVariantsTab extends ConsumerWidget {
           ...variants.map(
             (variant) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _buildVariantCard(variant: variant, locale: locale),
+              child: _buildVariantCard(
+                context: context,
+                variant: variant,
+                locale: locale,
+              ),
             ),
           ),
         ],
@@ -39,6 +44,7 @@ class ExerciseVariantsTab extends ConsumerWidget {
   }
 
   Widget _buildVariantCard({
+    required BuildContext context,
     required ExerciseVariantModel variant,
     required Locale locale,
   }) {
@@ -52,7 +58,10 @@ class ExerciseVariantsTab extends ConsumerWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A2E),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 1,
+          ),
         ),
         child: Row(
           children: [
@@ -77,7 +86,7 @@ class ExerciseVariantsTab extends ConsumerWidget {
                   Text(
                     variant.nameI18n?.fromI18n(locale) ??
                         variant.id ??
-                        'N/A',
+                        context.tr('common.na'),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,
@@ -99,7 +108,7 @@ class ExerciseVariantsTab extends ConsumerWidget {
                       ),
                     ),
                     child: Text(
-                      variant.difficultyLevel ?? 'N/A',
+                      _difficultyLabel(context, variant.difficultyLevel),
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.6),
                         fontSize: 11,
@@ -119,5 +128,18 @@ class ExerciseVariantsTab extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _difficultyLabel(BuildContext context, String? raw) {
+    if (raw == null || raw.trim().isEmpty) {
+      return context.tr('common.na');
+    }
+
+    return switch (raw.toLowerCase()) {
+      'beginner' => context.tr('exercise.difficulty.beginner'),
+      'intermediate' => context.tr('exercise.difficulty.intermediate'),
+      'advanced' => context.tr('exercise.difficulty.advanced'),
+      _ => raw,
+    };
   }
 }

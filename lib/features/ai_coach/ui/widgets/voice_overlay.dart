@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:coachly/features/ai_coach/ui/theme/ai_coach_theme.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class VoiceOverlay extends StatefulWidget {
@@ -53,8 +54,8 @@ class _VoiceOverlayState extends State<VoiceOverlay>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'IN ASCOLTO...',
+              Text(
+                context.tr('ai.listening'),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -67,7 +68,7 @@ class _VoiceOverlayState extends State<VoiceOverlay>
               const SizedBox(height: 20),
               Text(
                 widget.voiceTranscript.isEmpty
-                    ? 'Parla adesso...'
+                    ? context.tr('ai.speak_now')
                     : widget.voiceTranscript,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
@@ -86,7 +87,7 @@ class _VoiceOverlayState extends State<VoiceOverlay>
                       foregroundColor: AiCoachTheme.textSecondary,
                       side: const BorderSide(color: AiCoachTheme.borderMid),
                     ),
-                    child: const Text('Annulla'),
+                    child: Text(context.tr('common.cancel')),
                   ),
                   const SizedBox(width: 10),
                   ElevatedButton(
@@ -95,7 +96,7 @@ class _VoiceOverlayState extends State<VoiceOverlay>
                       backgroundColor: AiCoachTheme.accentBlue,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Invia ?'),
+                    child: Text(context.tr('ai.send')),
                   ),
                 ],
               ),

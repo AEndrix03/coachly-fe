@@ -3,6 +3,7 @@ import 'package:coachly/features/workout/workout_organize_page/widgets/organize_
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
@@ -47,9 +48,9 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
           _buildHeader(context),
           TabBar(
             controller: _tabController,
-            tabs: const [
-              Tab(text: 'Schede Attive'),
-              Tab(text: 'Schede Non Attive'),
+            tabs: [
+              Tab(text: context.tr('workout.organize.active')),
+              Tab(text: context.tr('workout.organize.inactive')),
             ],
           ),
           Expanded(
@@ -122,10 +123,10 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
               ),
             ),
             const SizedBox(height: 16),
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(24, 8, 24, 16),
               child: Text(
-                'Organizza gli Allenamenti',
+                context.tr('workout.organize.title'),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 28,
@@ -146,12 +147,12 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
   ) {
     final locale = ref.watch(languageProvider);
     if (workouts.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(32),
+          padding: const EdgeInsets.all(32),
           child: Text(
-            'Nessuna scheda in questa categoria',
-            style: TextStyle(color: Colors.grey),
+            context.tr('workout.organize.empty'),
+            style: const TextStyle(color: Colors.grey),
           ),
         ),
       );
@@ -166,8 +167,11 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
           onDelete: () async {
             final confirmed = await _showConfirmationDialog(
               context,
-              'Conferma Eliminazione',
-              'Sei sicuro di voler eliminare la scheda "${workout.titleI18n?.fromI18n(locale) ?? ''}"?',
+              context.tr('workout.organize.delete_title'),
+              context.tr(
+                'workout.organize.delete_content',
+                params: {'name': workout.titleI18n?.fromI18n(locale) ?? ''},
+              ),
               destructive: true,
             );
             if (confirmed) {
@@ -175,11 +179,21 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             }
           },
           onToggleActive: (isActive) async {
-            final action = isActive ? 'attivare' : 'disattivare';
+            final action = context.tr(
+              isActive
+                  ? 'workout.organize.action_activate'
+                  : 'workout.organize.action_deactivate',
+            );
             final confirmed = await _showConfirmationDialog(
               context,
-              'Conferma Modifica Stato',
-              'Sei sicuro di voler $action la scheda "${workout.titleI18n?.fromI18n(locale) ?? ''}"?',
+              context.tr('workout.organize.status_title'),
+              context.tr(
+                'workout.organize.status_content',
+                params: {
+                  'action': action,
+                  'name': workout.titleI18n?.fromI18n(locale) ?? '',
+                },
+              ),
             );
             if (confirmed) {
               if (isActive) {
@@ -229,7 +243,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
   Widget _buildError(Object err) {
     return Center(
       child: ShadAlert(
-        title: const Text('Errore'),
+        title: Text(context.tr('common.error')),
         description: Text(err.toString()),
       ),
     );
@@ -246,7 +260,7 @@ Future<bool> _showConfirmationDialog(
     context,
     title: title,
     content: content,
-    confirmLabel: 'Conferma',
+    confirmLabel: context.tr('common.confirm'),
     destructive: destructive,
     icon: destructive
         ? Icons.delete_outline_rounded

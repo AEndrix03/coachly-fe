@@ -1,3 +1,4 @@
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/cards/stat_card.dart';
 import 'package:flutter/material.dart';
 
@@ -23,7 +24,7 @@ class WorkoutDetailStatsCards extends StatelessWidget {
             child: StatCard(
               icon: Icons.fitness_center,
               value: exercisesCount.toString(),
-              label: 'Esercizi',
+              label: context.tr('common.exercises'),
               borderColor: const Color(0xFF2196F3),
             ),
           ),
@@ -32,7 +33,7 @@ class WorkoutDetailStatsCards extends StatelessWidget {
             child: StatCard(
               icon: Icons.timer_outlined,
               value: duration,
-              label: 'Durata',
+              label: context.tr('workout.duration'),
               borderColor: const Color(0xFF9C27B0),
             ),
           ),
@@ -41,7 +42,7 @@ class WorkoutDetailStatsCards extends StatelessWidget {
             child: StatCard(
               icon: Icons.local_fire_department,
               value: focus,
-              label: 'Focus',
+              label: context.tr('workout.focus'),
               borderColor: const Color(0xFFFF9800),
             ),
           ),

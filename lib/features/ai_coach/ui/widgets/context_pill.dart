@@ -1,5 +1,6 @@
 import 'package:coachly/features/ai_coach/domain/models/workout_context.dart';
 import 'package:coachly/features/ai_coach/ui/theme/ai_coach_theme.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 class ContextPill extends StatefulWidget {
@@ -35,7 +36,9 @@ class _ContextPillState extends State<ContextPill>
     final minutesAgo = DateTime.now()
         .difference(widget.context.sessionStart)
         .inMinutes;
-    final timeAgo = minutesAgo <= 0 ? 'adesso' : '${minutesAgo}m fa';
+    final timeAgo = minutesAgo <= 0
+        ? context.tr('ai.now')
+        : context.tr('ai.minutes_ago', params: {'value': '$minutesAgo'});
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 6, 16, 8),
@@ -53,8 +56,8 @@ class _ContextPillState extends State<ContextPill>
               color: AiCoachTheme.accentBlue,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Text(
-              'LIVE',
+            child: Text(
+              context.tr('ai.live'),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 9,
@@ -66,7 +69,16 @@ class _ContextPillState extends State<ContextPill>
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '${widget.context.exerciseName} - Set ${widget.context.currentSet}/${widget.context.totalSets} - ${widget.context.weightKg.toStringAsFixed(1)} kg - $timeAgo',
+              context.tr(
+                'ai.context_line',
+                params: {
+                  'exercise': widget.context.exerciseName,
+                  'current': '${widget.context.currentSet}',
+                  'total': '${widget.context.totalSets}',
+                  'weight': widget.context.weightKg.toStringAsFixed(1),
+                  'time': timeAgo,
+                },
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(

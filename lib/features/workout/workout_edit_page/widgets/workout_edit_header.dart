@@ -1,3 +1,4 @@
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
@@ -104,7 +105,7 @@ class WorkoutEditHeader extends StatelessWidget {
               letterSpacing: 0.5,
             ),
             decoration: InputDecoration(
-              hintText: 'Nome scheda...',
+              hintText: context.tr('workout.edit.name_hint'),
               hintStyle: TextStyle(
                 color: Colors.white.withValues(alpha: 0.4),
                 fontSize: 28,
@@ -130,9 +131,9 @@ class WorkoutEditHeader extends StatelessWidget {
 
     final shouldExit = await showAppConfirmationDialog(
       context,
-      title: 'Modifiche non salvate',
-      content: 'Hai modifiche non salvate. Vuoi uscire senza salvare?',
-      confirmLabel: 'Esci',
+      title: context.tr('workout.edit.unsaved_title'),
+      content: context.tr('workout.edit.unsaved_content'),
+      confirmLabel: context.tr('workout.edit.exit'),
       destructive: true,
       icon: Icons.warning_amber_rounded,
     );

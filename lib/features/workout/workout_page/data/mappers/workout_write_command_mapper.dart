@@ -69,8 +69,8 @@ class WorkoutWriteCommandMapper {
     }
 
     final fallbackName =
-        translations['it']?.title ??
         translations['en']?.title ??
+        translations['it']?.title ??
         translations.values.firstOrNull?.title ??
         workout.id;
 

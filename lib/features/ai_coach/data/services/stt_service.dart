@@ -17,6 +17,7 @@ class SttService {
   bool get isListening => _speech.isListening;
 
   Future<void> startListening({
+    required String localeId,
     required void Function(String partial) onPartialResult,
     required void Function(String final_) onFinalResult,
     required void Function() onError,
@@ -46,7 +47,7 @@ class SttService {
       cancelOnError: true,
       pauseFor: const Duration(milliseconds: 2500),
       listenFor: const Duration(minutes: 2),
-      localeId: 'it_IT',
+      localeId: localeId,
       onResult: (result) {
         final words = result.recognizedWords.trim();
         if (words.isNotEmpty) {

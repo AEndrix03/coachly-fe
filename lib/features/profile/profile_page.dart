@@ -30,7 +30,9 @@ class ProfilePage extends ConsumerWidget {
           PageHeader(
             badgeIcon: Ionicons.person_circle_outline,
             badgeLabel: context.tr('profile.profile'),
-            title: fullName.isEmpty ? context.tr('profile.your_profile') : fullName,
+            title: fullName.isEmpty
+                ? context.tr('profile.your_profile')
+                : fullName,
             bottom: _buildAvatarInHeader(context, initials),
           ),
           Expanded(
@@ -39,7 +41,7 @@ class ProfilePage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                      _buildSection(
+                  _buildSection(
                     icon: Ionicons.settings_outline,
                     color: const Color(0xFF2196F3),
                     title: context.tr('profile.preferences'),

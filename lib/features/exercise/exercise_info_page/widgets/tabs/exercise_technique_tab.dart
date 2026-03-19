@@ -2,6 +2,7 @@ import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exe
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_safety_model/exercise_safety_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,36 +27,39 @@ class ExerciseTechniqueTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (hasDescription) _buildDescriptionCard(description),
+          if (hasDescription) _buildDescriptionCard(context, description),
           if (safety.isNotEmpty) ...[
             SizedBox(height: hasDescription ? 20 : 0),
-            _buildSafetySection(safety, locale),
+            _buildSafetySection(context, safety, locale),
           ],
           if (equipments.isNotEmpty) ...[
             const SizedBox(height: 20),
-            _buildEquipmentSection(equipments, locale),
+            _buildEquipmentSection(context, equipments, locale),
           ],
           if (!hasDescription && safety.isEmpty && equipments.isEmpty)
-            _buildEmptyState(),
+            _buildEmptyState(context),
         ],
       ),
     );
   }
 
-  Widget _buildDescriptionCard(String description) {
+  Widget _buildDescriptionCard(BuildContext context, String description) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Descrizione',
-            style: TextStyle(
+          Text(
+            context.tr('workout.description'),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -75,16 +79,19 @@ class ExerciseTechniqueTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Text(
-        'Nessun dato tecnico disponibile.',
+        context.tr('exercise.no_technical_data'),
         style: TextStyle(
           color: Colors.white.withValues(alpha: 0.7),
           fontSize: 14,
@@ -94,6 +101,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
   }
 
   Widget _buildSafetySection(
+    BuildContext context,
     List<ExerciseSafetyModel> safetyItems,
     Locale locale,
   ) {
@@ -125,9 +133,9 @@ class ExerciseTechniqueTab extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'Consigli di Sicurezza',
-                style: TextStyle(
+              Text(
+                context.tr('exercise.safety_tips'),
+                style: const TextStyle(
                   color: Color(0xFFFF5252),
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -176,6 +184,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
   }
 
   Widget _buildEquipmentSection(
+    BuildContext context,
     List<ExerciseEquipmentModel> equipments,
     Locale locale,
   ) {
@@ -184,14 +193,17 @@ class ExerciseTechniqueTab extends ConsumerWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Attrezzatura Necessaria',
-            style: TextStyle(
+          Text(
+            context.tr('exercise.required_equipment'),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.bold,

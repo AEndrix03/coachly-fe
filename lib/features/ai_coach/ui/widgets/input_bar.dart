@@ -1,5 +1,6 @@
 import 'package:coachly/features/ai_coach/application/ai_coach_notifier.dart';
 import 'package:coachly/features/ai_coach/ui/theme/ai_coach_theme.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -125,14 +126,14 @@ class _InputBarState extends ConsumerState<InputBar> {
                       fontSize: 13,
                       color: AiCoachTheme.textPrimary,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: 'Scrivi o parla...',
-                      hintStyle: TextStyle(
+                      hintText: context.tr('ai.write_or_speak'),
+                      hintStyle: const TextStyle(
                         color: AiCoachTheme.textHint,
                         fontSize: 13,
                       ),
-                      contentPadding: EdgeInsets.symmetric(
+                      contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
                         vertical: 10,
                       ),

@@ -15,7 +15,7 @@ class AppToastService {
   void showSuccess(
     BuildContext context,
     String message, {
-    String title = 'Successo',
+    String title = 'Success',
     Duration duration = _defaultDuration,
   }) {
     _show(
@@ -30,7 +30,7 @@ class AppToastService {
   void showError(
     BuildContext context,
     String message, {
-    String title = 'Errore',
+    String title = 'Error',
     Duration duration = const Duration(seconds: 4),
   }) {
     _show(
@@ -60,7 +60,7 @@ class AppToastService {
   void showWarning(
     BuildContext context,
     String message, {
-    String title = 'Attenzione',
+    String title = 'Warning',
     Duration duration = _defaultDuration,
   }) {
     _show(

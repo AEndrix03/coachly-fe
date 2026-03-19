@@ -1,27 +1,14 @@
 import 'dart:math' as math;
 
 import 'package:coachly/features/ai_coach/domain/models/workout_context.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'gemma_inference_service.g.dart';
 
 class GemmaInferenceService {
-  static const String _systemPrompt =
-      'Sei AI Coach di Coachly, un assistente fitness on-device.\n'
-      'Hai accesso al contesto del workout in tempo reale dell\'utente.\n'
-      'Rispondi SEMPRE in JSON con questa struttura esatta:\n'
-      '{\n'
-      '  "message": "<risposta conversazionale in italiano, max 3 frasi>",\n'
-      '  "insight_card": {\n'
-      '    "icon": "<emoji>",\n'
-      '    "label": "<LABEL IN UPPERCASE, max 3 parole>",\n'
-      '    "body": "<dato strutturato, max 12 parole>"\n'
-      '  } | null\n'
-      '}\n'
-      'Non aggiungere nulla fuori dal JSON. Non usare markdown.\n'
-      'Sei conciso, diretto, motivante. Non sei un chatbot generico.';
-
   dynamic _model;
   bool _isModelReady = false;
   bool _isInitializing = false;
@@ -61,12 +48,18 @@ class GemmaInferenceService {
   Stream<String> generate({
     required WorkoutContext context,
     required String userMessage,
+    required String languageCode,
   }) async* {
-    final prompt = _buildPrompt(context: context, userMessage: userMessage);
+    final locale = _localeFromLanguageCode(languageCode);
+    final prompt = _buildPrompt(
+      context: context,
+      userMessage: userMessage,
+      locale: locale,
+    );
     final ready = await ensureInitialized();
 
     if (!ready || _model == null) {
-      yield _offlineFallback(context, userMessage);
+      yield _offlineFallback(context, userMessage, locale);
       return;
     }
 
@@ -82,7 +75,7 @@ class GemmaInferenceService {
         }
       }
     } catch (_) {
-      yield _offlineFallback(context, userMessage);
+      yield _offlineFallback(context, userMessage, locale);
     } finally {
       try {
         await session?.close();
@@ -95,6 +88,7 @@ class GemmaInferenceService {
   String _buildPrompt({
     required WorkoutContext context,
     required String userMessage,
+    required Locale locale,
   }) {
     final minutesSinceStart = math.max(
       DateTime.now().difference(context.sessionStart).inMinutes,
@@ -109,28 +103,97 @@ class GemmaInferenceService {
               .map((value) => value.toStringAsFixed(1))
               .join(', ');
 
-    return '$_systemPrompt\n\n'
-        '[CONTESTO WORKOUT]\n'
-        'Esercizio: ${context.exerciseName} | Set: ${context.currentSet}/${context.totalSets}\n'
-        'Peso: ${context.weightKg.toStringAsFixed(1)}kg x ${context.targetReps} reps target\n'
-        'Indice fatica: $fatigue\n'
-        'Storico pesi recenti: $recentWeights\n'
-        'Minuti sessione: $minutesSinceStart\n\n'
-        '[MESSAGGIO UTENTE]\n'
+    final systemPrompt = AppStrings.translate(
+      'ai.prompt.system.en',
+      locale: locale,
+    );
+    final contextTitle = AppStrings.translate(
+      'ai.prompt.context_title',
+      locale: locale,
+    );
+    final userTitle = AppStrings.translate(
+      'ai.prompt.user_title',
+      locale: locale,
+    );
+    final exerciseLine = AppStrings.translate(
+      'ai.prompt.exercise_line',
+      locale: locale,
+      params: {
+        'name': context.exerciseName,
+        'current': '${context.currentSet}',
+        'total': '${context.totalSets}',
+      },
+    );
+    final weightLine = AppStrings.translate(
+      'ai.prompt.weight_line',
+      locale: locale,
+      params: {
+        'weight': context.weightKg.toStringAsFixed(1),
+        'reps': '${context.targetReps}',
+      },
+    );
+    final fatigueLine = AppStrings.translate(
+      'ai.prompt.fatigue_line',
+      locale: locale,
+      params: {'value': fatigue},
+    );
+    final recentWeightsLine = AppStrings.translate(
+      'ai.prompt.recent_weights_line',
+      locale: locale,
+      params: {'value': recentWeights},
+    );
+    final minutesLine = AppStrings.translate(
+      'ai.prompt.minutes_line',
+      locale: locale,
+      params: {'value': '$minutesSinceStart'},
+    );
+
+    return '$systemPrompt\n\n'
+        '$contextTitle\n'
+        '$exerciseLine\n'
+        '$weightLine\n'
+        '$fatigueLine\n'
+        '$recentWeightsLine\n'
+        '$minutesLine\n\n'
+        '$userTitle\n'
         '$userMessage';
   }
 
-  String _offlineFallback(WorkoutContext context, String userMessage) {
+  String _offlineFallback(
+    WorkoutContext context,
+    String userMessage,
+    Locale locale,
+  ) {
     final body = context.fatigueIndex != null
-        ? 'Fatica ${((context.fatigueIndex ?? 0) * 100).round()}% su ${context.exerciseName}'
-        : 'Mantieni tecnica pulita e recupero regolare';
+        ? AppStrings.translate(
+            'ai.offline.body',
+            locale: locale,
+            params: {
+              'value': '${((context.fatigueIndex ?? 0) * 100).round()}',
+              'exercise': context.exerciseName,
+            },
+          )
+        : AppStrings.translate('ai.offline.body_default', locale: locale);
 
     final escapedMessage = userMessage.replaceAll('"', '\\"');
+    final message = AppStrings.translate(
+      'ai.offline.message',
+      locale: locale,
+      params: {'message': escapedMessage},
+    ).replaceAll('"', '\\"');
+    final label = AppStrings.translate('ai.offline.label', locale: locale);
 
     return '{'
-        '"message":"Ho letto: $escapedMessage. Ora mantieni ritmo controllato e forma stabile.",'
-        '"insight_card":{"icon":"info","label":"CHECK RAPIDO","body":"$body"}'
+        '"message":"$message",'
+        '"insight_card":{"icon":"info","label":"$label","body":"$body"}'
         '}';
+  }
+
+  Locale _localeFromLanguageCode(String languageCode) {
+    if (languageCode.toLowerCase() == 'it') {
+      return const Locale('it');
+    }
+    return const Locale('en');
   }
 }
 

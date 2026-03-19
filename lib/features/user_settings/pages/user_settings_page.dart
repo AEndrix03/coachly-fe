@@ -1,4 +1,5 @@
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -10,26 +11,29 @@ class UserSettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
     final language = ref.watch(languageProvider);
+    final currentLocale =
+        Localizations.maybeLocaleOf(context) ?? AppStrings.defaultLocale;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(context.tr('common.settings'))),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Language', style: theme.textTheme.h4),
+            Text(context.tr('common.language'), style: theme.textTheme.h4),
             const SizedBox(height: 8),
             ShadSelect<Locale>(
-              placeholder: const Text('Select a language'),
+              placeholder: Text(context.tr('common.select_language')),
               initialValue: language,
-              options: const [Locale('it', 'IT'), Locale('en', 'EN')].map((
-                locale,
-              ) {
+              options: AppStrings.languageOptions.map((locale) {
                 return ShadOption(
                   value: locale,
                   child: Text(
-                    locale.languageCode == 'it' ? 'Italiano' : 'English',
+                    AppStrings.languageDisplayName(
+                      locale,
+                      displayLocale: currentLocale,
+                    ),
                   ),
                 );
               }).toList(),
@@ -40,7 +44,10 @@ class UserSettingsPage extends ConsumerWidget {
               },
               selectedOptionBuilder: (BuildContext context, Locale value) {
                 return Text(
-                  value.languageCode == 'it' ? 'Italiano' : 'English',
+                  AppStrings.languageDisplayName(
+                    value,
+                    displayLocale: currentLocale,
+                  ),
                 );
               },
             ),

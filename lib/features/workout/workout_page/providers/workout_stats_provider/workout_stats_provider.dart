@@ -47,7 +47,7 @@ class WorkoutStatsNotifier extends _$WorkoutStatsNotifier {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: response.message ?? 'Errore caricamento stats',
+          errorMessage: response.message ?? 'Error loading stats',
         );
       }
     } catch (e) {

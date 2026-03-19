@@ -1,4 +1,5 @@
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,10 @@ class WorkoutHeader extends ConsumerWidget {
         bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildAppBar(context, scheme), _buildContent(scheme)],
+          children: [
+            _buildAppBar(context, scheme),
+            _buildContent(context, scheme),
+          ],
         ),
       ),
     );
@@ -63,7 +67,7 @@ class WorkoutHeader extends ConsumerWidget {
                 const Icon(Icons.fitness_center, color: Colors.white, size: 15),
                 const SizedBox(width: 7),
                 Text(
-                  'Allenamenti',
+                  context.tr('common.workouts'),
                   style: TextStyle(
                     color: scheme.onPrimary.withValues(alpha: 0.95),
                     fontSize: 13,
@@ -82,9 +86,9 @@ class WorkoutHeader extends ConsumerWidget {
                   }
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  const PopupMenuItem<String>(
+                  PopupMenuItem<String>(
                     value: 'auth-disabled',
-                    child: Text('Accesso disabilitato'),
+                    child: Text(context.tr('workout.access_disabled')),
                   ),
                 ],
                 icon: const Icon(
@@ -107,9 +111,8 @@ class WorkoutHeader extends ConsumerWidget {
   Future<void> _showAuthDisabledDialog(BuildContext context) async {
     return showAppNoticeDialog(
       context,
-      title: 'Autenticazione disabilitata',
-      content:
-          'Login, logout e gestione token sono temporaneamente scollegati durante il refactor del backend.',
+      title: context.tr('workout.auth_disabled'),
+      content: context.tr('workout.auth_disabled_content'),
       icon: Icons.info_outline_rounded,
     );
   }
@@ -128,15 +131,15 @@ class WorkoutHeader extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(ColorScheme scheme) {
+  Widget _buildContent(BuildContext context, ColorScheme scheme) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'I Tuoi Allenamenti',
-            style: TextStyle(
+          Text(
+            context.tr('workout.header_title'),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -145,13 +148,13 @@ class WorkoutHeader extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _buildQuickStats(scheme),
+          _buildQuickStats(context, scheme),
         ],
       ),
     );
   }
 
-  Widget _buildQuickStats(ColorScheme scheme) {
+  Widget _buildQuickStats(BuildContext context, ColorScheme scheme) {
     if (isLoading) {
       return Container(
         width: double.infinity,
@@ -182,8 +185,8 @@ class WorkoutHeader extends ConsumerWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.trending_up,
-                label: 'Streak',
-                value: '${data.currentStreak} giorni',
+                label: context.tr('workout.streak'),
+                value: '${data.currentStreak} ${context.tr('common.days')}',
                 scheme: scheme,
               ),
             ),
@@ -195,8 +198,9 @@ class WorkoutHeader extends ConsumerWidget {
             Expanded(
               child: _buildStatItem(
                 icon: Icons.access_time,
-                label: 'Settimana',
-                value: '${data.weeklyWorkouts} workout',
+                label: context.tr('workout.week'),
+                value:
+                    '${data.weeklyWorkouts} ${context.tr(data.weeklyWorkouts == 1 ? 'common.workout' : 'common.workouts')}',
                 scheme: scheme,
               ),
             ),

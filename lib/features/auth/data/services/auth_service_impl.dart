@@ -26,7 +26,7 @@ class AuthServiceImpl implements AuthService {
 
       if (response.accessToken == null || response.refreshToken == null) {
         throw const ServerFailure(
-          'Keycloak ha completato il login ma non ha restituito i token attesi.',
+          'Keycloak completed login but did not return the expected tokens.',
         );
       }
 
@@ -45,7 +45,7 @@ class AuthServiceImpl implements AuthService {
       if (e is Failure) {
         rethrow;
       }
-      throw ServerFailure('Errore durante il login con Keycloak: $e');
+      throw ServerFailure('Error during Keycloak login: $e');
     }
   }
 
@@ -64,9 +64,7 @@ class AuthServiceImpl implements AuthService {
       );
 
       if (response.accessToken == null || response.refreshToken == null) {
-        throw const ServerFailure(
-          'Keycloak non ha restituito i token aggiornati.',
-        );
+        throw const ServerFailure('Keycloak did not return refreshed tokens.');
       }
 
       final loginResponse = LoginResponseDto.fromTokens(
@@ -84,9 +82,7 @@ class AuthServiceImpl implements AuthService {
       if (e is Failure) {
         rethrow;
       }
-      throw NetworkFailure(
-        'Impossibile aggiornare la sessione tramite Keycloak: $e',
-      );
+      throw NetworkFailure('Unable to refresh session via Keycloak: $e');
     }
   }
 

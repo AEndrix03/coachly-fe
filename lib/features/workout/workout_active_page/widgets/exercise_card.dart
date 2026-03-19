@@ -1,9 +1,11 @@
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../providers/rest_timer_provider.dart';
 import 'set_row.dart';
 
 class ExerciseCard extends ConsumerStatefulWidget {
@@ -179,7 +181,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
             scheme: scheme,
             icon: Icons.info_rounded,
             onTap: () => _openExerciseDetail(context, exercise),
-            tooltip: 'Info esercizio',
+            tooltip: context.tr('exercise.info'),
           ),
           const SizedBox(width: 4),
           _buildExerciseMenu(exercise, scheme),
@@ -222,7 +224,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
 
   Widget _buildExerciseMenu(ActiveExerciseState exercise, ColorScheme scheme) {
     return PopupMenuButton<String>(
-      tooltip: 'Azioni esercizio',
+      tooltip: context.tr('exercise.actions'),
       icon: Icon(
         Icons.more_horiz_rounded,
         color: scheme.onSurface.withValues(alpha: 0.65),
@@ -253,7 +255,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
               ),
               const SizedBox(width: 10),
               Text(
-                'Aggiungi serie',
+                context.tr('exercise.add_set'),
                 style: TextStyle(
                   color: scheme.onSurface,
                   fontWeight: FontWeight.w600,
@@ -283,7 +285,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
           onCompleteToggle: (completed) {
             _notifier.completeSet(widget.exerciseIndex, setIdx, completed);
             if (completed) {
-              _onSetCompleted();
+              _onSetCompleted(exercise);
             }
           },
           onWeightChanged: (w) =>
@@ -308,9 +310,9 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
         child: OutlinedButton.icon(
           onPressed: () => _notifier.addSet(widget.exerciseIndex),
           icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
-          label: const Text(
-            'Aggiungi serie',
-            style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700),
+          label: Text(
+            context.tr('exercise.add_set'),
+            style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700),
           ),
           style: OutlinedButton.styleFrom(
             foregroundColor: scheme.primary,
@@ -358,7 +360,10 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
     });
   }
 
-  void _onSetCompleted() {
+  void _onSetCompleted(ActiveExerciseState exercise) {
+    final restSeconds = exercise.restSeconds > 0 ? exercise.restSeconds : 90;
+    ref.read(restTimerProvider.notifier).startTimer(restSeconds);
+
     // Auto-collapse when all sets in this exercise are done.
     final updated = ref
         .read(activeWorkoutProvider(widget.workoutId))

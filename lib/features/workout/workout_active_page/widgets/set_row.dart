@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 
 class SetRow extends StatelessWidget {
   final String type;
@@ -83,12 +84,13 @@ class SetRow extends StatelessWidget {
       'Volume': 'V',
       'Avvicinamento': 'A',
     };
+    final selectedType = _normalizeTypeForDropdown(type, typeMap);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: _fieldDecoration(scheme),
       child: DropdownButton<String>(
-        value: type,
+        value: selectedType,
         underline: const SizedBox.shrink(),
         dropdownColor: scheme.surfaceContainerHigh,
         isDense: true,
@@ -167,6 +169,32 @@ class SetRow extends StatelessWidget {
         },
       ),
     );
+  }
+
+  String _normalizeTypeForDropdown(
+    String rawType,
+    Map<String, String> typeMap,
+  ) {
+    final trimmed = rawType.trim();
+    if (typeMap.containsKey(trimmed)) {
+      return trimmed;
+    }
+
+    switch (trimmed.toLowerCase()) {
+      case 'normal':
+        return 'Normale';
+      case 'warmup':
+      case 'warm-up':
+        return 'Riscaldamento';
+      case 'failure':
+        return 'Cedimento';
+      case 'drop set':
+        return 'Dropset';
+      case 'approach':
+        return 'Avvicinamento';
+      default:
+        return 'Normale';
+    }
   }
 
   Widget _buildWeightInput(ColorScheme scheme) {
@@ -304,7 +332,7 @@ class SetRow extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'Note serie',
+                      context.tr('session.notes'),
                       style: TextStyle(
                         color: scheme.onSurface,
                         fontSize: 14,
@@ -329,7 +357,7 @@ class SetRow extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'Duplica',
+                      context.tr('common.duplicate'),
                       style: TextStyle(
                         color: scheme.onSurface,
                         fontSize: 14,
@@ -355,7 +383,7 @@ class SetRow extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'Elimina',
+                      context.tr('common.delete'),
                       style: TextStyle(
                         color: scheme.error,
                         fontSize: 14,

@@ -7,6 +7,7 @@ import 'package:coachly/features/user_settings/providers/settings_provider.dart'
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -168,9 +169,9 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             ),
           ),
           const SizedBox(width: 12),
-          const Text(
-            'Aggiungi Esercizio',
-            style: TextStyle(
+          Text(
+            context.tr('workout.edit.add_exercise'),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.w800,
@@ -253,22 +254,36 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 1,
+          ),
         ),
         child: TextField(
           controller: _searchCtrl,
           style: const TextStyle(color: Colors.white, fontSize: 15),
           decoration: InputDecoration(
-            hintText: 'Cerca esercizio...',
+            hintText: context.tr('workout.search_exercise_hint'),
             hintStyle: TextStyle(
               color: Colors.white.withValues(alpha: 0.35),
               fontSize: 15,
             ),
-            prefixIcon: Icon(Icons.search_rounded, color: Colors.white.withValues(alpha: 0.4), size: 20),
+            prefixIcon: Icon(
+              Icons.search_rounded,
+              color: Colors.white.withValues(alpha: 0.4),
+              size: 20,
+            ),
             suffixIcon: _searchCtrl.text.isNotEmpty
                 ? GestureDetector(
-                    onTap: () { _searchCtrl.clear(); _applyFilters(); },
-                    child: Icon(Icons.close_rounded, color: Colors.white.withValues(alpha: 0.4), size: 18),
+                    onTap: () {
+                      _searchCtrl.clear();
+                      _applyFilters();
+                    },
+                    child: Icon(
+                      Icons.close_rounded,
+                      color: Colors.white.withValues(alpha: 0.4),
+                      size: 18,
+                    ),
                   )
                 : null,
             border: InputBorder.none,
@@ -336,7 +351,10 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         if (id == null || id.isEmpty) continue;
         muscleById.putIfAbsent(
           id,
-          () => _Option(id: id, label: em.muscle?.nameI18n.fromI18n(locale) ?? id),
+          () => _Option(
+            id: id,
+            label: em.muscle?.nameI18n.fromI18n(locale) ?? id,
+          ),
         );
       }
     }
@@ -344,25 +362,27 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       ..sort((a, b) => a.label.compareTo(b.label));
 
     // Extract mechanics
-    final mechanics = exercises
-        .map((e) => e.mechanicsType)
-        .whereType<String>()
-        .toSet()
-        .toList()..sort();
+    final mechanics =
+        exercises
+            .map((e) => e.mechanicsType)
+            .whereType<String>()
+            .toSet()
+            .toList()
+          ..sort();
 
     // Extract force types
-    final forceTypes = exercises
-        .map((e) => e.forceType)
-        .whereType<String>()
-        .toSet()
-        .toList()..sort();
+    final forceTypes =
+        exercises.map((e) => e.forceType).whereType<String>().toSet().toList()
+          ..sort();
 
     // Extract difficulties
-    final difficulties = exercises
-        .map((e) => e.difficultyLevel)
-        .whereType<String>()
-        .toSet()
-        .toList()..sort();
+    final difficulties =
+        exercises
+            .map((e) => e.difficultyLevel)
+            .whereType<String>()
+            .toSet()
+            .toList()
+          ..sort();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,7 +406,12 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
           child: _showAdvanced
-              ? _buildAdvancedFilters(muscles, mechanics, forceTypes, difficulties)
+              ? _buildAdvancedFilters(
+                  muscles,
+                  mechanics,
+                  forceTypes,
+                  difficulties,
+                )
               : const SizedBox.shrink(),
         ),
         const SizedBox(height: 8),
@@ -411,7 +436,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (muscles.isNotEmpty) ...[
-            _buildFilterLabel('Muscolo'),
+            _buildFilterLabel(context.tr('exercise.muscle')),
             _buildHorizontalChips<_Option>(
               items: muscles,
               selected: _muscleId,
@@ -425,7 +450,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             ),
           ],
           if (mechanics.isNotEmpty) ...[
-            _buildFilterLabel('Meccanica'),
+            _buildFilterLabel(context.tr('exercise.mechanics')),
             _buildHorizontalChips<String>(
               items: mechanics,
               selected: _mechanics,
@@ -439,7 +464,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             ),
           ],
           if (forceTypes.isNotEmpty) ...[
-            _buildFilterLabel('Tipo di forza'),
+            _buildFilterLabel(context.tr('exercise.force_type')),
             _buildHorizontalChips<String>(
               items: forceTypes,
               selected: _forceType,
@@ -453,7 +478,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             ),
           ],
           if (difficulties.isNotEmpty) ...[
-            _buildFilterLabel('Difficoltà'),
+            _buildFilterLabel(context.tr('exercise.difficulty')),
             _buildHorizontalChips<String>(
               items: difficulties,
               selected: _difficulty,
@@ -474,32 +499,38 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               runSpacing: 8,
               children: [
                 _buildToggleChip(
-                  label: 'Solo corpo libero',
+                  label: context.tr('exercise.bodyweight_only'),
                   icon: Icons.self_improvement_rounded,
                   active: _bodyweight == true,
                   color: const Color(0xFF4CAF50),
                   onTap: () {
-                    setState(() => _bodyweight = _bodyweight == true ? null : true);
+                    setState(
+                      () => _bodyweight = _bodyweight == true ? null : true,
+                    );
                     _applyFilters();
                   },
                 ),
                 _buildToggleChip(
-                  label: 'Con attrezzi',
+                  label: context.tr('exercise.with_equipment'),
                   icon: Icons.fitness_center_rounded,
                   active: _bodyweight == false,
                   color: const Color(0xFF2196F3),
                   onTap: () {
-                    setState(() => _bodyweight = _bodyweight == false ? null : false);
+                    setState(
+                      () => _bodyweight = _bodyweight == false ? null : false,
+                    );
                     _applyFilters();
                   },
                 ),
                 _buildToggleChip(
-                  label: 'Unilaterale',
+                  label: context.tr('exercise.unilateral'),
                   icon: Icons.swap_horiz_rounded,
                   active: _unilateral == true,
                   color: const Color(0xFF7B4BC1),
                   onTap: () {
-                    setState(() => _unilateral = _unilateral == true ? null : true);
+                    setState(
+                      () => _unilateral = _unilateral == true ? null : true,
+                    );
                     _applyFilters();
                   },
                 ),
@@ -561,7 +592,9 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                         ],
                       ),
                 border: Border.all(
-                  color: isActive ? color : Colors.white.withValues(alpha: 0.12),
+                  color: isActive
+                      ? color
+                      : Colors.white.withValues(alpha: 0.12),
                   width: 1,
                 ),
                 boxShadow: isActive
@@ -577,7 +610,9 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               child: Text(
                 getLabel(item),
                 style: TextStyle(
-                  color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.6),
+                  color: isActive
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: 0.6),
                   fontSize: 13,
                   fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                 ),
@@ -619,12 +654,20 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: active ? Colors.white : Colors.white.withValues(alpha: 0.5)),
+            Icon(
+              icon,
+              size: 14,
+              color: active
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.5),
+            ),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: active ? Colors.white : Colors.white.withValues(alpha: 0.6),
+                color: active
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.6),
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w700 : FontWeight.w500,
               ),
@@ -649,7 +692,10 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             ),
           ),
           error: (err, _) => Center(
-            child: Text(err.toString(), style: const TextStyle(color: Colors.red)),
+            child: Text(
+              err.toString(),
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
           data: (exercises) {
             final visible = _excludeSelected(exercises);
@@ -670,18 +716,25 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off_rounded, size: 56, color: Colors.white.withValues(alpha: 0.2)),
+          Icon(
+            Icons.search_off_rounded,
+            size: 56,
+            color: Colors.white.withValues(alpha: 0.2),
+          ),
           const SizedBox(height: 12),
           Text(
-            'Nessun esercizio trovato',
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontSize: 15),
+            context.tr('workout.no_exercise_found'),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.45),
+              fontSize: 15,
+            ),
           ),
           if (_activeCount > 0) ...[
             const SizedBox(height: 8),
             GestureDetector(
               onTap: _clearFilters,
-              child: const Text(
-                'Rimuovi filtri',
+              child: Text(
+                context.tr('exercise.clear_filters'),
                 style: TextStyle(
                   color: Color(0xFF2196F3),
                   fontSize: 14,
@@ -699,7 +752,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   Widget _buildCard(ExerciseDetailModel exercise) {
     final locale = ref.watch(languageProvider);
-    final name = exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? 'N/A';
+    final na = context.tr('common.na');
+    final name = exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? na;
     final muscles = (exercise.muscles ?? const [])
         .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? '')
         .where((s) => s.isNotEmpty)
@@ -712,23 +766,25 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     return GestureDetector(
       onTap: () {
         final defaults = _lastSessionDefaults(exercise.id ?? '');
-        widget.onExerciseSelected(EditableExerciseModel(
-          id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
-          exerciseId: exercise.id ?? '',
-          number: 0,
-          name: name,
-          muscles: (exercise.muscles ?? const [])
-              .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? 'N/A')
-              .toList(),
-          difficulty: difficulty ?? 'N/A',
-          sets: defaults.sets,
-          rest: '60s',
-          weight: defaults.weight,
-          progress: '0',
-          notes: '',
-          accentColorHex: '#2196F3',
-          variants: exercise.variants ?? const [],
-        ));
+        widget.onExerciseSelected(
+          EditableExerciseModel(
+            id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
+            exerciseId: exercise.id ?? '',
+            number: 0,
+            name: name,
+            muscles: (exercise.muscles ?? const [])
+                .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? na)
+                .toList(),
+            difficulty: _difficultyLabel(difficulty),
+            sets: defaults.sets,
+            rest: '60s',
+            weight: defaults.weight,
+            progress: '0',
+            notes: '',
+            accentColorHex: '#2196F3',
+            variants: exercise.variants ?? const [],
+          ),
+        );
         Navigator.pop(context);
       },
       child: Container(
@@ -851,7 +907,11 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                child: const Icon(
+                  Icons.add_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ],
           ),
@@ -866,7 +926,10 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.18), color.withValues(alpha: 0.08)],
+          colors: [
+            color.withValues(alpha: 0.18),
+            color.withValues(alpha: 0.08),
+          ],
         ),
         border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
       ),
@@ -926,37 +989,44 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   List<ExerciseDetailModel> _excludeSelected(List<ExerciseDetailModel> list) {
     if (widget.excludedExerciseIds.isEmpty) return list;
-    return list.where((e) => !widget.excludedExerciseIds.contains(e.id)).toList();
+    return list
+        .where((e) => !widget.excludedExerciseIds.contains(e.id))
+        .toList();
   }
 
-  String _difficultyLabel(String raw) => switch (raw.toLowerCase()) {
-        'beginner' => 'Principiante',
-        'intermediate' => 'Intermedio',
-        'advanced' => 'Avanzato',
-        _ => raw,
-      };
+  String _difficultyLabel(String? raw) {
+    if (raw == null || raw.trim().isEmpty) {
+      return context.tr('common.na');
+    }
+    return switch (raw.toLowerCase()) {
+      'beginner' => context.tr('exercise.difficulty.beginner'),
+      'intermediate' => context.tr('exercise.difficulty.intermediate'),
+      'advanced' => context.tr('exercise.difficulty.advanced'),
+      _ => raw,
+    };
+  }
 
   Color _difficultyColor(String raw) => switch (raw.toLowerCase()) {
-        'beginner' => const Color(0xFF4CAF50),
-        'intermediate' => const Color(0xFFFF9800),
-        'advanced' => const Color(0xFFFF5252),
-        _ => Colors.white54,
-      };
+    'beginner' => const Color(0xFF4CAF50),
+    'intermediate' => const Color(0xFFFF9800),
+    'advanced' => const Color(0xFFFF5252),
+    _ => Colors.white54,
+  };
 
   String _mechanicsLabel(String raw) => switch (raw.toLowerCase()) {
-        'compound' => 'Composto',
-        'isolation' => 'Isolamento',
-        _ => raw,
-      };
+    'compound' => context.tr('exercise.mechanics.compound'),
+    'isolation' => context.tr('exercise.mechanics.isolation'),
+    _ => raw,
+  };
 
   String _forceLabel(String raw) => switch (raw.toLowerCase()) {
-        'push' => 'Spinta',
-        'pull' => 'Trazione',
-        'legs' => 'Gambe',
-        'core' => 'Core',
-        'static' => 'Statico',
-        _ => raw,
-      };
+    'push' => context.tr('exercise.force.push'),
+    'pull' => context.tr('exercise.force.pull'),
+    'legs' => context.tr('exercise.force.legs'),
+    'core' => context.tr('exercise.force.core'),
+    'static' => context.tr('exercise.force.static'),
+    _ => raw,
+  };
 }
 
 // ─────────────────────────── data class ──────────────────────────────────────
@@ -966,5 +1036,9 @@ class _Option {
   final String label;
   final bool isPrimary;
 
-  const _Option({required this.id, required this.label, this.isPrimary = false});
+  const _Option({
+    required this.id,
+    required this.label,
+    this.isPrimary = false,
+  });
 }

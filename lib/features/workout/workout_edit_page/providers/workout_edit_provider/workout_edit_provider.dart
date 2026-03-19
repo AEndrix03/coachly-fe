@@ -6,6 +6,7 @@ import 'package:coachly/features/workout/workout_page/data/models/workout_model/
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart'; // Required for fromI18n
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart'; // Required for Locale
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -27,7 +28,7 @@ class WorkoutEditState {
     this.title = '',
     this.description = '',
     this.duration = '60',
-    this.type = 'Ipertrofia',
+    this.type = 'Hypertrophy',
     this.exercises = const [],
     this.isDirty = false,
     this.isLoading = false,
@@ -79,10 +80,10 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
     if (workoutId == 'new') {
       state = state.copyWith(
         isLoading: false,
-        title: 'Nuova Scheda',
+        title: 'New Workout',
         description: '',
         duration: '60',
-        type: 'Ipertrofia',
+        type: AppStrings.translate('workout.hypertrophy', locale: locale),
         exercises: [],
       );
       return;
@@ -122,7 +123,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: response.message ?? 'Errore caricamento dati workout',
+          error: response.message ?? 'Error loading workout data',
         );
       }
     } catch (e) {
@@ -137,15 +138,16 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
     Locale locale,
   ) {
     final exercise = workoutExercise.exercise;
+    final na = AppStrings.translate('common.na', locale: locale);
     return EditableExerciseModel(
       id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
       exerciseId: exercise.id ?? '',
       number: number,
-      name: exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? 'N/A',
+      name: exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? na,
       muscles: (exercise.muscles ?? const [])
-          .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? 'N/A')
+          .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? na)
           .toList(),
-      difficulty: exercise.difficultyLevel ?? 'N/A',
+      difficulty: exercise.difficultyLevel ?? na,
       sets: workoutExercise.sets,
       rest: workoutExercise.rest,
       weight: workoutExercise.weight,
@@ -217,8 +219,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
   Future<bool> save() async {
     if (!state.isValid) {
       state = state.copyWith(
-        error:
-            'Compila tutti i campi obbligatori e aggiungi almeno un esercizio',
+        error: 'Fill all required fields and add at least one exercise',
       );
       return false;
     }
@@ -240,15 +241,12 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: response.message ?? 'Errore durante il salvataggio',
+          error: response.message ?? 'Error while saving',
         );
         return false;
       }
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Errore durante il salvataggio: $e',
-      );
+      state = state.copyWith(isLoading: false, error: 'Error while saving: $e');
       return false;
     }
   }

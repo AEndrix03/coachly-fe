@@ -34,7 +34,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       );
     } else {
       state = ActiveWorkoutState.error(
-        response.message ?? 'Impossibile caricare il workout.',
+        response.message ?? 'Unable to load workout.',
       );
     }
   }
@@ -116,10 +116,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     final exercises = [...state.exercises];
     final ex = exercises[exerciseIdx];
     final sets = [...ex.sets];
-    final copy = sets[setIdx].copyWith(
-      position: sets.length,
-      completed: false,
-    );
+    final copy = sets[setIdx].copyWith(position: sets.length, completed: false);
     sets.insert(setIdx + 1, copy);
     final renumbered = sets
         .asMap()
@@ -162,7 +159,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     } else {
       state = state.copyWith(
         status: ActiveWorkoutStatus.active,
-        errorMessage: response.message ?? 'Errore nel salvataggio.',
+        errorMessage: response.message ?? 'Error while saving.',
       );
       return false;
     }
@@ -206,8 +203,9 @@ class ActiveWorkout extends _$ActiveWorkout {
   // ─── Helpers ─────────────────────────────────────────────────────────────
 
   (String, String) _extractSetParts(String rawSets) {
-    final matches =
-        RegExp(r'\d+').allMatches(rawSets).map((m) => m.group(0)!).toList();
+    final matches = RegExp(
+      r'\d+',
+    ).allMatches(rawSets).map((m) => m.group(0)!).toList();
     if (matches.length >= 2) return (matches[0], matches[1]);
     if (matches.length == 1) return (matches[0], '');
     return ('', '');
@@ -223,16 +221,19 @@ class ActiveWorkout extends _$ActiveWorkout {
     final exerciseId = exercise.exercise.id;
     final names = exercise.exercise.nameI18n;
     if (names != null) {
-      for (final lang in ['it', 'it_IT', 'en', 'en_EN']) {
-        final name = names[lang];
+      final normalizedNames = names.map(
+        (key, value) => MapEntry(key.toLowerCase().replaceAll('-', '_'), value),
+      );
+      for (final lang in ['en', 'en_us', 'en_en', 'it', 'it_it']) {
+        final name = normalizedNames[lang];
         if (name != null && name.isNotEmpty && name != exerciseId) {
           return name;
         }
       }
-      for (final name in names.values) {
+      for (final name in normalizedNames.values) {
         if (name.isNotEmpty && name != exerciseId) return name;
       }
     }
-    return 'Esercizio ${index + 1}';
+    return 'Exercise ${index + 1}';
   }
 }

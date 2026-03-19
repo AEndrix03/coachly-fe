@@ -6,6 +6,7 @@ import 'package:coachly/features/workout/workout_detail_page/widgets/workout_det
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/cards/border_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,7 +62,7 @@ class WorkoutDetailPage extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: BorderCard(
-                title: 'Descrizione',
+                title: context.tr('workout.description'),
                 text: workout.descriptionI18n?.fromI18n(locale) ?? '',
                 borderColor: const Color(0xFF2196F3),
               ),
@@ -106,9 +107,9 @@ class WorkoutDetailPage extends ConsumerWidget {
             extra: workout,
           ),
           icon: const Icon(Icons.play_arrow, size: 22),
-          label: const Text(
-            'Inizia Allenamento',
-            style: TextStyle(
+          label: Text(
+            context.tr('workout.start'),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.3,
@@ -134,8 +135,8 @@ class WorkoutDetailPage extends ConsumerWidget {
         .read(appToastServiceProvider)
         .showInfo(
           context,
-          'Condivisione workout in arrivo',
-          title: 'Condividi',
+          context.tr('workout.share_soon'),
+          title: context.tr('workout.share'),
           duration: const Duration(seconds: 2),
         );
   }

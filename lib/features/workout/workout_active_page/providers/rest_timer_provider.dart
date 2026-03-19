@@ -6,22 +6,26 @@ class RestTimerState {
   final int remainingSeconds;
   final bool isActive;
   final int initialSeconds;
+  final bool isBellEnabled;
 
   const RestTimerState({
     required this.remainingSeconds,
     required this.isActive,
     required this.initialSeconds,
+    required this.isBellEnabled,
   });
 
   RestTimerState copyWith({
     int? remainingSeconds,
     bool? isActive,
     int? initialSeconds,
+    bool? isBellEnabled,
   }) {
     return RestTimerState(
       remainingSeconds: remainingSeconds ?? this.remainingSeconds,
       isActive: isActive ?? this.isActive,
       initialSeconds: initialSeconds ?? this.initialSeconds,
+      isBellEnabled: isBellEnabled ?? this.isBellEnabled,
     );
   }
 }
@@ -36,6 +40,7 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
       remainingSeconds: 0,
       isActive: false,
       initialSeconds: 0,
+      isBellEnabled: true,
     );
   }
 
@@ -45,6 +50,7 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
       remainingSeconds: seconds,
       isActive: true,
       initialSeconds: seconds,
+      isBellEnabled: state.isBellEnabled,
     );
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -58,8 +64,17 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
 
   void addTime(int seconds) {
     if (state.isActive) {
+      final updatedSeconds = state.remainingSeconds + seconds;
+      if (updatedSeconds <= 0) {
+        state = state.copyWith(remainingSeconds: 1);
+        return;
+      }
+
       state = state.copyWith(
-        remainingSeconds: state.remainingSeconds + seconds,
+        remainingSeconds: updatedSeconds,
+        initialSeconds: updatedSeconds > state.initialSeconds
+            ? updatedSeconds
+            : state.initialSeconds,
       );
     }
   }
@@ -67,6 +82,14 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
   void stopTimer() {
     _timer?.cancel();
     state = state.copyWith(isActive: false, remainingSeconds: 0);
+  }
+
+  void setBellEnabled(bool enabled) {
+    state = state.copyWith(isBellEnabled: enabled);
+  }
+
+  void toggleBell() {
+    state = state.copyWith(isBellEnabled: !state.isBellEnabled);
   }
 }
 

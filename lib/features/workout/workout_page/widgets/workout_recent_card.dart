@@ -4,6 +4,7 @@ import 'package:coachly/features/user_settings/providers/settings_provider.dart'
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/shared/animations/sparkle_tap_animation.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/badges/coach_badge_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -205,7 +206,10 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
           context,
           scheme,
           Icons.fitness_center,
-          '${widget.workout.workoutExercises.length} esercizi',
+          context.tr(
+            'workout.organize.exercises_count',
+            params: {'count': '${widget.workout.workoutExercises.length}'},
+          ),
         ),
         _buildStatChip(
           context,
@@ -229,7 +233,12 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
         Icon(Icons.schedule, size: 14, color: scheme.primary),
         const SizedBox(width: 7),
         Text(
-          'Ultima: ${DateFormat('dd/MM/yyyy').format(widget.workout.lastUsed)}',
+          context.tr(
+            'workout.last_used',
+            params: {
+              'date': DateFormat('dd/MM/yyyy').format(widget.workout.lastUsed),
+            },
+          ),
           style: TextStyle(
             fontSize: 11,
             color: scheme.onSurface.withValues(alpha: 0.7),
@@ -249,7 +258,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
         ),
         icon: Icon(Icons.play_arrow, size: 20, color: scheme.onPrimary),
         label: Text(
-          'Inizia Workout',
+          context.tr('workout.start'),
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 14,

@@ -1,3 +1,4 @@
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -29,21 +30,27 @@ class _WorkoutEmptyStateState extends State<WorkoutEmptyState>
     );
     _fadeAnim = CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOut);
     _slideAnim = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOutCubic));
+        .animate(
+          CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOutCubic),
+        );
 
     _floatCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2400),
     )..repeat(reverse: true);
-    _floatAnim = Tween<double>(begin: -7.0, end: 7.0)
-        .animate(CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut));
+    _floatAnim = Tween<double>(
+      begin: -7.0,
+      end: 7.0,
+    ).animate(CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut));
 
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1900),
     )..repeat(reverse: true);
-    _pulseAnim = Tween<double>(begin: 1.0, end: 1.05)
-        .animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+    _pulseAnim = Tween<double>(
+      begin: 1.0,
+      end: 1.05,
+    ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
 
     _entranceCtrl.forward();
   }
@@ -207,10 +214,10 @@ class _WorkoutEmptyStateState extends State<WorkoutEmptyState>
               end: Alignment.bottomRight,
               colors: [Color(0xFF64B5F6), Color(0xFFCE93D8)],
             ).createShader(bounds),
-            child: const Text(
-              'Crea la tua\nprima scheda!',
+            child: Text(
+              context.tr('workout.empty.create_first'),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 34,
                 fontWeight: FontWeight.w900,
@@ -221,7 +228,7 @@ class _WorkoutEmptyStateState extends State<WorkoutEmptyState>
           ),
           const SizedBox(height: 16),
           Text(
-            'Progetta allenamenti su misura per te.\nInizia il tuo percorso fitness oggi.',
+            context.tr('workout.empty.subtitle'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.5),
@@ -285,15 +292,19 @@ class _WorkoutEmptyStateState extends State<WorkoutEmptyState>
                   ),
                 ),
               ),
-              const Center(
+              Center(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add_rounded, color: Colors.white, size: 22),
-                    SizedBox(width: 8),
+                    const Icon(
+                      Icons.add_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 8),
                     Text(
-                      'Iniziamo',
-                      style: TextStyle(
+                      context.tr('workout.empty.start'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 17,
                         fontWeight: FontWeight.w700,

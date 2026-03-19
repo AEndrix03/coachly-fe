@@ -1,8 +1,11 @@
 import 'package:coachly/core/sync/app_data_sync_service.dart';
 import 'package:coachly/core/sync/local_database_service.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/core/themes/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -21,6 +24,7 @@ class CoachlyApplication extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
+    final locale = ref.watch(languageProvider);
     final colorScheme = AppThemeScheme.lightTheme.colorScheme;
     final shadColorScheme = ShadSlateColorScheme.light().copyWith(
       primary: colorScheme.primary,
@@ -36,10 +40,17 @@ class CoachlyApplication extends ConsumerWidget {
       child: _AppSyncBootstrap(
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: 'Coachly',
+          title: context.tr('common.app_name'),
           theme: AppThemeScheme.lightTheme,
           darkTheme: AppThemeScheme.darkTheme,
           themeMode: ThemeMode.dark,
+          locale: locale,
+          supportedLocales: AppStrings.supportedLocales,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
           routerConfig: router,
         ),
       ),
@@ -62,10 +73,7 @@ class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap> {
         authState.value?.isTokenValid == true;
   }
 
-  Future<void> _handleAuthState(
-    AsyncValue? previous,
-    AsyncValue next,
-  ) async {
+  Future<void> _handleAuthState(AsyncValue? previous, AsyncValue next) async {
     final syncService = ref.read(appDataSyncServiceProvider);
     final isAuthenticated = _isAuthenticated(next);
     final wasAuthenticated = previous != null && _isAuthenticated(previous);

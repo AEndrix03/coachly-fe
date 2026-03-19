@@ -1,4 +1,5 @@
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/cards/stat_card.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +34,7 @@ class WorkoutStatsOverview extends StatelessWidget {
             child: StatCard(
               icon: Icons.assignment_outlined,
               value: '${data.activeWorkouts}',
-              label: 'Schede\nAttive',
+              label: context.tr('workout.active_short'),
               borderColor: scheme.primary,
             ),
           ),
@@ -42,7 +43,7 @@ class WorkoutStatsOverview extends StatelessWidget {
             child: StatCard(
               icon: Icons.history,
               value: '${data.completedWorkouts}',
-              label: 'Completate',
+              label: context.tr('workout.completed'),
               borderColor: scheme.secondary,
             ),
           ),
@@ -51,7 +52,7 @@ class WorkoutStatsOverview extends StatelessWidget {
             child: StatCard(
               icon: Icons.local_fire_department_outlined,
               value: '${data.currentStreak}',
-              label: 'Streak\n(giorni)',
+              label: 'Streak\n(${context.tr('common.days')})',
               borderColor: scheme.tertiary,
             ),
           ),

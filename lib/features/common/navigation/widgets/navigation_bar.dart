@@ -1,15 +1,13 @@
 import 'dart:ui';
 
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppNavigationBar extends StatefulWidget {
-  const AppNavigationBar({
-    super.key,
-    required this.navigationShell,
-  });
+  const AppNavigationBar({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
@@ -20,11 +18,11 @@ class AppNavigationBar extends StatefulWidget {
 class _AppNavigationBarState extends State<AppNavigationBar>
     with TickerProviderStateMixin {
   static const _tabs = [
-    _NavTab(icon: Icons.people, label: 'Community'),
-    _NavTab(icon: Icons.fitness_center, label: 'Workouts'),
-    _NavTab(icon: LucideIcons.target, label: 'Coach'),
-    _NavTab(icon: Icons.tips_and_updates_rounded, label: 'Idee'),
-    _NavTab(icon: Ionicons.person_circle_outline, label: 'Profilo'),
+    _NavTab(icon: Icons.people, labelKey: 'nav.community'),
+    _NavTab(icon: Icons.fitness_center, labelKey: 'nav.workouts'),
+    _NavTab(icon: LucideIcons.target, labelKey: 'nav.coach'),
+    _NavTab(icon: Icons.tips_and_updates_rounded, labelKey: 'nav.ideas'),
+    _NavTab(icon: Ionicons.person_circle_outline, labelKey: 'nav.profile'),
   ];
 
   late final List<AnimationController> _bounceControllers;
@@ -43,18 +41,24 @@ class _AppNavigationBarState extends State<AppNavigationBar>
     _bounceAnimations = _bounceControllers.map((c) {
       return TweenSequence<double>([
         TweenSequenceItem(
-          tween: Tween(begin: 1.0, end: 0.72)
-              .chain(CurveTween(curve: Curves.easeOut)),
+          tween: Tween(
+            begin: 1.0,
+            end: 0.72,
+          ).chain(CurveTween(curve: Curves.easeOut)),
           weight: 30,
         ),
         TweenSequenceItem(
-          tween: Tween(begin: 0.72, end: 1.18)
-              .chain(CurveTween(curve: Curves.easeOut)),
+          tween: Tween(
+            begin: 0.72,
+            end: 1.18,
+          ).chain(CurveTween(curve: Curves.easeOut)),
           weight: 35,
         ),
         TweenSequenceItem(
-          tween: Tween(begin: 1.18, end: 1.0)
-              .chain(CurveTween(curve: Curves.elasticOut)),
+          tween: Tween(
+            begin: 1.18,
+            end: 1.0,
+          ).chain(CurveTween(curve: Curves.elasticOut)),
           weight: 35,
         ),
       ]).animate(c);
@@ -82,10 +86,7 @@ class _AppNavigationBarState extends State<AppNavigationBar>
 
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 10, 20, bottomPadding + 14),
-      child: SizedBox(
-        height: 64,
-        child: _buildBar(currentIndex),
-      ),
+      child: SizedBox(height: 64, child: _buildBar(currentIndex)),
     );
   }
 
@@ -215,7 +216,10 @@ class _NavItem extends StatelessWidget {
         scale: isSelected ? 1.0 : 0.88,
         child: Icon(
           tab.icon,
-          color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.38),
+          semanticLabel: context.tr(tab.labelKey),
+          color: isSelected
+              ? Colors.white
+              : Colors.white.withValues(alpha: 0.38),
           size: isSelected ? 24 : 21,
         ),
       ),
@@ -225,10 +229,7 @@ class _NavItem extends StatelessWidget {
 
 class _NavTab {
   final IconData icon;
-  final String label;
+  final String labelKey;
 
-  const _NavTab({
-    required this.icon,
-    required this.label,
-  });
+  const _NavTab({required this.icon, required this.labelKey});
 }

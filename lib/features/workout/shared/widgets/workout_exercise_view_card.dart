@@ -2,6 +2,7 @@ import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -174,14 +175,15 @@ class _WorkoutExerciseViewCardState
                   runSpacing: 8,
                   children: [
                     _buildTag(
-                      exercise.muscles?.firstOrNull?.muscle?.nameI18n
-                              .fromI18n(locale) ??
-                          'N/A',
+                      exercise.muscles?.firstOrNull?.muscle?.nameI18n.fromI18n(
+                            locale,
+                          ) ??
+                          context.tr('common.na'),
                       const Color(0xFF2196F3),
                       Icons.fitness_center,
                     ),
                     _buildTag(
-                      exercise.difficultyLevel ?? 'N/A',
+                      exercise.difficultyLevel ?? context.tr('common.na'),
                       const Color(0xFFFF9800),
                       Icons.whatshot,
                     ),
@@ -268,10 +270,7 @@ class _WorkoutExerciseViewCardState
             ],
           ),
           shape: BoxShape.circle,
-          border: Border.all(
-            color: color.withValues(alpha: 0.3),
-            width: 1.5,
-          ),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
         ),
         child: Icon(icon, color: color, size: 18),
       ),
@@ -349,20 +348,36 @@ class _WorkoutExerciseViewCardState
         children: [
           Row(
             children: [
-              Expanded(child: _buildReadOnlyField('Serie', sets.$1)),
-              const SizedBox(width: 12),
-              Expanded(child: _buildReadOnlyField('Rep', sets.$2)),
+              Expanded(
+                child: _buildReadOnlyField(context.tr('workout.sets'), sets.$1),
+              ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildReadOnlyField('Carico', weightValue, suffix: 'kg'),
+                child: _buildReadOnlyField(context.tr('workout.reps'), sets.$2),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildReadOnlyField(
+                  context.tr('workout.load'),
+                  weightValue,
+                  suffix: 'kg',
+                ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          _buildReadOnlyField('Rest', restValue, suffix: 's'),
+          _buildReadOnlyField(
+            context.tr('workout.rest'),
+            restValue,
+            suffix: 's',
+          ),
           if (description.isNotEmpty) ...[
             const SizedBox(height: 12),
-            _buildReadOnlyField('Descrizione', description, multiline: true),
+            _buildReadOnlyField(
+              context.tr('workout.description'),
+              description,
+              multiline: true,
+            ),
           ],
         ],
       ),
@@ -439,8 +454,9 @@ class _WorkoutExerciseViewCardState
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
   (String, String) _extractSetParts(String rawSets) {
-    final matches =
-        RegExp(r'\d+').allMatches(rawSets).map((m) => m.group(0)!).toList();
+    final matches = RegExp(
+      r'\d+',
+    ).allMatches(rawSets).map((m) => m.group(0)!).toList();
     if (matches.length >= 2) return (matches[0], matches[1]);
     if (matches.length == 1) return (matches[0], '');
     return ('', '');
@@ -451,10 +467,7 @@ class _WorkoutExerciseViewCardState
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            color.withValues(alpha: 0.2),
-            color.withValues(alpha: 0.1),
-          ],
+          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
         ),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: color.withValues(alpha: 0.35), width: 1.5),
@@ -492,13 +505,14 @@ class _WorkoutExerciseViewCardState
   }
 
   String _displayName(Locale locale) {
-    final localName =
-        widget.workoutExercise.exercise.nameI18n?.fromI18n(locale);
+    final localName = widget.workoutExercise.exercise.nameI18n?.fromI18n(
+      locale,
+    );
     if (_isValidDisplayName(localName)) return localName!.trim();
     if (_isValidDisplayName(_resolvedExerciseName)) {
       return _resolvedExerciseName!.trim();
     }
-    return 'Esercizio ${widget.exerciseNumber}';
+    return 'Exercise ${widget.exerciseNumber}';
   }
 
   bool _isValidDisplayName(String? name) {
@@ -535,8 +549,9 @@ class _WorkoutExerciseViewCardState
 
     setState(() {
       _isResolvingName = false;
-      _resolvedExerciseName =
-          _isValidDisplayName(resolvedName) ? resolvedName : null;
+      _resolvedExerciseName = _isValidDisplayName(resolvedName)
+          ? resolvedName
+          : null;
     });
   }
 }

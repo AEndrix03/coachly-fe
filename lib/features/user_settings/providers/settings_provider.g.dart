@@ -40,7 +40,7 @@ final class LanguageProvider extends $NotifierProvider<Language, Locale> {
   }
 }
 
-String _$languageHash() => r'ea30b649d95c441a9fee0a1400b139f3ece253e0';
+String _$languageHash() => r'b464d0ba3e84e6cdd14f22cf04d4ce42dfc6b804';
 
 abstract class _$Language extends $Notifier<Locale> {
   Locale build();

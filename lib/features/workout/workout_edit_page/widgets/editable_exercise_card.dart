@@ -3,6 +3,7 @@ import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -269,7 +270,7 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
                     _buildTag(
                       widget.exercise.muscles.isNotEmpty
                           ? widget.exercise.muscles.first
-                          : 'N/A',
+                          : context.tr('common.na'),
                       widget.exercise.accentColor,
                       Icons.fitness_center,
                     ),
@@ -441,7 +442,7 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
             children: [
               Expanded(
                 child: _buildNumericField(
-                  label: 'Serie',
+                  label: context.tr('workout.sets'),
                   controller: _setsController,
                   hint: '4',
                 ),
@@ -449,7 +450,7 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildNumericField(
-                  label: 'Rep',
+                  label: context.tr('workout.reps'),
                   controller: _repsController,
                   hint: '10',
                 ),
@@ -457,7 +458,7 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildNumericField(
-                  label: 'Carico',
+                  label: context.tr('workout.load'),
                   controller: _weightController,
                   suffix: 'kg',
                   hint: '80',
@@ -467,9 +468,9 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
           ),
           const SizedBox(height: 12),
           _buildNumericField(
-            label: 'Rest',
+            label: context.tr('workout.rest'),
             controller: _restController,
-            suffix: 'seconds',
+            suffix: context.tr('common.seconds'),
             hint: '90',
           ),
           const SizedBox(height: 12),
@@ -594,7 +595,7 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
             maxLines: 2,
             dragStartBehavior: DragStartBehavior.down,
             decoration: InputDecoration(
-              hintText: 'Aggiungi note...',
+              hintText: context.tr('workout.add_notes_hint'),
               hintStyle: TextStyle(
                 color: Colors.white.withValues(alpha: 0.3),
                 fontSize: 13,
@@ -657,7 +658,7 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
     if (name.isNotEmpty && name != exerciseId) {
       return name;
     }
-    return 'Esercizio ${widget.exercise.number}';
+    return 'Exercise ${widget.exercise.number}';
   }
 
   Future<void> _resolveNameIfNeeded() async {
@@ -681,9 +682,7 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
       final resolved = response.data?.nameI18n?.fromI18n(locale);
       setState(() {
         _isResolvingName = false;
-        if (resolved != null &&
-            resolved.isNotEmpty &&
-            resolved != exerciseId) {
+        if (resolved != null && resolved.isNotEmpty && resolved != exerciseId) {
           _resolvedName = resolved;
         }
       });

@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/badges/coach_badge_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,7 +64,9 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
             ],
           ),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFF2196F3).withValues(alpha: 0.14)),
+          border: Border.all(
+            color: const Color(0xFF2196F3).withValues(alpha: 0.14),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.13),
@@ -93,7 +96,8 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                           children: [
                             Expanded(
                               child: Text(
-                                widget.workout.titleI18n?.fromI18n(language) ?? '',
+                                widget.workout.titleI18n?.fromI18n(language) ??
+                                    '',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -123,11 +127,24 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                           children: [
                             _buildInfoChip(
                               Icons.fitness_center,
-                              '${widget.workout.workoutExercises.length} esercizi',
+                              context.tr(
+                                'workout.organize.exercises_count',
+                                params: {
+                                  'count':
+                                      '${widget.workout.workoutExercises.length}',
+                                },
+                              ),
                             ),
                             _buildInfoChip(
                               Icons.person_outline,
-                              'Coach ${widget.workout.coachName ?? 'N/A'}',
+                              context.tr(
+                                'workout.organize.coach',
+                                params: {
+                                  'name':
+                                      widget.workout.coachName ??
+                                      context.tr('common.na'),
+                                },
+                              ),
                             ),
                           ],
                         ),
@@ -152,15 +169,19 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                         <PopupMenuEntry<String>>[
                           PopupMenuItem<String>(
                             value: 'toggleActive',
-                            child: Text(_isActive ? 'Disattiva' : 'Attiva'),
+                            child: Text(
+                              _isActive
+                                  ? context.tr('common.deactivate')
+                                  : context.tr('common.activate'),
+                            ),
                           ),
-                          const PopupMenuItem<String>(
+                          PopupMenuItem<String>(
                             value: 'edit',
-                            child: Text('Modifica'),
+                            child: Text(context.tr('common.edit')),
                           ),
-                          const PopupMenuItem<String>(
+                          PopupMenuItem<String>(
                             value: 'delete',
-                            child: Text('Elimina'),
+                            child: Text(context.tr('common.delete')),
                           ),
                         ],
                   ),

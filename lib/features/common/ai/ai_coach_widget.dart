@@ -1,3 +1,4 @@
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
 /// Widget AI Coach moderno con quick actions e chat
@@ -33,15 +34,15 @@ class AICoachWidget extends StatelessWidget {
 
           // Quick actions (se richieste)
           if (showQuickActions) ...[
-            _buildQuickActions(),
+            _buildQuickActions(context),
             const Divider(color: Color(0xFF374151), height: 1, thickness: 1),
           ],
 
           // Chat messages
-          Expanded(child: _buildChatArea()),
+          Expanded(child: _buildChatArea(context)),
 
           // Input field
-          _buildInputField(),
+          _buildInputField(context),
         ],
       ),
     );
@@ -83,12 +84,12 @@ class AICoachWidget extends StatelessWidget {
           const SizedBox(width: 14),
 
           // Title
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'AI Coach',
+                  context.tr('nav.coach'),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -97,7 +98,7 @@ class AICoachWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Sempre pronto ad aiutarti',
+                  context.tr('ai.header_ready'),
                   style: TextStyle(
                     color: Colors.white54,
                     fontSize: 14,
@@ -119,7 +120,7 @@ class AICoachWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget _buildQuickActions(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -129,7 +130,7 @@ class AICoachWidget extends StatelessWidget {
               Expanded(
                 child: _buildQuickActionCard(
                   icon: Icons.fitness_center_rounded,
-                  label: 'Crea Scheda',
+                  label: context.tr('ai.create_workout'),
                   gradient: [const Color(0xFF6366F1), const Color(0xFF4F46E5)],
                   onTap: () {},
                 ),
@@ -138,7 +139,7 @@ class AICoachWidget extends StatelessWidget {
               Expanded(
                 child: _buildQuickActionCard(
                   icon: Icons.trending_up_rounded,
-                  label: 'Analizza Progressi',
+                  label: context.tr('ai.analyze_progress'),
                   gradient: [const Color(0xFF10B981), const Color(0xFF059669)],
                   onTap: () {},
                 ),
@@ -151,7 +152,7 @@ class AICoachWidget extends StatelessWidget {
               Expanded(
                 child: _buildQuickActionCard(
                   icon: Icons.calendar_today_rounded,
-                  label: 'Pianifica Settimana',
+                  label: context.tr('ai.plan_week'),
                   gradient: [const Color(0xFFF59E0B), const Color(0xFFD97706)],
                   onTap: () {},
                 ),
@@ -160,7 +161,7 @@ class AICoachWidget extends StatelessWidget {
               Expanded(
                 child: _buildQuickActionCard(
                   icon: Icons.emoji_events_rounded,
-                  label: 'Consigli Obiettivi',
+                  label: context.tr('ai.goal_tips'),
                   gradient: [const Color(0xFFEC4899), const Color(0xFFDB2777)],
                   onTap: () {},
                 ),
@@ -188,7 +189,10 @@ class AICoachWidget extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: gradient),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1),
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
                 color: gradient[0].withValues(alpha: 0.3),
@@ -218,32 +222,20 @@ class AICoachWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildChatArea() {
+  Widget _buildChatArea(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        _ChatBubble(
-          isAI: true,
-          message:
-              'Ciao! Sono il tuo AI Coach. Posso aiutarti con schede di allenamento, analisi progressi, consigli nutrizionali e molto altro. Come posso aiutarti oggi? 💪',
-        ),
+        _ChatBubble(isAI: true, message: context.tr('ai.greeting')),
         const SizedBox(height: 12),
-        _ChatBubble(
-          isAI: false,
-          message:
-              'Sto facendo la panca piana, mi sento stanco. Devo continuare?',
-        ),
+        _ChatBubble(isAI: false, message: context.tr('ai.sample_question')),
         const SizedBox(height: 12),
-        _ChatBubble(
-          isAI: true,
-          message:
-              'Ottima domanda! Se senti fatica muscolare normale, continua pure. Se invece percepisci dolore o instabilità articolare, fermati. Considera di ridurre leggermente il carico del 5-10% nelle serie rimanenti per mantenere la forma corretta. 🎯',
-        ),
+        _ChatBubble(isAI: true, message: context.tr('ai.sample_answer')),
       ],
     );
   }
 
-  Widget _buildInputField() {
+  Widget _buildInputField(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
@@ -288,8 +280,10 @@ class AICoachWidget extends StatelessWidget {
               child: TextField(
                 style: const TextStyle(color: Colors.white, fontSize: 15),
                 decoration: InputDecoration(
-                  hintText: 'Scrivi il tuo messaggio...',
-                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+                  hintText: context.tr('ai.write_message'),
+                  hintStyle: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.4),
+                  ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,

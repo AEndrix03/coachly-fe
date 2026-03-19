@@ -1,3 +1,4 @@
+import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
@@ -129,8 +130,6 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   }
 
   Future<void> _showCompleteDialog() async {
-    final scheme = Theme.of(context).colorScheme;
-
     final result = await showAppConfirmationDialog(
       context,
       title: context.tr('workout.complete_title'),
@@ -147,23 +146,25 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
     if (!mounted) return;
 
     if (success) {
+      ref
+          .read(appToastServiceProvider)
+          .showSuccess(
+            context,
+            context.tr('workout.completed_saved'),
+            title: context.tr('workout.complete_confirm'),
+          );
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.tr('workout.completed_saved')),
-          backgroundColor: scheme.primary,
-        ),
-      );
     } else {
       final errorMessage = ref
           .read(activeWorkoutProvider(widget.workoutId))
           .errorMessage;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage ?? context.tr('workout.save_error')),
-          backgroundColor: scheme.error,
-        ),
-      );
+      ref
+          .read(appToastServiceProvider)
+          .showError(
+            context,
+            errorMessage ?? context.tr('workout.save_error'),
+            title: context.tr('workout.save_error'),
+          );
     }
   }
 

@@ -2,6 +2,7 @@ import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/buttons/add_fab_button.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:coachly/shared/widgets/sections/section_bar.dart';
@@ -43,7 +44,7 @@ class WorkoutPage extends ConsumerWidget {
         },
         child: workoutState.when(
           loading: () => _buildLoading(scheme),
-          error: (err, stack) => _buildError(err),
+          error: (err, stack) => _buildError(context, err),
           data: (workouts) {
             final recentWorkoutsState = ref.watch(recentWorkoutsProvider);
             final statsState = ref.watch(workoutStatsProvider);
@@ -96,7 +97,7 @@ class WorkoutPage extends ConsumerWidget {
                   const Gap(28),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: SectionBar(title: 'Schede Recenti'),
+                    child: SectionBar(title: context.tr('workout.recent')),
                   ),
                   const Gap(10),
                   _buildRecentWorkouts(recent, scheme),
@@ -110,7 +111,7 @@ class WorkoutPage extends ConsumerWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 18),
-                child: SectionBar(title: 'Tutte le Schede', icon: null),
+                child: SectionBar(title: context.tr('workout.all'), icon: null),
               ),
               GlassIconButton(
                 icon: Icons.edit_note,
@@ -172,10 +173,10 @@ class WorkoutPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildError(Object err) {
+  Widget _buildError(BuildContext context, Object err) {
     return Center(
       child: ShadAlert(
-        title: Text('Errore'),
+        title: Text(context.tr('common.error')),
         description: Text(err.toString()),
       ),
     );
@@ -225,8 +226,8 @@ class WorkoutPage extends ConsumerWidget {
         .read(appToastServiceProvider)
         .showInfo(
           context,
-          'Funzionalita notifiche in arrivo',
-          title: 'Notifiche',
+          context.tr('workout.notifications_soon'),
+          title: context.tr('workout.notifications'),
           duration: const Duration(seconds: 2),
         );
   }

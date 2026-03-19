@@ -7,11 +7,13 @@ abstract class AiCoachRepository {
   Stream<String> streamResponse({
     required WorkoutContext context,
     required String userMessage,
+    required String languageCode,
   });
 
   CoachMessage parseAiMessage({
     required String raw,
     required String id,
     required DateTime timestamp,
+    required String languageCode,
   });
 }

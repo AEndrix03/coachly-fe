@@ -8,10 +8,24 @@ class MapConverter implements JsonConverter<Map<String, String>?, Object?> {
     if (json == null) {
       return null;
     }
-    if (json is Map<String, dynamic>) {
-      return json.map((k, e) => MapEntry(k, e as String));
+    if (json is Map) {
+      final mapped = <String, String>{};
+      for (final entry in json.entries) {
+        final key = entry.key.toString().trim();
+        final value = entry.value;
+        if (key.isEmpty || value == null) {
+          continue;
+        }
+
+        final text = value.toString().trim();
+        if (text.isEmpty) {
+          continue;
+        }
+
+        mapped[key] = text;
+      }
+      return mapped.isEmpty ? null : mapped;
     }
-    // Handle cases where backend might send "" or other non-map types
     return null;
   }
 

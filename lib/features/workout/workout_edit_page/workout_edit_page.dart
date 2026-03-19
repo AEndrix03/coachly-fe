@@ -4,6 +4,7 @@ import 'package:coachly/features/user_settings/providers/settings_provider.dart'
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_edit_page/providers/workout_edit_provider/workout_edit_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -113,7 +114,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final shouldPop = await _showExitDialog();
-        if (shouldPop) {
+        if (shouldPop && context.mounted) {
           context.pop();
         }
       },
@@ -189,9 +190,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Descrizione',
-              style: TextStyle(
+            Text(
+              context.tr('workout.edit.description'),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -206,7 +207,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               ),
               maxLines: null,
               decoration: InputDecoration(
-                hintText: 'Aggiungi una descrizione...',
+                hintText: context.tr('workout.edit.description'),
                 hintStyle: TextStyle(
                   color: Colors.white.withValues(alpha: 0.3),
                 ),
@@ -229,7 +230,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             child: _buildStatCard(
               Icons.fitness_center,
               state.exercises.length.toString(),
-              'Esercizi',
+              context.tr('common.exercises'),
               const Color(0xFF2196F3),
               null,
             ),
@@ -239,7 +240,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             child: _buildStatCard(
               Icons.timer_outlined,
               state.duration,
-              'Durata (min)',
+              context.tr('workout.duration_minutes'),
               const Color(0xFF9C27B0),
               _durationController,
             ),
@@ -249,7 +250,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             child: _buildStatCard(
               Icons.local_fire_department,
               state.type,
-              'Tipo',
+              context.tr('workout.type'),
               const Color(0xFFFF9800),
               _typeController,
             ),
@@ -379,14 +380,14 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add_rounded, color: Colors.white, size: 22),
-            SizedBox(width: 8),
+            const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+            const SizedBox(width: 8),
             Text(
-              'Aggiungi Esercizio',
-              style: TextStyle(
+              context.tr('workout.edit.add_exercise'),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
@@ -423,7 +424,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           ),
           const SizedBox(height: 24),
           Text(
-            'Nessun esercizio',
+            context.tr('workout.edit.no_exercise'),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.7),
               fontSize: 20,
@@ -432,7 +433,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Aggiungi il primo esercizio per iniziare',
+            context.tr('workout.edit.add_first_exercise'),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.5),
               fontSize: 14,
@@ -474,9 +475,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   Future<void> _handleRemoveExercise(String exerciseId) async {
     final shouldRemove = await showAppConfirmationDialog(
       context,
-      title: 'Rimuovi esercizio',
-      content: 'Sei sicuro di voler rimuovere questo esercizio?',
-      confirmLabel: 'Rimuovi',
+      title: context.tr('workout.edit.remove_title'),
+      content: context.tr('workout.edit.remove_content'),
+      confirmLabel: context.tr('workout.edit.remove_confirm'),
       destructive: true,
       icon: Icons.remove_circle_outline_rounded,
     );
@@ -495,7 +496,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         .showInfo(
           context,
           'Cerca variante per: ${exercise.name}',
-          title: 'Varianti esercizio',
+          title: context.tr('workout.edit.variant_title'),
           duration: const Duration(seconds: 2),
         );
   }
@@ -510,8 +511,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           .read(appToastServiceProvider)
           .showSuccess(
             context,
-            'Scheda salvata con successo',
-            title: 'Salvataggio completato',
+            context.tr('workout.edit.saved'),
+            title: context.tr('workout.edit.save_completed'),
           );
       context.pop();
     } else {
@@ -520,8 +521,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           .read(appToastServiceProvider)
           .showError(
             context,
-            error ?? 'Errore durante il salvataggio',
-            title: 'Salvataggio non riuscito',
+            error ?? context.tr('workout.save_error'),
+            title: context.tr('workout.edit.save_failed'),
           );
     }
   }
@@ -529,9 +530,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   Future<bool> _showExitDialog() async {
     final shouldExit = await showAppConfirmationDialog(
       context,
-      title: 'Modifiche non salvate',
-      content: 'Hai modifiche non salvate. Vuoi uscire senza salvare?',
-      confirmLabel: 'Esci',
+      title: context.tr('workout.edit.unsaved_title'),
+      content: context.tr('workout.edit.unsaved_content'),
+      confirmLabel: context.tr('workout.edit.exit'),
       destructive: true,
       icon: Icons.warning_amber_rounded,
     );
