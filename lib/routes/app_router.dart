@@ -179,7 +179,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: navigationShell,
-      bottomNavigationBar: const AppNavigationBar(),
+      bottomNavigationBar: AppNavigationBar(navigationShell: navigationShell),
     );
   }
 }

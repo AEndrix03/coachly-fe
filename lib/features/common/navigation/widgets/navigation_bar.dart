@@ -1,28 +1,30 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../providers/navigation_provider.dart';
+class AppNavigationBar extends StatefulWidget {
+  const AppNavigationBar({
+    super.key,
+    required this.navigationShell,
+  });
 
-class AppNavigationBar extends ConsumerStatefulWidget {
-  const AppNavigationBar({super.key});
+  final StatefulNavigationShell navigationShell;
 
   @override
-  ConsumerState<AppNavigationBar> createState() => _AppNavigationBarState();
+  State<AppNavigationBar> createState() => _AppNavigationBarState();
 }
 
-class _AppNavigationBarState extends ConsumerState<AppNavigationBar>
+class _AppNavigationBarState extends State<AppNavigationBar>
     with TickerProviderStateMixin {
   static const _tabs = [
-    _NavTab(icon: Icons.people, label: 'Community', route: '/community'),
-    _NavTab(icon: Icons.fitness_center, label: 'Workouts', route: '/workouts'),
-    _NavTab(icon: LucideIcons.target, label: 'Coach', route: '/coach'),
-    _NavTab(icon: Icons.tips_and_updates_rounded, label: 'Idee', route: '/feedback'),
-    _NavTab(icon: Ionicons.person_circle_outline, label: 'Profilo', route: '/profile'),
+    _NavTab(icon: Icons.people, label: 'Community'),
+    _NavTab(icon: Icons.fitness_center, label: 'Workouts'),
+    _NavTab(icon: LucideIcons.target, label: 'Coach'),
+    _NavTab(icon: Icons.tips_and_updates_rounded, label: 'Idee'),
+    _NavTab(icon: Ionicons.person_circle_outline, label: 'Profilo'),
   ];
 
   late final List<AnimationController> _bounceControllers;
@@ -70,13 +72,12 @@ class _AppNavigationBarState extends ConsumerState<AppNavigationBar>
   void _onTap(int index, int currentIndex) {
     if (index == currentIndex) return;
     _bounceControllers[index].forward(from: 0.0);
-    ref.read(navigationIndexProvider.notifier).set(index);
-    context.go(_tabs[index].route);
+    widget.navigationShell.goBranch(index);
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentIndex = ref.watch(navigationIndexProvider);
+    final currentIndex = widget.navigationShell.currentIndex;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Padding(
@@ -225,11 +226,9 @@ class _NavItem extends StatelessWidget {
 class _NavTab {
   final IconData icon;
   final String label;
-  final String route;
 
   const _NavTab({
     required this.icon,
     required this.label,
-    required this.route,
   });
 }
