@@ -114,10 +114,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
 
     // Configure the inference service with the selected model.
     final service = ref.read(gemmaInferenceServiceProvider);
-    service.configure(
-      LocalAiModelConfig.forModel(aiSettings.model),
-      hfToken: aiSettings.hfToken,
-    );
+    service.configure(LocalAiModelConfig.forModel(aiSettings.model));
 
     final repository = ref.read(aiCoachRepositoryProvider);
 

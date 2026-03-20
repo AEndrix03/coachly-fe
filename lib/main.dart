@@ -108,10 +108,7 @@ class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap> {
       if (!aiSettings.enabled) return;
 
       final service = ref.read(gemmaInferenceServiceProvider);
-      service.configure(
-        LocalAiModelConfig.forModel(aiSettings.model),
-        hfToken: aiSettings.hfToken,
-      );
+      service.configure(LocalAiModelConfig.forModel(aiSettings.model));
       final installed = await service.isModelInstalled();
       if (installed) {
         await service.ensureInitialized();

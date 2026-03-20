@@ -7,7 +7,6 @@ import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/headers/page_header.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
@@ -317,22 +316,6 @@ class _AiCoachSettings extends ConsumerStatefulWidget {
 }
 
 class _AiCoachSettingsState extends ConsumerState<_AiCoachSettings> {
-  final _tokenController = TextEditingController();
-  bool _tokenVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    final token = ref.read(localAiSettingsProvider).hfToken;
-    if (token != null) _tokenController.text = token;
-  }
-
-  @override
-  void dispose() {
-    _tokenController.dispose();
-    super.dispose();
-  }
-
   Future<void> _requestEnable(BuildContext context) async {
     final aiSettings = ref.read(localAiSettingsProvider);
     final config = LocalAiModelConfig.forModel(aiSettings.model);
@@ -438,7 +421,6 @@ class _AiCoachSettingsState extends ConsumerState<_AiCoachSettings> {
     );
     if (confirm == true && mounted) {
       await ref.read(gemmaInferenceServiceProvider).uninstallAllModels();
-      HapticFeedback.lightImpact();
     }
   }
 
@@ -599,76 +581,6 @@ class _AiCoachSettingsState extends ConsumerState<_AiCoachSettings> {
               ),
             );
           }),
-
-          Divider(color: dividerColor, height: 24),
-
-          // HuggingFace token
-          Text(
-            context.tr('settings.local_ai.hf_token'),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.50),
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.6,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            context.tr('settings.local_ai.hf_token_subtitle'),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.35),
-              fontSize: 11,
-            ),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _tokenController,
-            obscureText: !_tokenVisible,
-            style: const TextStyle(color: Colors.white, fontSize: 13),
-            decoration: InputDecoration(
-              hintText: context.tr('settings.local_ai.hf_token_hint'),
-              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.25)),
-              filled: true,
-              fillColor: Colors.white.withValues(alpha: 0.05),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(
-                  color: Color(0xFF9C27B0),
-                  width: 1.5,
-                ),
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _tokenVisible ? Icons.visibility_off : Icons.visibility,
-                  size: 16,
-                  color: Colors.white.withValues(alpha: 0.40),
-                ),
-                onPressed: () => setState(() => _tokenVisible = !_tokenVisible),
-              ),
-            ),
-            onEditingComplete: () {
-              ref
-                  .read(localAiSettingsProvider.notifier)
-                  .setHfToken(_tokenController.text);
-              FocusScope.of(context).unfocus();
-            },
-          ),
 
           Divider(color: dividerColor, height: 24),
 

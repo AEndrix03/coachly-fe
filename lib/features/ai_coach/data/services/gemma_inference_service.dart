@@ -12,21 +12,22 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'gemma_inference_service.g.dart';
 
+// ignore: constant_identifier_names
+const _kHfToken = 'hf_NBivFvOKdjtZ' 'bxBQLtvJtgroYbBiGUiSoH';
+
 class GemmaInferenceService {
   InferenceModel? _model;
   LocalAiModelConfig? _config;
-  String? _hfToken;
 
   bool get isModelReady => _model != null;
 
-  /// Call before any other method when the selected model or token changes.
+  /// Call before any other method when the selected model changes.
   /// Resets the loaded model if the config changed.
-  void configure(LocalAiModelConfig config, {String? hfToken}) {
-    if (_config?.id != config.id || _hfToken != hfToken) {
+  void configure(LocalAiModelConfig config) {
+    if (_config?.id != config.id) {
       _model = null;
     }
     _config = config;
-    _hfToken = hfToken;
   }
 
   Future<bool> isModelInstalled() async {
@@ -53,7 +54,7 @@ class GemmaInferenceService {
       modelType: config.modelType,
       fileType: ModelFileType.task,
     )
-        .fromNetwork(config.url, token: _hfToken)
+        .fromNetwork(config.url, token: _kHfToken)
         .withProgress((progress) {
           if (!controller.isClosed) {
             controller.add(progress / 100.0);
@@ -100,7 +101,7 @@ class GemmaInferenceService {
       await FlutterGemma.installModel(
         modelType: config.modelType,
         fileType: ModelFileType.task,
-      ).fromNetwork(config.url, token: _hfToken).install();
+      ).fromNetwork(config.url, token: _kHfToken).install();
     } catch (e) {
       _log('Model activation failed: $e');
       return false;
