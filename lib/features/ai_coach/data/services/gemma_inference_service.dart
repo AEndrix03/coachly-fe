@@ -74,12 +74,12 @@ class GemmaInferenceService {
 
     try {
       _log('Activating $_kModelId...');
-      // Must call installModel().install() on every app launch to register
-      // the existing local file as the active inference model.
+      // fromNetwork + install() is idempotent: if the file already exists on
+      // device flutter_gemma skips the download and just sets the active model.
       await FlutterGemma.installModel(
         modelType: ModelType.qwen,
         fileType: ModelFileType.task,
-      ).install();
+      ).fromNetwork(_kModelUrl).install();
     } catch (e) {
       _log('Model activation failed: $e');
       return false;
