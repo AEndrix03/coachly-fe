@@ -1,5 +1,6 @@
 import 'package:coachly/core/sync/app_data_sync_service.dart';
 import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/features/ai_coach/data/services/gemma_inference_service.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
@@ -99,6 +100,14 @@ class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap> {
 
     Future.microtask(() {
       _handleAuthState(null, ref.read(authProvider));
+    });
+
+    Future.microtask(() async {
+      final service = ref.read(gemmaInferenceServiceProvider);
+      final installed = await service.isModelInstalled();
+      if (installed) {
+        await service.ensureInitialized();
+      }
     });
   }
 
