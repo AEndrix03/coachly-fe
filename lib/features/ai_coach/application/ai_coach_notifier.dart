@@ -15,6 +15,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'ai_coach_notifier.g.dart';
 
+// How often (in tokens) we flush the visible text to the message bubble.
+const _kStreamFlushEvery = 3;
+
 enum QuickActionType {
   adjustWeight,
   showProgress,
@@ -230,6 +233,8 @@ class AiCoachNotifier extends _$AiCoachNotifier {
 
     final repository = ref.read(aiCoachRepositoryProvider);
     final context = ref.read(currentWorkoutContextProvider);
+    final history = _buildChatHistory(_current.messages);
+
     final userMessage = CoachMessage(
       id: _nextId('user'),
       text: trimmed,
@@ -253,38 +258,60 @@ class AiCoachNotifier extends _$AiCoachNotifier {
     );
 
     final streamBuffer = StringBuffer();
+    var tokensSinceFlush = 0;
 
     try {
       await for (final token in repository.streamResponse(
         context: context,
         userMessage: trimmed,
         languageCode: _languageCode,
+        chatHistory: history,
       )) {
+        if (!ref.mounted) return;
         streamBuffer.write(token);
-        // Do not update the bubble with raw JSON during streaming;
-        // the typing indicator stays visible until parsing is complete.
+        tokensSinceFlush++;
+
+        // Flush visible text to the bubble every N tokens.
+        if (tokensSinceFlush >= _kStreamFlushEvery) {
+          tokensSinceFlush = 0;
+          final visible = GemmaInferenceService.visibleText(
+            streamBuffer.toString(),
+          );
+          _replaceMessageText(aiPlaceholder.id, visible);
+        }
       }
 
-      final parsed = repository.parseAiMessage(
-        raw: streamBuffer.toString(),
+      if (!ref.mounted) return;
+
+      // Parse the final buffer for text + optional InsightCard.
+      final parsed = GemmaInferenceService.parseStreamedResponse(
+        streamBuffer.toString(),
+      );
+
+      final finalMessage = CoachMessage(
         id: aiPlaceholder.id,
+        text: parsed.text.isEmpty ? _tr('ai.retry_short') : parsed.text,
+        sender: MessageSender.ai,
         timestamp: DateTime.now(),
-        languageCode: _languageCode,
+        insightCard: parsed.insight,
       );
 
       final messages = _current.messages
-          .map((message) => message.id == aiPlaceholder.id ? parsed : message)
+          .map(
+            (m) => m.id == aiPlaceholder.id ? finalMessage : m,
+          )
           .toList(growable: false);
 
       state = AsyncData(
         _current.copyWith(
           messages: messages,
           isGenerating: false,
-          suggestions: _buildSuggestions(parsed, context),
+          suggestions: _buildSuggestions(finalMessage, context),
         ),
       );
       await HapticFeedback.lightImpact();
     } catch (_) {
+      if (!ref.mounted) return;
       final fallback = CoachMessage(
         id: aiPlaceholder.id,
         text: _tr('ai.retry_short'),
@@ -293,7 +320,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
       );
 
       final messages = _current.messages
-          .map((message) => message.id == aiPlaceholder.id ? fallback : message)
+          .map((m) => m.id == aiPlaceholder.id ? fallback : m)
           .toList(growable: false);
 
       state = AsyncData(
@@ -304,6 +331,31 @@ class AiCoachNotifier extends _$AiCoachNotifier {
         ),
       );
     }
+  }
+
+  /// Formats the last 6 user/AI message pairs as a compact history string
+  /// to be injected into the prompt.
+  String _buildChatHistory(List<CoachMessage> messages) {
+    // Exclude the very last AI placeholder (text is empty).
+    final history = messages
+        .where((m) => m.text.isNotEmpty)
+        .toList();
+
+    // Keep only the last 6 messages (3 pairs) to limit token usage.
+    final recent = history.length > 6
+        ? history.sublist(history.length - 6)
+        : history;
+
+    if (recent.isEmpty) return '';
+
+    final buffer = StringBuffer('[HISTORY]');
+    for (final m in recent) {
+      final prefix = m.sender == MessageSender.user ? 'U' : 'A';
+      // Truncate long messages to save tokens.
+      final snippet = m.text.length > 120 ? '${m.text.substring(0, 120)}…' : m.text;
+      buffer.write('\n$prefix: $snippet');
+    }
+    return buffer.toString();
   }
 
   Future<void> startVoiceInput() async {

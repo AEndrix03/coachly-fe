@@ -31,11 +31,11 @@ class LocalAiModelConfig {
     switch (model) {
       case LocalAiModel.minimal:
         return const LocalAiModelConfig(
-          id: 'gemma-3-1b-it-int4.task',
+          id: 'gemma3-1b-it-int4.task',
           url:
-              'https://huggingface.co/google/gemma-3-1b-it-litert-preview/resolve/main/gemma-3-1b-it-int4.task',
+              'https://huggingface.co/MiCkSoftware/Gemma3-1B-IT-LiteRT/resolve/main/gemma3-1b-it-int4.task',
           modelType: ModelType.gemmaIt,
-          storageGb: 0.5,
+          storageGb: 0.53,
         );
       case LocalAiModel.good:
         return const LocalAiModelConfig(
@@ -43,7 +43,7 @@ class LocalAiModelConfig {
           url:
               'https://huggingface.co/google/gemma-3n-E2B-it-litert-preview/resolve/main/gemma-3n-E2B-it-int4.task',
           modelType: ModelType.gemmaIt,
-          storageGb: 3.1,
+          storageGb: 2.92,
         );
       case LocalAiModel.best:
         return const LocalAiModelConfig(
@@ -51,7 +51,7 @@ class LocalAiModelConfig {
           url:
               'https://huggingface.co/google/gemma-3n-E4B-it-litert-preview/resolve/main/gemma-3n-E4B-it-int4.task',
           modelType: ModelType.gemmaIt,
-          storageGb: 6.5,
+          storageGb: 4.1,
         );
     }
   }
