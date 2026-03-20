@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:coachly/features/ai_coach/domain/models/local_ai_model.dart';
 import 'package:coachly/features/ai_coach/domain/models/workout_context.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/foundation.dart';
@@ -11,19 +12,28 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'gemma_inference_service.g.dart';
 
-const _kModelUrl =
-    'https://huggingface.co/litert-community/Qwen2.5-1.5B-Instruct/resolve/main/Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv4096.litertlm';
-const _kModelId =
-    'Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv4096.litertlm';
-
 class GemmaInferenceService {
   InferenceModel? _model;
+  LocalAiModelConfig? _config;
+  String? _hfToken;
 
   bool get isModelReady => _model != null;
 
+  /// Call before any other method when the selected model or token changes.
+  /// Resets the loaded model if the config changed.
+  void configure(LocalAiModelConfig config, {String? hfToken}) {
+    if (_config?.id != config.id || _hfToken != hfToken) {
+      _model = null;
+    }
+    _config = config;
+    _hfToken = hfToken;
+  }
+
   Future<bool> isModelInstalled() async {
+    final config = _config;
+    if (config == null) return false;
     try {
-      return await FlutterGemma.isModelInstalled(_kModelId);
+      return await FlutterGemma.isModelInstalled(config.id);
     } catch (e) {
       _log('isModelInstalled error: $e');
       return false;
@@ -32,13 +42,18 @@ class GemmaInferenceService {
 
   /// Streams download progress as values from 0.0 to 1.0.
   Stream<double> downloadModel() {
+    final config = _config;
+    if (config == null) {
+      return Stream.error(StateError('Model not configured'));
+    }
+
     final controller = StreamController<double>();
 
     FlutterGemma.installModel(
-      modelType: ModelType.qwen,
+      modelType: config.modelType,
       fileType: ModelFileType.task,
     )
-        .fromNetwork(_kModelUrl)
+        .fromNetwork(config.url, token: _hfToken)
         .withProgress((progress) {
           if (!controller.isClosed) {
             controller.add(progress / 100.0);
@@ -66,6 +81,12 @@ class GemmaInferenceService {
   Future<bool> ensureInitialized() async {
     if (_model != null) return true;
 
+    final config = _config;
+    if (config == null) {
+      _log('Model not configured.');
+      return false;
+    }
+
     final installed = await isModelInstalled();
     if (!installed) {
       _log('Model not installed. Cannot initialize.');
@@ -73,20 +94,20 @@ class GemmaInferenceService {
     }
 
     try {
-      _log('Activating $_kModelId...');
+      _log('Activating ${config.id}...');
       // fromNetwork + install() is idempotent: if the file already exists on
       // device flutter_gemma skips the download and just sets the active model.
       await FlutterGemma.installModel(
-        modelType: ModelType.qwen,
+        modelType: config.modelType,
         fileType: ModelFileType.task,
-      ).fromNetwork(_kModelUrl).install();
+      ).fromNetwork(config.url, token: _hfToken).install();
     } catch (e) {
       _log('Model activation failed: $e');
       return false;
     }
 
     try {
-      _log('Loading $_kModelId into memory...');
+      _log('Loading ${config.id} into memory...');
       final stopwatch = Stopwatch()..start();
       _model = await FlutterGemma.getActiveModel(
         maxTokens: 1024,
@@ -97,6 +118,20 @@ class GemmaInferenceService {
     } catch (e) {
       _log('Model load failed: $e');
       return false;
+    }
+  }
+
+  /// Removes all installed models from the device storage.
+  Future<void> uninstallAllModels() async {
+    _model = null;
+    try {
+      final installed = await FlutterGemma.listInstalledModels();
+      for (final modelId in installed) {
+        await FlutterGemma.uninstallModel(modelId);
+        _log('Uninstalled: $modelId');
+      }
+    } catch (e) {
+      _log('Uninstall error: $e');
     }
   }
 

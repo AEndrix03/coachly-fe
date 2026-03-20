@@ -1,6 +1,7 @@
 import 'package:coachly/features/ai_coach/application/ai_coach_notifier.dart';
 import 'package:coachly/features/ai_coach/data/services/context_assembler_service.dart';
 import 'package:coachly/features/ai_coach/domain/models/coach_message.dart';
+import 'package:coachly/features/ai_coach/domain/models/local_ai_model.dart';
 import 'package:coachly/features/ai_coach/ui/theme/ai_coach_theme.dart';
 import 'package:coachly/features/ai_coach/ui/widgets/coach_header.dart';
 import 'package:coachly/features/ai_coach/ui/widgets/context_pill.dart';
@@ -10,6 +11,7 @@ import 'package:coachly/features/ai_coach/ui/widgets/message_bubble.dart';
 import 'package:coachly/features/ai_coach/ui/widgets/quick_actions_row.dart';
 import 'package:coachly/features/ai_coach/ui/widgets/suggestions_row.dart';
 import 'package:coachly/features/ai_coach/ui/widgets/voice_overlay.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -127,10 +129,15 @@ class _AiCoachPanelState extends ConsumerState<AiCoachPanel> {
                           ? _LoadingMessages(
                               scrollController: sheetScrollController,
                             )
+                          : !coachState.isLocalAiEnabled
+                          ? const _LocalAiDisabledPrompt()
                           : !coachState.isModelInstalled
                           ? _ModelDownloadPrompt(
                               isDownloading: coachState.isDownloading,
                               progress: coachState.downloadProgress,
+                              selectedModel: ref
+                                  .read(localAiSettingsProvider)
+                                  .model,
                               onDownload: () => ref
                                   .read(aiCoachProvider.notifier)
                                   .startModelDownload(),
@@ -202,16 +209,19 @@ class _ModelDownloadPrompt extends StatelessWidget {
   const _ModelDownloadPrompt({
     required this.isDownloading,
     required this.progress,
+    required this.selectedModel,
     required this.onDownload,
   });
 
   final bool isDownloading;
   final double progress;
+  final LocalAiModel selectedModel;
   final VoidCallback onDownload;
 
   @override
   Widget build(BuildContext context) {
     final pct = (progress * 100).round();
+    final config = LocalAiModelConfig.forModel(selectedModel);
 
     return Center(
       child: Padding(
@@ -237,7 +247,11 @@ class _ModelDownloadPrompt extends StatelessWidget {
                   ),
                 ],
               ),
-              child: const Icon(Icons.download_rounded, color: Colors.white, size: 26),
+              child: const Icon(
+                Icons.download_rounded,
+                color: Colors.white,
+                size: 26,
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -251,7 +265,7 @@ class _ModelDownloadPrompt extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              context.tr('ai.download.subtitle'),
+              '${config.id.replaceAll('.task', '')} · ${config.storageSizeLabel} · offline',
               style: const TextStyle(
                 color: AiCoachTheme.accentBlue,
                 fontSize: 12,
@@ -277,12 +291,17 @@ class _ModelDownloadPrompt extends StatelessWidget {
                   value: progress > 0 ? progress : null,
                   minHeight: 6,
                   backgroundColor: AiCoachTheme.bgSurface,
-                  valueColor: const AlwaysStoppedAnimation(AiCoachTheme.accentBlue),
+                  valueColor: const AlwaysStoppedAnimation(
+                    AiCoachTheme.accentBlue,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               Text(
-                context.tr('ai.download.progress', params: {'progress': '$pct'}),
+                context.tr(
+                  'ai.download.progress',
+                  params: {'progress': '$pct'},
+                ),
                 style: const TextStyle(
                   color: AiCoachTheme.textSecondary,
                   fontSize: 12,
@@ -305,6 +324,61 @@ class _ModelDownloadPrompt extends StatelessWidget {
                   ),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LocalAiDisabledPrompt extends StatelessWidget {
+  const _LocalAiDisabledPrompt();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AiCoachTheme.bgSurface,
+                border: Border.all(
+                  color: AiCoachTheme.borderSubtle,
+                  width: 1.5,
+                ),
+              ),
+              child: const Icon(
+                Icons.hardware_outlined,
+                color: AiCoachTheme.textSecondary,
+                size: 26,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              context.tr('ai.disabled.title'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              context.tr('ai.disabled.subtitle'),
+              style: const TextStyle(
+                color: AiCoachTheme.textSecondary,
+                fontSize: 13,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),

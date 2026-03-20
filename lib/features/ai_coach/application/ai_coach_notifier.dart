@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:coachly/features/ai_coach/data/repositories/ai_coach_repository_impl.dart';
 import 'package:coachly/features/ai_coach/data/services/context_assembler_service.dart';
+import 'package:coachly/features/ai_coach/data/services/gemma_inference_service.dart';
 import 'package:coachly/features/ai_coach/data/services/stt_service.dart';
 import 'package:coachly/features/ai_coach/domain/models/coach_message.dart';
+import 'package:coachly/features/ai_coach/domain/models/local_ai_model.dart';
 import 'package:coachly/features/ai_coach/domain/models/workout_context.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
@@ -32,6 +34,7 @@ class AiCoachState {
     this.isModelInstalled = true,
     this.isDownloading = false,
     this.downloadProgress = 0.0,
+    this.isLocalAiEnabled = true,
   });
 
   final List<CoachMessage> messages;
@@ -46,6 +49,8 @@ class AiCoachState {
   final bool isDownloading;
   /// Download progress from 0.0 to 1.0.
   final double downloadProgress;
+  /// False when the user has disabled local AI in settings.
+  final bool isLocalAiEnabled;
 
   AiCoachState copyWith({
     List<CoachMessage>? messages,
@@ -57,6 +62,7 @@ class AiCoachState {
     bool? isModelInstalled,
     bool? isDownloading,
     double? downloadProgress,
+    bool? isLocalAiEnabled,
   }) {
     return AiCoachState(
       messages: messages ?? this.messages,
@@ -68,6 +74,7 @@ class AiCoachState {
       isModelInstalled: isModelInstalled ?? this.isModelInstalled,
       isDownloading: isDownloading ?? this.isDownloading,
       downloadProgress: downloadProgress ?? this.downloadProgress,
+      isLocalAiEnabled: isLocalAiEnabled ?? this.isLocalAiEnabled,
     );
   }
 }
@@ -93,6 +100,25 @@ class AiCoachNotifier extends _$AiCoachNotifier {
   }
 
   Future<void> _bootstrap() async {
+    final aiSettings = ref.read(localAiSettingsProvider);
+
+    if (!aiSettings.enabled) {
+      state = AsyncData(
+        _current.copyWith(
+          isModelLoading: false,
+          isLocalAiEnabled: false,
+        ),
+      );
+      return;
+    }
+
+    // Configure the inference service with the selected model.
+    final service = ref.read(gemmaInferenceServiceProvider);
+    service.configure(
+      LocalAiModelConfig.forModel(aiSettings.model),
+      hfToken: aiSettings.hfToken,
+    );
+
     final repository = ref.read(aiCoachRepositoryProvider);
 
     final installed = await repository.isModelInstalled();
@@ -100,7 +126,11 @@ class AiCoachNotifier extends _$AiCoachNotifier {
 
     if (!installed) {
       state = AsyncData(
-        _current.copyWith(isModelLoading: false, isModelInstalled: false),
+        _current.copyWith(
+          isModelLoading: false,
+          isModelInstalled: false,
+          isLocalAiEnabled: true,
+        ),
       );
       return;
     }
@@ -111,6 +141,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
     var updated = _current.copyWith(
       isModelLoading: false,
       isModelInstalled: true,
+      isLocalAiEnabled: true,
     );
     if (!ready) {
       final warning = CoachMessage(

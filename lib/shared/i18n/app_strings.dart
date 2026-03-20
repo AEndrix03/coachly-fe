@@ -554,6 +554,100 @@ class AppStrings {
       'en': 'Download failed. Tap to retry.',
       'it': 'Download fallito. Tocca per riprovare.',
     },
+
+    // Local AI settings (profile page)
+    'settings.local_ai.section': {
+      'en': 'AI Coach',
+      'it': 'AI Coach',
+    },
+    'settings.local_ai.toggle': {
+      'en': 'Use local AI',
+      'it': 'Usa AI in locale',
+    },
+    'settings.local_ai.toggle_subtitle': {
+      'en': 'Run AI entirely on your device, offline',
+      'it': 'Esegui l\'AI interamente sul dispositivo, offline',
+    },
+    'settings.local_ai.model_quality': {
+      'en': 'Model quality',
+      'it': 'Qualità modello',
+    },
+    'settings.local_ai.model_minimal': {
+      'en': 'Minimal',
+      'it': 'Minima',
+    },
+    'settings.local_ai.model_good': {
+      'en': 'Good',
+      'it': 'Buona',
+    },
+    'settings.local_ai.model_best': {
+      'en': 'Best',
+      'it': 'Ottima',
+    },
+    'settings.local_ai.uninstall_all': {
+      'en': 'Uninstall downloaded models',
+      'it': 'Disinstalla modelli scaricati',
+    },
+    'settings.local_ai.uninstall_title': {
+      'en': 'Uninstall models?',
+      'it': 'Disinstallare i modelli?',
+    },
+    'settings.local_ai.uninstall_body': {
+      'en': 'All downloaded AI models will be removed from your device.',
+      'it': 'Tutti i modelli AI scaricati verranno rimossi dal dispositivo.',
+    },
+    'settings.local_ai.uninstall_confirm': {
+      'en': 'Uninstall',
+      'it': 'Disinstalla',
+    },
+    'settings.local_ai.enable_title': {
+      'en': 'Enable local AI?',
+      'it': 'Abilitare AI in locale?',
+    },
+    'settings.local_ai.storage_info': {
+      'en': 'Storage required: {size}',
+      'it': 'Spazio archiviazione necessario: {size}',
+    },
+    'settings.local_ai.no_cost': {
+      'en': 'No additional costs',
+      'it': 'Nessun costo aggiuntivo',
+    },
+    'settings.local_ai.modern_device': {
+      'en': 'Designed for modern devices',
+      'it': 'Pensato per dispositivi moderni',
+    },
+    'settings.local_ai.can_disable': {
+      'en': 'You can disable it at any time',
+      'it': 'Puoi disabilitare l\'opzione in qualsiasi momento',
+    },
+    'settings.local_ai.enable_confirm': {
+      'en': 'Enable',
+      'it': 'Abilita',
+    },
+    'settings.local_ai.hf_token': {
+      'en': 'HuggingFace Token (optional)',
+      'it': 'Token HuggingFace (opzionale)',
+    },
+    'settings.local_ai.hf_token_hint': {
+      'en': 'hf_...',
+      'it': 'hf_...',
+    },
+    'settings.local_ai.hf_token_subtitle': {
+      'en': 'Required to download gated models from HuggingFace',
+      'it': 'Necessario per scaricare i modelli protetti da HuggingFace',
+    },
+
+    // AI coach panel — disabled state
+    'ai.disabled.title': {
+      'en': 'Local AI disabled',
+      'it': 'AI locale disabilitata',
+    },
+    'ai.disabled.subtitle': {
+      'en':
+          'Enable local AI in your profile settings to use the AI coach during workouts.',
+      'it':
+          'Abilita l\'AI in locale dalle impostazioni del profilo per usare il coach AI durante l\'allenamento.',
+    },
   };
 
   static Locale normalizeLocale(Locale locale) {
