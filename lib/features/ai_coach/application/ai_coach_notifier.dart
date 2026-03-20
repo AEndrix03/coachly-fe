@@ -35,6 +35,7 @@ class AiCoachState {
     this.isDownloading = false,
     this.downloadProgress = 0.0,
     this.isLocalAiEnabled = true,
+    this.isInsufficientMemory = false,
   });
 
   final List<CoachMessage> messages;
@@ -51,6 +52,8 @@ class AiCoachState {
   final double downloadProgress;
   /// False when the user has disabled local AI in settings.
   final bool isLocalAiEnabled;
+  /// True when the model failed to load due to insufficient RAM.
+  final bool isInsufficientMemory;
 
   AiCoachState copyWith({
     List<CoachMessage>? messages,
@@ -63,6 +66,7 @@ class AiCoachState {
     bool? isDownloading,
     double? downloadProgress,
     bool? isLocalAiEnabled,
+    bool? isInsufficientMemory,
   }) {
     return AiCoachState(
       messages: messages ?? this.messages,
@@ -75,6 +79,7 @@ class AiCoachState {
       isDownloading: isDownloading ?? this.isDownloading,
       downloadProgress: downloadProgress ?? this.downloadProgress,
       isLocalAiEnabled: isLocalAiEnabled ?? this.isLocalAiEnabled,
+      isInsufficientMemory: isInsufficientMemory ?? this.isInsufficientMemory,
     );
   }
 }
@@ -132,7 +137,7 @@ class AiCoachNotifier extends _$AiCoachNotifier {
       return;
     }
 
-    final ready = await repository.ensureModelReady();
+    final result = await repository.ensureModelReady();
     if (!ref.mounted) return;
 
     var updated = _current.copyWith(
@@ -140,14 +145,20 @@ class AiCoachNotifier extends _$AiCoachNotifier {
       isModelInstalled: true,
       isLocalAiEnabled: true,
     );
-    if (!ready) {
-      final warning = CoachMessage(
-        id: _nextId('ai'),
-        text: _tr('ai.model_unavailable'),
-        sender: MessageSender.ai,
-        timestamp: DateTime.now(),
-      );
-      updated = updated.copyWith(messages: [...updated.messages, warning]);
+
+    switch (result) {
+      case ModelInitResult.success:
+        break;
+      case ModelInitResult.insufficientMemory:
+        updated = updated.copyWith(isInsufficientMemory: true);
+      case ModelInitResult.failed:
+        final warning = CoachMessage(
+          id: _nextId('ai'),
+          text: _tr('ai.model_unavailable'),
+          sender: MessageSender.ai,
+          timestamp: DateTime.now(),
+        );
+        updated = updated.copyWith(messages: [...updated.messages, warning]);
     }
 
     state = AsyncData(updated);
@@ -180,18 +191,23 @@ class AiCoachNotifier extends _$AiCoachNotifier {
         ),
       );
 
-      final ready = await repository.ensureModelReady();
+      final result = await repository.ensureModelReady();
       if (!ref.mounted) return;
 
       var updated = _current.copyWith(isModelLoading: false);
-      if (!ready) {
-        final warning = CoachMessage(
-          id: _nextId('ai'),
-          text: _tr('ai.model_unavailable'),
-          sender: MessageSender.ai,
-          timestamp: DateTime.now(),
-        );
-        updated = updated.copyWith(messages: [...updated.messages, warning]);
+      switch (result) {
+        case ModelInitResult.success:
+          break;
+        case ModelInitResult.insufficientMemory:
+          updated = updated.copyWith(isInsufficientMemory: true);
+        case ModelInitResult.failed:
+          final warning = CoachMessage(
+            id: _nextId('ai'),
+            text: _tr('ai.model_unavailable'),
+            sender: MessageSender.ai,
+            timestamp: DateTime.now(),
+          );
+          updated = updated.copyWith(messages: [...updated.messages, warning]);
       }
       state = AsyncData(updated);
     } catch (_) {

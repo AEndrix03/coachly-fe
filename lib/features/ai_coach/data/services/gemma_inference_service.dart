@@ -79,19 +79,19 @@ class GemmaInferenceService {
     return controller.stream;
   }
 
-  Future<bool> ensureInitialized() async {
-    if (_model != null) return true;
+  Future<ModelInitResult> ensureInitialized() async {
+    if (_model != null) return ModelInitResult.success;
 
     final config = _config;
     if (config == null) {
       _log('Model not configured.');
-      return false;
+      return ModelInitResult.failed;
     }
 
     final installed = await isModelInstalled();
     if (!installed) {
       _log('Model not installed. Cannot initialize.');
-      return false;
+      return ModelInitResult.failed;
     }
 
     try {
@@ -104,7 +104,7 @@ class GemmaInferenceService {
       ).fromNetwork(config.url, token: _kHfToken).install();
     } catch (e) {
       _log('Model activation failed: $e');
-      return false;
+      return ModelInitResult.failed;
     }
 
     try {
@@ -115,11 +115,27 @@ class GemmaInferenceService {
         preferredBackend: PreferredBackend.gpu,
       );
       _log('Model loaded in ${stopwatch.elapsedMilliseconds}ms.');
-      return true;
+      return ModelInitResult.success;
     } catch (e) {
       _log('Model load failed: $e');
-      return false;
+      return _isMemoryError(e)
+          ? ModelInitResult.insufficientMemory
+          : ModelInitResult.failed;
     }
+  }
+
+  /// Returns true if the exception looks like an out-of-memory / allocation
+  /// failure from the native inference runtime.
+  bool _isMemoryError(Object e) {
+    final msg = e.toString().toLowerCase();
+    return msg.contains('out of memory') ||
+        msg.contains('oom') ||
+        msg.contains('enomem') ||
+        msg.contains('allocation') ||
+        msg.contains('allocat') ||
+        msg.contains('memory') ||
+        msg.contains('failed to create') ||
+        msg.contains('cannot allocate');
   }
 
   /// Removes all installed models from the device storage.

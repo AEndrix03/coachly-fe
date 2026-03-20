@@ -1,4 +1,5 @@
 import 'package:coachly/features/ai_coach/domain/models/coach_message.dart';
+import 'package:coachly/features/ai_coach/domain/models/local_ai_model.dart';
 import 'package:coachly/features/ai_coach/domain/models/workout_context.dart';
 
 abstract class AiCoachRepository {
@@ -6,7 +7,7 @@ abstract class AiCoachRepository {
 
   Stream<double> downloadModel();
 
-  Future<bool> ensureModelReady();
+  Future<ModelInitResult> ensureModelReady();
 
   Stream<String> streamResponse({
     required WorkoutContext context,

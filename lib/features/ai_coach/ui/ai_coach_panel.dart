@@ -131,6 +131,8 @@ class _AiCoachPanelState extends ConsumerState<AiCoachPanel> {
                             )
                           : !coachState.isLocalAiEnabled
                           ? const _LocalAiDisabledPrompt()
+                          : coachState.isInsufficientMemory
+                          ? const _InsufficientMemoryPrompt()
                           : !coachState.isModelInstalled
                           ? _ModelDownloadPrompt(
                               isDownloading: coachState.isDownloading,
@@ -324,6 +326,61 @@ class _ModelDownloadPrompt extends StatelessWidget {
                   ),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InsufficientMemoryPrompt extends StatelessWidget {
+  const _InsufficientMemoryPrompt();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFFF6B35).withAlpha(30),
+                border: Border.all(
+                  color: const Color(0xFFFF6B35).withAlpha(100),
+                  width: 1.5,
+                ),
+              ),
+              child: const Icon(
+                Icons.memory_outlined,
+                color: Color(0xFFFF6B35),
+                size: 26,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              context.tr('ai.oom.title'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              context.tr('ai.oom.subtitle'),
+              style: const TextStyle(
+                color: AiCoachTheme.textSecondary,
+                fontSize: 13,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),

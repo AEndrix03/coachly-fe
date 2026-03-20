@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:coachly/features/ai_coach/data/services/gemma_inference_service.dart';
 import 'package:coachly/features/ai_coach/domain/models/coach_message.dart';
 import 'package:coachly/features/ai_coach/domain/models/insight_card.dart';
+import 'package:coachly/features/ai_coach/domain/models/local_ai_model.dart';
 import 'package:coachly/features/ai_coach/domain/models/workout_context.dart';
 import 'package:coachly/features/ai_coach/domain/repositories/ai_coach_repository.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
@@ -27,7 +28,7 @@ class AiCoachRepositoryImpl implements AiCoachRepository {
   }
 
   @override
-  Future<bool> ensureModelReady() {
+  Future<ModelInitResult> ensureModelReady() {
     return _gemmaService.ensureInitialized();
   }
 

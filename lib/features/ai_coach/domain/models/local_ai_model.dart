@@ -2,6 +2,8 @@ import 'package:flutter_gemma/flutter_gemma.dart';
 
 enum LocalAiModel { minimal, good, best }
 
+enum ModelInitResult { success, insufficientMemory, failed }
+
 class LocalAiModelConfig {
   const LocalAiModelConfig({
     required this.id,

@@ -648,6 +648,18 @@ class AppStrings {
       'it':
           'Abilita l\'AI in locale dalle impostazioni del profilo per usare il coach AI durante l\'allenamento.',
     },
+
+    // AI coach panel — insufficient memory
+    'ai.oom.title': {
+      'en': 'Not enough memory',
+      'it': 'RAM insufficiente',
+    },
+    'ai.oom.subtitle': {
+      'en':
+          'This model is too large for your device\'s available memory. Choose a lighter model in the profile settings.',
+      'it':
+          'Questo modello è troppo grande per la RAM disponibile sul tuo dispositivo. Scegli un modello meno potente dalle impostazioni del profilo.',
+    },
   };
 
   static Locale normalizeLocale(Locale locale) {
