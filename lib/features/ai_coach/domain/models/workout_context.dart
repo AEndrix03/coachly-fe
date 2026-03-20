@@ -15,6 +15,8 @@ abstract class WorkoutContext with _$WorkoutContext {
     double? fatigueIndex,
     List<double>? recentWeights,
     required DateTime sessionStart,
+    /// Full workout plan summary injected into the AI prompt.
+    String? workoutPlan,
   }) = _WorkoutContext;
 
   factory WorkoutContext.fromJson(Map<String, dynamic> json) =>

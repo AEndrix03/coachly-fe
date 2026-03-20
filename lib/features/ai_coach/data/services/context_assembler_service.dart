@@ -66,11 +66,47 @@ WorkoutContext currentWorkoutContext(Ref ref) {
     fatigueIndex: fatigueIndex,
     recentWeights: recentWeights,
     sessionStart: activeState.startedAt ?? DateTime.now(),
+    workoutPlan: _buildWorkoutPlanSummary(activeState.exercises),
   );
 }
 
 @riverpod
 String aiCoachWorkoutId(Ref ref) => '';
+
+/// Builds a compact workout plan string for the AI system prompt.
+/// Each line: "<n>. <name> — <sets>x<reps> @ <weight>kg [STATUS]"
+/// STATUS is one of: done / active (set X/Y) / next / pending
+String _buildWorkoutPlanSummary(List<ActiveExerciseState> exercises) {
+  if (exercises.isEmpty) return '';
+
+  final currentIdx = exercises.indexWhere(
+    (e) => e.sets.any((s) => !s.completed),
+  );
+
+  final buf = StringBuffer();
+  for (var i = 0; i < exercises.length; i++) {
+    final ex = exercises[i];
+    final weight =
+        ex.sets.isNotEmpty ? ex.sets.first.weight.toStringAsFixed(1) : '0.0';
+    final reps = ex.sets.isNotEmpty ? ex.sets.first.reps : 0;
+    final total = ex.totalSets;
+    final done = ex.completedSets;
+
+    final String status;
+    if (done == total) {
+      status = 'done';
+    } else if (i == currentIdx) {
+      status = 'active — set $done/$total completed';
+    } else if (currentIdx == -1 || i > currentIdx) {
+      status = i == currentIdx + 1 ? 'next' : 'pending';
+    } else {
+      status = 'done';
+    }
+
+    buf.writeln('${i + 1}. ${ex.displayName} — ${total}x$reps @ ${weight}kg [$status]');
+  }
+  return buf.toString().trimRight();
+}
 
 ActiveExerciseState _resolveCurrentExercise(
   List<ActiveExerciseState> exercises,

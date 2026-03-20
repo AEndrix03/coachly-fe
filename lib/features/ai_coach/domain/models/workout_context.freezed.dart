@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutContext {
 
- String get exerciseName; int get currentSet; int get totalSets; double get weightKg; int get targetReps; int? get completedReps; double? get fatigueIndex; List<double>? get recentWeights; DateTime get sessionStart;
+ String get exerciseName; int get currentSet; int get totalSets; double get weightKg; int get targetReps; int? get completedReps; double? get fatigueIndex; List<double>? get recentWeights; DateTime get sessionStart; String? get workoutPlan;
 /// Create a copy of WorkoutContext
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $WorkoutContextCopyWith<WorkoutContext> get copyWith => _$WorkoutContextCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutContext&&(identical(other.exerciseName, exerciseName) || other.exerciseName == exerciseName)&&(identical(other.currentSet, currentSet) || other.currentSet == currentSet)&&(identical(other.totalSets, totalSets) || other.totalSets == totalSets)&&(identical(other.weightKg, weightKg) || other.weightKg == weightKg)&&(identical(other.targetReps, targetReps) || other.targetReps == targetReps)&&(identical(other.completedReps, completedReps) || other.completedReps == completedReps)&&(identical(other.fatigueIndex, fatigueIndex) || other.fatigueIndex == fatigueIndex)&&const DeepCollectionEquality().equals(other.recentWeights, recentWeights)&&(identical(other.sessionStart, sessionStart) || other.sessionStart == sessionStart));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutContext&&(identical(other.exerciseName, exerciseName) || other.exerciseName == exerciseName)&&(identical(other.currentSet, currentSet) || other.currentSet == currentSet)&&(identical(other.totalSets, totalSets) || other.totalSets == totalSets)&&(identical(other.weightKg, weightKg) || other.weightKg == weightKg)&&(identical(other.targetReps, targetReps) || other.targetReps == targetReps)&&(identical(other.completedReps, completedReps) || other.completedReps == completedReps)&&(identical(other.fatigueIndex, fatigueIndex) || other.fatigueIndex == fatigueIndex)&&const DeepCollectionEquality().equals(other.recentWeights, recentWeights)&&(identical(other.sessionStart, sessionStart) || other.sessionStart == sessionStart)&&(identical(other.workoutPlan, workoutPlan) || other.workoutPlan == workoutPlan));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,exerciseName,currentSet,totalSets,weightKg,targetReps,completedReps,fatigueIndex,const DeepCollectionEquality().hash(recentWeights),sessionStart);
+int get hashCode => Object.hash(runtimeType,exerciseName,currentSet,totalSets,weightKg,targetReps,completedReps,fatigueIndex,const DeepCollectionEquality().hash(recentWeights),sessionStart,workoutPlan);
 
 @override
 String toString() {
-  return 'WorkoutContext(exerciseName: $exerciseName, currentSet: $currentSet, totalSets: $totalSets, weightKg: $weightKg, targetReps: $targetReps, completedReps: $completedReps, fatigueIndex: $fatigueIndex, recentWeights: $recentWeights, sessionStart: $sessionStart)';
+  return 'WorkoutContext(exerciseName: $exerciseName, currentSet: $currentSet, totalSets: $totalSets, weightKg: $weightKg, targetReps: $targetReps, completedReps: $completedReps, fatigueIndex: $fatigueIndex, recentWeights: $recentWeights, sessionStart: $sessionStart, workoutPlan: $workoutPlan)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $WorkoutContextCopyWith<$Res>  {
   factory $WorkoutContextCopyWith(WorkoutContext value, $Res Function(WorkoutContext) _then) = _$WorkoutContextCopyWithImpl;
 @useResult
 $Res call({
- String exerciseName, int currentSet, int totalSets, double weightKg, int targetReps, int? completedReps, double? fatigueIndex, List<double>? recentWeights, DateTime sessionStart
+ String exerciseName, int currentSet, int totalSets, double weightKg, int targetReps, int? completedReps, double? fatigueIndex, List<double>? recentWeights, DateTime sessionStart, String? workoutPlan
 });
 
 
@@ -65,7 +65,7 @@ class _$WorkoutContextCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutContext
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? exerciseName = null,Object? currentSet = null,Object? totalSets = null,Object? weightKg = null,Object? targetReps = null,Object? completedReps = freezed,Object? fatigueIndex = freezed,Object? recentWeights = freezed,Object? sessionStart = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? exerciseName = null,Object? currentSet = null,Object? totalSets = null,Object? weightKg = null,Object? targetReps = null,Object? completedReps = freezed,Object? fatigueIndex = freezed,Object? recentWeights = freezed,Object? sessionStart = null,Object? workoutPlan = freezed,}) {
   return _then(_self.copyWith(
 exerciseName: null == exerciseName ? _self.exerciseName : exerciseName // ignore: cast_nullable_to_non_nullable
 as String,currentSet: null == currentSet ? _self.currentSet : currentSet // ignore: cast_nullable_to_non_nullable
@@ -76,7 +76,8 @@ as int,completedReps: freezed == completedReps ? _self.completedReps : completed
 as int?,fatigueIndex: freezed == fatigueIndex ? _self.fatigueIndex : fatigueIndex // ignore: cast_nullable_to_non_nullable
 as double?,recentWeights: freezed == recentWeights ? _self.recentWeights : recentWeights // ignore: cast_nullable_to_non_nullable
 as List<double>?,sessionStart: null == sessionStart ? _self.sessionStart : sessionStart // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,workoutPlan: freezed == workoutPlan ? _self.workoutPlan : workoutPlan // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -217,7 +218,7 @@ return $default(_that.exerciseName,_that.currentSet,_that.totalSets,_that.weight
 @JsonSerializable()
 
 class _WorkoutContext implements WorkoutContext {
-  const _WorkoutContext({required this.exerciseName, required this.currentSet, required this.totalSets, required this.weightKg, required this.targetReps, this.completedReps, this.fatigueIndex, final  List<double>? recentWeights, required this.sessionStart}): _recentWeights = recentWeights;
+  const _WorkoutContext({required this.exerciseName, required this.currentSet, required this.totalSets, required this.weightKg, required this.targetReps, this.completedReps, this.fatigueIndex, final  List<double>? recentWeights, required this.sessionStart, this.workoutPlan}): _recentWeights = recentWeights;
   factory _WorkoutContext.fromJson(Map<String, dynamic> json) => _$WorkoutContextFromJson(json);
 
 @override final  String exerciseName;
@@ -237,6 +238,7 @@ class _WorkoutContext implements WorkoutContext {
 }
 
 @override final  DateTime sessionStart;
+@override final  String? workoutPlan;
 
 /// Create a copy of WorkoutContext
 /// with the given fields replaced by the non-null parameter values.
@@ -251,16 +253,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutContext&&(identical(other.exerciseName, exerciseName) || other.exerciseName == exerciseName)&&(identical(other.currentSet, currentSet) || other.currentSet == currentSet)&&(identical(other.totalSets, totalSets) || other.totalSets == totalSets)&&(identical(other.weightKg, weightKg) || other.weightKg == weightKg)&&(identical(other.targetReps, targetReps) || other.targetReps == targetReps)&&(identical(other.completedReps, completedReps) || other.completedReps == completedReps)&&(identical(other.fatigueIndex, fatigueIndex) || other.fatigueIndex == fatigueIndex)&&const DeepCollectionEquality().equals(other._recentWeights, _recentWeights)&&(identical(other.sessionStart, sessionStart) || other.sessionStart == sessionStart));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutContext&&(identical(other.exerciseName, exerciseName) || other.exerciseName == exerciseName)&&(identical(other.currentSet, currentSet) || other.currentSet == currentSet)&&(identical(other.totalSets, totalSets) || other.totalSets == totalSets)&&(identical(other.weightKg, weightKg) || other.weightKg == weightKg)&&(identical(other.targetReps, targetReps) || other.targetReps == targetReps)&&(identical(other.completedReps, completedReps) || other.completedReps == completedReps)&&(identical(other.fatigueIndex, fatigueIndex) || other.fatigueIndex == fatigueIndex)&&const DeepCollectionEquality().equals(other._recentWeights, _recentWeights)&&(identical(other.sessionStart, sessionStart) || other.sessionStart == sessionStart)&&(identical(other.workoutPlan, workoutPlan) || other.workoutPlan == workoutPlan));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,exerciseName,currentSet,totalSets,weightKg,targetReps,completedReps,fatigueIndex,const DeepCollectionEquality().hash(_recentWeights),sessionStart);
+int get hashCode => Object.hash(runtimeType,exerciseName,currentSet,totalSets,weightKg,targetReps,completedReps,fatigueIndex,const DeepCollectionEquality().hash(_recentWeights),sessionStart,workoutPlan);
 
 @override
 String toString() {
-  return 'WorkoutContext(exerciseName: $exerciseName, currentSet: $currentSet, totalSets: $totalSets, weightKg: $weightKg, targetReps: $targetReps, completedReps: $completedReps, fatigueIndex: $fatigueIndex, recentWeights: $recentWeights, sessionStart: $sessionStart)';
+  return 'WorkoutContext(exerciseName: $exerciseName, currentSet: $currentSet, totalSets: $totalSets, weightKg: $weightKg, targetReps: $targetReps, completedReps: $completedReps, fatigueIndex: $fatigueIndex, recentWeights: $recentWeights, sessionStart: $sessionStart, workoutPlan: $workoutPlan)';
 }
 
 
@@ -271,7 +273,7 @@ abstract mixin class _$WorkoutContextCopyWith<$Res> implements $WorkoutContextCo
   factory _$WorkoutContextCopyWith(_WorkoutContext value, $Res Function(_WorkoutContext) _then) = __$WorkoutContextCopyWithImpl;
 @override @useResult
 $Res call({
- String exerciseName, int currentSet, int totalSets, double weightKg, int targetReps, int? completedReps, double? fatigueIndex, List<double>? recentWeights, DateTime sessionStart
+ String exerciseName, int currentSet, int totalSets, double weightKg, int targetReps, int? completedReps, double? fatigueIndex, List<double>? recentWeights, DateTime sessionStart, String? workoutPlan
 });
 
 
@@ -288,7 +290,7 @@ class __$WorkoutContextCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutContext
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? exerciseName = null,Object? currentSet = null,Object? totalSets = null,Object? weightKg = null,Object? targetReps = null,Object? completedReps = freezed,Object? fatigueIndex = freezed,Object? recentWeights = freezed,Object? sessionStart = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? exerciseName = null,Object? currentSet = null,Object? totalSets = null,Object? weightKg = null,Object? targetReps = null,Object? completedReps = freezed,Object? fatigueIndex = freezed,Object? recentWeights = freezed,Object? sessionStart = null,Object? workoutPlan = freezed,}) {
   return _then(_WorkoutContext(
 exerciseName: null == exerciseName ? _self.exerciseName : exerciseName // ignore: cast_nullable_to_non_nullable
 as String,currentSet: null == currentSet ? _self.currentSet : currentSet // ignore: cast_nullable_to_non_nullable
@@ -299,7 +301,8 @@ as int,completedReps: freezed == completedReps ? _self.completedReps : completed
 as int?,fatigueIndex: freezed == fatigueIndex ? _self.fatigueIndex : fatigueIndex // ignore: cast_nullable_to_non_nullable
 as double?,recentWeights: freezed == recentWeights ? _self._recentWeights : recentWeights // ignore: cast_nullable_to_non_nullable
 as List<double>?,sessionStart: null == sessionStart ? _self.sessionStart : sessionStart // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,workoutPlan: freezed == workoutPlan ? _self.workoutPlan : workoutPlan // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

@@ -19,6 +19,7 @@ _WorkoutContext _$WorkoutContextFromJson(Map<String, dynamic> json) =>
           ?.map((e) => (e as num).toDouble())
           .toList(),
       sessionStart: DateTime.parse(json['sessionStart'] as String),
+      workoutPlan: json['workoutPlan'] as String?,
     );
 
 Map<String, dynamic> _$WorkoutContextToJson(_WorkoutContext instance) =>
@@ -32,4 +33,5 @@ Map<String, dynamic> _$WorkoutContextToJson(_WorkoutContext instance) =>
       'fatigueIndex': instance.fatigueIndex,
       'recentWeights': instance.recentWeights,
       'sessionStart': instance.sessionStart.toIso8601String(),
+      'workoutPlan': instance.workoutPlan,
     };

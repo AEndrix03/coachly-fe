@@ -189,13 +189,19 @@ class GemmaInferenceService {
       params: {'value': '$minutesSinceStart'},
     );
 
+    final workoutPlanSection =
+        context.workoutPlan != null && context.workoutPlan!.isNotEmpty
+        ? '\n\n[WORKOUT PLAN]\n${context.workoutPlan}'
+        : '';
+
     return '$systemPrompt\n\n'
         '$contextTitle\n'
         '$exerciseLine\n'
         '$weightLine\n'
         '$fatigueLine\n'
         '$recentWeightsLine\n'
-        '$minutesLine\n\n'
+        '$minutesLine'
+        '$workoutPlanSection\n\n'
         '$userTitle\n'
         '$userMessage';
   }
