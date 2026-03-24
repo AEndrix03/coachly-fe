@@ -247,6 +247,27 @@ class AppStrings {
       'it': 'Inserimento massivo vocale',
     },
     'session.voice.listening': {'en': 'Listening...', 'it': 'In ascolto...'},
+    'session.voice.tap_stop_hint': {
+      'en': 'Speak and press Stop when you are done.',
+      'it': 'Parla e premi Stop quando hai finito.',
+    },
+    'session.voice.live_transcript': {
+      'en': 'Live transcript',
+      'it': 'Trascrizione live',
+    },
+    'session.voice.waiting_transcript': {
+      'en': 'Waiting for speech...',
+      'it': 'In attesa del parlato...',
+    },
+    'session.voice.stop': {'en': 'Stop', 'it': 'Stop'},
+    'session.voice.reactivate_hint': {
+      'en': 'Microphone paused unexpectedly. Press Stop and try again.',
+      'it': 'Microfono fermato inaspettatamente. Premi Stop e riprova.',
+    },
+    'session.voice.capture_error': {
+      'en': 'Unable to start microphone capture.',
+      'it': 'Impossibile avviare la cattura microfono.',
+    },
     'session.voice.processing': {
       'en': 'Processing voice input...',
       'it': 'Elaborazione input vocale...',

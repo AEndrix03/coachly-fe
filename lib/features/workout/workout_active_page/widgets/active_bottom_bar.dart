@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/auth/providers/user_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
@@ -126,14 +128,10 @@ class ActiveBottomBar extends ConsumerWidget {
       return;
     }
 
-    final transcript = await _runBlockingTask(
+    final transcript = await showDialog<String?>(
       context: context,
-      message: context.tr('session.voice.listening'),
-      task: () {
-        return ref
-            .read(workoutSpeechToTextServiceProvider)
-            .transcribe(localeId: localeId);
-      },
+      barrierDismissible: false,
+      builder: (_) => _VoiceCaptureDialog(localeId: localeId),
     );
 
     if (!context.mounted) {
@@ -350,6 +348,232 @@ class ActiveBottomBar extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _VoiceCaptureDialog extends ConsumerStatefulWidget {
+  const _VoiceCaptureDialog({required this.localeId});
+
+  final String localeId;
+
+  @override
+  ConsumerState<_VoiceCaptureDialog> createState() => _VoiceCaptureDialogState();
+}
+
+class _VoiceCaptureDialogState extends ConsumerState<_VoiceCaptureDialog> {
+  String _transcript = '';
+  bool _starting = true;
+  bool _listening = false;
+  bool _failed = false;
+  bool _stopping = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(_startListening);
+  }
+
+  @override
+  void dispose() {
+    unawaited(ref.read(workoutSpeechToTextServiceProvider).stopListening());
+    super.dispose();
+  }
+
+  Future<void> _startListening() async {
+    final stt = ref.read(workoutSpeechToTextServiceProvider);
+    final started = await stt.startListening(
+      localeId: widget.localeId,
+      onPartialResult: (partial) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _transcript = partial;
+        });
+      },
+      onError: () {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _failed = true;
+        });
+      },
+      onListeningStopped: () {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _listening = false;
+        });
+      },
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _starting = false;
+      _listening = started;
+      _failed = !started || _failed;
+    });
+  }
+
+  Future<void> _stopAndClose() async {
+    if (_stopping) {
+      return;
+    }
+    setState(() {
+      _stopping = true;
+    });
+    final transcript = await ref
+        .read(workoutSpeechToTextServiceProvider)
+        .stopListening();
+    if (!mounted) {
+      return;
+    }
+    Navigator.of(context).pop(transcript);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return PopScope(
+      canPop: false,
+      child: Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: scheme.primaryContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    child: _starting
+                        ? Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: scheme.primary,
+                            ),
+                          )
+                        : Icon(
+                            Icons.mic_rounded,
+                            color: _failed ? scheme.error : scheme.primary,
+                            size: 24,
+                          ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      context.tr('session.voice.listening'),
+                      style: TextStyle(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                _failed
+                    ? context.tr('session.voice.capture_error')
+                    : context.tr('session.voice.tap_stop_hint'),
+                style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.68),
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                context.tr('session.voice.live_transcript'),
+                style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.72),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(minHeight: 96),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: scheme.outlineVariant.withValues(alpha: 0.8),
+                  ),
+                ),
+                child: Text(
+                  _transcript.isEmpty
+                      ? context.tr('session.voice.waiting_transcript')
+                      : _transcript,
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(
+                      alpha: _transcript.isEmpty ? 0.52 : 0.92,
+                    ),
+                    fontSize: 14,
+                    fontStyle:
+                        _transcript.isEmpty ? FontStyle.italic : FontStyle.normal,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: _stopping ? null : _stopAndClose,
+                  icon: _stopping
+                      ? SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: scheme.onError,
+                          ),
+                        )
+                      : const Icon(Icons.stop_rounded),
+                  label: Text(context.tr('session.voice.stop')),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: scheme.error,
+                    foregroundColor: scheme.onError,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              if (!_starting && !_listening && !_failed) ...[
+                const SizedBox(height: 8),
+                Text(
+                  context.tr('session.voice.reactivate_hint'),
+                  style: TextStyle(
+                    color: scheme.error,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
