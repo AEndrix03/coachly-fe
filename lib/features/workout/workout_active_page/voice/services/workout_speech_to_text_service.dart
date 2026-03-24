@@ -27,6 +27,7 @@ class WorkoutSpeechToTextService {
 
     final completer = Completer<String?>();
     var transcript = '';
+    var hasRecognizedText = false;
     Timer? silenceTimer;
 
     Future<void> complete() async {
@@ -44,29 +45,45 @@ class WorkoutSpeechToTextService {
     }
 
     final resolvedLocaleId = await _resolveLocaleId(localeId);
-    await _speech.listen(
-      localeId: resolvedLocaleId,
-      pauseFor: const Duration(milliseconds: 2500),
-      listenFor: const Duration(minutes: 2),
-      listenOptions: SpeechListenOptions(
-        partialResults: true,
-        cancelOnError: true,
-      ),
-      onResult: (result) {
-        final words = result.recognizedWords.trim();
-        if (words.isNotEmpty) {
-          transcript = words;
-          silenceTimer?.cancel();
-          silenceTimer = Timer(const Duration(milliseconds: 2500), () async {
-            await complete();
-          });
-        }
+    Future<void> startListening() async {
+      await _speech.listen(
+        localeId: resolvedLocaleId,
+        pauseFor: const Duration(milliseconds: 2500),
+        listenFor: const Duration(minutes: 2),
+        listenOptions: SpeechListenOptions(
+          partialResults: true,
+          cancelOnError: true,
+        ),
+        onResult: (result) {
+          final words = result.recognizedWords.trim();
+          if (words.isNotEmpty) {
+            hasRecognizedText = true;
+            transcript = words;
+            silenceTimer?.cancel();
+            silenceTimer = Timer(const Duration(milliseconds: 2500), () async {
+              await complete();
+            });
+          }
 
-        if (result.finalResult) {
-          unawaited(complete());
-        }
-      },
-    );
+          // Some engines can emit finalResult with empty text immediately.
+          // Only close when we actually captured speech.
+          if (result.finalResult && words.isNotEmpty) {
+            unawaited(complete());
+          }
+        },
+      );
+    }
+
+    if (_speech.isListening) {
+      await _speech.stop();
+    }
+    await startListening();
+
+    // Retry once if recognition did not effectively start.
+    await Future<void>.delayed(const Duration(milliseconds: 180));
+    if (!_speech.isListening && !hasRecognizedText) {
+      await startListening();
+    }
 
     return completer.future.timeout(
       maxDuration,
