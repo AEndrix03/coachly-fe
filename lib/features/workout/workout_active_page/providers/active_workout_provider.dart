@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
+import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
@@ -88,6 +91,59 @@ class ActiveWorkout extends _$ActiveWorkout {
 
   void updateSetType(int exerciseIdx, int setIdx, String setType) {
     _mutateSet(exerciseIdx, setIdx, (s) => s.copyWith(setType: setType));
+  }
+
+  VoiceApplyOutcome? applyVoiceEntry({
+    required String exerciseId,
+    required int? sets,
+    required int? reps,
+    required double? weightKg,
+  }) {
+    if (sets == null && reps == null && weightKg == null) {
+      return null;
+    }
+
+    final exerciseIndex = state.exercises.indexWhere(
+      (exercise) => exercise.exercise.exercise.id == exerciseId,
+    );
+    if (exerciseIndex == -1) {
+      return null;
+    }
+
+    final exercises = [...state.exercises];
+    final exercise = exercises[exerciseIndex];
+    final existingSets = exercise.sets;
+    final firstSet = existingSets.isNotEmpty ? existingSets.first : null;
+
+    final resolvedSetCount = (sets != null && sets > 0)
+        ? sets
+        : max(1, existingSets.length);
+    final resolvedReps = (reps != null && reps > 0) ? reps : (firstSet?.reps ?? 0);
+    final resolvedWeight = (weightKg != null && weightKg >= 0)
+        ? weightKg
+        : (firstSet?.weight ?? 0);
+
+    final updatedSets = List.generate(resolvedSetCount, (index) {
+      final previous = index < existingSets.length ? existingSets[index] : null;
+      return ActiveSetState(
+        position: index,
+        setType: previous?.setType ?? firstSet?.setType ?? 'Normale',
+        weight: resolvedWeight,
+        reps: resolvedReps,
+        completed: previous?.completed ?? false,
+      );
+    });
+
+    exercises[exerciseIndex] = exercise.copyWith(sets: updatedSets);
+    state = state.copyWith(exercises: exercises);
+
+    return VoiceApplyOutcome(
+      exerciseId: exerciseId,
+      exerciseName: exercise.displayName,
+      sets: resolvedSetCount,
+      reps: resolvedReps,
+      weightKg: resolvedWeight,
+    );
   }
 
   void addSet(int exerciseIdx) {

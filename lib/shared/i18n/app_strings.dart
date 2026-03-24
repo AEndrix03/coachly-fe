@@ -241,6 +241,41 @@ class AppStrings {
       'en': '{count} exercises',
       'it': '{count} esercizi',
     },
+    'session.voice.title': {'en': 'Voice entry', 'it': 'Inserimento vocale'},
+    'session.voice.tooltip': {
+      'en': 'Voice bulk entry',
+      'it': 'Inserimento massivo vocale',
+    },
+    'session.voice.listening': {'en': 'Listening...', 'it': 'In ascolto...'},
+    'session.voice.processing': {
+      'en': 'Processing voice input...',
+      'it': 'Elaborazione input vocale...',
+    },
+    'session.voice.no_speech': {
+      'en': 'No speech detected. Try again.',
+      'it': 'Nessun parlato rilevato. Riprova.',
+    },
+    'session.voice.no_match': {
+      'en': 'No matching exercise found.',
+      'it': 'Nessun esercizio corrispondente trovato.',
+    },
+    'session.voice.no_exercises': {
+      'en': 'No exercises available in this session.',
+      'it': 'Nessun esercizio disponibile in questa sessione.',
+    },
+    'session.voice.apply_failed': {
+      'en': 'Unable to apply parsed values.',
+      'it': 'Impossibile applicare i valori riconosciuti.',
+    },
+    'session.voice.choose_title': {
+      'en': 'Choose the matched exercise',
+      'it': 'Scegli l\'esercizio riconosciuto',
+    },
+    'session.voice.confidence': {'en': 'Confidence', 'it': 'Confidenza'},
+    'session.voice.applied': {
+      'en': '{exercise}: {sets}x{reps} @ {kg}kg',
+      'it': '{exercise}: {sets}x{reps} @ {kg}kg',
+    },
     'workout.edit.description': {'en': 'Description', 'it': 'Descrizione'},
     'workout.edit.add_exercise': {
       'en': 'Add Exercise',
