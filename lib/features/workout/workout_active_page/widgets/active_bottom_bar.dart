@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/auth/providers/user_provider.dart';
@@ -361,22 +362,32 @@ class _VoiceCaptureDialog extends ConsumerStatefulWidget {
   ConsumerState<_VoiceCaptureDialog> createState() => _VoiceCaptureDialogState();
 }
 
-class _VoiceCaptureDialogState extends ConsumerState<_VoiceCaptureDialog> {
+class _VoiceCaptureDialogState extends ConsumerState<_VoiceCaptureDialog>
+    with SingleTickerProviderStateMixin {
   String _transcript = '';
   bool _starting = true;
   bool _listening = false;
   bool _failed = false;
   bool _stopping = false;
+  double _soundLevel = 0;
+  double _minSoundLevel = 50000;
+  double _maxSoundLevel = -50000;
+  late final AnimationController _vuPulseController;
 
   @override
   void initState() {
     super.initState();
+    _vuPulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 960),
+    )..repeat();
     Future.microtask(_startListening);
   }
 
   @override
   void dispose() {
     unawaited(ref.read(workoutSpeechToTextServiceProvider).stopListening());
+    _vuPulseController.dispose();
     super.dispose();
   }
 
@@ -390,6 +401,24 @@ class _VoiceCaptureDialogState extends ConsumerState<_VoiceCaptureDialog> {
         }
         setState(() {
           _transcript = partial;
+        });
+      },
+      onSoundLevelChange: (level) {
+        if (!mounted) {
+          return;
+        }
+        if (level < _minSoundLevel) {
+          _minSoundLevel = level;
+        }
+        if (level > _maxSoundLevel) {
+          _maxSoundLevel = level;
+        }
+        final range = (_maxSoundLevel - _minSoundLevel).abs();
+        final normalized = range < 0.001
+            ? 0.0
+            : ((level - _minSoundLevel) / range).clamp(0.0, 1.0);
+        setState(() {
+          _soundLevel = normalized;
         });
       },
       onError: () {
@@ -418,6 +447,9 @@ class _VoiceCaptureDialogState extends ConsumerState<_VoiceCaptureDialog> {
       _starting = false;
       _listening = started;
       _failed = !started || _failed;
+      if (!started) {
+        _soundLevel = 0;
+      }
     });
   }
 
@@ -498,6 +530,20 @@ class _VoiceCaptureDialogState extends ConsumerState<_VoiceCaptureDialog> {
                   fontSize: 13,
                 ),
               ),
+              const SizedBox(height: 12),
+              Center(
+                child: AnimatedBuilder(
+                  animation: _vuPulseController,
+                  builder: (context, _) {
+                    return _VoiceVuMeter(
+                      level: _listening ? _soundLevel : 0,
+                      pulseValue: _vuPulseController.value,
+                      activeColor: _failed ? scheme.error : scheme.primary,
+                      inactiveColor: scheme.outlineVariant,
+                    );
+                  },
+                ),
+              ),
               const SizedBox(height: 14),
               Text(
                 context.tr('session.voice.live_transcript'),
@@ -573,6 +619,53 @@ class _VoiceCaptureDialogState extends ConsumerState<_VoiceCaptureDialog> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _VoiceVuMeter extends StatelessWidget {
+  const _VoiceVuMeter({
+    required this.level,
+    required this.pulseValue,
+    required this.activeColor,
+    required this.inactiveColor,
+  });
+
+  final double level;
+  final double pulseValue;
+  final Color activeColor;
+  final Color inactiveColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 42,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(9, (index) {
+          final phase = (pulseValue * math.pi * 2) + (index * 0.6);
+          final wave = (math.sin(phase) + 1) / 2;
+          final responsiveLevel = (0.22 + (level * 0.78)) * (0.55 + (wave * 0.45));
+          final barHeight = 8 + (responsiveLevel * 30);
+          final isActive = responsiveLevel > 0.34;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 90),
+              curve: Curves.easeOutCubic,
+              width: 5,
+              height: barHeight,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: isActive
+                    ? activeColor.withValues(alpha: 0.9)
+                    : inactiveColor.withValues(alpha: 0.42),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }

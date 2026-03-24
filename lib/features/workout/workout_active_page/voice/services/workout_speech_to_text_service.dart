@@ -22,6 +22,7 @@ class WorkoutSpeechToTextService {
   Future<bool> startListening({
     required String localeId,
     required void Function(String partial) onPartialResult,
+    void Function(double level)? onSoundLevelChange,
     void Function()? onError,
     void Function()? onListeningStopped,
   }) async {
@@ -60,6 +61,9 @@ class WorkoutSpeechToTextService {
         partialResults: true,
         cancelOnError: true,
       ),
+      onSoundLevelChange: (level) {
+        onSoundLevelChange?.call(level);
+      },
       onResult: (result) {
         final words = result.recognizedWords.trim();
         if (words.isEmpty) {
