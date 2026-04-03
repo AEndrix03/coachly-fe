@@ -1,5 +1,6 @@
 import 'package:coachly/core/sync/app_data_sync_service.dart';
 import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
@@ -41,6 +42,7 @@ class CoachlyApplication extends ConsumerWidget {
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: context.tr('common.app_name'),
+          scaffoldMessengerKey: appScaffoldMessengerKey,
           theme: AppThemeScheme.lightTheme,
           darkTheme: AppThemeScheme.darkTheme,
           themeMode: ThemeMode.dark,

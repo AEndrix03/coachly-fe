@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+final GlobalKey<ScaffoldMessengerState> appScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
+
 final appToastServiceProvider = Provider<AppToastService>((ref) {
   return const AppToastService();
 });
@@ -73,6 +76,13 @@ class AppToastService {
   }
 
   void hide(BuildContext context) {
+    final messenger = appScaffoldMessengerKey.currentState;
+    if (messenger != null) {
+      messenger.hideCurrentSnackBar();
+      return;
+    }
+
+    if (!context.mounted) return;
     ScaffoldMessenger.maybeOf(context)?.hideCurrentSnackBar();
   }
 
@@ -83,10 +93,15 @@ class AppToastService {
     required String message,
     required Duration duration,
   }) {
-    final messenger = ScaffoldMessenger.maybeOf(context);
+    final messenger =
+        appScaffoldMessengerKey.currentState ??
+        (context.mounted ? ScaffoldMessenger.maybeOf(context) : null);
     if (messenger == null) return;
 
-    final theme = Theme.of(context);
+    final themeContext = appScaffoldMessengerKey.currentContext;
+    if (themeContext == null) return;
+
+    final theme = Theme.of(themeContext);
     final palette = _ToastPalette.from(type, theme.colorScheme);
     final textColor =
         ThemeData.estimateBrightnessForColor(palette.backgroundStart) ==
