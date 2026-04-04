@@ -28,6 +28,45 @@ class SetRow extends StatelessWidget {
     required this.onDuplicate,
   });
 
+  static const List<_SetTypeOption> _setTypeOptions = [
+    _SetTypeOption(
+      key: 'Normale',
+      label: 'Normale',
+      icon: Icons.fitness_center_rounded,
+    ),
+    _SetTypeOption(
+      key: 'Riscaldamento',
+      label: 'Riscaldamento',
+      icon: Icons.local_fire_department_rounded,
+    ),
+    _SetTypeOption(
+      key: 'Avvicinamento',
+      label: 'Avvicinamento',
+      icon: Icons.trending_up_rounded,
+    ),
+    _SetTypeOption(
+      key: 'Cluster',
+      label: 'Cluster',
+      icon: Icons.view_module_rounded,
+    ),
+    _SetTypeOption(
+      key: 'Dropset',
+      label: 'Drop set',
+      icon: Icons.south_rounded,
+    ),
+    _SetTypeOption(key: 'Buffer', label: 'Buffer', icon: Icons.pause_rounded),
+    _SetTypeOption(
+      key: 'Cedimento',
+      label: 'Cedimento',
+      icon: Icons.bolt_rounded,
+    ),
+    _SetTypeOption(
+      key: 'Volume',
+      label: 'Volume',
+      icon: Icons.stacked_line_chart_rounded,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -75,16 +114,7 @@ class SetRow extends StatelessWidget {
   }
 
   Widget _buildTypeDropdown(ColorScheme scheme) {
-    final typeMap = {
-      'Normale': 'N',
-      'Riscaldamento': 'R',
-      'Cedimento': 'C',
-      'Dropset': 'D',
-      'Buffer': 'B',
-      'Volume': 'V',
-      'Avvicinamento': 'A',
-    };
-    final selectedType = _normalizeTypeForDropdown(type, typeMap);
+    final selectedType = _normalizeTypeForDropdown(type);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -93,6 +123,7 @@ class SetRow extends StatelessWidget {
         value: selectedType,
         underline: const SizedBox.shrink(),
         dropdownColor: scheme.surfaceContainerHigh,
+        menuWidth: 260,
         isDense: true,
         icon: const SizedBox.shrink(),
         menuMaxHeight: 320,
@@ -102,11 +133,11 @@ class SetRow extends StatelessWidget {
           fontSize: 15,
           fontWeight: FontWeight.w800,
         ),
-        items: typeMap.entries.map((entry) {
+        items: _setTypeOptions.map((option) {
           return DropdownMenuItem(
-            value: entry.key,
+            value: option.key,
             child: SizedBox(
-              width: 160,
+              width: 260,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   vertical: 8,
@@ -122,19 +153,16 @@ class SetRow extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
-                      child: Text(
-                        entry.value,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: scheme.primary,
-                        ),
+                      child: Icon(
+                        option.icon,
+                        size: 15,
+                        color: scheme.primary,
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        entry.key,
+                        option.label,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -149,15 +177,12 @@ class SetRow extends StatelessWidget {
           );
         }).toList(),
         selectedItemBuilder: (context) {
-          return typeMap.entries.map((entry) {
+          return _setTypeOptions.map((option) {
             return Center(
-              child: Text(
-                entry.value,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: scheme.onSurface.withValues(alpha: 0.82),
-                ),
+              child: Icon(
+                option.icon,
+                size: 16,
+                color: scheme.onSurface.withValues(alpha: 0.82),
               ),
             );
           }).toList();
@@ -171,12 +196,9 @@ class SetRow extends StatelessWidget {
     );
   }
 
-  String _normalizeTypeForDropdown(
-    String rawType,
-    Map<String, String> typeMap,
-  ) {
+  String _normalizeTypeForDropdown(String rawType) {
     final trimmed = rawType.trim();
-    if (typeMap.containsKey(trimmed)) {
+    if (_setTypeOptions.any((option) => option.key == trimmed)) {
       return trimmed;
     }
 
@@ -189,7 +211,11 @@ class SetRow extends StatelessWidget {
       case 'failure':
         return 'Cedimento';
       case 'drop set':
+      case 'dropset':
         return 'Dropset';
+      case 'cluster set':
+      case 'cluster':
+        return 'Cluster';
       case 'approach':
         return 'Avvicinamento';
       default:
@@ -452,4 +478,16 @@ class SetRow extends StatelessWidget {
       border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.72)),
     );
   }
+}
+
+class _SetTypeOption {
+  final String key;
+  final String label;
+  final IconData icon;
+
+  const _SetTypeOption({
+    required this.key,
+    required this.label,
+    required this.icon,
+  });
 }
