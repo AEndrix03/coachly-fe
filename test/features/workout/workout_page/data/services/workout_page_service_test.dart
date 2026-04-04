@@ -192,6 +192,7 @@ WorkoutWriteCommand _sampleCommand() {
   return WorkoutWriteCommand(
     id: 'workout-id',
     name: 'Push Day',
+    description: 'Descrizione',
     translations: const {
       'it': WorkoutTranslationWritePayload(
         title: 'Push Day',
