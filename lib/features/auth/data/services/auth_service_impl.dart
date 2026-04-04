@@ -8,6 +8,12 @@ import 'package:flutter_appauth/flutter_appauth.dart';
 class AuthServiceImpl implements AuthService {
   final TokenManager _tokenManager;
   final FlutterAppAuth _appAuth;
+  static const AuthorizationServiceConfiguration _serviceConfiguration =
+      AuthorizationServiceConfiguration(
+        authorizationEndpoint: ApiEndpoints.keycloakAuthorizationEndpoint,
+        tokenEndpoint: ApiEndpoints.keycloakTokenEndpoint,
+        endSessionEndpoint: ApiEndpoints.keycloakLogoutEndpoint,
+      );
 
   AuthServiceImpl(this._tokenManager) : _appAuth = const FlutterAppAuth();
 
@@ -18,8 +24,7 @@ class AuthServiceImpl implements AuthService {
         AuthorizationTokenRequest(
           ApiEndpoints.keycloakClientId,
           ApiEndpoints.keycloakRedirectUri,
-          issuer: ApiEndpoints.keycloakIssuer,
-          discoveryUrl: ApiEndpoints.keycloakDiscoveryUrl,
+          serviceConfiguration: _serviceConfiguration,
           scopes: ApiEndpoints.openIdScopes,
         ),
       );
@@ -56,8 +61,7 @@ class AuthServiceImpl implements AuthService {
         TokenRequest(
           ApiEndpoints.keycloakClientId,
           ApiEndpoints.keycloakRedirectUri,
-          issuer: ApiEndpoints.keycloakIssuer,
-          discoveryUrl: ApiEndpoints.keycloakDiscoveryUrl,
+          serviceConfiguration: _serviceConfiguration,
           scopes: ApiEndpoints.openIdScopes,
           refreshToken: refreshToken,
         ),
@@ -127,8 +131,7 @@ class AuthServiceImpl implements AuthService {
         EndSessionRequest(
           idTokenHint: idToken,
           postLogoutRedirectUrl: ApiEndpoints.keycloakPostLogoutRedirectUri,
-          issuer: ApiEndpoints.keycloakIssuer,
-          discoveryUrl: ApiEndpoints.keycloakDiscoveryUrl,
+          serviceConfiguration: _serviceConfiguration,
         ),
       );
     } catch (_) {

@@ -23,6 +23,8 @@ class ApiEndpoints {
   static const String keycloakPostLogoutRedirectUri =
       '$keycloakRedirectScheme:/logout/';
 
+  static const String keycloakAuthorizationEndpoint =
+      '$keycloakIssuer/protocol/openid-connect/auth';
   static const String keycloakTokenEndpoint =
       '$keycloakIssuer/protocol/openid-connect/token';
   static const String keycloakLogoutEndpoint =

@@ -115,8 +115,6 @@ class AuthHttpClient extends http.BaseClient {
       );
       return true;
     } catch (_) {
-      await authService.clearTokens();
-      _ref.invalidate(authProvider);
       return false;
     }
   }
