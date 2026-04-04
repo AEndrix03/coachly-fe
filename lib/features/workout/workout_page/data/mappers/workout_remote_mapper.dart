@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
@@ -69,7 +71,6 @@ class WorkoutRemoteMapper {
     final rawLegacyExercises = json['workoutExercises'];
     if (rawLegacyExercises is List && rawLegacyExercises.isNotEmpty) {
       final parsedLegacyExercises = <WorkoutExerciseModel>[];
-      var index = 0;
       for (final rawExercise in rawLegacyExercises) {
         final exerciseMap = _asMap(rawExercise);
         if (exerciseMap == null) {
@@ -79,7 +80,6 @@ class WorkoutRemoteMapper {
         parsedLegacyExercises.add(
           WorkoutExerciseModel.fromJsonSafe(exerciseMap),
         );
-        index += 1;
       }
 
       if (parsedLegacyExercises.isNotEmpty) {
@@ -233,7 +233,7 @@ class WorkoutRemoteMapper {
     Map<String, dynamic> json, {
     required String field,
   }) {
-    final translations = _asMap(json['translations']);
+    final translations = _parseTranslations(json['translations']);
     if (translations == null || translations.isEmpty) {
       return const {};
     }
@@ -252,6 +252,24 @@ class WorkoutRemoteMapper {
       }
     }
     return mappedTranslations;
+  }
+
+  static Map<String, dynamic>? _parseTranslations(Object? rawTranslations) {
+    final parsedMap = _asMap(rawTranslations);
+    if (parsedMap != null) {
+      return parsedMap;
+    }
+
+    if (rawTranslations is String) {
+      try {
+        final decoded = jsonDecode(rawTranslations);
+        return _asMap(decoded);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    return null;
   }
 
   static List<TagDto> _parseMuscleTags(Map<String, dynamic> json) {
