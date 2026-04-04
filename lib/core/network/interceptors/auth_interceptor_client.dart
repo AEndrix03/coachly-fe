@@ -30,8 +30,10 @@ class AuthHttpClient extends http.BaseClient {
 
     String? accessToken = await authService.getAccessToken();
 
-    if (!isAuthRequest && accessToken != null) {
-      if (JwtValidator.isRefreshNeeded(accessToken)) {
+    if (!isAuthRequest) {
+      final needsRefresh =
+          accessToken == null || JwtValidator.isRefreshNeeded(accessToken);
+      if (needsRefresh) {
         final didRefreshToken = await _refreshToken();
         if (didRefreshToken) {
           accessToken = await authService.getAccessToken();

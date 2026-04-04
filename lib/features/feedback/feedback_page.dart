@@ -144,7 +144,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                 ),
                 child: TabBar(
                   controller: _tabs,
-                  isScrollable: true,
+                  isScrollable: false,
                   indicatorSize: TabBarIndicatorSize.tab,
                   splashBorderRadius: BorderRadius.circular(14),
                   labelStyle: const TextStyle(
