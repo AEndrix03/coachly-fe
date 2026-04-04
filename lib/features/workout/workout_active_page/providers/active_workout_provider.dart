@@ -5,6 +5,8 @@ import 'package:coachly/features/workout/workout_active_page/voice/models/voice_
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
+import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
+import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'active_workout_provider.g.dart';
@@ -219,6 +221,9 @@ class ActiveWorkout extends _$ActiveWorkout {
     }
 
     if (response.success) {
+      ref.invalidate(workoutListProvider);
+      ref.invalidate(recentWorkoutsProvider);
+      ref.invalidate(workoutStatsProvider);
       state = state.copyWith(status: ActiveWorkoutStatus.saved);
       return true;
     } else {
@@ -239,7 +244,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       final sets = ex.sets.map((s) {
         return WorkoutSessionSetWritePayload(
           position: s.position,
-          setType: s.setType,
+          setType: _toBackendSetType(s.setType),
           reps: s.reps,
           load: s.weight,
           loadUnit: 'kg',
@@ -280,6 +285,37 @@ class ActiveWorkout extends _$ActiveWorkout {
     final match = RegExp(r'[\d.]+').firstMatch(rawWeight);
     if (match == null) return 0;
     return double.tryParse(match.group(0)!) ?? 0;
+  }
+
+  String _toBackendSetType(String rawType) {
+    switch (rawType.trim().toLowerCase()) {
+      case 'normale':
+      case 'normal':
+        return 'normal';
+      case 'riscaldamento':
+      case 'warmup':
+      case 'warm-up':
+        return 'warmup';
+      case 'avvicinamento':
+      case 'approach':
+        return 'approach';
+      case 'dropset':
+      case 'drop set':
+        return 'dropset';
+      case 'cluster':
+      case 'cluster set':
+        return 'cluster';
+      case 'cedimento':
+      case 'failure':
+        return 'failure';
+      case 'rest pause':
+      case 'rest_pause':
+        return 'rest_pause';
+      case 'amrap':
+        return 'amrap';
+      default:
+        return 'normal';
+    }
   }
 
   String _extractDisplayName(WorkoutExerciseModel exercise, int index) {
