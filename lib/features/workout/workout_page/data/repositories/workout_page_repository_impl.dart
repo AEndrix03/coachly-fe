@@ -160,13 +160,19 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
     try {
       final workouts = await _hiveService.getWorkouts();
       final sessions = await _sessionHiveService.getAllSessions();
+      final validSessions = sessions
+          .where(
+            (session) =>
+                session.syncState != LocalWorkoutSessionSyncState.failedPermanent,
+          )
+          .toList(growable: false);
 
       final activeWorkouts = workouts
           .where((workout) => workout.active && !workout.delete)
           .length;
 
-      final completedWorkouts = sessions.isNotEmpty
-          ? sessions.length
+      final completedWorkouts = validSessions.isNotEmpty
+          ? validSessions.length
           : workouts.fold<int>(
               0,
               (total, workout) => total + workout.sessionsCount,
@@ -181,11 +187,11 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
             100;
 
       final weeklyWorkouts = _computeWeeklyWorkouts(
-        sessions: sessions,
+        sessions: validSessions,
         workouts: workouts,
       );
       final currentStreak = _computeCurrentStreak(
-        sessions: sessions,
+        sessions: validSessions,
         workouts: workouts,
       );
 
@@ -477,19 +483,15 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
     required List<LocalWorkoutSession> sessions,
     required List<WorkoutModel> workouts,
   }) {
-    final now = DateTime.now().toUtc();
-    final weekStart = DateTime.utc(now.year, now.month, now.day)
-        .subtract(const Duration(days: 6));
+    final today = _localDay(DateTime.now());
+    final weekStart = today.subtract(Duration(days: today.weekday - 1));
+    final weekEnd = weekStart.add(const Duration(days: 6));
 
     if (sessions.isNotEmpty) {
       return sessions.where((session) {
-        final completedAt = session.completedAt?.toUtc() ?? session.createdAt.toUtc();
-        final day = DateTime.utc(
-          completedAt.year,
-          completedAt.month,
-          completedAt.day,
-        );
-        return !day.isBefore(weekStart);
+        final completedAt = session.completedAt ?? session.createdAt;
+        final day = _localDay(completedAt);
+        return !day.isBefore(weekStart) && !day.isAfter(weekEnd);
       }).length;
     }
 
@@ -497,9 +499,8 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       if (workout.sessionsCount <= 0) {
         return false;
       }
-      final lastUsed = workout.lastUsed.toUtc();
-      final day = DateTime.utc(lastUsed.year, lastUsed.month, lastUsed.day);
-      return !day.isBefore(weekStart);
+      final day = _localDay(workout.lastUsed);
+      return !day.isBefore(weekStart) && !day.isAfter(weekEnd);
     }).length;
   }
 
@@ -509,10 +510,8 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   }) {
     final sessionDays = <DateTime>{};
     for (final session in sessions) {
-      final completedAt = session.completedAt?.toUtc() ?? session.createdAt.toUtc();
-      sessionDays.add(
-        DateTime.utc(completedAt.year, completedAt.month, completedAt.day),
-      );
+      final completedAt = session.completedAt ?? session.createdAt;
+      sessionDays.add(_localDay(completedAt));
     }
 
     if (sessionDays.isEmpty) {
@@ -520,8 +519,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
         if (workout.sessionsCount <= 0) {
           continue;
         }
-        final lastUsed = workout.lastUsed.toUtc();
-        sessionDays.add(DateTime.utc(lastUsed.year, lastUsed.month, lastUsed.day));
+        sessionDays.add(_localDay(workout.lastUsed));
       }
     }
 
@@ -529,13 +527,17 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       return 0;
     }
 
-    final todayUtc = DateTime.now().toUtc();
-    var cursor = DateTime.utc(todayUtc.year, todayUtc.month, todayUtc.day);
+    var cursor = _localDay(DateTime.now());
     var streak = 0;
     while (sessionDays.contains(cursor)) {
       streak += 1;
       cursor = cursor.subtract(const Duration(days: 1));
     }
     return streak;
+  }
+
+  DateTime _localDay(DateTime dateTime) {
+    final local = dateTime.toLocal();
+    return DateTime(local.year, local.month, local.day);
   }
 }

@@ -22,6 +22,146 @@ import 'package:http/http.dart' as http;
 const _exerciseId = '11111111-1111-4111-8111-111111111111';
 
 void main() {
+  group('WorkoutPageRepositoryImpl.getWorkoutStats', () {
+    late Directory tempDir;
+    late Box<WorkoutModel> workoutsBox;
+    late Box<Map> sessionsBox;
+    late Box<Map> jobsBox;
+    late Box<Map> structuredBox;
+    late WorkoutHiveService workoutHiveService;
+    late WorkoutSessionHiveService sessionHiveService;
+    late WorkoutStructuredHiveService structuredHiveService;
+    late _FakeWorkoutPageService fakeWorkoutPageService;
+    late WorkoutSessionSyncService syncService;
+    late WorkoutPageRepositoryImpl repository;
+
+    setUp(() async {
+      await Hive.close();
+      tempDir = await Directory.systemTemp.createTemp(
+        'coachly_workout_stats_repository_test_',
+      );
+      Hive.init(tempDir.path);
+
+      if (!Hive.isAdapterRegistered(0)) {
+        Hive.registerAdapter(WorkoutAdapter());
+      }
+
+      workoutsBox = await Hive.openBox<WorkoutModel>('stats_workouts_box');
+      sessionsBox = await Hive.openBox<Map>('stats_sessions_box');
+      jobsBox = await Hive.openBox<Map>('stats_jobs_box');
+      structuredBox = await Hive.openBox<Map>('stats_structured_box');
+
+      workoutHiveService = WorkoutHiveService.fromBox(workoutsBox);
+      sessionHiveService = WorkoutSessionHiveService.fromBoxes(
+        sessionsBox: sessionsBox,
+        syncJobsBox: jobsBox,
+      );
+      structuredHiveService = WorkoutStructuredHiveService.fromBox(
+        structuredBox,
+      );
+      fakeWorkoutPageService = _FakeWorkoutPageService();
+      syncService = WorkoutSessionSyncService(
+        sessionHiveService: sessionHiveService,
+        workoutPageService: fakeWorkoutPageService,
+        workoutHiveService: workoutHiveService,
+        isAuthenticatedReader: () => true,
+        isOnlineOverride: () async => false,
+        invalidateWorkoutCaches: () {},
+      );
+
+      repository = WorkoutPageRepositoryImpl(
+        fakeWorkoutPageService,
+        workoutHiveService,
+        sessionHiveService,
+        structuredHiveService,
+        syncService,
+      );
+
+      await workoutsBox.put('workout-1', _buildWorkout());
+    });
+
+    tearDown(() async {
+      syncService.dispose();
+      await Hive.close();
+      if (tempDir.existsSync()) {
+        await tempDir.delete(recursive: true);
+      }
+    });
+
+    test('excludes failed-permanent sessions from weekly/completed stats', () async {
+      final now = DateTime.now();
+      final monday = DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).subtract(Duration(days: now.weekday - 1));
+
+      await sessionHiveService.saveSession(
+        _buildLocalSession(
+          localSessionId: 'ok-1',
+          completedAt: monday.add(const Duration(hours: 8)),
+          syncState: LocalWorkoutSessionSyncState.synced,
+        ),
+      );
+      await sessionHiveService.saveSession(
+        _buildLocalSession(
+          localSessionId: 'ok-2',
+          completedAt: monday.add(const Duration(days: 1, hours: 9)),
+          syncState: LocalWorkoutSessionSyncState.queued,
+        ),
+      );
+      await sessionHiveService.saveSession(
+        _buildLocalSession(
+          localSessionId: 'bad-1',
+          completedAt: monday.add(const Duration(days: 2, hours: 10)),
+          syncState: LocalWorkoutSessionSyncState.failedPermanent,
+        ),
+      );
+
+      final stats = await repository.getWorkoutStats();
+
+      expect(stats.success, isTrue);
+      expect(stats.data, isNotNull);
+      expect(stats.data!.weeklyWorkouts, 2);
+      expect(stats.data!.completedWorkouts, 2);
+    });
+
+    test('computes streak as consecutive local days with at least one session', () async {
+      final today = DateTime.now();
+      final d0 = DateTime(today.year, today.month, today.day, 10);
+      final d1 = d0.subtract(const Duration(days: 1));
+      final d2 = d0.subtract(const Duration(days: 3));
+
+      await sessionHiveService.saveSession(
+        _buildLocalSession(
+          localSessionId: 'streak-1',
+          completedAt: d0,
+          syncState: LocalWorkoutSessionSyncState.synced,
+        ),
+      );
+      await sessionHiveService.saveSession(
+        _buildLocalSession(
+          localSessionId: 'streak-2',
+          completedAt: d1,
+          syncState: LocalWorkoutSessionSyncState.synced,
+        ),
+      );
+      await sessionHiveService.saveSession(
+        _buildLocalSession(
+          localSessionId: 'gap',
+          completedAt: d2,
+          syncState: LocalWorkoutSessionSyncState.synced,
+        ),
+      );
+
+      final stats = await repository.getWorkoutStats();
+
+      expect(stats.success, isTrue);
+      expect(stats.data, isNotNull);
+      expect(stats.data!.currentStreak, 2);
+    });
+  });
+
   group('WorkoutPageRepositoryImpl.saveSession', () {
     late Directory tempDir;
     late Box<WorkoutModel> workoutsBox;
@@ -123,6 +263,27 @@ void main() {
       expect(fakeWorkoutPageService.patchCalls, 0);
     });
   });
+}
+
+LocalWorkoutSession _buildLocalSession({
+  required String localSessionId,
+  required DateTime completedAt,
+  required LocalWorkoutSessionSyncState syncState,
+}) {
+  return LocalWorkoutSession(
+    localSessionId: localSessionId,
+    workoutId: 'workout-1',
+    startedAt: completedAt.subtract(const Duration(minutes: 45)),
+    completedAt: completedAt,
+    notes: null,
+    entries: const [],
+    syncState: syncState,
+    retryCount: 0,
+    nextRetryAt: null,
+    lastError: null,
+    createdAt: completedAt,
+    updatedAt: completedAt,
+  );
 }
 
 WorkoutModel _buildWorkout() {
