@@ -1,5 +1,8 @@
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
+import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +32,9 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
   late bool _isExpanded;
   late AnimationController _expandController;
   late Animation<double> _expandAnimation;
+  bool _isResolvingName = false;
+  bool _triedNameResolution = false;
+  String? _resolvedExerciseName;
 
   @override
   void initState() {
@@ -44,6 +50,17 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
     );
     if (_isExpanded) {
       _expandController.value = 1.0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ExerciseCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.exerciseIndex != widget.exerciseIndex ||
+        oldWidget.workoutId != widget.workoutId) {
+      _resolvedExerciseName = null;
+      _triedNameResolution = false;
+      _isResolvingName = false;
     }
   }
 
@@ -65,6 +82,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
     }
 
     final exercise = workoutState.exercises[widget.exerciseIndex];
+    _resolveExerciseNameIfNeeded(exercise);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
@@ -149,7 +167,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  exercise.displayName,
+                  _displayName(exercise),
                   style: TextStyle(
                     color: scheme.onSurface,
                     fontSize: 16,
@@ -159,6 +177,17 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                if (_isResolvingName) ...[
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: scheme.primary,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 6),
                 Row(
                   children: [
@@ -386,5 +415,81 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard>
     context.push(
       '/workouts/workout/${widget.workoutId}/workout_exercise_page/$exerciseId',
     );
+  }
+
+  String _displayName(ActiveExerciseState exercise) {
+    final locale = ref.read(languageProvider);
+    final fallback = 'Exercise ${widget.exerciseIndex + 1}';
+    final exerciseId = exercise.exercise.exercise.id?.trim();
+
+    final localName = exercise.exercise.exercise.nameI18n?.fromI18n(locale);
+    if (_isValidDisplayName(localName, exerciseId, fallback)) {
+      return localName!.trim();
+    }
+    if (_isValidDisplayName(_resolvedExerciseName, exerciseId, fallback)) {
+      return _resolvedExerciseName!.trim();
+    }
+    if (_isValidDisplayName(exercise.displayName, exerciseId, fallback)) {
+      return exercise.displayName.trim();
+    }
+    return fallback;
+  }
+
+  bool _isValidDisplayName(
+    String? name,
+    String? exerciseId,
+    String fallback,
+  ) {
+    if (name == null) return false;
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return false;
+    if (trimmed == fallback) return false;
+    if (exerciseId != null && exerciseId.isNotEmpty && trimmed == exerciseId) {
+      return false;
+    }
+    return true;
+  }
+
+  bool _hasEmbeddedDisplayName(ActiveExerciseState exercise) {
+    final names = exercise.exercise.exercise.nameI18n;
+    if (names == null || names.isEmpty) return false;
+    final exerciseId = exercise.exercise.exercise.id?.trim();
+    final fallback = 'Exercise ${widget.exerciseIndex + 1}';
+    return names.values.any(
+      (name) => _isValidDisplayName(name, exerciseId, fallback),
+    );
+  }
+
+  Future<void> _resolveExerciseNameIfNeeded(ActiveExerciseState exercise) async {
+    if (_triedNameResolution || _hasEmbeddedDisplayName(exercise)) {
+      return;
+    }
+
+    final exerciseId = exercise.exercise.exercise.id?.trim();
+    if (exerciseId == null || exerciseId.isEmpty) {
+      return;
+    }
+
+    _triedNameResolution = true;
+    if (mounted) {
+      setState(() => _isResolvingName = true);
+    }
+
+    final repository = ref.read(exerciseInfoPageRepositoryProvider);
+    final response = await repository.getExerciseDetail(exerciseId);
+
+    if (!mounted) return;
+
+    final locale = ref.read(languageProvider);
+    final fallback = 'Exercise ${widget.exerciseIndex + 1}';
+    final resolvedName = response.data?.nameI18n?.fromI18n(locale);
+
+    setState(() {
+      _isResolvingName = false;
+      _resolvedExerciseName =
+          _isValidDisplayName(resolvedName, exerciseId, fallback)
+          ? resolvedName
+          : null;
+    });
   }
 }
