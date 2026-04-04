@@ -157,7 +157,52 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
   @override
   Future<ApiResponse<WorkoutStatsModel>> getWorkoutStats() async {
-    return _apiService.fetchWorkoutStats();
+    try {
+      final workouts = await _hiveService.getWorkouts();
+      final sessions = await _sessionHiveService.getAllSessions();
+
+      final activeWorkouts = workouts
+          .where((workout) => workout.active && !workout.delete)
+          .length;
+
+      final completedWorkouts = sessions.isNotEmpty
+          ? sessions.length
+          : workouts.fold<int>(
+              0,
+              (total, workout) => total + workout.sessionsCount,
+            );
+
+      final progressPercentage = workouts.isEmpty
+          ? 0.0
+          : (workouts
+                    .where((workout) => workout.sessionsCount > 0)
+                    .length /
+                workouts.length) *
+            100;
+
+      final weeklyWorkouts = _computeWeeklyWorkouts(
+        sessions: sessions,
+        workouts: workouts,
+      );
+      final currentStreak = _computeCurrentStreak(
+        sessions: sessions,
+        workouts: workouts,
+      );
+
+      return ApiResponse.success(
+        data: WorkoutStatsModel(
+          activeWorkouts: activeWorkouts,
+          completedWorkouts: completedWorkouts,
+          progressPercentage: progressPercentage,
+          currentStreak: currentStreak,
+          weeklyWorkouts: weeklyWorkouts,
+        ),
+      );
+    } catch (error) {
+      return ApiResponse.error(
+        message: 'Failed to compute workout stats: ${error.toString()}',
+      );
+    }
   }
 
   @override
@@ -426,5 +471,71 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
         '${hex.substring(12, 16)}-'
         '${hex.substring(16, 20)}-'
         '${hex.substring(20)}';
+  }
+
+  int _computeWeeklyWorkouts({
+    required List<LocalWorkoutSession> sessions,
+    required List<WorkoutModel> workouts,
+  }) {
+    final now = DateTime.now().toUtc();
+    final weekStart = DateTime.utc(now.year, now.month, now.day)
+        .subtract(const Duration(days: 6));
+
+    if (sessions.isNotEmpty) {
+      return sessions.where((session) {
+        final completedAt = session.completedAt?.toUtc() ?? session.createdAt.toUtc();
+        final day = DateTime.utc(
+          completedAt.year,
+          completedAt.month,
+          completedAt.day,
+        );
+        return !day.isBefore(weekStart);
+      }).length;
+    }
+
+    return workouts.where((workout) {
+      if (workout.sessionsCount <= 0) {
+        return false;
+      }
+      final lastUsed = workout.lastUsed.toUtc();
+      final day = DateTime.utc(lastUsed.year, lastUsed.month, lastUsed.day);
+      return !day.isBefore(weekStart);
+    }).length;
+  }
+
+  int _computeCurrentStreak({
+    required List<LocalWorkoutSession> sessions,
+    required List<WorkoutModel> workouts,
+  }) {
+    final sessionDays = <DateTime>{};
+    for (final session in sessions) {
+      final completedAt = session.completedAt?.toUtc() ?? session.createdAt.toUtc();
+      sessionDays.add(
+        DateTime.utc(completedAt.year, completedAt.month, completedAt.day),
+      );
+    }
+
+    if (sessionDays.isEmpty) {
+      for (final workout in workouts) {
+        if (workout.sessionsCount <= 0) {
+          continue;
+        }
+        final lastUsed = workout.lastUsed.toUtc();
+        sessionDays.add(DateTime.utc(lastUsed.year, lastUsed.month, lastUsed.day));
+      }
+    }
+
+    if (sessionDays.isEmpty) {
+      return 0;
+    }
+
+    final todayUtc = DateTime.now().toUtc();
+    var cursor = DateTime.utc(todayUtc.year, todayUtc.month, todayUtc.day);
+    var streak = 0;
+    while (sessionDays.contains(cursor)) {
+      streak += 1;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    return streak;
   }
 }

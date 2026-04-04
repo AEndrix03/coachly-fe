@@ -54,6 +54,14 @@ class WorkoutSessionHiveService {
     return sessions;
   }
 
+  Future<List<LocalWorkoutSession>> getAllSessions() async {
+    final sessions = _sessionsBox.values
+        .map((raw) => LocalWorkoutSession.fromJson(_normalizeMap(raw)))
+        .toList();
+    sessions.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return sessions;
+  }
+
   Future<void> enqueueSyncJob(SessionSyncJob job) async {
     await _syncJobsBox.put(job.jobId, job.toJson());
   }

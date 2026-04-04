@@ -33,7 +33,10 @@ class WorkoutStatsState {
 @riverpod
 class WorkoutStatsNotifier extends _$WorkoutStatsNotifier {
   @override
-  WorkoutStatsState build() => const WorkoutStatsState();
+  WorkoutStatsState build() {
+    Future.microtask(loadStats);
+    return const WorkoutStatsState(isLoading: true);
+  }
 
   Future<void> loadStats() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
