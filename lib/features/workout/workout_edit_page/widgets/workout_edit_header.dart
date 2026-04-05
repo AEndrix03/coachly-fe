@@ -1,3 +1,5 @@
+import 'package:coachly/core/text_filter/offensive_text_filter_service.dart';
+import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
@@ -114,6 +116,11 @@ class WorkoutEditHeader extends StatelessWidget {
               border: InputBorder.none,
               contentPadding: EdgeInsets.zero,
             ),
+            inputFormatters: [
+              PoliteTextInputFormatter(
+                policy: TextModerationPolicy.titleStrict,
+              ),
+            ],
             onChanged: onTitleChanged,
           ),
           const SizedBox(height: 12),

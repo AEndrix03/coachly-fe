@@ -1,3 +1,4 @@
+import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
@@ -591,6 +592,7 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
           ),
           child: TextField(
             controller: _notesController,
+            inputFormatters: [PoliteTextInputFormatter()],
             style: const TextStyle(color: Colors.white, fontSize: 13),
             maxLines: 2,
             dragStartBehavior: DragStartBehavior.down,

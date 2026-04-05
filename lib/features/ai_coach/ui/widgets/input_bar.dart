@@ -1,5 +1,7 @@
 import 'package:coachly/features/ai_coach/application/ai_coach_notifier.dart';
 import 'package:coachly/features/ai_coach/ui/theme/ai_coach_theme.dart';
+import 'package:coachly/core/text_filter/offensive_text_filter_service.dart';
+import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,6 +24,7 @@ class InputBar extends ConsumerStatefulWidget {
 class _InputBarState extends ConsumerState<InputBar> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
+  final _textFilter = const OffensiveTextFilterService();
 
   @override
   void initState() {
@@ -49,7 +52,10 @@ class _InputBarState extends ConsumerState<InputBar> {
       final justFinished =
           (prevState?.isListening ?? false) && !nextState.isListening;
       if (justFinished && nextState.voiceTranscript.isNotEmpty) {
-        _controller.text = nextState.voiceTranscript;
+        _controller.text = _textFilter.sanitize(
+          nextState.voiceTranscript,
+          policy: TextModerationPolicy.freeText,
+        );
         _controller.selection = TextSelection.fromPosition(
           TextPosition(offset: _controller.text.length),
         );
@@ -143,6 +149,7 @@ class _InputBarState extends ConsumerState<InputBar> {
                     controller: _controller,
                     focusNode: _focusNode,
                     enabled: !widget.isGenerating,
+                    inputFormatters: [PoliteTextInputFormatter()],
                     style: const TextStyle(
                       fontSize: 13,
                       color: AiCoachTheme.textPrimary,
@@ -159,14 +166,7 @@ class _InputBarState extends ConsumerState<InputBar> {
                         vertical: 10,
                       ),
                     ),
-                    onSubmitted: (value) {
-                      final text = value.trim();
-                      if (text.isEmpty) {
-                        return;
-                      }
-                      _controller.clear();
-                      notifier.sendMessage(text);
-                    },
+                    onSubmitted: (_) => _sendSanitizedMessage(notifier),
                   ),
                 ),
               ),
@@ -175,12 +175,7 @@ class _InputBarState extends ConsumerState<InputBar> {
                 onTap: widget.isGenerating
                     ? null
                     : () {
-                        final text = _controller.text.trim();
-                        if (text.isEmpty) {
-                          return;
-                        }
-                        _controller.clear();
-                        notifier.sendMessage(text);
+                        _sendSanitizedMessage(notifier);
                       },
                 child: Container(
                   width: 42,
@@ -205,5 +200,16 @@ class _InputBarState extends ConsumerState<InputBar> {
         ),
       ),
     );
+  }
+
+  void _sendSanitizedMessage(AiCoachNotifier notifier) {
+    final text = _textFilter
+        .sanitize(_controller.text, policy: TextModerationPolicy.freeText)
+        .trim();
+    if (text.isEmpty) {
+      return;
+    }
+    _controller.clear();
+    notifier.sendMessage(text);
   }
 }

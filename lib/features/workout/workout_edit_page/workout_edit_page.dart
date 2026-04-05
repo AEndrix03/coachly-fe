@@ -1,4 +1,6 @@
 import 'package:coachly/core/feedback/app_toast_service.dart';
+import 'package:coachly/core/text_filter/offensive_text_filter_service.dart';
+import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
@@ -35,6 +37,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
 
   // Debouncer per ritardare l'aggiornamento dello stato durante la digitazione
   final _debouncer = Debouncer(delay: Duration(milliseconds: 300));
+  final _textFilter = const OffensiveTextFilterService();
 
   @override
   void initState() {
@@ -71,6 +74,10 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   void _onDescriptionChanged() {
+    _sanitizeControllerValue(
+      _descriptionController,
+      TextModerationPolicy.freeText,
+    );
     _debouncer.run(() {
       ref
           .read(workoutEditPageProvider(widget.workoutId).notifier)
@@ -79,6 +86,10 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   void _onDurationChanged() {
+    _sanitizeControllerValue(
+      _durationController,
+      TextModerationPolicy.freeText,
+    );
     _debouncer.run(() {
       ref
           .read(workoutEditPageProvider(widget.workoutId).notifier)
@@ -87,11 +98,28 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   void _onTypeChanged() {
+    _sanitizeControllerValue(_typeController, TextModerationPolicy.freeText);
     _debouncer.run(() {
       ref
           .read(workoutEditPageProvider(widget.workoutId).notifier)
           .updateType(_typeController.text);
     });
+  }
+
+  void _sanitizeControllerValue(
+    TextEditingController controller,
+    TextModerationPolicy policy,
+  ) {
+    final sanitized = _textFilter.sanitize(controller.text, policy: policy);
+    if (sanitized == controller.text) {
+      return;
+    }
+    final offset = controller.selection.extentOffset.clamp(0, sanitized.length);
+    controller.value = controller.value.copyWith(
+      text: sanitized,
+      selection: TextSelection.collapsed(offset: offset),
+      composing: TextRange.empty,
+    );
   }
 
   @override
@@ -202,6 +230,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
+              inputFormatters: [PoliteTextInputFormatter()],
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.8),
                 fontSize: 14,
@@ -296,6 +325,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               height: 20,
               child: TextField(
                 controller: controller,
+                inputFormatters: [PoliteTextInputFormatter()],
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
@@ -504,10 +534,37 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
 
   Future<void> _handleSave() async {
     _debouncer.cancel();
-    final notifier = ref.read(workoutEditPageProvider(widget.workoutId).notifier)
-      ..updateDescription(_descriptionController.text)
-      ..updateDuration(_durationController.text)
-      ..updateType(_typeController.text);
+    final state = ref.read(workoutEditPageProvider(widget.workoutId));
+    final sanitizedTitle = _textFilter.sanitize(
+      state.title,
+      policy: TextModerationPolicy.titleStrict,
+    );
+    if (sanitizedTitle != state.title) {
+      ref
+          .read(workoutEditPageProvider(widget.workoutId).notifier)
+          .updateTitle(sanitizedTitle);
+    }
+
+    final notifier =
+        ref.read(workoutEditPageProvider(widget.workoutId).notifier)
+          ..updateDescription(
+            _textFilter.sanitize(
+              _descriptionController.text,
+              policy: TextModerationPolicy.freeText,
+            ),
+          )
+          ..updateDuration(
+            _textFilter.sanitize(
+              _durationController.text,
+              policy: TextModerationPolicy.freeText,
+            ),
+          )
+          ..updateType(
+            _textFilter.sanitize(
+              _typeController.text,
+              policy: TextModerationPolicy.freeText,
+            ),
+          );
 
     final success = await notifier.save();
     if (!mounted) return;

@@ -1,4 +1,5 @@
 import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
@@ -261,6 +262,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         ),
         child: TextField(
           controller: _searchCtrl,
+          inputFormatters: [PoliteTextInputFormatter()],
           style: const TextStyle(color: Colors.white, fontSize: 15),
           decoration: InputDecoration(
             hintText: context.tr('workout.search_exercise_hint'),

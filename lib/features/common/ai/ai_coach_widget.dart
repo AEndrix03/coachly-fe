@@ -1,3 +1,4 @@
+import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
@@ -278,6 +279,7 @@ class AICoachWidget extends StatelessWidget {
                 border: Border.all(color: const Color(0xFF374151), width: 1.5),
               ),
               child: TextField(
+                inputFormatters: [PoliteTextInputFormatter()],
                 style: const TextStyle(color: Colors.white, fontSize: 15),
                 decoration: InputDecoration(
                   hintText: context.tr('ai.write_message'),
