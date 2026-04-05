@@ -10,6 +10,8 @@ _ExerciseDetailModel _$ExerciseDetailModelFromJson(
   Map<String, dynamic> json,
 ) => _ExerciseDetailModel(
   id: json['id'] as String? ?? null,
+  createdBy: json['createdBy'] as String? ?? null,
+  isPersonal: json['isPersonal'] as bool? ?? false,
   nameI18n: json['nameI18n'] == null
       ? null
       : const MapConverter().fromJson(json['nameI18n']),
@@ -69,6 +71,8 @@ Map<String, dynamic> _$ExerciseDetailModelToJson(
   _ExerciseDetailModel instance,
 ) => <String, dynamic>{
   'id': instance.id,
+  'createdBy': instance.createdBy,
+  'isPersonal': instance.isPersonal,
   'nameI18n': const MapConverter().toJson(instance.nameI18n),
   'descriptionI18n': const MapConverter().toJson(instance.descriptionI18n),
   'tipsI18n': const MapConverter().toJson(instance.tipsI18n),

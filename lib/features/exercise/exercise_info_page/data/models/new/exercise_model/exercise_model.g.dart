@@ -9,6 +9,8 @@ part of 'exercise_model.dart';
 _ExerciseModel _$ExerciseModelFromJson(Map<String, dynamic> json) =>
     _ExerciseModel(
       id: json['id'] as String? ?? null,
+      createdBy: json['createdBy'] as String? ?? null,
+      isPersonal: json['isPersonal'] as bool? ?? false,
       nameI18n: json['nameI18n'] == null
           ? null
           : const MapConverter().fromJson(json['nameI18n']),
@@ -28,6 +30,8 @@ _ExerciseModel _$ExerciseModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ExerciseModelToJson(_ExerciseModel instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'createdBy': instance.createdBy,
+      'isPersonal': instance.isPersonal,
       'nameI18n': const MapConverter().toJson(instance.nameI18n),
       'descriptionI18n': const MapConverter().toJson(instance.descriptionI18n),
       'tipsI18n': const MapConverter().toJson(instance.tipsI18n),

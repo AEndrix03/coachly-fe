@@ -71,9 +71,85 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   }
 
   @override
+  Future<ApiResponse<List<ExerciseModel>>> getMyExercises() async {
+    try {
+      final response = await _service.fetchMyExercises();
+      return response;
+    } catch (e) {
+      return ApiResponse.error(
+        message: 'Failed to load personal exercises: $e',
+      );
+    }
+  }
+
+  @override
+  Future<ApiResponse<ExerciseDetailModel>> createPersonalExercise({
+    required Map<String, String> nameI18n,
+    Map<String, String>? descriptionI18n,
+    Map<String, String>? tipsI18n,
+    String? difficultyLevel,
+    String? mechanicsType,
+    String? forceType,
+    bool? isUnilateral,
+    bool? isBodyweight,
+  }) async {
+    final response = await _service.createPersonalExercise({
+      'nameI18n': nameI18n,
+      'descriptionI18n': descriptionI18n,
+      'tipsI18n': tipsI18n,
+      'difficultyLevel': difficultyLevel,
+      'mechanicsType': mechanicsType,
+      'forceType': forceType,
+      'isUnilateral': isUnilateral,
+      'isBodyweight': isBodyweight,
+    });
+    if (response.success) {
+      await refreshFromRemote();
+    }
+    return response;
+  }
+
+  @override
+  Future<ApiResponse<ExerciseDetailModel>> updatePersonalExercise(
+    String exerciseId, {
+    required Map<String, String> nameI18n,
+    Map<String, String>? descriptionI18n,
+    Map<String, String>? tipsI18n,
+    String? difficultyLevel,
+    String? mechanicsType,
+    String? forceType,
+    bool? isUnilateral,
+    bool? isBodyweight,
+  }) async {
+    final response = await _service.updatePersonalExercise(exerciseId, {
+      'nameI18n': nameI18n,
+      'descriptionI18n': descriptionI18n,
+      'tipsI18n': tipsI18n,
+      'difficultyLevel': difficultyLevel,
+      'mechanicsType': mechanicsType,
+      'forceType': forceType,
+      'isUnilateral': isUnilateral,
+      'isBodyweight': isBodyweight,
+    });
+    if (response.success) {
+      await refreshFromRemote();
+    }
+    return response;
+  }
+
+  @override
+  Future<ApiResponse<void>> deletePersonalExercise(String exerciseId) async {
+    final response = await _service.deletePersonalExercise(exerciseId);
+    if (response.success) {
+      await refreshFromRemote();
+    }
+    return response;
+  }
+
+  @override
   Future<ApiResponse<List<ExerciseDetailModel>>> refreshFromRemote() async {
     final response = await _service.fetchFilteredExercises(
-      const ExerciseFilterModel(),
+      const ExerciseFilterModel(scope: 'community'),
     );
 
     if (!response.success || response.data == null) {

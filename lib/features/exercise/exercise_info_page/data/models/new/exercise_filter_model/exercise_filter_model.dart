@@ -6,6 +6,7 @@ part 'exercise_filter_model.g.dart';
 @freezed
 abstract class ExerciseFilterModel with _$ExerciseFilterModel {
   const factory ExerciseFilterModel({
+    @Default(null) String? scope,
     String? textFilter,
     String? langFilter,
     String? difficultyLevel,

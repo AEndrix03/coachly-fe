@@ -6,6 +6,7 @@ import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/headers/page_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -53,6 +54,13 @@ class ProfilePage extends ConsumerWidget {
                     color: const Color(0xFF9C27B0),
                     title: context.tr('profile.app_section'),
                     child: _buildAppInfo(context),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSection(
+                    icon: Ionicons.barbell_outline,
+                    color: const Color(0xFF00BCD4),
+                    title: context.tr('profile.workout_section'),
+                    child: _buildPersonalExercisesEntry(context),
                   ),
                   const SizedBox(height: 32),
                   _buildLogoutButton(context, ref),
@@ -217,6 +225,41 @@ class ProfilePage extends ConsumerWidget {
         Divider(color: Colors.white.withValues(alpha: 0.07), height: 24),
         _infoRow(label: context.tr('common.build'), value: 'alpha'),
       ],
+    );
+  }
+
+  Widget _buildPersonalExercisesEntry(BuildContext context) {
+    return InkWell(
+      onTap: () => context.push('/profile/personal-exercises'),
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            Icon(
+              Ionicons.list_outline,
+              color: Colors.white.withValues(alpha: 0.7),
+              size: 18,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                context.tr('profile.personal_exercises'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Ionicons.chevron_forward_outline,
+              color: Colors.white.withValues(alpha: 0.5),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

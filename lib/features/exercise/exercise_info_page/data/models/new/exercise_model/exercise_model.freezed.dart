@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExerciseModel {
 
- String? get id;@MapConverter() Map<String, String>? get nameI18n;@MapConverter() Map<String, String>? get descriptionI18n;@MapConverter() Map<String, String>? get tipsI18n; String? get difficultyLevel; String? get mechanicsType; String? get forceType; bool? get isUnilateral; bool? get isBodyweight;
+ String? get id; String? get createdBy; bool get isPersonal;@MapConverter() Map<String, String>? get nameI18n;@MapConverter() Map<String, String>? get descriptionI18n;@MapConverter() Map<String, String>? get tipsI18n; String? get difficultyLevel; String? get mechanicsType; String? get forceType; bool? get isUnilateral; bool? get isBodyweight;
 /// Create a copy of ExerciseModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ExerciseModelCopyWith<ExerciseModel> get copyWith => _$ExerciseModelCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExerciseModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other.nameI18n, nameI18n)&&const DeepCollectionEquality().equals(other.descriptionI18n, descriptionI18n)&&const DeepCollectionEquality().equals(other.tipsI18n, tipsI18n)&&(identical(other.difficultyLevel, difficultyLevel) || other.difficultyLevel == difficultyLevel)&&(identical(other.mechanicsType, mechanicsType) || other.mechanicsType == mechanicsType)&&(identical(other.forceType, forceType) || other.forceType == forceType)&&(identical(other.isUnilateral, isUnilateral) || other.isUnilateral == isUnilateral)&&(identical(other.isBodyweight, isBodyweight) || other.isBodyweight == isBodyweight));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExerciseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.isPersonal, isPersonal) || other.isPersonal == isPersonal)&&const DeepCollectionEquality().equals(other.nameI18n, nameI18n)&&const DeepCollectionEquality().equals(other.descriptionI18n, descriptionI18n)&&const DeepCollectionEquality().equals(other.tipsI18n, tipsI18n)&&(identical(other.difficultyLevel, difficultyLevel) || other.difficultyLevel == difficultyLevel)&&(identical(other.mechanicsType, mechanicsType) || other.mechanicsType == mechanicsType)&&(identical(other.forceType, forceType) || other.forceType == forceType)&&(identical(other.isUnilateral, isUnilateral) || other.isUnilateral == isUnilateral)&&(identical(other.isBodyweight, isBodyweight) || other.isBodyweight == isBodyweight));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(nameI18n),const DeepCollectionEquality().hash(descriptionI18n),const DeepCollectionEquality().hash(tipsI18n),difficultyLevel,mechanicsType,forceType,isUnilateral,isBodyweight);
+int get hashCode => Object.hash(runtimeType,id,createdBy,isPersonal,const DeepCollectionEquality().hash(nameI18n),const DeepCollectionEquality().hash(descriptionI18n),const DeepCollectionEquality().hash(tipsI18n),difficultyLevel,mechanicsType,forceType,isUnilateral,isBodyweight);
 
 @override
 String toString() {
-  return 'ExerciseModel(id: $id, nameI18n: $nameI18n, descriptionI18n: $descriptionI18n, tipsI18n: $tipsI18n, difficultyLevel: $difficultyLevel, mechanicsType: $mechanicsType, forceType: $forceType, isUnilateral: $isUnilateral, isBodyweight: $isBodyweight)';
+  return 'ExerciseModel(id: $id, createdBy: $createdBy, isPersonal: $isPersonal, nameI18n: $nameI18n, descriptionI18n: $descriptionI18n, tipsI18n: $tipsI18n, difficultyLevel: $difficultyLevel, mechanicsType: $mechanicsType, forceType: $forceType, isUnilateral: $isUnilateral, isBodyweight: $isBodyweight)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ExerciseModelCopyWith<$Res>  {
   factory $ExerciseModelCopyWith(ExerciseModel value, $Res Function(ExerciseModel) _then) = _$ExerciseModelCopyWithImpl;
 @useResult
 $Res call({
- String? id,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight
+ String? id, String? createdBy, bool isPersonal,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight
 });
 
 
@@ -65,10 +65,12 @@ class _$ExerciseModelCopyWithImpl<$Res>
 
 /// Create a copy of ExerciseModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? nameI18n = freezed,Object? descriptionI18n = freezed,Object? tipsI18n = freezed,Object? difficultyLevel = freezed,Object? mechanicsType = freezed,Object? forceType = freezed,Object? isUnilateral = freezed,Object? isBodyweight = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? createdBy = freezed,Object? isPersonal = null,Object? nameI18n = freezed,Object? descriptionI18n = freezed,Object? tipsI18n = freezed,Object? difficultyLevel = freezed,Object? mechanicsType = freezed,Object? forceType = freezed,Object? isUnilateral = freezed,Object? isBodyweight = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,nameI18n: freezed == nameI18n ? _self.nameI18n : nameI18n // ignore: cast_nullable_to_non_nullable
+as String?,createdBy: freezed == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
+as String?,isPersonal: null == isPersonal ? _self.isPersonal : isPersonal // ignore: cast_nullable_to_non_nullable
+as bool,nameI18n: freezed == nameI18n ? _self.nameI18n : nameI18n // ignore: cast_nullable_to_non_nullable
 as Map<String, String>?,descriptionI18n: freezed == descriptionI18n ? _self.descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
 as Map<String, String>?,tipsI18n: freezed == tipsI18n ? _self.tipsI18n : tipsI18n // ignore: cast_nullable_to_non_nullable
 as Map<String, String>?,difficultyLevel: freezed == difficultyLevel ? _self.difficultyLevel : difficultyLevel // ignore: cast_nullable_to_non_nullable
@@ -161,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? createdBy,  bool isPersonal, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExerciseModel() when $default != null:
-return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight);case _:
+return $default(_that.id,_that.createdBy,_that.isPersonal,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight);case _:
   return orElse();
 
 }
@@ -182,10 +184,10 @@ return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? createdBy,  bool isPersonal, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight)  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseModel():
-return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight);case _:
+return $default(_that.id,_that.createdBy,_that.isPersonal,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +204,10 @@ return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? createdBy,  bool isPersonal, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight)?  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseModel() when $default != null:
-return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight);case _:
+return $default(_that.id,_that.createdBy,_that.isPersonal,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight);case _:
   return null;
 
 }
@@ -217,10 +219,12 @@ return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_th
 @JsonSerializable()
 
 class _ExerciseModel implements ExerciseModel {
-  const _ExerciseModel({this.id = null, @MapConverter() final  Map<String, String>? nameI18n = null, @MapConverter() final  Map<String, String>? descriptionI18n = null, @MapConverter() final  Map<String, String>? tipsI18n = null, this.difficultyLevel = null, this.mechanicsType = null, this.forceType = null, this.isUnilateral = null, this.isBodyweight = null}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_tipsI18n = tipsI18n;
+  const _ExerciseModel({this.id = null, this.createdBy = null, this.isPersonal = false, @MapConverter() final  Map<String, String>? nameI18n = null, @MapConverter() final  Map<String, String>? descriptionI18n = null, @MapConverter() final  Map<String, String>? tipsI18n = null, this.difficultyLevel = null, this.mechanicsType = null, this.forceType = null, this.isUnilateral = null, this.isBodyweight = null}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_tipsI18n = tipsI18n;
   factory _ExerciseModel.fromJson(Map<String, dynamic> json) => _$ExerciseModelFromJson(json);
 
 @override@JsonKey() final  String? id;
+@override@JsonKey() final  String? createdBy;
+@override@JsonKey() final  bool isPersonal;
  final  Map<String, String>? _nameI18n;
 @override@JsonKey()@MapConverter() Map<String, String>? get nameI18n {
   final value = _nameI18n;
@@ -267,16 +271,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExerciseModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other._nameI18n, _nameI18n)&&const DeepCollectionEquality().equals(other._descriptionI18n, _descriptionI18n)&&const DeepCollectionEquality().equals(other._tipsI18n, _tipsI18n)&&(identical(other.difficultyLevel, difficultyLevel) || other.difficultyLevel == difficultyLevel)&&(identical(other.mechanicsType, mechanicsType) || other.mechanicsType == mechanicsType)&&(identical(other.forceType, forceType) || other.forceType == forceType)&&(identical(other.isUnilateral, isUnilateral) || other.isUnilateral == isUnilateral)&&(identical(other.isBodyweight, isBodyweight) || other.isBodyweight == isBodyweight));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExerciseModel&&(identical(other.id, id) || other.id == id)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy)&&(identical(other.isPersonal, isPersonal) || other.isPersonal == isPersonal)&&const DeepCollectionEquality().equals(other._nameI18n, _nameI18n)&&const DeepCollectionEquality().equals(other._descriptionI18n, _descriptionI18n)&&const DeepCollectionEquality().equals(other._tipsI18n, _tipsI18n)&&(identical(other.difficultyLevel, difficultyLevel) || other.difficultyLevel == difficultyLevel)&&(identical(other.mechanicsType, mechanicsType) || other.mechanicsType == mechanicsType)&&(identical(other.forceType, forceType) || other.forceType == forceType)&&(identical(other.isUnilateral, isUnilateral) || other.isUnilateral == isUnilateral)&&(identical(other.isBodyweight, isBodyweight) || other.isBodyweight == isBodyweight));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(_nameI18n),const DeepCollectionEquality().hash(_descriptionI18n),const DeepCollectionEquality().hash(_tipsI18n),difficultyLevel,mechanicsType,forceType,isUnilateral,isBodyweight);
+int get hashCode => Object.hash(runtimeType,id,createdBy,isPersonal,const DeepCollectionEquality().hash(_nameI18n),const DeepCollectionEquality().hash(_descriptionI18n),const DeepCollectionEquality().hash(_tipsI18n),difficultyLevel,mechanicsType,forceType,isUnilateral,isBodyweight);
 
 @override
 String toString() {
-  return 'ExerciseModel(id: $id, nameI18n: $nameI18n, descriptionI18n: $descriptionI18n, tipsI18n: $tipsI18n, difficultyLevel: $difficultyLevel, mechanicsType: $mechanicsType, forceType: $forceType, isUnilateral: $isUnilateral, isBodyweight: $isBodyweight)';
+  return 'ExerciseModel(id: $id, createdBy: $createdBy, isPersonal: $isPersonal, nameI18n: $nameI18n, descriptionI18n: $descriptionI18n, tipsI18n: $tipsI18n, difficultyLevel: $difficultyLevel, mechanicsType: $mechanicsType, forceType: $forceType, isUnilateral: $isUnilateral, isBodyweight: $isBodyweight)';
 }
 
 
@@ -287,7 +291,7 @@ abstract mixin class _$ExerciseModelCopyWith<$Res> implements $ExerciseModelCopy
   factory _$ExerciseModelCopyWith(_ExerciseModel value, $Res Function(_ExerciseModel) _then) = __$ExerciseModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight
+ String? id, String? createdBy, bool isPersonal,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight
 });
 
 
@@ -304,10 +308,12 @@ class __$ExerciseModelCopyWithImpl<$Res>
 
 /// Create a copy of ExerciseModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? nameI18n = freezed,Object? descriptionI18n = freezed,Object? tipsI18n = freezed,Object? difficultyLevel = freezed,Object? mechanicsType = freezed,Object? forceType = freezed,Object? isUnilateral = freezed,Object? isBodyweight = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? createdBy = freezed,Object? isPersonal = null,Object? nameI18n = freezed,Object? descriptionI18n = freezed,Object? tipsI18n = freezed,Object? difficultyLevel = freezed,Object? mechanicsType = freezed,Object? forceType = freezed,Object? isUnilateral = freezed,Object? isBodyweight = freezed,}) {
   return _then(_ExerciseModel(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String?,nameI18n: freezed == nameI18n ? _self._nameI18n : nameI18n // ignore: cast_nullable_to_non_nullable
+as String?,createdBy: freezed == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
+as String?,isPersonal: null == isPersonal ? _self.isPersonal : isPersonal // ignore: cast_nullable_to_non_nullable
+as bool,nameI18n: freezed == nameI18n ? _self._nameI18n : nameI18n // ignore: cast_nullable_to_non_nullable
 as Map<String, String>?,descriptionI18n: freezed == descriptionI18n ? _self._descriptionI18n : descriptionI18n // ignore: cast_nullable_to_non_nullable
 as Map<String, String>?,tipsI18n: freezed == tipsI18n ? _self._tipsI18n : tipsI18n // ignore: cast_nullable_to_non_nullable
 as Map<String, String>?,difficultyLevel: freezed == difficultyLevel ? _self.difficultyLevel : difficultyLevel // ignore: cast_nullable_to_non_nullable

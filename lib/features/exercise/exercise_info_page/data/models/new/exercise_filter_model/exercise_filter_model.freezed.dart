@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExerciseFilterModel {
 
- String? get textFilter; String? get langFilter; String? get difficultyLevel; String? get mechanicsType; String? get forceType; bool? get isUnilateral; bool? get isBodyweight; List<String>? get categoryIds; List<String>? get muscleIds;
+ String? get scope; String? get textFilter; String? get langFilter; String? get difficultyLevel; String? get mechanicsType; String? get forceType; bool? get isUnilateral; bool? get isBodyweight; List<String>? get categoryIds; List<String>? get muscleIds;
 /// Create a copy of ExerciseFilterModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ExerciseFilterModelCopyWith<ExerciseFilterModel> get copyWith => _$ExerciseFilt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExerciseFilterModel&&(identical(other.textFilter, textFilter) || other.textFilter == textFilter)&&(identical(other.langFilter, langFilter) || other.langFilter == langFilter)&&(identical(other.difficultyLevel, difficultyLevel) || other.difficultyLevel == difficultyLevel)&&(identical(other.mechanicsType, mechanicsType) || other.mechanicsType == mechanicsType)&&(identical(other.forceType, forceType) || other.forceType == forceType)&&(identical(other.isUnilateral, isUnilateral) || other.isUnilateral == isUnilateral)&&(identical(other.isBodyweight, isBodyweight) || other.isBodyweight == isBodyweight)&&const DeepCollectionEquality().equals(other.categoryIds, categoryIds)&&const DeepCollectionEquality().equals(other.muscleIds, muscleIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ExerciseFilterModel&&(identical(other.scope, scope) || other.scope == scope)&&(identical(other.textFilter, textFilter) || other.textFilter == textFilter)&&(identical(other.langFilter, langFilter) || other.langFilter == langFilter)&&(identical(other.difficultyLevel, difficultyLevel) || other.difficultyLevel == difficultyLevel)&&(identical(other.mechanicsType, mechanicsType) || other.mechanicsType == mechanicsType)&&(identical(other.forceType, forceType) || other.forceType == forceType)&&(identical(other.isUnilateral, isUnilateral) || other.isUnilateral == isUnilateral)&&(identical(other.isBodyweight, isBodyweight) || other.isBodyweight == isBodyweight)&&const DeepCollectionEquality().equals(other.categoryIds, categoryIds)&&const DeepCollectionEquality().equals(other.muscleIds, muscleIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,textFilter,langFilter,difficultyLevel,mechanicsType,forceType,isUnilateral,isBodyweight,const DeepCollectionEquality().hash(categoryIds),const DeepCollectionEquality().hash(muscleIds));
+int get hashCode => Object.hash(runtimeType,scope,textFilter,langFilter,difficultyLevel,mechanicsType,forceType,isUnilateral,isBodyweight,const DeepCollectionEquality().hash(categoryIds),const DeepCollectionEquality().hash(muscleIds));
 
 @override
 String toString() {
-  return 'ExerciseFilterModel(textFilter: $textFilter, langFilter: $langFilter, difficultyLevel: $difficultyLevel, mechanicsType: $mechanicsType, forceType: $forceType, isUnilateral: $isUnilateral, isBodyweight: $isBodyweight, categoryIds: $categoryIds, muscleIds: $muscleIds)';
+  return 'ExerciseFilterModel(scope: $scope, textFilter: $textFilter, langFilter: $langFilter, difficultyLevel: $difficultyLevel, mechanicsType: $mechanicsType, forceType: $forceType, isUnilateral: $isUnilateral, isBodyweight: $isBodyweight, categoryIds: $categoryIds, muscleIds: $muscleIds)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ExerciseFilterModelCopyWith<$Res>  {
   factory $ExerciseFilterModelCopyWith(ExerciseFilterModel value, $Res Function(ExerciseFilterModel) _then) = _$ExerciseFilterModelCopyWithImpl;
 @useResult
 $Res call({
- String? textFilter, String? langFilter, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight, List<String>? categoryIds, List<String>? muscleIds
+ String? scope, String? textFilter, String? langFilter, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight, List<String>? categoryIds, List<String>? muscleIds
 });
 
 
@@ -65,9 +65,10 @@ class _$ExerciseFilterModelCopyWithImpl<$Res>
 
 /// Create a copy of ExerciseFilterModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? textFilter = freezed,Object? langFilter = freezed,Object? difficultyLevel = freezed,Object? mechanicsType = freezed,Object? forceType = freezed,Object? isUnilateral = freezed,Object? isBodyweight = freezed,Object? categoryIds = freezed,Object? muscleIds = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? scope = freezed,Object? textFilter = freezed,Object? langFilter = freezed,Object? difficultyLevel = freezed,Object? mechanicsType = freezed,Object? forceType = freezed,Object? isUnilateral = freezed,Object? isBodyweight = freezed,Object? categoryIds = freezed,Object? muscleIds = freezed,}) {
   return _then(_self.copyWith(
-textFilter: freezed == textFilter ? _self.textFilter : textFilter // ignore: cast_nullable_to_non_nullable
+scope: freezed == scope ? _self.scope : scope // ignore: cast_nullable_to_non_nullable
+as String?,textFilter: freezed == textFilter ? _self.textFilter : textFilter // ignore: cast_nullable_to_non_nullable
 as String?,langFilter: freezed == langFilter ? _self.langFilter : langFilter // ignore: cast_nullable_to_non_nullable
 as String?,difficultyLevel: freezed == difficultyLevel ? _self.difficultyLevel : difficultyLevel // ignore: cast_nullable_to_non_nullable
 as String?,mechanicsType: freezed == mechanicsType ? _self.mechanicsType : mechanicsType // ignore: cast_nullable_to_non_nullable
@@ -161,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? textFilter,  String? langFilter,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  List<String>? categoryIds,  List<String>? muscleIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? scope,  String? textFilter,  String? langFilter,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  List<String>? categoryIds,  List<String>? muscleIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExerciseFilterModel() when $default != null:
-return $default(_that.textFilter,_that.langFilter,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.categoryIds,_that.muscleIds);case _:
+return $default(_that.scope,_that.textFilter,_that.langFilter,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.categoryIds,_that.muscleIds);case _:
   return orElse();
 
 }
@@ -182,10 +183,10 @@ return $default(_that.textFilter,_that.langFilter,_that.difficultyLevel,_that.me
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? textFilter,  String? langFilter,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  List<String>? categoryIds,  List<String>? muscleIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? scope,  String? textFilter,  String? langFilter,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  List<String>? categoryIds,  List<String>? muscleIds)  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseFilterModel():
-return $default(_that.textFilter,_that.langFilter,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.categoryIds,_that.muscleIds);case _:
+return $default(_that.scope,_that.textFilter,_that.langFilter,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.categoryIds,_that.muscleIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +203,10 @@ return $default(_that.textFilter,_that.langFilter,_that.difficultyLevel,_that.me
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? textFilter,  String? langFilter,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  List<String>? categoryIds,  List<String>? muscleIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? scope,  String? textFilter,  String? langFilter,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  List<String>? categoryIds,  List<String>? muscleIds)?  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseFilterModel() when $default != null:
-return $default(_that.textFilter,_that.langFilter,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.categoryIds,_that.muscleIds);case _:
+return $default(_that.scope,_that.textFilter,_that.langFilter,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.categoryIds,_that.muscleIds);case _:
   return null;
 
 }
@@ -217,9 +218,10 @@ return $default(_that.textFilter,_that.langFilter,_that.difficultyLevel,_that.me
 @JsonSerializable()
 
 class _ExerciseFilterModel implements ExerciseFilterModel {
-  const _ExerciseFilterModel({this.textFilter, this.langFilter, this.difficultyLevel, this.mechanicsType, this.forceType, this.isUnilateral, this.isBodyweight, final  List<String>? categoryIds, final  List<String>? muscleIds}): _categoryIds = categoryIds,_muscleIds = muscleIds;
+  const _ExerciseFilterModel({this.scope = null, this.textFilter, this.langFilter, this.difficultyLevel, this.mechanicsType, this.forceType, this.isUnilateral, this.isBodyweight, final  List<String>? categoryIds, final  List<String>? muscleIds}): _categoryIds = categoryIds,_muscleIds = muscleIds;
   factory _ExerciseFilterModel.fromJson(Map<String, dynamic> json) => _$ExerciseFilterModelFromJson(json);
 
+@override@JsonKey() final  String? scope;
 @override final  String? textFilter;
 @override final  String? langFilter;
 @override final  String? difficultyLevel;
@@ -259,16 +261,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExerciseFilterModel&&(identical(other.textFilter, textFilter) || other.textFilter == textFilter)&&(identical(other.langFilter, langFilter) || other.langFilter == langFilter)&&(identical(other.difficultyLevel, difficultyLevel) || other.difficultyLevel == difficultyLevel)&&(identical(other.mechanicsType, mechanicsType) || other.mechanicsType == mechanicsType)&&(identical(other.forceType, forceType) || other.forceType == forceType)&&(identical(other.isUnilateral, isUnilateral) || other.isUnilateral == isUnilateral)&&(identical(other.isBodyweight, isBodyweight) || other.isBodyweight == isBodyweight)&&const DeepCollectionEquality().equals(other._categoryIds, _categoryIds)&&const DeepCollectionEquality().equals(other._muscleIds, _muscleIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ExerciseFilterModel&&(identical(other.scope, scope) || other.scope == scope)&&(identical(other.textFilter, textFilter) || other.textFilter == textFilter)&&(identical(other.langFilter, langFilter) || other.langFilter == langFilter)&&(identical(other.difficultyLevel, difficultyLevel) || other.difficultyLevel == difficultyLevel)&&(identical(other.mechanicsType, mechanicsType) || other.mechanicsType == mechanicsType)&&(identical(other.forceType, forceType) || other.forceType == forceType)&&(identical(other.isUnilateral, isUnilateral) || other.isUnilateral == isUnilateral)&&(identical(other.isBodyweight, isBodyweight) || other.isBodyweight == isBodyweight)&&const DeepCollectionEquality().equals(other._categoryIds, _categoryIds)&&const DeepCollectionEquality().equals(other._muscleIds, _muscleIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,textFilter,langFilter,difficultyLevel,mechanicsType,forceType,isUnilateral,isBodyweight,const DeepCollectionEquality().hash(_categoryIds),const DeepCollectionEquality().hash(_muscleIds));
+int get hashCode => Object.hash(runtimeType,scope,textFilter,langFilter,difficultyLevel,mechanicsType,forceType,isUnilateral,isBodyweight,const DeepCollectionEquality().hash(_categoryIds),const DeepCollectionEquality().hash(_muscleIds));
 
 @override
 String toString() {
-  return 'ExerciseFilterModel(textFilter: $textFilter, langFilter: $langFilter, difficultyLevel: $difficultyLevel, mechanicsType: $mechanicsType, forceType: $forceType, isUnilateral: $isUnilateral, isBodyweight: $isBodyweight, categoryIds: $categoryIds, muscleIds: $muscleIds)';
+  return 'ExerciseFilterModel(scope: $scope, textFilter: $textFilter, langFilter: $langFilter, difficultyLevel: $difficultyLevel, mechanicsType: $mechanicsType, forceType: $forceType, isUnilateral: $isUnilateral, isBodyweight: $isBodyweight, categoryIds: $categoryIds, muscleIds: $muscleIds)';
 }
 
 
@@ -279,7 +281,7 @@ abstract mixin class _$ExerciseFilterModelCopyWith<$Res> implements $ExerciseFil
   factory _$ExerciseFilterModelCopyWith(_ExerciseFilterModel value, $Res Function(_ExerciseFilterModel) _then) = __$ExerciseFilterModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? textFilter, String? langFilter, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight, List<String>? categoryIds, List<String>? muscleIds
+ String? scope, String? textFilter, String? langFilter, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight, List<String>? categoryIds, List<String>? muscleIds
 });
 
 
@@ -296,9 +298,10 @@ class __$ExerciseFilterModelCopyWithImpl<$Res>
 
 /// Create a copy of ExerciseFilterModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? textFilter = freezed,Object? langFilter = freezed,Object? difficultyLevel = freezed,Object? mechanicsType = freezed,Object? forceType = freezed,Object? isUnilateral = freezed,Object? isBodyweight = freezed,Object? categoryIds = freezed,Object? muscleIds = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? scope = freezed,Object? textFilter = freezed,Object? langFilter = freezed,Object? difficultyLevel = freezed,Object? mechanicsType = freezed,Object? forceType = freezed,Object? isUnilateral = freezed,Object? isBodyweight = freezed,Object? categoryIds = freezed,Object? muscleIds = freezed,}) {
   return _then(_ExerciseFilterModel(
-textFilter: freezed == textFilter ? _self.textFilter : textFilter // ignore: cast_nullable_to_non_nullable
+scope: freezed == scope ? _self.scope : scope // ignore: cast_nullable_to_non_nullable
+as String?,textFilter: freezed == textFilter ? _self.textFilter : textFilter // ignore: cast_nullable_to_non_nullable
 as String?,langFilter: freezed == langFilter ? _self.langFilter : langFilter // ignore: cast_nullable_to_non_nullable
 as String?,difficultyLevel: freezed == difficultyLevel ? _self.difficultyLevel : difficultyLevel // ignore: cast_nullable_to_non_nullable
 as String?,mechanicsType: freezed == mechanicsType ? _self.mechanicsType : mechanicsType // ignore: cast_nullable_to_non_nullable

@@ -13,5 +13,32 @@ abstract class IExerciseInfoPageRepository {
     Set<String> excludedExerciseIds = const {},
   });
 
+  Future<ApiResponse<List<ExerciseModel>>> getMyExercises();
+
+  Future<ApiResponse<ExerciseDetailModel>> createPersonalExercise({
+    required Map<String, String> nameI18n,
+    Map<String, String>? descriptionI18n,
+    Map<String, String>? tipsI18n,
+    String? difficultyLevel,
+    String? mechanicsType,
+    String? forceType,
+    bool? isUnilateral,
+    bool? isBodyweight,
+  });
+
+  Future<ApiResponse<ExerciseDetailModel>> updatePersonalExercise(
+    String exerciseId, {
+    required Map<String, String> nameI18n,
+    Map<String, String>? descriptionI18n,
+    Map<String, String>? tipsI18n,
+    String? difficultyLevel,
+    String? mechanicsType,
+    String? forceType,
+    bool? isUnilateral,
+    bool? isBodyweight,
+  });
+
+  Future<ApiResponse<void>> deletePersonalExercise(String exerciseId);
+
   Future<ApiResponse<List<ExerciseDetailModel>>> refreshFromRemote();
 }

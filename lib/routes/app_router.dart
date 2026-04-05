@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/auth/pages/login_page/login_page.dart';
 import '../features/common/navigation/widgets/navigation_bar.dart';
+import '../features/exercise/personal_exercises_page/personal_exercises_page.dart';
 import '../features/exercise/exercise_info_page/exercise_info_page.dart';
 import '../features/feedback/feedback_page.dart';
 import '../features/home/home.dart';
@@ -147,6 +148,13 @@ GoRouter router(Ref ref) {
               GoRoute(
                 path: '/profile',
                 builder: (context, state) => const ProfilePage(),
+                routes: [
+                  GoRoute(
+                    path: 'personal-exercises',
+                    pageBuilder: (context, state) =>
+                        _fadeTransition(state, const PersonalExercisesPage()),
+                  ),
+                ],
               ),
             ],
           ),

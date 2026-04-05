@@ -16,7 +16,9 @@ class ExerciseHiveService {
   Future<List<ExerciseDetailModel>> getExercises() async {
     final box = _localDbService.exercises;
     return box.values
-        .map((raw) => ExerciseDetailModel.fromJson(Map<String, dynamic>.from(raw)))
+        .map(
+          (raw) => ExerciseDetailModel.fromJson(Map<String, dynamic>.from(raw)),
+        )
         .toList();
   }
 
@@ -66,7 +68,14 @@ class ExerciseHiveService {
         return false;
       }
 
-      if (!_matchesStringFilter(exercise.difficultyLevel, filter.difficultyLevel)) {
+      if (!_matchesScope(exercise, filter.scope)) {
+        return false;
+      }
+
+      if (!_matchesStringFilter(
+        exercise.difficultyLevel,
+        filter.difficultyLevel,
+      )) {
         return false;
       }
 
@@ -112,6 +121,8 @@ class ExerciseHiveService {
         .map(
           (exercise) => ExerciseModel(
             id: exercise.id,
+            createdBy: exercise.createdBy,
+            isPersonal: exercise.isPersonal,
             nameI18n: exercise.nameI18n,
             descriptionI18n: exercise.descriptionI18n,
             tipsI18n: exercise.tipsI18n,
@@ -143,6 +154,22 @@ class ExerciseHiveService {
     }
 
     return value == expected;
+  }
+
+  bool _matchesScope(ExerciseDetailModel exercise, String? scope) {
+    if (scope == null || scope.isEmpty) {
+      return true;
+    }
+
+    switch (scope.toLowerCase()) {
+      case 'default':
+        return !exercise.isPersonal;
+      case 'mine':
+        return exercise.isPersonal;
+      case 'community':
+      default:
+        return true;
+    }
   }
 
   bool _matchesBoolFilter(bool? value, bool? expected) {

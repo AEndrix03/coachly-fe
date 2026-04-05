@@ -37,6 +37,9 @@ class ExerciseInfoPageService {
     ExerciseFilterModel filter,
   ) async {
     final Map<String, String> queryParameters = {};
+    if (filter.scope != null && filter.scope!.isNotEmpty) {
+      queryParameters['scope'] = filter.scope!;
+    }
 
     if (filter.textFilter != null && filter.textFilter!.isNotEmpty) {
       queryParameters['textFilter'] = filter.textFilter!;
@@ -78,5 +81,42 @@ class ExerciseInfoPageService {
         return [];
       },
     );
+  }
+
+  Future<ApiResponse<List<ExerciseModel>>> fetchMyExercises() async {
+    return await _apiClient.get<List<ExerciseModel>>(
+      '/exercises/mine',
+      fromJson: (data) {
+        if (data is List) {
+          return data.map((json) => ExerciseModel.fromJson(json)).toList();
+        }
+        return [];
+      },
+    );
+  }
+
+  Future<ApiResponse<ExerciseDetailModel>> createPersonalExercise(
+    Map<String, dynamic> body,
+  ) async {
+    return await _apiClient.post<ExerciseDetailModel>(
+      '/exercises',
+      body: body,
+      fromJson: (json) => ExerciseDetailModel.fromJson(json),
+    );
+  }
+
+  Future<ApiResponse<ExerciseDetailModel>> updatePersonalExercise(
+    String exerciseId,
+    Map<String, dynamic> body,
+  ) async {
+    return await _apiClient.put<ExerciseDetailModel>(
+      '/exercises/$exerciseId',
+      body: body,
+      fromJson: (json) => ExerciseDetailModel.fromJson(json),
+    );
+  }
+
+  Future<ApiResponse<void>> deletePersonalExercise(String exerciseId) async {
+    return await _apiClient.delete<void>('/exercises/$exerciseId');
   }
 }

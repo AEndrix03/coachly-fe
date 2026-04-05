@@ -3,6 +3,7 @@ import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
@@ -36,6 +37,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 400));
 
   bool _showAdvanced = false;
+  String _scope = 'community';
 
   // active filters
   String? _categoryId;
@@ -46,7 +48,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   bool? _bodyweight;
   bool? _unilateral;
 
-  ExerciseFilterModel _filter = const ExerciseFilterModel();
+  ExerciseFilterModel _filter = const ExerciseFilterModel(scope: 'community');
 
   // ── lifecycle ─────────────────────────────────────────────────────────────
 
@@ -76,6 +78,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     final text = _searchCtrl.text;
     setState(() {
       _filter = ExerciseFilterModel(
+        scope: _scope,
         textFilter: text.length >= 2 || text.isEmpty ? text : null,
         langFilter: lang,
         difficultyLevel: _difficulty,
@@ -100,6 +103,103 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       _unilateral = null;
     });
     _applyFilters();
+  }
+
+  Future<void> _showCreateExerciseDialog() async {
+    final locale = ref.read(languageProvider);
+    final lang = locale.languageCode;
+    final nameController = TextEditingController();
+    final descriptionController = TextEditingController();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF151524),
+          title: Text(
+            context.tr('exercise.personal.create'),
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                maxLength: 80,
+                inputFormatters: [PoliteTextInputFormatter()],
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: context.tr('exercise.personal.name'),
+                  labelStyle: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                  ),
+                ),
+              ),
+              TextField(
+                controller: descriptionController,
+                maxLength: 160,
+                inputFormatters: [PoliteTextInputFormatter()],
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: context.tr('exercise.personal.description'),
+                  labelStyle: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(context.tr('common.cancel')),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(context.tr('common.confirm')),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != true) {
+      return;
+    }
+
+    final name = nameController.text.trim();
+    final description = descriptionController.text.trim();
+    if (name.isEmpty) {
+      return;
+    }
+
+    final repository = ref.read(exerciseInfoPageRepositoryProvider);
+    final response = await repository.createPersonalExercise(
+      nameI18n: {lang: name},
+      descriptionI18n: description.isNotEmpty ? {lang: description} : null,
+      tipsI18n: const {},
+      difficultyLevel: 'beginner',
+      mechanicsType: 'compound',
+      isBodyweight: true,
+      isUnilateral: false,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (!response.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.message ?? context.tr('common.error'))),
+      );
+      return;
+    }
+
+    setState(() => _scope = 'mine');
+    _applyFilters();
+    ref.invalidate(exerciseListProvider);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.tr('exercise.personal.created'))),
+    );
   }
 
   int get _activeCount => [
@@ -127,6 +227,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           _buildHandle(),
           _buildHeader(),
           _buildSearchBar(),
+          _buildSourceSelector(),
           _buildOptionsSource(),
           Expanded(child: _buildList()),
         ],
@@ -180,6 +281,26 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             ),
           ),
           const Spacer(),
+          GestureDetector(
+            onTap: _showCreateExerciseDialog,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  width: 1,
+                ),
+              ),
+              child: const Icon(
+                Icons.add_rounded,
+                size: 18,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           // filter button with badge
           GestureDetector(
             onTap: () => setState(() => _showAdvanced = !_showAdvanced),
@@ -296,6 +417,60 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     );
   }
 
+  Widget _buildSourceSelector() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+      child: Row(
+        children: [
+          _sourceChip(
+            label: context.tr('exercise.scope.community'),
+            value: 'community',
+          ),
+          const SizedBox(width: 8),
+          _sourceChip(
+            label: context.tr('exercise.scope.default'),
+            value: 'default',
+          ),
+          const SizedBox(width: 8),
+          _sourceChip(label: context.tr('exercise.scope.mine'), value: 'mine'),
+        ],
+      ),
+    );
+  }
+
+  Widget _sourceChip({required String label, required String value}) {
+    final isActive = _scope == value;
+    return GestureDetector(
+      onTap: () {
+        setState(() => _scope = value);
+        _applyFilters();
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: isActive
+              ? const Color(0xFF2196F3).withValues(alpha: 0.25)
+              : Colors.white.withValues(alpha: 0.06),
+          border: Border.all(
+            color: isActive
+                ? const Color(0xFF2196F3)
+                : Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: isActive ? 0.95 : 0.7),
+            fontSize: 12,
+            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
   // ── filter options source ─────────────────────────────────────────────────
 
   /// Uses a base filter (text + lang only) to build available filter options
@@ -305,6 +480,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     final lang = '${locale.languageCode}_${locale.countryCode}';
     final text = _searchCtrl.text;
     final baseFilter = ExerciseFilterModel(
+      scope: _scope,
       langFilter: lang,
       textFilter: text.length >= 2 || text.isEmpty ? text : null,
     );

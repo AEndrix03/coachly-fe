@@ -8,6 +8,8 @@ part 'exercise_model.g.dart';
 abstract class ExerciseModel with _$ExerciseModel {
   const factory ExerciseModel({
     @Default(null) String? id,
+    @Default(null) String? createdBy,
+    @Default(false) bool isPersonal,
     @MapConverter() @Default(null) Map<String, String>? nameI18n,
     @MapConverter() @Default(null) Map<String, String>? descriptionI18n,
     @MapConverter() @Default(null) Map<String, String>? tipsI18n,

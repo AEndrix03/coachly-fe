@@ -8,6 +8,7 @@ part of 'exercise_filter_model.dart';
 
 _ExerciseFilterModel _$ExerciseFilterModelFromJson(Map<String, dynamic> json) =>
     _ExerciseFilterModel(
+      scope: json['scope'] as String? ?? null,
       textFilter: json['textFilter'] as String?,
       langFilter: json['langFilter'] as String?,
       difficultyLevel: json['difficultyLevel'] as String?,
@@ -26,6 +27,7 @@ _ExerciseFilterModel _$ExerciseFilterModelFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ExerciseFilterModelToJson(
   _ExerciseFilterModel instance,
 ) => <String, dynamic>{
+  'scope': instance.scope,
   'textFilter': instance.textFilter,
   'langFilter': instance.langFilter,
   'difficultyLevel': instance.difficultyLevel,

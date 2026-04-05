@@ -44,6 +44,11 @@ class AppStrings {
     'profile.member': {'en': 'Coachly Member', 'it': 'Membro Coachly'},
     'profile.preferences': {'en': 'Preferences', 'it': 'Preferenze'},
     'profile.app_section': {'en': 'App', 'it': 'App'},
+    'profile.workout_section': {'en': 'Workout', 'it': 'Allenamento'},
+    'profile.personal_exercises': {
+      'en': 'Personal Exercises',
+      'it': 'Esercizi personali',
+    },
     'profile.logout': {'en': 'Logout', 'it': 'Logout'},
     'profile.logout_title': {'en': 'Logout', 'it': 'Logout'},
     'profile.logout_content': {
@@ -439,6 +444,35 @@ class AppStrings {
     'exercise.with_equipment': {'en': 'With equipment', 'it': 'Con attrezzi'},
     'exercise.unilateral': {'en': 'Unilateral', 'it': 'Unilaterale'},
     'exercise.clear_filters': {'en': 'Clear filters', 'it': 'Rimuovi filtri'},
+    'exercise.scope.community': {'en': 'Community', 'it': 'Community'},
+    'exercise.scope.default': {'en': 'Default', 'it': 'Default'},
+    'exercise.scope.mine': {'en': 'Mine', 'it': 'I miei'},
+    'exercise.personal.create': {
+      'en': 'Create personal exercise',
+      'it': 'Crea esercizio personale',
+    },
+    'exercise.personal.edit': {
+      'en': 'Edit personal exercise',
+      'it': 'Modifica esercizio personale',
+    },
+    'exercise.personal.created': {
+      'en': 'Exercise created',
+      'it': 'Esercizio creato',
+    },
+    'exercise.personal.name': {'en': 'Name', 'it': 'Nome'},
+    'exercise.personal.description': {'en': 'Description', 'it': 'Descrizione'},
+    'exercise.personal.delete': {
+      'en': 'Delete exercise',
+      'it': 'Elimina esercizio',
+    },
+    'exercise.personal.delete_confirm': {
+      'en': 'Delete this personal exercise?',
+      'it': 'Eliminare questo esercizio personale?',
+    },
+    'exercise.personal.empty': {
+      'en': 'No personal exercises yet.',
+      'it': 'Nessun esercizio personale.',
+    },
     'exercise.difficulty.beginner': {'en': 'Beginner', 'it': 'Principiante'},
     'exercise.difficulty.intermediate': {
       'en': 'Intermediate',
@@ -612,10 +646,7 @@ class AppStrings {
     },
 
     // Local AI settings (profile page)
-    'settings.local_ai.section': {
-      'en': 'AI Coach',
-      'it': 'AI Coach',
-    },
+    'settings.local_ai.section': {'en': 'AI Coach', 'it': 'AI Coach'},
     'settings.local_ai.toggle': {
       'en': 'Use local AI',
       'it': 'Usa AI in locale',
@@ -628,18 +659,9 @@ class AppStrings {
       'en': 'Model quality',
       'it': 'Qualità modello',
     },
-    'settings.local_ai.model_minimal': {
-      'en': 'Minimal',
-      'it': 'Minima',
-    },
-    'settings.local_ai.model_good': {
-      'en': 'Good',
-      'it': 'Buona',
-    },
-    'settings.local_ai.model_best': {
-      'en': 'Best',
-      'it': 'Ottima',
-    },
+    'settings.local_ai.model_minimal': {'en': 'Minimal', 'it': 'Minima'},
+    'settings.local_ai.model_good': {'en': 'Good', 'it': 'Buona'},
+    'settings.local_ai.model_best': {'en': 'Best', 'it': 'Ottima'},
     'settings.local_ai.uninstall_all': {
       'en': 'Uninstall downloaded models',
       'it': 'Disinstalla modelli scaricati',
@@ -676,18 +698,12 @@ class AppStrings {
       'en': 'You can disable it at any time',
       'it': 'Puoi disabilitare l\'opzione in qualsiasi momento',
     },
-    'settings.local_ai.enable_confirm': {
-      'en': 'Enable',
-      'it': 'Abilita',
-    },
+    'settings.local_ai.enable_confirm': {'en': 'Enable', 'it': 'Abilita'},
     'settings.local_ai.hf_token': {
       'en': 'HuggingFace Token (optional)',
       'it': 'Token HuggingFace (opzionale)',
     },
-    'settings.local_ai.hf_token_hint': {
-      'en': 'hf_...',
-      'it': 'hf_...',
-    },
+    'settings.local_ai.hf_token_hint': {'en': 'hf_...', 'it': 'hf_...'},
     'settings.local_ai.hf_token_subtitle': {
       'en': 'Required to download gated models from HuggingFace',
       'it': 'Necessario per scaricare i modelli protetti da HuggingFace',
@@ -706,10 +722,7 @@ class AppStrings {
     },
 
     // AI coach panel — insufficient memory
-    'ai.oom.title': {
-      'en': 'Not enough memory',
-      'it': 'RAM insufficiente',
-    },
+    'ai.oom.title': {'en': 'Not enough memory', 'it': 'RAM insufficiente'},
     'ai.oom.subtitle': {
       'en':
           'This model is too large for your device\'s available memory. Choose a lighter model in the profile settings.',
