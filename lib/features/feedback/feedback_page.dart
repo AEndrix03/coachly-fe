@@ -2,7 +2,10 @@ import 'dart:ui';
 
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
+import 'package:coachly/core/text_filter/offensive_text_filter_service.dart';
+import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/features/feedback/feedback_hub_controller.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/headers/page_header.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +27,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
   final _featureTitle = TextEditingController();
   final _featureBody = TextEditingController();
   final _comment = TextEditingController();
+  final _textFilter = const OffensiveTextFilterService();
 
   final Map<String, Set<String>> _pollSelection = <String, Set<String>>{};
 
@@ -83,6 +87,8 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
     );
 
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: _quickComposer(ctrl, toast, online),
       body: Stack(
         children: [
           const _FeedbackBackdrop(),
@@ -90,10 +96,17 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
             children: [
               PageHeader(
                 badgeIcon: Icons.forum_rounded,
-                badgeLabel: 'Feedback Hub',
-                title: 'Roadmap Collaborativa',
-                subtitle:
-                    'Voti, discussioni e insight in una control room unica e condivisa.',
+                badgeLabel: _t(context, en: 'Feedback Hub', it: 'Feedback Hub'),
+                title: _t(
+                  context,
+                  en: 'Community Product Pulse',
+                  it: 'Pulse della Community',
+                ),
+                subtitle: _t(
+                  context,
+                  en: 'Vote, discuss and ship what matters. Fast.',
+                  it: 'Vota, discuti e porta in roadmap cio che conta.',
+                ),
                 gradientColors: const [
                   Color(0xFF0F766E),
                   Color(0xFF0C4A6E),
@@ -101,17 +114,30 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                 ],
                 bottom: Row(
                   children: [
-                    _headStat('Sondaggi', '${state.polls.length}'),
+                    _headStat(
+                      _t(context, en: 'Polls', it: 'Sondaggi'),
+                      '${state.polls.length}',
+                    ),
                     const SizedBox(width: 8),
-                    _headStat('Richieste', '${state.featureRequests.length}'),
+                    _headStat(
+                      _t(context, en: 'Requests', it: 'Richieste'),
+                      '${state.featureRequests.length}',
+                    ),
                     const SizedBox(width: 8),
-                    _headStat('Commenti', '$commentsTotal'),
+                    _headStat(
+                      _t(context, en: 'Comments', it: 'Commenti'),
+                      '$commentsTotal',
+                    ),
                   ],
                 ),
               ),
               if (!online)
                 _banner(
-                  message: 'Offline: sincronizzazione sospesa.',
+                  message: _t(
+                    context,
+                    en: 'Offline: sync paused.',
+                    it: 'Offline: sincronizzazione sospesa.',
+                  ),
                   icon: Icons.cloud_off_rounded,
                   color: _accentC,
                 ),
@@ -167,11 +193,19 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                   dividerColor: Colors.transparent,
                   labelColor: Colors.white,
                   unselectedLabelColor: Colors.white70,
-                  tabs: const [
-                    Tab(text: 'Panoramica'),
-                    Tab(text: 'Sondaggi'),
-                    Tab(text: 'Richieste'),
-                    Tab(text: 'Invia'),
+                  tabs: [
+                    Tab(
+                      text: _t(context, en: 'Overview', it: 'Panoramica'),
+                    ),
+                    Tab(
+                      text: _t(context, en: 'Polls', it: 'Sondaggi'),
+                    ),
+                    Tab(
+                      text: _t(context, en: 'Requests', it: 'Richieste'),
+                    ),
+                    Tab(
+                      text: _t(context, en: 'Send', it: 'Invia'),
+                    ),
                   ],
                 ),
               ),
@@ -375,9 +409,16 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
         const SizedBox(height: 12),
         if (state.featureRequests.isEmpty)
           _emptyStateCard(
-            title: 'Nessuna richiesta disponibile',
-            subtitle:
-                'Quando arriveranno nuove proposte le vedrai qui con voti e trend.',
+            title: _t(
+              context,
+              en: 'No requests available',
+              it: 'Nessuna richiesta disponibile',
+            ),
+            subtitle: _t(
+              context,
+              en: 'New proposals will appear here with votes and trend.',
+              it: 'Quando arriveranno nuove proposte le vedrai qui con voti e trend.',
+            ),
             icon: Icons.lightbulb_outline_rounded,
           )
         else
@@ -456,8 +497,16 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
         children: [
           _emptyStateCard(
-            title: 'Nessun sondaggio disponibile',
-            subtitle: 'Appena ne viene pubblicato uno, compare qui.',
+            title: _t(
+              context,
+              en: 'No polls available',
+              it: 'Nessun sondaggio disponibile',
+            ),
+            subtitle: _t(
+              context,
+              en: 'As soon as one is published, it appears here.',
+              it: 'Appena ne viene pubblicato uno, compare qui.',
+            ),
             icon: Icons.how_to_vote_rounded,
           ),
         ],
@@ -582,7 +631,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                                     toast.showError(
                                       context,
                                       '$e',
-                                      title: 'Errore',
+                                      title: context.tr('common.error'),
                                     );
                                   }
                                 } finally {
@@ -592,7 +641,9 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                                 }
                               },
                         icon: const Icon(Icons.bar_chart_rounded),
-                        label: const Text('Risultati'),
+                        label: Text(
+                          _t(context, en: 'Results', it: 'Risultati'),
+                        ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.white,
                           side: BorderSide(
@@ -625,7 +676,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                                     toast.showError(
                                       context,
                                       '$e',
-                                      title: 'Errore',
+                                      title: context.tr('common.error'),
                                     );
                                   }
                                 } finally {
@@ -635,7 +686,11 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                                 }
                               },
                         icon: const Icon(Icons.send_rounded),
-                        label: Text(sending ? 'Invio...' : 'Vota'),
+                        label: Text(
+                          sending
+                              ? _t(context, en: 'Sending...', it: 'Invio...')
+                              : _t(context, en: 'Vote', it: 'Vota'),
+                        ),
                         style: FilledButton.styleFrom(
                           backgroundColor: _accentA,
                           foregroundColor: Colors.white,
@@ -708,15 +763,27 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _sectionTitle(
-                'Proponi Una Feature',
-                subtitle:
-                    'Descrivi il valore, scegli la categoria e mettila subito in votazione.',
+                _t(context, en: 'Propose a feature', it: 'Proponi una feature'),
+                subtitle: _t(
+                  context,
+                  en: 'Describe the value, choose a category and publish it.',
+                  it: 'Descrivi il valore, scegli la categoria e mettila in votazione.',
+                ),
                 icon: Icons.add_circle_outline_rounded,
               ),
               const SizedBox(height: 10),
-              _input(_featureTitle, 'Titolo richiesta'),
+              _input(
+                _featureTitle,
+                _t(context, en: 'Request title', it: 'Titolo richiesta'),
+                policy: TextModerationPolicy.titleStrict,
+              ),
               const SizedBox(height: 8),
-              _input(_featureBody, 'Descrizione', min: 3, max: 5),
+              _input(
+                _featureBody,
+                _t(context, en: 'Description', it: 'Descrizione'),
+                min: 3,
+                max: 5,
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 6,
@@ -750,13 +817,31 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                   onPressed: !online || _loadingFeature
                       ? null
                       : () async {
-                          final title = _featureTitle.text.trim();
-                          final body = _featureBody.text.trim();
+                          final title = _textFilter
+                              .sanitize(
+                                _featureTitle.text,
+                                policy: TextModerationPolicy.titleStrict,
+                              )
+                              .trim();
+                          final body = _textFilter
+                              .sanitize(
+                                _featureBody.text,
+                                policy: TextModerationPolicy.freeText,
+                              )
+                              .trim();
                           if (title.isEmpty || body.isEmpty) {
                             toast.showWarning(
                               context,
-                              'Compila titolo e descrizione',
-                              title: 'Attenzione',
+                              _t(
+                                context,
+                                en: 'Title and description are required',
+                                it: 'Titolo e descrizione sono obbligatori',
+                              ),
+                              title: _t(
+                                context,
+                                en: 'Attention',
+                                it: 'Attenzione',
+                              ),
                             );
                             return;
                           }
@@ -772,13 +857,21 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                             if (mounted) {
                               toast.showSuccess(
                                 context,
-                                'Richiesta inviata',
-                                title: 'Ok',
+                                _t(
+                                  context,
+                                  en: 'Request sent',
+                                  it: 'Richiesta inviata',
+                                ),
+                                title: _t(context, en: 'Done', it: 'Ok'),
                               );
                             }
                           } catch (e) {
                             if (mounted) {
-                              toast.showError(context, '$e', title: 'Errore');
+                              toast.showError(
+                                context,
+                                '$e',
+                                title: context.tr('common.error'),
+                              );
                             }
                           } finally {
                             if (mounted) {
@@ -787,7 +880,15 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                           }
                         },
                   icon: const Icon(Icons.campaign_rounded),
-                  label: Text(_loadingFeature ? 'Invio...' : 'Invia richiesta'),
+                  label: Text(
+                    _loadingFeature
+                        ? _t(context, en: 'Sending...', it: 'Invio...')
+                        : _t(
+                            context,
+                            en: 'Send request',
+                            it: 'Invia richiesta',
+                          ),
+                  ),
                   style: FilledButton.styleFrom(
                     backgroundColor: _accentA,
                     foregroundColor: Colors.white,
@@ -800,8 +901,16 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
         const SizedBox(height: 12),
         if (state.featureRequests.isEmpty)
           _emptyStateCard(
-            title: 'Nessuna richiesta presente',
-            subtitle: 'Proponi la prima feature e avvia la discussione.',
+            title: _t(
+              context,
+              en: 'No requests yet',
+              it: 'Nessuna richiesta presente',
+            ),
+            subtitle: _t(
+              context,
+              en: 'Create the first one and start discussion.',
+              it: 'Proponi la prima feature e avvia la discussione.',
+            ),
             icon: Icons.hub_outlined,
           )
         else
@@ -865,7 +974,17 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                                   : Icons.forum_outlined,
                             ),
                             label: Text(
-                              selected ? 'Thread aperto' : 'Apri thread',
+                              selected
+                                  ? _t(
+                                      context,
+                                      en: 'Thread open',
+                                      it: 'Thread aperto',
+                                    )
+                                  : _t(
+                                      context,
+                                      en: 'Open thread',
+                                      it: 'Apri thread',
+                                    ),
                             ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white,
@@ -887,8 +1006,16 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                                       if (mounted) {
                                         toast.showSuccess(
                                           context,
-                                          'Voto registrato',
-                                          title: 'Ok',
+                                          _t(
+                                            context,
+                                            en: 'Vote registered',
+                                            it: 'Voto registrato',
+                                          ),
+                                          title: _t(
+                                            context,
+                                            en: 'Done',
+                                            it: 'Ok',
+                                          ),
                                         );
                                       }
                                     } catch (e) {
@@ -896,7 +1023,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                                         toast.showError(
                                           context,
                                           '$e',
-                                          title: 'Errore',
+                                          title: context.tr('common.error'),
                                         );
                                       }
                                     } finally {
@@ -908,7 +1035,15 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                                     }
                                   },
                             icon: const Icon(Icons.thumb_up_alt_rounded),
-                            label: Text(voting ? 'Invio...' : 'Supporta'),
+                            label: Text(
+                              voting
+                                  ? _t(
+                                      context,
+                                      en: 'Sending...',
+                                      it: 'Invio...',
+                                    )
+                                  : _t(context, en: 'Support', it: 'Supporta'),
+                            ),
                             style: FilledButton.styleFrom(
                               backgroundColor: _accentA,
                               foregroundColor: Colors.white,
@@ -929,8 +1064,12 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _sectionTitle(
-                  'Discussione',
-                  subtitle: 'Commenti e confronto sulla richiesta selezionata.',
+                  _t(context, en: 'Discussion', it: 'Discussione'),
+                  subtitle: _t(
+                    context,
+                    en: 'Comments and context on selected request.',
+                    it: 'Commenti e confronto sulla richiesta selezionata.',
+                  ),
                   icon: Icons.chat_rounded,
                 ),
                 const SizedBox(height: 10),
@@ -945,9 +1084,13 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                         color: Colors.white.withValues(alpha: 0.12),
                       ),
                     ),
-                    child: const Text(
-                      'Nessun commento, apri tu la discussione.',
-                      style: TextStyle(color: Colors.white70),
+                    child: Text(
+                      _t(
+                        context,
+                        en: 'No comments yet, start the discussion.',
+                        it: 'Nessun commento, apri tu la discussione.',
+                      ),
+                      style: const TextStyle(color: Colors.white70),
                     ),
                   )
                 else
@@ -994,7 +1137,12 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                       ),
                     ),
                   ),
-                _input(_comment, 'Aggiungi un commento', min: 2, max: 4),
+                _input(
+                  _comment,
+                  _t(context, en: 'Add a comment', it: 'Aggiungi un commento'),
+                  min: 2,
+                  max: 4,
+                ),
                 const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
@@ -1003,8 +1151,26 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                         ? null
                         : () async {
                             final featureId = state.selectedFeatureId;
-                            final body = _comment.text.trim();
+                            final body = _textFilter
+                                .sanitize(
+                                  _comment.text,
+                                  policy: TextModerationPolicy.freeText,
+                                )
+                                .trim();
                             if (featureId == null || body.isEmpty) {
+                              toast.showWarning(
+                                context,
+                                _t(
+                                  context,
+                                  en: 'Comment cannot be empty',
+                                  it: 'Il commento non puo essere vuoto',
+                                ),
+                                title: _t(
+                                  context,
+                                  en: 'Attention',
+                                  it: 'Attenzione',
+                                ),
+                              );
                               return;
                             }
                             setState(() => _loadingComment = true);
@@ -1017,13 +1183,21 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                               if (mounted) {
                                 toast.showSuccess(
                                   context,
-                                  'Commento pubblicato',
-                                  title: 'Ok',
+                                  _t(
+                                    context,
+                                    en: 'Comment published',
+                                    it: 'Commento pubblicato',
+                                  ),
+                                  title: _t(context, en: 'Done', it: 'Ok'),
                                 );
                               }
                             } catch (e) {
                               if (mounted) {
-                                toast.showError(context, '$e', title: 'Errore');
+                                toast.showError(
+                                  context,
+                                  '$e',
+                                  title: context.tr('common.error'),
+                                );
                               }
                             } finally {
                               if (mounted) {
@@ -1033,7 +1207,13 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                           },
                     icon: const Icon(Icons.send_rounded),
                     label: Text(
-                      _loadingComment ? 'Invio...' : 'Pubblica commento',
+                      _loadingComment
+                          ? _t(context, en: 'Sending...', it: 'Invio...')
+                          : _t(
+                              context,
+                              en: 'Publish comment',
+                              it: 'Pubblica commento',
+                            ),
                     ),
                     style: FilledButton.styleFrom(
                       backgroundColor: _accentA,
@@ -1062,9 +1242,16 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _sectionTitle(
-                'Invia Feedback Strutturato',
-                subtitle:
-                    'Segnala bug, review o contesto: ogni input alimenta le decisioni prodotto.',
+                _t(
+                  context,
+                  en: 'Send structured feedback',
+                  it: 'Invia feedback strutturato',
+                ),
+                subtitle: _t(
+                  context,
+                  en: 'Report bugs, reviews and context in one fast form.',
+                  it: 'Segnala bug, review e contesto in un flusso rapido.',
+                ),
                 icon: Icons.edit_note_rounded,
               ),
               const SizedBox(height: 10),
@@ -1094,9 +1281,18 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                     .toList(),
               ),
               const SizedBox(height: 8),
-              _input(_feedbackTitle, 'Titolo feedback'),
+              _input(
+                _feedbackTitle,
+                _t(context, en: 'Feedback title', it: 'Titolo feedback'),
+                policy: TextModerationPolicy.titleStrict,
+              ),
               const SizedBox(height: 8),
-              _input(_feedbackBody, 'Descrizione', min: 4, max: 7),
+              _input(
+                _feedbackBody,
+                _t(context, en: 'Description', it: 'Descrizione'),
+                min: 4,
+                max: 7,
+              ),
               if (_feedbackType == 'REVIEW') ...[
                 const SizedBox(height: 8),
                 Container(
@@ -1113,8 +1309,8 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                   ),
                   child: Row(
                     children: [
-                      const Text(
-                        'Rating',
+                      Text(
+                        _t(context, en: 'Rating', it: 'Valutazione'),
                         style: TextStyle(
                           color: Colors.white70,
                           fontWeight: FontWeight.w600,
@@ -1144,7 +1340,9 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                   initialValue: _severity,
                   style: const TextStyle(color: Colors.white),
                   dropdownColor: const Color(0xFF0F172A),
-                  decoration: _inputDecoration('Severita'),
+                  decoration: _inputDecoration(
+                    _t(context, en: 'Severity', it: 'Severita'),
+                  ),
                   items: const [
                     DropdownMenuItem(value: 'LOW', child: Text('LOW')),
                     DropdownMenuItem(value: 'MEDIUM', child: Text('MEDIUM')),
@@ -1168,8 +1366,8 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                   child: SwitchListTile(
                     value: _reproducible,
                     onChanged: (v) => setState(() => _reproducible = v),
-                    title: const Text(
-                      'Riproducibile',
+                    title: Text(
+                      _t(context, en: 'Reproducible', it: 'Riproducibile'),
                       style: TextStyle(color: Colors.white),
                     ),
                     activeThumbColor: _accentA,
@@ -1184,13 +1382,31 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                   onPressed: !online || _loadingFeedback
                       ? null
                       : () async {
-                          final title = _feedbackTitle.text.trim();
-                          final body = _feedbackBody.text.trim();
+                          final title = _textFilter
+                              .sanitize(
+                                _feedbackTitle.text,
+                                policy: TextModerationPolicy.titleStrict,
+                              )
+                              .trim();
+                          final body = _textFilter
+                              .sanitize(
+                                _feedbackBody.text,
+                                policy: TextModerationPolicy.freeText,
+                              )
+                              .trim();
                           if (title.isEmpty || body.isEmpty) {
                             toast.showWarning(
                               context,
-                              'Compila titolo e descrizione',
-                              title: 'Attenzione',
+                              _t(
+                                context,
+                                en: 'Title and description are required',
+                                it: 'Titolo e descrizione sono obbligatori',
+                              ),
+                              title: _t(
+                                context,
+                                en: 'Attention',
+                                it: 'Attenzione',
+                              ),
                             );
                             return;
                           }
@@ -1215,13 +1431,21 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                             if (mounted) {
                               toast.showSuccess(
                                 context,
-                                'Feedback inviato',
-                                title: 'Grazie',
+                                _t(
+                                  context,
+                                  en: 'Feedback sent',
+                                  it: 'Feedback inviato',
+                                ),
+                                title: _t(context, en: 'Thanks', it: 'Grazie'),
                               );
                             }
                           } catch (e) {
                             if (mounted) {
-                              toast.showError(context, '$e', title: 'Errore');
+                              toast.showError(
+                                context,
+                                '$e',
+                                title: context.tr('common.error'),
+                              );
                             }
                           } finally {
                             if (mounted) {
@@ -1230,7 +1454,15 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                           }
                         },
                   icon: const Icon(Icons.rocket_launch_rounded),
-                  label: Text(_loadingFeedback ? 'Invio...' : 'Invia feedback'),
+                  label: Text(
+                    _loadingFeedback
+                        ? _t(context, en: 'Sending...', it: 'Invio...')
+                        : _t(
+                            context,
+                            en: 'Send feedback',
+                            it: 'Invia feedback',
+                          ),
+                  ),
                   style: FilledButton.styleFrom(
                     backgroundColor: _accentA,
                     foregroundColor: Colors.white,
@@ -1244,16 +1476,82 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
     );
   }
 
+  Widget _quickComposer(
+    FeedbackHubController ctrl,
+    AppToastService toast,
+    bool online,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0E7490), Color(0xFF0284C7)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 14,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton.icon(
+            onPressed: online ? () => _tabs.animateTo(2) : null,
+            icon: const Icon(
+              Icons.campaign_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            label: Text(
+              _t(context, en: 'Request', it: 'Richiesta'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          TextButton.icon(
+            onPressed: online ? () => _tabs.animateTo(3) : null,
+            icon: const Icon(
+              Icons.rate_review_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            label: Text(
+              _t(context, en: 'Feedback', it: 'Feedback'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _t(BuildContext context, {required String en, required String it}) {
+    final locale =
+        Localizations.maybeLocaleOf(context) ?? AppStrings.defaultLocale;
+    return locale.languageCode.toLowerCase() == 'it' ? it : en;
+  }
+
   Widget _input(
     TextEditingController controller,
     String hint, {
     int min = 1,
     int max = 1,
+    TextModerationPolicy policy = TextModerationPolicy.freeText,
   }) {
     return TextField(
       controller: controller,
       minLines: min,
       maxLines: max,
+      inputFormatters: [PoliteTextInputFormatter(policy: policy)],
       style: const TextStyle(color: Colors.white),
       decoration: _inputDecoration(hint),
     );
