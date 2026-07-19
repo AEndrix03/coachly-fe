@@ -1,5 +1,3 @@
-import 'package:coachly/features/ai_coach/data/services/context_assembler_service.dart';
-import 'package:coachly/features/ai_coach/ui/ai_coach_panel.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
@@ -71,7 +69,9 @@ class ActiveBottomBar extends ConsumerWidget {
                   backgroundColor: scheme.primary,
                   foregroundColor: scheme.onPrimary,
                   disabledBackgroundColor: scheme.surfaceContainerHighest,
-                  disabledForegroundColor: scheme.onSurface.withValues(alpha: 0.6),
+                  disabledForegroundColor: scheme.onSurface.withValues(
+                    alpha: 0.6,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -84,41 +84,9 @@ class ActiveBottomBar extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 50,
-              height: 50,
-              child: IconButton.filledTonal(
-                tooltip: context.tr('nav.coach'),
-                onPressed: isSaving ? null : () => _openAiCoachPanel(context),
-                icon: const Icon(Icons.smart_toy_rounded, size: 22),
-                style: IconButton.styleFrom(
-                  backgroundColor: scheme.secondaryContainer,
-                  foregroundColor: scheme.onSecondaryContainer,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
-    );
-  }
-
-  Future<void> _openAiCoachPanel(BuildContext context) {
-    return showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) {
-        return ProviderScope(
-          overrides: [aiCoachWorkoutIdProvider.overrideWithValue(workoutId)],
-          child: const AiCoachPanel(),
-        );
-      },
     );
   }
 }

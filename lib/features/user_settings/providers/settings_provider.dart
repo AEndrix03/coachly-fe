@@ -1,8 +1,6 @@
 import 'package:coachly/core/sync/local_database_service.dart';
-import 'package:coachly/features/ai_coach/domain/models/local_ai_model.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings_provider.g.dart';
@@ -45,52 +43,3 @@ class Language extends _$Language {
 }
 
 // ─── Local AI Settings ───────────────────────────────────────────────────────
-
-class LocalAiSettings {
-  const LocalAiSettings({
-    this.enabled = false,
-    this.model = LocalAiModel.good,
-  });
-
-  final bool enabled;
-  final LocalAiModel model;
-
-  LocalAiSettings copyWith({bool? enabled, LocalAiModel? model}) {
-    return LocalAiSettings(
-      enabled: enabled ?? this.enabled,
-      model: model ?? this.model,
-    );
-  }
-}
-
-class LocalAiSettingsNotifier extends Notifier<LocalAiSettings> {
-  @override
-  LocalAiSettings build() {
-    final db = LocalDatabaseService();
-    final enabled =
-        db.settings.get('local_ai_enabled', defaultValue: false) as bool;
-    final modelStr = db.settings.get('local_ai_model') as String?;
-    final model = modelStr != null
-        ? LocalAiModel.values.firstWhere(
-            (e) => e.name == modelStr,
-            orElse: () => LocalAiModel.good,
-          )
-        : LocalAiModel.good;
-    return LocalAiSettings(enabled: enabled, model: model);
-  }
-
-  Future<void> setEnabled(bool v) async {
-    await LocalDatabaseService().settings.put('local_ai_enabled', v);
-    state = state.copyWith(enabled: v);
-  }
-
-  Future<void> setModel(LocalAiModel m) async {
-    await LocalDatabaseService().settings.put('local_ai_model', m.name);
-    state = state.copyWith(model: m);
-  }
-}
-
-final localAiSettingsProvider =
-    NotifierProvider<LocalAiSettingsNotifier, LocalAiSettings>(
-  LocalAiSettingsNotifier.new,
-);
