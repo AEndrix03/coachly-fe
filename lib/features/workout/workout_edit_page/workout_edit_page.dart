@@ -184,11 +184,11 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                     hasScrollBody: false,
                     child: _buildEmptyExerciseState(),
                   )
-                else
+                else ...[
+                  SliverToBoxAdapter(child: _buildExerciseSectionHeader(state)),
                   _buildExerciseSliverList(state),
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 100), // FAB space
-                ),
+                ],
+                const SliverToBoxAdapter(child: SizedBox(height: 28)),
               ],
             ),
             if (state.isLoading && state.exercises.isEmpty)
@@ -198,7 +198,6 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               ),
           ],
         ),
-        floatingActionButton: _buildFAB(),
       ),
     );
   }
@@ -385,48 +384,43 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     );
   }
 
-  Widget _buildFAB() {
-    return _buildFABContent();
-  }
-
-  Widget _buildFABContent() {
-    return GestureDetector(
-      onTap: _handleAddExercise,
-      child: Container(
-        height: 52,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(26),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+  Widget _buildExerciseSectionHeader(WorkoutEditState state) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 2, 24, 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.tr(
+                    'workout.edit.exercises_count',
+                    params: {'count': '${state.exercises.length}'},
+                  ),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  context.tr('workout.edit.exercises_hint'),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.55),
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF2196F3).withValues(alpha: 0.45),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-              spreadRadius: -4,
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.add_rounded, color: Colors.white, size: 22),
-            const SizedBox(width: 8),
-            Text(
-              context.tr('workout.edit.add_exercise'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.2,
-              ),
-            ),
-          ],
-        ),
+          TextButton.icon(
+            onPressed: _handleAddExercise,
+            icon: const Icon(Icons.add_rounded, size: 18),
+            label: Text(context.tr('workout.edit.add_exercise')),
+          ),
+        ],
       ),
     );
   }
@@ -469,6 +463,12 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               color: Colors.white.withValues(alpha: 0.5),
               fontSize: 14,
             ),
+          ),
+          const SizedBox(height: 20),
+          FilledButton.icon(
+            onPressed: _handleAddExercise,
+            icon: const Icon(Icons.add_rounded),
+            label: Text(context.tr('workout.edit.add_exercise')),
           ),
         ],
       ),

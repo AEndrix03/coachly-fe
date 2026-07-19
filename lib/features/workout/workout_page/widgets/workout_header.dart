@@ -1,20 +1,18 @@
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
-import 'package:coachly/shared/widgets/app_dialogs.dart';
-import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class WorkoutHeader extends ConsumerWidget {
   final WorkoutStatsModel? stats;
   final bool isLoading;
-  final VoidCallback? onNotifications;
+  final VoidCallback? onStatsTap;
 
   const WorkoutHeader({
     super.key,
     this.stats,
     this.isLoading = false,
-    this.onNotifications,
+    this.onStatsTap,
   });
 
   @override
@@ -77,57 +75,8 @@ class WorkoutHeader extends ConsumerWidget {
               ],
             ),
           ),
-          Row(
-            children: [
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'auth-disabled') {
-                    _showAuthDisabledDialog(context);
-                  }
-                },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    value: 'auth-disabled',
-                    child: Text(context.tr('workout.access_disabled')),
-                  ),
-                ],
-                icon: const Icon(
-                  Icons.settings_outlined,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                padding:
-                    EdgeInsets.zero, // Remove default padding of IconButton
-              ),
-              const SizedBox(width: 8),
-              _buildNotificationButton(scheme),
-            ],
-          ),
         ],
       ),
-    );
-  }
-
-  Future<void> _showAuthDisabledDialog(BuildContext context) async {
-    return showAppNoticeDialog(
-      context,
-      title: context.tr('workout.auth_disabled'),
-      content: context.tr('workout.auth_disabled_content'),
-      icon: Icons.info_outline_rounded,
-    );
-  }
-
-  Widget _buildNotificationButton(ColorScheme scheme) {
-    return Stack(
-      children: [
-        GlassIconButton(
-          icon: Icons.notifications_outlined,
-          onPressed: onNotifications,
-          iconColor: Colors.white,
-          size: 20,
-        ),
-        // Se serve un badge, aggiungilo qui
-      ],
     );
   }
 
@@ -172,39 +121,43 @@ class WorkoutHeader extends ConsumerWidget {
 
     final data = stats ?? _defaultStats;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: scheme.onPrimary.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            Expanded(
-              child: _buildStatItem(
-                icon: Icons.trending_up,
-                label: context.tr('workout.streak'),
-                value: '${data.currentStreak} ${context.tr('common.days')}',
-                scheme: scheme,
+    return InkWell(
+      onTap: onStatsTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: scheme.onPrimary.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildStatItem(
+                  icon: Icons.trending_up,
+                  label: context.tr('workout.streak'),
+                  value: '${data.currentStreak} ${context.tr('common.days')}',
+                  scheme: scheme,
+                ),
               ),
-            ),
-            Container(
-              width: 1,
-              height: 40,
-              color: scheme.onPrimary.withValues(alpha: 0.3),
-            ),
-            Expanded(
-              child: _buildStatItem(
-                icon: Icons.access_time,
-                label: context.tr('workout.week'),
-                value:
-                    '${data.weeklyWorkouts} ${context.tr(data.weeklyWorkouts == 1 ? 'common.workout' : 'common.workouts')}',
-                scheme: scheme,
+              Container(
+                width: 1,
+                height: 40,
+                color: scheme.onPrimary.withValues(alpha: 0.3),
               ),
-            ),
-          ],
+              Expanded(
+                child: _buildStatItem(
+                  icon: Icons.access_time,
+                  label: context.tr('workout.week'),
+                  value:
+                      '${data.weeklyWorkouts} ${context.tr(data.weeklyWorkouts == 1 ? 'common.workout' : 'common.workouts')}',
+                  scheme: scheme,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

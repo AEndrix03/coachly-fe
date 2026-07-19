@@ -54,7 +54,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 4, vsync: this);
+    _tabs = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -112,11 +112,6 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                 ],
                 bottom: Row(
                   children: [
-                    _headStat(
-                      _t(context, en: 'Polls', it: 'Sondaggi'),
-                      '${state.polls.length}',
-                    ),
-                    const SizedBox(width: 8),
                     _headStat(
                       _t(context, en: 'Requests', it: 'Richieste'),
                       '${state.featureRequests.length}',
@@ -196,9 +191,6 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                       text: _t(context, en: 'Overview', it: 'Panoramica'),
                     ),
                     Tab(
-                      text: _t(context, en: 'Polls', it: 'Sondaggi'),
-                    ),
-                    Tab(
                       text: _t(context, en: 'Requests', it: 'Richieste'),
                     ),
                     Tab(
@@ -214,7 +206,6 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                         controller: _tabs,
                         children: [
                           _overview(state),
-                          _polls(state, ctrl, toast, online),
                           _features(state, ctrl, toast, online),
                           _sendFeedback(ctrl, toast, online),
                         ],
@@ -394,9 +385,9 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _tabs.animateTo(1),
-                      icon: const Icon(Icons.how_to_vote_rounded),
+                      icon: const Icon(Icons.campaign_rounded),
                       label: Text(
-                        _t(context, en: 'View polls', it: 'Vedi sondaggi'),
+                        _t(context, en: 'View requests', it: 'Vedi richieste'),
                       ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: _accentB,
@@ -410,7 +401,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                   const SizedBox(width: 8),
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed: () => _tabs.animateTo(3),
+                      onPressed: () => _tabs.animateTo(2),
                       icon: const Icon(Icons.rate_review_rounded),
                       label: Text(
                         _t(context, en: 'Send feedback', it: 'Invia feedback'),
@@ -534,6 +525,8 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
     );
   }
 
+  // Kept ready for a future release; polls are intentionally hidden from the UI.
+  // ignore: unused_element
   Widget _polls(
     FeedbackHubState state,
     FeedbackHubController ctrl,

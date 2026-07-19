@@ -71,7 +71,6 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
         child: Stack(
           children: [
             Container(
-              constraints: const BoxConstraints(maxWidth: 320),
               decoration: BoxDecoration(
                 color: scheme.surface.withValues(alpha: 0.98),
                 // Elegante, leggermente staccato dal bg
@@ -92,10 +91,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -106,16 +102,16 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
                           language,
                           hasCoachName: hasCoachName,
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                         if (hasCoachName) ...[
                           _buildCoachInfo(context, scheme, coachName),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 8),
                         ] else
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                         _buildStats(context, scheme),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
                         _buildLastUsed(context, scheme),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         _buildStartButton(context, scheme),
                       ],
                     ),
@@ -148,7 +144,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
           child: Text(
             widget.workout.titleI18n?.fromI18n(language) ?? '',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: FontWeight.w700,
               color: scheme.onSurface,
               height: 1.2,
@@ -217,12 +213,6 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
           Icons.timer_outlined,
           '${widget.workout.durationMinutes} min',
         ),
-        _buildStatChip(
-          context,
-          scheme,
-          Icons.flag_outlined,
-          widget.workout.goal,
-        ),
       ],
     );
   }
@@ -270,7 +260,7 @@ class _WorkoutRecentCardState extends ConsumerState<WorkoutRecentCard> {
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
           shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: const EdgeInsets.symmetric(vertical: 11),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

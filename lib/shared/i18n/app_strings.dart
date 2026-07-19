@@ -58,7 +58,33 @@ class AppStrings {
     'profile.logout_confirm': {'en': 'Exit', 'it': 'Esci'},
 
     'workout.recent': {'en': 'Recent Workouts', 'it': 'Schede Recenti'},
+    'workout.resume': {
+      'en': 'Pick up where you left off',
+      'it': 'Riprendi da dove eri rimasto',
+    },
     'workout.all': {'en': 'All Workouts', 'it': 'Tutte le Schede'},
+    'workout.my_workouts_count': {
+      'en': 'My workouts ({count})',
+      'it': 'Le tue schede ({count})',
+    },
+    'workout.search_hint': {'en': 'Search workouts', 'it': 'Cerca una scheda'},
+    'workout.clear_search': {'en': 'Clear search', 'it': 'Cancella ricerca'},
+    'workout.no_search_results': {
+      'en': 'No workouts match your search.',
+      'it': 'Nessuna scheda corrisponde alla ricerca.',
+    },
+    'workout.sort': {'en': 'Sort workouts', 'it': 'Ordina schede'},
+    'workout.sort_recent': {'en': 'Last used', 'it': 'Usate di recente'},
+    'workout.sort_name': {'en': 'Name', 'it': 'Nome'},
+    'workout.sort_progress': {'en': 'Progress', 'it': 'Progresso'},
+    'workout.progress_overview': {
+      'en': 'Your progress',
+      'it': 'I tuoi progressi',
+    },
+    'workout.progress_overview_hint': {
+      'en': 'A quick view of your training consistency.',
+      'it': 'Una panoramica della costanza nei tuoi allenamenti.',
+    },
     'workout.actions': {'en': 'Workout actions', 'it': 'Azioni scheda'},
     'workout.no_active': {
       'en':
@@ -321,6 +347,15 @@ class AppStrings {
     'workout.edit.add_exercise': {
       'en': 'Add Exercise',
       'it': 'Aggiungi Esercizio',
+    },
+    'workout.edit.exercises_count': {
+      'en': 'Exercises ({count})',
+      'it': 'Esercizi ({count})',
+    },
+    'workout.edit.exercises_hint': {
+      'en': 'Tap a card to edit it. Drag its number to change the order.',
+      'it':
+          'Tocca una scheda per modificarla. Trascina il numero per riordinarla.',
     },
     'workout.edit.no_exercise': {
       'en': 'No exercises',

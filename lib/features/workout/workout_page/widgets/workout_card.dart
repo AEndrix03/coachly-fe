@@ -209,6 +209,8 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
                                       ),
                                       onSelected: _onActionSelected,
                                       itemBuilder: (context) => [
+                                        if (!widget.workout.active)
+                                          _toggleActiveMenuItem(context),
                                         PopupMenuItem(
                                           value: _WorkoutAction.edit,
                                           child: _menuItem(
@@ -216,19 +218,8 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
                                             context.tr('common.edit'),
                                           ),
                                         ),
-                                        PopupMenuItem(
-                                          value: _WorkoutAction.toggleActive,
-                                          child: _menuItem(
-                                            widget.workout.active
-                                                ? Icons.archive_outlined
-                                                : Icons.unarchive_outlined,
-                                            context.tr(
-                                              widget.workout.active
-                                                  ? 'common.deactivate'
-                                                  : 'common.activate',
-                                            ),
-                                          ),
-                                        ),
+                                        if (widget.workout.active)
+                                          _toggleActiveMenuItem(context),
                                         PopupMenuItem(
                                           value: _WorkoutAction.delete,
                                           child: _menuItem(
@@ -318,6 +309,20 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
         const SizedBox(width: 10),
         Text(label, style: TextStyle(color: foreground)),
       ],
+    );
+  }
+
+  PopupMenuItem<_WorkoutAction> _toggleActiveMenuItem(BuildContext context) {
+    return PopupMenuItem(
+      value: _WorkoutAction.toggleActive,
+      child: _menuItem(
+        widget.workout.active
+            ? Icons.archive_outlined
+            : Icons.unarchive_outlined,
+        context.tr(
+          widget.workout.active ? 'common.deactivate' : 'common.activate',
+        ),
+      ),
     );
   }
 

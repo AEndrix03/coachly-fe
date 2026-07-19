@@ -11,6 +11,7 @@ import '../features/common/navigation/widgets/navigation_bar.dart';
 import '../features/coach/presentation/coach_discovery_page.dart';
 import '../features/exercise/personal_exercises_page/personal_exercises_page.dart';
 import '../features/exercise/exercise_info_page/exercise_info_page.dart';
+import '../features/exercise/exercise_create_page/exercise_create_page.dart';
 import '../features/feedback/feedback_page.dart';
 import '../features/home/home.dart';
 import '../features/profile/profile_page.dart';
@@ -56,6 +57,10 @@ GoRouter router(Ref ref) {
         builder: (context, state) => const LoadingPage(),
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/exercises/create',
+        builder: (context, state) => const ExerciseCreatePage(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);

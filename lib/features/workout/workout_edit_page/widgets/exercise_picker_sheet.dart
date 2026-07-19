@@ -3,7 +3,6 @@ import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
@@ -12,6 +11,7 @@ import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 // ─────────────────────────── public widget ───────────────────────────────────
 
@@ -106,6 +106,34 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   }
 
   Future<void> _showCreateExerciseDialog() async {
+    final created = await context.push<ExerciseDetailModel>(
+      '/exercises/create',
+    );
+    if (created == null || !mounted) return;
+    final locale = ref.read(languageProvider);
+    final name =
+        created.nameI18n?.fromI18n(locale) ?? created.id ?? 'Esercizio';
+    widget.onExerciseSelected(
+      EditableExerciseModel(
+        id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${created.id}',
+        exerciseId: created.id ?? '',
+        number: 0,
+        name: name,
+        muscles: const [],
+        difficulty: _difficultyLabel(created.difficultyLevel),
+        sets: '3x10',
+        rest: '60s',
+        weight: '-',
+        progress: '0',
+        notes: '',
+        accentColorHex: '#2196F3',
+        variants: const [],
+      ),
+    );
+    if (mounted) Navigator.pop(context);
+    return;
+
+    /*
     final locale = ref.read(languageProvider);
     final lang = locale.languageCode;
     final nameController = TextEditingController();
@@ -200,6 +228,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(context.tr('exercise.personal.created'))),
     );
+    */
   }
 
   int get _activeCount => [
@@ -255,114 +284,84 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 14, 12, 4),
-      child: Row(
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 4,
-            height: 26,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2),
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            context.tr('workout.edit.add_exercise'),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const Spacer(),
-          GestureDetector(
-            onTap: _showCreateExerciseDialog,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white.withValues(alpha: 0.08),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  width: 1,
-                ),
-              ),
-              child: const Icon(
-                Icons.add_rounded,
-                size: 18,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          // filter button with badge
-          GestureDetector(
-            onTap: () => setState(() => _showAdvanced = !_showAdvanced),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: _showAdvanced || _activeCount > 0
-                    ? const LinearGradient(
-                        colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                      )
-                    : LinearGradient(
-                        colors: [
-                          Colors.white.withValues(alpha: 0.08),
-                          Colors.white.withValues(alpha: 0.04),
-                        ],
-                      ),
-                border: Border.all(
-                  color: _showAdvanced || _activeCount > 0
-                      ? Colors.transparent
-                      : Colors.white.withValues(alpha: 0.12),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.tune_rounded,
-                    size: 16,
-                    color: _showAdvanced || _activeCount > 0
-                        ? Colors.white
-                        : Colors.white.withValues(alpha: 0.6),
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 26,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(2),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
-                  if (_activeCount > 0) ...[
-                    const SizedBox(width: 6),
-                    Text(
-                      '$_activeCount',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                  if (_activeCount > 0) ...[
-                    const SizedBox(width: 6),
-                    GestureDetector(
-                      onTap: _clearFilters,
-                      child: const Icon(
-                        Icons.close_rounded,
-                        size: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  context.tr('workout.edit.add_exercise'),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              _buildFilterButton(),
+            ],
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: _showCreateExerciseDialog,
+              icon: const Icon(Icons.add_rounded, size: 18),
+              label: Text(context.tr('exercise.personal.create')),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF7B4BC1),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),
           ),
-          const SizedBox(width: 8),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFilterButton() {
+    return GestureDetector(
+      onTap: () => setState(() => _showAdvanced = !_showAdvanced),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: _showAdvanced || _activeCount > 0
+              ? const Color(0xFF2196F3)
+              : Colors.white.withValues(alpha: 0.08),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.tune_rounded, size: 16, color: Colors.white),
+            if (_activeCount > 0) ...[
+              const SizedBox(width: 6),
+              Text(
+                '$_activeCount',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
