@@ -2,10 +2,12 @@ import 'dart:ui';
 
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/animations/sparkle_tap_animation.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/badges/coach_badge_widget.dart';
+import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -48,6 +50,62 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
       _scale = 1.0;
       _showSparkle = false;
     });
+  }
+
+  Future<void> _onActionSelected(_WorkoutAction action) async {
+    final language = ref.read(languageProvider);
+    final name = widget.workout.titleI18n?.fromI18n(language) ?? '';
+
+    switch (action) {
+      case _WorkoutAction.edit:
+        context.push(
+          '/workouts/workout/${widget.workout.id}/edit',
+          extra: widget.workout,
+        );
+      case _WorkoutAction.toggleActive:
+        final activating = !widget.workout.active;
+        final actionLabel = context.tr(
+          activating
+              ? 'workout.organize.action_activate'
+              : 'workout.organize.action_deactivate',
+        );
+        final confirmed = await showAppConfirmationDialog(
+          context,
+          title: context.tr('workout.organize.status_title'),
+          content: context.tr(
+            'workout.organize.status_content',
+            params: {'action': actionLabel, 'name': name},
+          ),
+          confirmLabel: context.tr('common.confirm'),
+          icon: Icons.archive_outlined,
+        );
+        if (!confirmed) return;
+        if (activating) {
+          await ref
+              .read(workoutListProvider.notifier)
+              .enableWorkout(widget.workout.id);
+        } else {
+          await ref
+              .read(workoutListProvider.notifier)
+              .disableWorkout(widget.workout.id);
+        }
+      case _WorkoutAction.delete:
+        final confirmed = await showAppConfirmationDialog(
+          context,
+          title: context.tr('workout.organize.delete_title'),
+          content: context.tr(
+            'workout.organize.delete_content',
+            params: {'name': name},
+          ),
+          confirmLabel: context.tr('common.delete'),
+          destructive: true,
+          icon: Icons.delete_outline_rounded,
+        );
+        if (!confirmed) return;
+        await ref
+            .read(workoutListProvider.notifier)
+            .deleteWorkout(widget.workout.id);
+    }
   }
 
   @override
@@ -140,6 +198,49 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
                                         ),
                                       ),
                                     ],
+                                    const SizedBox(width: 2),
+                                    PopupMenuButton<_WorkoutAction>(
+                                      tooltip: context.tr('workout.actions'),
+                                      icon: Icon(
+                                        Icons.more_horiz_rounded,
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                      ),
+                                      onSelected: _onActionSelected,
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: _WorkoutAction.edit,
+                                          child: _menuItem(
+                                            Icons.edit_outlined,
+                                            context.tr('common.edit'),
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          value: _WorkoutAction.toggleActive,
+                                          child: _menuItem(
+                                            widget.workout.active
+                                                ? Icons.archive_outlined
+                                                : Icons.unarchive_outlined,
+                                            context.tr(
+                                              widget.workout.active
+                                                  ? 'common.deactivate'
+                                                  : 'common.activate',
+                                            ),
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          value: _WorkoutAction.delete,
+                                          child: _menuItem(
+                                            Icons.delete_outline_rounded,
+                                            context.tr('common.delete'),
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.error,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 6),
@@ -209,6 +310,17 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
     );
   }
 
+  Widget _menuItem(IconData icon, String label, {Color? color}) {
+    final foreground = color ?? Theme.of(context).colorScheme.onSurface;
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: foreground),
+        const SizedBox(width: 10),
+        Text(label, style: TextStyle(color: foreground)),
+      ],
+    );
+  }
+
   Widget _buildInfoChip(IconData icon, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -235,3 +347,5 @@ class _WorkoutCardState extends ConsumerState<WorkoutCard>
     );
   }
 }
+
+enum _WorkoutAction { edit, toggleActive, delete }

@@ -163,7 +163,8 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       final validSessions = sessions
           .where(
             (session) =>
-                session.syncState != LocalWorkoutSessionSyncState.failedPermanent,
+                session.syncState !=
+                LocalWorkoutSessionSyncState.failedPermanent,
           )
           .toList(growable: false);
 
@@ -180,11 +181,9 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
       final progressPercentage = workouts.isEmpty
           ? 0.0
-          : (workouts
-                    .where((workout) => workout.sessionsCount > 0)
-                    .length /
-                workouts.length) *
-            100;
+          : (workouts.where((workout) => workout.sessionsCount > 0).length /
+                    workouts.length) *
+                100;
 
       final weeklyWorkouts = _computeWeeklyWorkouts(
         sessions: validSessions,
@@ -225,8 +224,13 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
   @override
   Future<ApiResponse<void>> deleteWorkout(String workoutId) async {
+    final response = await _apiService.deleteWorkout(workoutId);
+    if (!response.success) {
+      return response;
+    }
     await _hiveService.deleteWorkout(workoutId);
-    return ApiResponse.success(message: 'Deleted workout $workoutId');
+    await _structuredHiveService.deleteSnapshot(workoutId);
+    return response;
   }
 
   @override

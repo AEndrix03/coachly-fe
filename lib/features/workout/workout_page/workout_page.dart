@@ -4,7 +4,6 @@ import 'package:coachly/features/workout/workout_page/providers/workout_list_pro
 import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/buttons/add_fab_button.dart';
-import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
 import 'package:coachly/shared/widgets/sections/section_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -70,7 +69,12 @@ class WorkoutPage extends ConsumerWidget {
     WorkoutStatsState statsState,
     ColorScheme scheme,
   ) {
-    if (workouts.isEmpty) {
+    final activeWorkouts = workouts.where((workout) => workout.active).toList();
+    final archivedWorkouts = workouts
+        .where((workout) => !workout.active)
+        .toList();
+
+    if (activeWorkouts.isEmpty && archivedWorkouts.isEmpty) {
       return _buildEmptyState(context, scheme);
     }
     return SingleChildScrollView(
@@ -106,25 +110,18 @@ class WorkoutPage extends ConsumerWidget {
             },
           ),
           const Gap(28),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-                child: SectionBar(title: context.tr('workout.all'), icon: null),
-              ),
-              GlassIconButton(
-                icon: Icons.edit_note,
-                onPressed: () {
-                  context.go('/workouts/organize');
-                },
-                marginRight: 8,
-                iconColor: Colors.white,
-                size: 20,
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: SectionBar(title: context.tr('workout.all'), icon: null),
           ),
-          _buildAllWorkouts(workouts, scheme),
+          if (activeWorkouts.isEmpty)
+            _buildNoActiveWorkouts(context)
+          else
+            _buildAllWorkouts(activeWorkouts, scheme),
+          if (archivedWorkouts.isNotEmpty) ...[
+            const Gap(20),
+            _buildArchivedWorkouts(context, archivedWorkouts, scheme),
+          ],
           const SizedBox(height: _listBottomSpacerHeight),
         ],
       ),
@@ -210,6 +207,43 @@ class WorkoutPage extends ConsumerWidget {
         itemCount: workouts.length,
         separatorBuilder: (_, __) => const Gap(11),
         itemBuilder: (context, i) => WorkoutCard(workout: workouts[i]),
+      ),
+    );
+  }
+
+  Widget _buildNoActiveWorkouts(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 0),
+      child: Text(
+        context.tr('workout.no_active'),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+      ),
+    );
+  }
+
+  Widget _buildArchivedWorkouts(
+    BuildContext context,
+    List<WorkoutModel> workouts,
+    ColorScheme scheme,
+  ) {
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        tilePadding: const EdgeInsets.symmetric(horizontal: 18),
+        childrenPadding: const EdgeInsets.only(bottom: 4),
+        leading: Icon(
+          Icons.inventory_2_outlined,
+          color: scheme.onSurfaceVariant,
+        ),
+        title: Text(
+          context.tr(
+            'workout.archived_count',
+            params: {'count': '${workouts.length}'},
+          ),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        subtitle: Text(context.tr('workout.archived_hint')),
+        children: [_buildAllWorkouts(workouts, scheme)],
       ),
     );
   }

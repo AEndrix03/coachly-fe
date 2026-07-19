@@ -107,6 +107,10 @@ class WorkoutPageService {
     );
   }
 
+  Future<ApiResponse<void>> deleteWorkout(String workoutId) async {
+    return _apiClient.delete<void>('/workouts/$workoutId');
+  }
+
   Future<ApiResponse<void>> patchWorkoutPayload(
     String workoutId,
     Map<String, dynamic> commandPayload,

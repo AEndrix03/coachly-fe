@@ -59,6 +59,21 @@ class AppStrings {
 
     'workout.recent': {'en': 'Recent Workouts', 'it': 'Schede Recenti'},
     'workout.all': {'en': 'All Workouts', 'it': 'Tutte le Schede'},
+    'workout.actions': {'en': 'Workout actions', 'it': 'Azioni scheda'},
+    'workout.no_active': {
+      'en':
+          'You have no active workouts. Reactivate one from the archive below or create a new one.',
+      'it':
+          'Non hai schede attive. Riattivane una dall’archivio qui sotto o creane una nuova.',
+    },
+    'workout.archived_count': {
+      'en': 'Archived workouts ({count})',
+      'it': 'Schede archiviate ({count})',
+    },
+    'workout.archived_hint': {
+      'en': 'Hidden from your active workout list',
+      'it': 'Nascoste dalla lista delle schede attive',
+    },
     'workout.notifications': {'en': 'Notifications', 'it': 'Notifiche'},
     'workout.notifications_soon': {
       'en': 'Notifications feature coming soon',

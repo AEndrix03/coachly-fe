@@ -81,12 +81,8 @@ class WorkoutHiveService {
     }
   }
 
-  // Modifica locale: delete (soft delete)
   Future<void> deleteWorkout(String workoutId) async {
-    final workout = _workoutsBox.get(workoutId);
-    if (workout != null) {
-      await patchWorkout(workout.copyWith(delete: true));
-    }
+    await _workoutsBox.delete(workoutId);
   }
 
   // Modifica locale: update generico

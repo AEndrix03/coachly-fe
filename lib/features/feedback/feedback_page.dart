@@ -87,8 +87,6 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
     );
 
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _quickComposer(ctrl, toast, online),
       body: Stack(
         children: [
           const _FeedbackBackdrop(),
@@ -371,34 +369,57 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
 
   Widget _overview(FeedbackHubState state) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
       children: [
         _card(
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _sectionTitle(
-                'Situazione Prodotto',
-                subtitle:
-                    'Allinea team e utenti su priorita reali basate su segnali concreti.',
-                icon: Icons.auto_graph_rounded,
+                _t(
+                  context,
+                  en: 'Make your voice count',
+                  it: 'Fai sentire la tua voce',
+                ),
+                subtitle: _t(
+                  context,
+                  en: 'Vote on the ideas that matter or share your own feedback.',
+                  it: 'Vota le idee che contano o condividi il tuo feedback.',
+                ),
+                icon: Icons.forum_rounded,
               ),
               const SizedBox(height: 14),
               Row(
                 children: [
                   Expanded(
-                    child: _metricTile(
-                      title: 'Poll Attivi',
-                      value: '${state.polls.length}',
-                      color: _accentB,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _tabs.animateTo(1),
+                      icon: const Icon(Icons.how_to_vote_rounded),
+                      label: Text(
+                        _t(context, en: 'View polls', it: 'Vedi sondaggi'),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _accentB,
+                        side: BorderSide(
+                          color: _accentB.withValues(alpha: 0.65),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: _metricTile(
-                      title: 'Feature Aperte',
-                      value: '${state.featureRequests.length}',
-                      color: _accentA,
+                    child: FilledButton.icon(
+                      onPressed: () => _tabs.animateTo(3),
+                      icon: const Icon(Icons.rate_review_rounded),
+                      label: Text(
+                        _t(context, en: 'Send feedback', it: 'Invia feedback'),
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: _accentA,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
                     ),
                   ),
                 ],
@@ -422,67 +443,94 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
             icon: Icons.lightbulb_outline_rounded,
           )
         else
-          ...state.featureRequests
-              .take(3)
-              .map(
-                (f) => Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _card(
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+          _latestRequests(state),
+      ],
+    );
+  }
+
+  Widget _latestRequests(FeedbackHubState state) {
+    final requests = state.featureRequests.take(2).toList();
+
+    return _card(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionTitle(
+            _t(context, en: 'Latest requests', it: 'Richieste recenti'),
+            subtitle: _t(
+              context,
+              en: 'A quick look at what the community is discussing.',
+              it: 'Uno sguardo alle proposte di cui parla la community.',
+            ),
+            icon: Icons.lightbulb_outline_rounded,
+          ),
+          const SizedBox(height: 12),
+          ...requests.map(
+            (f) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => _tabs.animateTo(2),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white.withValues(alpha: 0.05),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.10),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Text(
-                                f.title,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            Text(
+                              f.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                            _softPill(f.status, color: const Color(0xFF60A5FA)),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          f.description,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            height: 1.35,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            _inlineMetric(
-                              icon: Icons.rocket_launch_rounded,
-                              label: '${f.upvotesCount} voti',
-                              color: _accentA,
-                            ),
-                            const SizedBox(width: 10),
-                            _inlineMetric(
-                              icon: Icons.chat_bubble_outline_rounded,
-                              label: '${f.commentsCount} commenti',
-                              color: _accentB,
-                            ),
-                            const Spacer(),
+                            const SizedBox(height: 5),
                             Text(
-                              _formatDate(f.createdAt),
-                              style: const TextStyle(color: Colors.white54),
+                              '${f.upvotesCount} ${_t(context, en: 'votes', it: 'voti')} · ${f.commentsCount} ${_t(context, en: 'comments', it: 'commenti')}',
+                              style: const TextStyle(color: Colors.white70),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        color: Colors.white54,
+                      ),
+                    ],
                   ),
                 ),
               ),
-      ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => _tabs.animateTo(2),
+              icon: const Icon(Icons.arrow_forward_rounded),
+              label: Text(
+                _t(
+                  context,
+                  en: 'View all requests',
+                  it: 'Vedi tutte le richieste',
+                ),
+              ),
+              style: TextButton.styleFrom(foregroundColor: _accentA),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1476,64 +1524,6 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
     );
   }
 
-  Widget _quickComposer(
-    FeedbackHubController ctrl,
-    AppToastService toast,
-    bool online,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0E7490), Color(0xFF0284C7)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 14,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextButton.icon(
-            onPressed: online ? () => _tabs.animateTo(2) : null,
-            icon: const Icon(
-              Icons.campaign_rounded,
-              color: Colors.white,
-              size: 18,
-            ),
-            label: Text(
-              _t(context, en: 'Request', it: 'Richiesta'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          TextButton.icon(
-            onPressed: online ? () => _tabs.animateTo(3) : null,
-            icon: const Icon(
-              Icons.rate_review_rounded,
-              color: Colors.white,
-              size: 18,
-            ),
-            label: Text(
-              _t(context, en: 'Feedback', it: 'Feedback'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   String _t(BuildContext context, {required String en, required String it}) {
     final locale =
         Localizations.maybeLocaleOf(context) ?? AppStrings.defaultLocale;
@@ -1575,44 +1565,6 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: _accentB, width: 1.2),
-      ),
-    );
-  }
-
-  Widget _metricTile({
-    required String title,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        color: color.withValues(alpha: 0.12),
-        border: Border.all(color: color.withValues(alpha: 0.34)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
-              height: 1,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
       ),
     );
   }

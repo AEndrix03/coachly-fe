@@ -32,7 +32,10 @@ class WorkoutList extends _$WorkoutList {
   }
 
   Future<void> deleteWorkout(String workoutId) async {
-    await _repository.deleteWorkout(workoutId);
+    final response = await _repository.deleteWorkout(workoutId);
+    if (!response.success) {
+      throw Exception(response.message ?? 'Failed to delete workout');
+    }
     ref.invalidateSelf();
   }
 
@@ -46,7 +49,7 @@ final recentWorkoutsProvider = FutureProvider.autoDispose<List<WorkoutModel>>((
   ref,
 ) async {
   final allWorkouts = await ref.watch(workoutListProvider.future);
-  final sortedWorkouts = [...allWorkouts]
+  final sortedWorkouts = allWorkouts.where((workout) => workout.active).toList()
     ..sort((a, b) => b.lastUsed.compareTo(a.lastUsed));
   return sortedWorkouts.take(3).toList();
 });
