@@ -15,6 +15,7 @@ class FeedbackHubState {
     this.pollResultsById = const <String, FeedbackPollResult>{},
     this.answeredPollIds = const <String>{},
     this.featureRequests = const <FeatureRequestItem>[],
+    this.latestFeatureRequests = const <FeatureRequestItem>[],
     this.selectedFeatureId,
     this.comments = const <FeedbackComment>[],
   });
@@ -25,6 +26,7 @@ class FeedbackHubState {
   final Map<String, FeedbackPollResult> pollResultsById;
   final Set<String> answeredPollIds;
   final List<FeatureRequestItem> featureRequests;
+  final List<FeatureRequestItem> latestFeatureRequests;
   final String? selectedFeatureId;
   final List<FeedbackComment> comments;
 
@@ -36,6 +38,7 @@ class FeedbackHubState {
     Map<String, FeedbackPollResult>? pollResultsById,
     Set<String>? answeredPollIds,
     List<FeatureRequestItem>? featureRequests,
+    List<FeatureRequestItem>? latestFeatureRequests,
     String? selectedFeatureId,
     bool clearSelectedFeature = false,
     List<FeedbackComment>? comments,
@@ -47,6 +50,8 @@ class FeedbackHubState {
       pollResultsById: pollResultsById ?? this.pollResultsById,
       answeredPollIds: answeredPollIds ?? this.answeredPollIds,
       featureRequests: featureRequests ?? this.featureRequests,
+      latestFeatureRequests:
+          latestFeatureRequests ?? this.latestFeatureRequests,
       selectedFeatureId: clearSelectedFeature
           ? null
           : (selectedFeatureId ?? this.selectedFeatureId),
@@ -72,8 +77,14 @@ class FeedbackHubController extends Notifier<FeedbackHubState> {
     _loading = true;
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final polls = await _service.fetchPolls();
-      final featureRequests = await _service.fetchFeatureRequests();
+      final results = await Future.wait([
+        _service.fetchPolls(),
+        _service.fetchFeatureRequests(),
+        _service.fetchFeatureRequests(sort: 'newest', size: 3),
+      ]);
+      final polls = results[0] as List<FeedbackPoll>;
+      final featureRequests = results[1] as List<FeatureRequestItem>;
+      final latestFeatureRequests = results[2] as List<FeatureRequestItem>;
       if (!ref.mounted) {
         return;
       }
@@ -85,6 +96,7 @@ class FeedbackHubController extends Notifier<FeedbackHubState> {
         isLoading: false,
         polls: polls,
         featureRequests: featureRequests,
+        latestFeatureRequests: latestFeatureRequests,
         selectedFeatureId: selectedFeatureId,
         comments: const <FeedbackComment>[],
         clearError: true,
@@ -101,6 +113,9 @@ class FeedbackHubController extends Notifier<FeedbackHubState> {
       _loading = false;
     }
   }
+
+  /// Re-fetches the community feed from the server, including the latest posts.
+  Future<void> refresh() => load();
 
   Future<void> submitFeedback({
     required String type,
@@ -134,7 +149,12 @@ class FeedbackHubController extends Notifier<FeedbackHubState> {
   }
 
   Future<void> refreshFeatureRequests() async {
-    final featureRequests = await _service.fetchFeatureRequests();
+    final results = await Future.wait([
+      _service.fetchFeatureRequests(),
+      _service.fetchFeatureRequests(sort: 'newest', size: 3),
+    ]);
+    final featureRequests = results[0];
+    final latestFeatureRequests = results[1];
     if (!ref.mounted) {
       return;
     }
@@ -149,6 +169,7 @@ class FeedbackHubController extends Notifier<FeedbackHubState> {
 
     state = state.copyWith(
       featureRequests: featureRequests,
+      latestFeatureRequests: latestFeatureRequests,
       selectedFeatureId: nextSelectedFeatureId,
       comments: shouldSelectFirst ? const <FeedbackComment>[] : state.comments,
       clearError: true,

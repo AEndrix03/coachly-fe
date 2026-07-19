@@ -121,6 +121,8 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                       _t(context, en: 'Comments', it: 'Commenti'),
                       '$commentsTotal',
                     ),
+                    const SizedBox(width: 8),
+                    _refreshButton(ctrl, state.isLoading),
                   ],
                 ),
               ),
@@ -187,15 +189,9 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                   labelColor: Colors.white,
                   unselectedLabelColor: Colors.white70,
                   tabs: [
-                    Tab(
-                      text: _t(context, en: 'Overview', it: 'Panoramica'),
-                    ),
-                    Tab(
-                      text: _t(context, en: 'Requests', it: 'Richieste'),
-                    ),
-                    Tab(
-                      text: _t(context, en: 'Send', it: 'Invia'),
-                    ),
+                    _tab(_t(context, en: 'Overview', it: 'Panoramica')),
+                    _tab(_t(context, en: 'Requests', it: 'Richieste')),
+                    _tab(_t(context, en: 'Send', it: 'Invia')),
                   ],
                 ),
               ),
@@ -205,7 +201,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
                     : TabBarView(
                         controller: _tabs,
                         children: [
-                          _overview(state),
+                          _overview(state, ctrl),
                           _features(state, ctrl, toast, online),
                           _sendFeedback(ctrl, toast, online),
                         ],
@@ -253,6 +249,37 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
       ),
     );
   }
+
+  Widget _refreshButton(FeedbackHubController ctrl, bool loading) {
+    return Semantics(
+      button: true,
+      label: _t(
+        context,
+        en: 'Refresh community updates',
+        it: 'Aggiorna aggiornamenti community',
+      ),
+      child: IconButton.filledTonal(
+        onPressed: loading ? null : ctrl.refresh,
+        icon: loading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.refresh_rounded),
+        color: Colors.white,
+        style: IconButton.styleFrom(
+          backgroundColor: Colors.white.withValues(alpha: 0.16),
+          disabledBackgroundColor: Colors.white.withValues(alpha: 0.12),
+        ),
+        tooltip: _t(context, en: 'Refresh', it: 'Aggiorna'),
+      ),
+    );
+  }
+
+  Tab _tab(String label) => Tab(
+    child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1)),
+  );
 
   Widget _banner({
     required String message,
@@ -358,89 +385,35 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
     );
   }
 
-  Widget _overview(FeedbackHubState state) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
-      children: [
-        _card(
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _sectionTitle(
-                _t(
-                  context,
-                  en: 'Make your voice count',
-                  it: 'Fai sentire la tua voce',
-                ),
-                subtitle: _t(
-                  context,
-                  en: 'Vote on the ideas that matter or share your own feedback.',
-                  it: 'Vota le idee che contano o condividi il tuo feedback.',
-                ),
-                icon: Icons.forum_rounded,
+  Widget _overview(FeedbackHubState state, FeedbackHubController ctrl) {
+    return RefreshIndicator(
+      onRefresh: ctrl.refresh,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+        children: [
+          if (state.latestFeatureRequests.isEmpty)
+            _emptyStateCard(
+              title: _t(
+                context,
+                en: 'No requests available',
+                it: 'Nessuna richiesta disponibile',
               ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _tabs.animateTo(1),
-                      icon: const Icon(Icons.campaign_rounded),
-                      label: Text(
-                        _t(context, en: 'View requests', it: 'Vedi richieste'),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _accentB,
-                        side: BorderSide(
-                          color: _accentB.withValues(alpha: 0.65),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () => _tabs.animateTo(2),
-                      icon: const Icon(Icons.rate_review_rounded),
-                      label: Text(
-                        _t(context, en: 'Send feedback', it: 'Invia feedback'),
-                      ),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: _accentA,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                ],
+              subtitle: _t(
+                context,
+                en: 'New proposals will appear here with votes and trend.',
+                it: 'Quando arriveranno nuove proposte le vedrai qui con voti e trend.',
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        if (state.featureRequests.isEmpty)
-          _emptyStateCard(
-            title: _t(
-              context,
-              en: 'No requests available',
-              it: 'Nessuna richiesta disponibile',
-            ),
-            subtitle: _t(
-              context,
-              en: 'New proposals will appear here with votes and trend.',
-              it: 'Quando arriveranno nuove proposte le vedrai qui con voti e trend.',
-            ),
-            icon: Icons.lightbulb_outline_rounded,
-          )
-        else
-          _latestRequests(state),
-      ],
+              icon: Icons.lightbulb_outline_rounded,
+            )
+          else
+            _latestRequests(state),
+        ],
+      ),
     );
   }
 
   Widget _latestRequests(FeedbackHubState state) {
-    final requests = state.featureRequests.take(2).toList();
+    final requests = state.latestFeatureRequests;
 
     return _card(
       Column(
@@ -461,7 +434,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
               padding: const EdgeInsets.only(bottom: 10),
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () => _tabs.animateTo(2),
+                onTap: () => _tabs.animateTo(1),
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -508,7 +481,7 @@ class _FeedbackPageState extends ConsumerState<FeedbackPage>
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
-              onPressed: () => _tabs.animateTo(2),
+              onPressed: () => _tabs.animateTo(1),
               icon: const Icon(Icons.arrow_forward_rounded),
               label: Text(
                 _t(

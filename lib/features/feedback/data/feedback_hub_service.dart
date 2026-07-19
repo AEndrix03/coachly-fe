@@ -67,10 +67,13 @@ class FeedbackHubService {
     _requireSuccess(response, 'Impossibile inviare il voto al sondaggio');
   }
 
-  Future<List<FeatureRequestItem>> fetchFeatureRequests() async {
+  Future<List<FeatureRequestItem>> fetchFeatureRequests({
+    String sort = 'trending',
+    int size = 30,
+  }) async {
     final response = await _apiClient.get<List<FeatureRequestItem>>(
       '/feature-requests',
-      queryParameters: {'sort': 'trending', 'size': '30', 'page': '0'},
+      queryParameters: {'sort': sort, 'size': '$size', 'page': '0'},
       fromJson: (json) {
         final payload = _unwrapData(json);
         if (payload is Map) {

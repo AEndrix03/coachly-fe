@@ -1,6 +1,7 @@
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_equipment_model/exercise_equipment_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_muscle_model/exercise_muscle_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_media_model/exercise_media_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_safety_model/exercise_safety_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_variant_model/exercise_variant_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
@@ -236,6 +237,7 @@ class _ContentState extends ConsumerWidget {
         exercise.id ??
         context.tr('exercise.fallback_name');
     final description = exercise.descriptionI18n?.fromI18n(locale).trim() ?? '';
+    final tips = exercise.tipsI18n?.fromI18n(locale).trim() ?? '';
     final video = exercise.media?.firstWhereOrNull(
       (m) => m.mediaType == 'video',
     );
@@ -243,6 +245,8 @@ class _ContentState extends ConsumerWidget {
     final safety = exercise.safety ?? const [];
     final equipments = exercise.equipments ?? const [];
     final variants = exercise.variants ?? const [];
+    final categories = exercise.categories ?? const [];
+    final tags = exercise.tags ?? const [];
 
     return CustomScrollView(
       slivers: [
@@ -280,6 +284,44 @@ class _ContentState extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
                 ],
+                if (tips.isNotEmpty) ...[
+                  _SectionBlock(
+                    icon: Icons.tips_and_updates_rounded,
+                    color: const Color(0xFFF59E0B),
+                    title: locale.languageCode == 'it'
+                        ? 'CONSIGLI DI ESECUZIONE'
+                        : 'EXECUTION TIPS',
+                    child: Text(
+                      tips,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.82),
+                        fontSize: 14,
+                        height: 1.6,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+                if (categories.isNotEmpty) ...[
+                  _SectionBlock(
+                    icon: Icons.account_tree_rounded,
+                    color: const Color(0xFF60A5FA),
+                    title: locale.languageCode == 'it'
+                        ? 'CATEGORIE'
+                        : 'CATEGORIES',
+                    child: _TextChips(
+                      labels: categories
+                          .map(
+                            (category) => category.nameI18n?.fromI18n(locale),
+                          )
+                          .whereType<String>()
+                          .where((label) => label.isNotEmpty)
+                          .toList(),
+                      color: const Color(0xFF60A5FA),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 if (muscles.isNotEmpty) ...[
                   _SectionBlock(
                     icon: Icons.fitness_center_rounded,
@@ -310,6 +352,24 @@ class _ContentState extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
                 ],
+                if (tags.isNotEmpty) ...[
+                  _SectionBlock(
+                    icon: Icons.sell_outlined,
+                    color: const Color(0xFFF472B6),
+                    title: locale.languageCode == 'it' ? 'TAG' : 'TAGS',
+                    child: _TextChips(
+                      labels: tags
+                          .map(
+                            (tag) => tag.nameI18n?.fromI18n(locale) ?? tag.code,
+                          )
+                          .whereType<String>()
+                          .where((label) => label.isNotEmpty)
+                          .toList(),
+                      color: const Color(0xFFF472B6),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 if (variants.isNotEmpty) ...[
                   _SectionBlock(
                     icon: Icons.swap_horiz_rounded,
@@ -318,22 +378,95 @@ class _ContentState extends ConsumerWidget {
                     child: _VariantsList(variants: variants, locale: locale),
                   ),
                 ],
-                if (description.isEmpty &&
-                    muscles.isEmpty &&
-                    safety.isEmpty &&
-                    equipments.isEmpty &&
-                    variants.isEmpty)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 48),
-                      child: Text(
-                        context.tr('exercise.no_information'),
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.4),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
+                if (description.isEmpty)
+                  _missingSection(
+                    icon: Icons.menu_book_rounded,
+                    color: const Color(0xFF2196F3),
+                    title: context.tr('workout.description'),
+                    message: locale.languageCode == 'it'
+                        ? 'Nessuna descrizione configurata'
+                        : 'No description configured',
+                  ),
+                if (tips.isEmpty)
+                  _missingSection(
+                    icon: Icons.tips_and_updates_rounded,
+                    color: const Color(0xFFF59E0B),
+                    title: locale.languageCode == 'it'
+                        ? 'CONSIGLI DI ESECUZIONE'
+                        : 'EXECUTION TIPS',
+                    message: locale.languageCode == 'it'
+                        ? 'Nessun consiglio configurato'
+                        : 'No execution tips configured',
+                  ),
+                if (categories.isEmpty)
+                  _missingSection(
+                    icon: Icons.account_tree_rounded,
+                    color: const Color(0xFF60A5FA),
+                    title: locale.languageCode == 'it'
+                        ? 'CATEGORIE'
+                        : 'CATEGORIES',
+                    message: locale.languageCode == 'it'
+                        ? 'Nessuna categoria configurata'
+                        : 'No categories configured',
+                  ),
+                if (muscles.isEmpty)
+                  _missingSection(
+                    icon: Icons.fitness_center_rounded,
+                    color: const Color(0xFF9C27B0),
+                    title: context.tr('exercise.muscles_involved'),
+                    message: locale.languageCode == 'it'
+                        ? 'Nessun muscolo configurato'
+                        : 'No muscles configured',
+                  ),
+                if (safety.isEmpty)
+                  _missingSection(
+                    icon: Icons.warning_rounded,
+                    color: const Color(0xFFFF9800),
+                    title: context.tr('exercise.safety_tips'),
+                    message: locale.languageCode == 'it'
+                        ? 'Nessuna indicazione di sicurezza configurata'
+                        : 'No safety guidance configured',
+                  ),
+                if (equipments.isEmpty)
+                  _missingSection(
+                    icon: Icons.build_rounded,
+                    color: const Color(0xFF00BCD4),
+                    title: context.tr('exercise.equipment'),
+                    message: locale.languageCode == 'it'
+                        ? 'Nessuna attrezzatura configurata'
+                        : 'No equipment configured',
+                  ),
+                if (tags.isEmpty)
+                  _missingSection(
+                    icon: Icons.sell_outlined,
+                    color: const Color(0xFFF472B6),
+                    title: locale.languageCode == 'it' ? 'TAG' : 'TAGS',
+                    message: locale.languageCode == 'it'
+                        ? 'Nessun tag configurato'
+                        : 'No tags configured',
+                  ),
+                _SectionBlock(
+                  icon: Icons.perm_media_outlined,
+                  color: const Color(0xFF38BDF8),
+                  title: 'MEDIA',
+                  child: exercise.media?.isEmpty ?? true
+                      ? _EmptyDetail(
+                          locale.languageCode == 'it'
+                              ? 'Nessun contenuto media configurato'
+                              : 'No media configured',
+                        )
+                      : _MediaList(media: exercise.media!),
+                ),
+                const SizedBox(height: 20),
+                if (variants.isEmpty)
+                  _missingSection(
+                    icon: Icons.swap_horiz_rounded,
+                    color: const Color(0xFF4CAF50),
+                    title: context.tr('exercise.variants'),
+                    message: locale.languageCode == 'it'
+                        ? 'Nessuna variante configurata'
+                        : 'No variants configured',
+                    last: true,
                   ),
               ],
             ),
@@ -342,6 +475,24 @@ class _ContentState extends ConsumerWidget {
       ],
     );
   }
+
+  Widget _missingSection({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String message,
+    bool last = false,
+  }) => Column(
+    children: [
+      _SectionBlock(
+        icon: icon,
+        color: color,
+        title: title,
+        child: _EmptyDetail(message),
+      ),
+      if (!last) const SizedBox(height: 20),
+    ],
+  );
 }
 
 // ─────────────────────────── hero header ─────────────────────────────────────
@@ -384,33 +535,26 @@ class _ExerciseHero extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Back button row
               Row(
                 children: [
                   _BackButton(onBack: () => Navigator.of(context).pop()),
-                ],
-              ),
-              const SizedBox(height: 20),
-              // Icon + name
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
+                  const SizedBox(width: 12),
                   Container(
-                    width: 52,
-                    height: 52,
+                    width: 44,
+                    height: 44,
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
                       isBodyweight
                           ? Icons.self_improvement_rounded
                           : Icons.fitness_center_rounded,
                       color: Colors.white,
-                      size: 28,
+                      size: 24,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       name,
@@ -425,7 +569,7 @@ class _ExerciseHero extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               // Stat chips
               Wrap(
                 spacing: 8,
@@ -602,6 +746,77 @@ class _SectionBlock extends StatelessWidget {
   }
 }
 
+class _EmptyDetail extends StatelessWidget {
+  final String message;
+
+  const _EmptyDetail(this.message);
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      const Icon(Icons.info_outline_rounded, size: 18, color: Colors.white38),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Text(
+          message,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.48),
+            fontSize: 13,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+class _MediaList extends StatelessWidget {
+  final List<ExerciseMediaModel> media;
+
+  const _MediaList({required this.media});
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: media.map((item) {
+      final label = [
+        item.mediaType,
+        item.mediaPurpose,
+        item.viewAngle,
+      ].where((value) => value.isNotEmpty).join(' · ');
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: const Color(0xFF38BDF8).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                item.mediaType.toLowerCase() == 'video'
+                    ? Icons.play_circle_outline_rounded
+                    : Icons.image_outlined,
+                color: const Color(0xFF38BDF8),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label.isEmpty ? item.mediaUrl : label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList(),
+  );
+}
+
 // ─────────────────────────── muscles list ────────────────────────────────────
 
 class _MusclesList extends StatelessWidget {
@@ -690,35 +905,103 @@ class _SafetyList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: safety.asMap().entries.map((entry) {
         final isLast = entry.key == safety.length - 1;
+        final note = entry.value.safetyNotesI18n.fromI18n(locale).trim();
         return Padding(
           padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                margin: const EdgeInsets.only(top: 5),
-                width: 6,
-                height: 6,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFF9800),
-                  shape: BoxShape.circle,
-                ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                children: [
+                  _SafetyPill(
+                    label:
+                        '${locale.languageCode == 'it' ? 'Rischio' : 'Risk'}: ${entry.value.overallRiskLevel}',
+                  ),
+                  if (entry.value.spotterRequired)
+                    _SafetyPill(
+                      label: locale.languageCode == 'it'
+                          ? 'Spotter consigliato'
+                          : 'Spotter recommended',
+                    ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  entry.value.safetyNotesI18n.fromI18n(locale),
+              if (note.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  note,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.82),
                     fontSize: 13,
                     height: 1.5,
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+class _SafetyPill extends StatelessWidget {
+  final String label;
+
+  const _SafetyPill({required this.label});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(999),
+      color: const Color(0xFFFF9800).withValues(alpha: 0.12),
+      border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.3)),
+    ),
+    child: Text(
+      label,
+      style: const TextStyle(
+        color: Color(0xFFFFB74D),
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  );
+}
+
+class _TextChips extends StatelessWidget {
+  final List<String> labels;
+  final Color color;
+
+  const _TextChips({required this.labels, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: labels
+          .toSet()
+          .map(
+            (label) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: color.withValues(alpha: 0.3)),
+              ),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }
