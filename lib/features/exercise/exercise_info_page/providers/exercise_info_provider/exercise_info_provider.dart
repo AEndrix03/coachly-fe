@@ -87,6 +87,8 @@ class ExerciseInfoNotifier extends _$ExerciseInfoNotifier {
       final repository = ref.read(exerciseInfoPageRepositoryProvider);
       final response = await repository.getAllExercises();
 
+      if (!ref.mounted) return;
+
       if (response.success && response.data != null) {
         state = state.copyWith(exercises: response.data!, isLoading: false);
       } else {
@@ -96,6 +98,7 @@ class ExerciseInfoNotifier extends _$ExerciseInfoNotifier {
         );
       }
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
@@ -106,6 +109,8 @@ class ExerciseInfoNotifier extends _$ExerciseInfoNotifier {
     try {
       final repository = ref.read(exerciseInfoPageRepositoryProvider);
       final response = await repository.getExerciseDetail(exerciseId);
+
+      if (!ref.mounted) return;
 
       if (response.success && response.data != null) {
         state = state.copyWith(
@@ -119,6 +124,7 @@ class ExerciseInfoNotifier extends _$ExerciseInfoNotifier {
         );
       }
     } catch (e) {
+      if (!ref.mounted) return;
       state = state.copyWith(
         isLoadingDetail: false,
         errorMessage: e.toString(),

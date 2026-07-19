@@ -54,10 +54,12 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
     );
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (state.remainingSeconds > 0) {
-        state = state.copyWith(remainingSeconds: state.remainingSeconds - 1);
-      } else {
+      // Finish in the same tick that reaches zero.  The completion listener
+      // relies on this active -> inactive transition to trigger the alarm.
+      if (state.remainingSeconds <= 1) {
         stopTimer();
+      } else {
+        state = state.copyWith(remainingSeconds: state.remainingSeconds - 1);
       }
     });
   }

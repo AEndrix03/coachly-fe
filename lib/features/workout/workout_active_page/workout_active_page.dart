@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
@@ -23,6 +25,16 @@ class WorkoutActivePage extends ConsumerStatefulWidget {
 }
 
 class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
+  final FlutterRingtonePlayer _ringtonePlayer = FlutterRingtonePlayer();
+  Timer? _restCompleteAlertStopTimer;
+
+  @override
+  void dispose() {
+    _restCompleteAlertStopTimer?.cancel();
+    unawaited(_ringtonePlayer.stop());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -35,7 +47,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
           next.remainingSeconds == 0 &&
           !next.isActive) {
         if (next.isBellEnabled) {
-          _playRestCompleteAlert();
+          unawaited(_playRestCompleteAlert());
         }
         showDialog(
           context: context,
@@ -168,17 +180,22 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
     }
   }
 
-  void _playRestCompleteAlert() {
-    final player = FlutterRingtonePlayer();
+  Future<void> _playRestCompleteAlert() async {
+    _restCompleteAlertStopTimer?.cancel();
+
     try {
-      player.stop();
-      player.play(
+      await _ringtonePlayer.stop();
+      await _ringtonePlayer.play(
         android: AndroidSounds.alarm,
         ios: IosSounds.alarm,
-        looping: false,
+        looping: true,
         volume: 1.0,
         asAlarm: true,
       );
+
+      _restCompleteAlertStopTimer = Timer(const Duration(seconds: 5), () {
+        unawaited(_ringtonePlayer.stop());
+      });
     } catch (_) {
       SystemSound.play(SystemSoundType.alert);
     }

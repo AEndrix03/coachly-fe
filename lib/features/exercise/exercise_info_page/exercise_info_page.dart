@@ -23,19 +23,13 @@ class ExercisePage extends ConsumerStatefulWidget {
 }
 
 class _ExercisePageState extends ConsumerState<ExercisePage> {
-  late final ExerciseInfoNotifier _exerciseInfoNotifier;
-
   @override
   void initState() {
     super.initState();
-    _exerciseInfoNotifier = ref.read(exerciseInfoProvider.notifier);
-    Future.microtask(() => _exerciseInfoNotifier.loadExerciseDetail(widget.id));
-  }
-
-  @override
-  void dispose() {
-    _exerciseInfoNotifier.clearSelectedExercise();
-    super.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(exerciseInfoProvider.notifier).loadExerciseDetail(widget.id);
+    });
   }
 
   @override

@@ -1,8 +1,31 @@
+import 'dart:async';
+
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 
-class RestCompleteDialog extends StatelessWidget {
+class RestCompleteDialog extends StatefulWidget {
   const RestCompleteDialog({super.key});
+
+  @override
+  State<RestCompleteDialog> createState() => _RestCompleteDialogState();
+}
+
+class _RestCompleteDialogState extends State<RestCompleteDialog> {
+  Timer? _autoCloseTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _autoCloseTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) Navigator.of(context).pop();
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoCloseTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,29 +91,6 @@ class RestCompleteDialog extends StatelessWidget {
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 22),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.play_circle_fill_rounded, size: 20),
-                label: Text(
-                  context.tr('session.continue'),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                style: FilledButton.styleFrom(
-                  backgroundColor: scheme.primary,
-                  foregroundColor: scheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-              ),
             ),
           ],
         ),
