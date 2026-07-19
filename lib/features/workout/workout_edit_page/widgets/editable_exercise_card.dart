@@ -275,11 +275,6 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
                       widget.exercise.accentColor,
                       Icons.fitness_center,
                     ),
-                    _buildTag(
-                      widget.exercise.difficulty,
-                      const Color(0xFFFF9800),
-                      Icons.whatshot,
-                    ),
                   ],
                 ),
               ],

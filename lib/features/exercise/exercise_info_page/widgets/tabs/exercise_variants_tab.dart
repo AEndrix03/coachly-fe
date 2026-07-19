@@ -93,29 +93,6 @@ class ExerciseVariantsTab extends ConsumerWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A2E),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Text(
-                      _difficultyLabel(context, variant.difficultyLevel),
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -128,18 +105,5 @@ class ExerciseVariantsTab extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _difficultyLabel(BuildContext context, String? raw) {
-    if (raw == null || raw.trim().isEmpty) {
-      return context.tr('common.na');
-    }
-
-    return switch (raw.toLowerCase()) {
-      'beginner' => context.tr('exercise.difficulty.beginner'),
-      'intermediate' => context.tr('exercise.difficulty.intermediate'),
-      'advanced' => context.tr('exercise.difficulty.advanced'),
-      _ => raw,
-    };
   }
 }

@@ -182,11 +182,6 @@ class _WorkoutExerciseViewCardState
                       const Color(0xFF2196F3),
                       Icons.fitness_center,
                     ),
-                    _buildTag(
-                      exercise.difficultyLevel ?? context.tr('common.na'),
-                      const Color(0xFFFF9800),
-                      Icons.whatshot,
-                    ),
                   ],
                 ),
               ],

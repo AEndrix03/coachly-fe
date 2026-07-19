@@ -8,7 +8,6 @@ import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -238,9 +237,6 @@ class _ContentState extends ConsumerWidget {
         context.tr('exercise.fallback_name');
     final description = exercise.descriptionI18n?.fromI18n(locale).trim() ?? '';
     final tips = exercise.tipsI18n?.fromI18n(locale).trim() ?? '';
-    final video = exercise.media?.firstWhereOrNull(
-      (m) => m.mediaType == 'video',
-    );
     final muscles = exercise.muscles ?? const [];
     final safety = exercise.safety ?? const [];
     final equipments = exercise.equipments ?? const [];
@@ -254,11 +250,9 @@ class _ContentState extends ConsumerWidget {
         SliverToBoxAdapter(
           child: _ExerciseHero(
             name: name,
-            difficulty: exercise.difficultyLevel,
             mechanics: exercise.mechanicsType,
             forceType: exercise.forceType,
             isBodyweight: exercise.isBodyweight ?? false,
-            videoUrl: video?.mediaUrl,
           ),
         ),
         // ── Sections ─────────────────────────────────────────────────────────
@@ -268,22 +262,52 @@ class _ContentState extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (description.isNotEmpty) ...[
-                  _SectionBlock(
-                    icon: Icons.menu_book_rounded,
-                    color: const Color(0xFF2196F3),
-                    title: context.tr('workout.description'),
-                    child: Text(
-                      description,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.82),
-                        fontSize: 14,
-                        height: 1.6,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                _SectionBlock(
+                  icon: Icons.menu_book_rounded,
+                  color: const Color(0xFF2196F3),
+                  title: context.tr('workout.description'),
+                  child: description.isEmpty
+                      ? _EmptyDetail(
+                          locale.languageCode == 'it'
+                              ? 'Nessuna descrizione configurata'
+                              : 'No description configured',
+                        )
+                      : Text(
+                          description,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.82),
+                            fontSize: 14,
+                            height: 1.6,
+                          ),
+                        ),
+                ),
+                const SizedBox(height: 20),
+                _SectionBlock(
+                  icon: Icons.perm_media_outlined,
+                  color: const Color(0xFF38BDF8),
+                  title: 'MEDIA',
+                  child: exercise.media?.isEmpty ?? true
+                      ? _EmptyDetail(
+                          locale.languageCode == 'it'
+                              ? 'Nessun contenuto media configurato'
+                              : 'No media configured',
+                        )
+                      : _MediaList(media: exercise.media!),
+                ),
+                const SizedBox(height: 20),
+                _SectionBlock(
+                  icon: Icons.fitness_center_rounded,
+                  color: const Color(0xFF9C27B0),
+                  title: context.tr('exercise.muscles_involved'),
+                  child: muscles.isEmpty
+                      ? _EmptyDetail(
+                          locale.languageCode == 'it'
+                              ? 'Nessun muscolo configurato'
+                              : 'No muscles configured',
+                        )
+                      : _MusclesList(muscles: muscles, locale: locale),
+                ),
+                const SizedBox(height: 20),
                 if (tips.isNotEmpty) ...[
                   _SectionBlock(
                     icon: Icons.tips_and_updates_rounded,
@@ -319,15 +343,6 @@ class _ContentState extends ConsumerWidget {
                           .toList(),
                       color: const Color(0xFF60A5FA),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                if (muscles.isNotEmpty) ...[
-                  _SectionBlock(
-                    icon: Icons.fitness_center_rounded,
-                    color: const Color(0xFF9C27B0),
-                    title: context.tr('exercise.muscles_involved'),
-                    child: _MusclesList(muscles: muscles, locale: locale),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -378,15 +393,6 @@ class _ContentState extends ConsumerWidget {
                     child: _VariantsList(variants: variants, locale: locale),
                   ),
                 ],
-                if (description.isEmpty)
-                  _missingSection(
-                    icon: Icons.menu_book_rounded,
-                    color: const Color(0xFF2196F3),
-                    title: context.tr('workout.description'),
-                    message: locale.languageCode == 'it'
-                        ? 'Nessuna descrizione configurata'
-                        : 'No description configured',
-                  ),
                 if (tips.isEmpty)
                   _missingSection(
                     icon: Icons.tips_and_updates_rounded,
@@ -408,15 +414,6 @@ class _ContentState extends ConsumerWidget {
                     message: locale.languageCode == 'it'
                         ? 'Nessuna categoria configurata'
                         : 'No categories configured',
-                  ),
-                if (muscles.isEmpty)
-                  _missingSection(
-                    icon: Icons.fitness_center_rounded,
-                    color: const Color(0xFF9C27B0),
-                    title: context.tr('exercise.muscles_involved'),
-                    message: locale.languageCode == 'it'
-                        ? 'Nessun muscolo configurato'
-                        : 'No muscles configured',
                   ),
                 if (safety.isEmpty)
                   _missingSection(
@@ -445,19 +442,6 @@ class _ContentState extends ConsumerWidget {
                         ? 'Nessun tag configurato'
                         : 'No tags configured',
                   ),
-                _SectionBlock(
-                  icon: Icons.perm_media_outlined,
-                  color: const Color(0xFF38BDF8),
-                  title: 'MEDIA',
-                  child: exercise.media?.isEmpty ?? true
-                      ? _EmptyDetail(
-                          locale.languageCode == 'it'
-                              ? 'Nessun contenuto media configurato'
-                              : 'No media configured',
-                        )
-                      : _MediaList(media: exercise.media!),
-                ),
-                const SizedBox(height: 20),
                 if (variants.isEmpty)
                   _missingSection(
                     icon: Icons.swap_horiz_rounded,
@@ -499,19 +483,15 @@ class _ContentState extends ConsumerWidget {
 
 class _ExerciseHero extends StatelessWidget {
   final String name;
-  final String? difficulty;
   final String? mechanics;
   final String? forceType;
   final bool isBodyweight;
-  final String? videoUrl;
 
   const _ExerciseHero({
     required this.name,
-    required this.difficulty,
     required this.mechanics,
     required this.forceType,
     required this.isBodyweight,
-    this.videoUrl,
   });
 
   @override
@@ -539,22 +519,6 @@ class _ExerciseHero extends StatelessWidget {
                 children: [
                   _BackButton(onBack: () => Navigator.of(context).pop()),
                   const SizedBox(width: 12),
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      isBodyweight
-                          ? Icons.self_improvement_rounded
-                          : Icons.fitness_center_rounded,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       name,
@@ -575,12 +539,6 @@ class _ExerciseHero extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  if (difficulty != null)
-                    _HeroChip(
-                      label: _difficultyLabel(context, difficulty!),
-                      icon: Icons.whatshot_rounded,
-                      color: _difficultyColor(difficulty!),
-                    ),
                   if (mechanics != null)
                     _HeroChip(
                       label: _mechanicsLabel(context, mechanics!),
@@ -607,21 +565,6 @@ class _ExerciseHero extends StatelessWidget {
       ),
     );
   }
-
-  String _difficultyLabel(BuildContext context, String raw) =>
-      switch (raw.toLowerCase()) {
-        'beginner' => context.tr('exercise.difficulty.beginner'),
-        'intermediate' => context.tr('exercise.difficulty.intermediate'),
-        'advanced' => context.tr('exercise.difficulty.advanced'),
-        _ => raw,
-      };
-
-  Color _difficultyColor(String raw) => switch (raw.toLowerCase()) {
-    'beginner' => const Color(0xFF69F0AE),
-    'intermediate' => const Color(0xFFFFB300),
-    'advanced' => const Color(0xFFFF5252),
-    _ => Colors.white70,
-  };
 
   String _mechanicsLabel(BuildContext context, String raw) =>
       switch (raw.toLowerCase()) {
@@ -1107,15 +1050,6 @@ class _VariantsList extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      if (v.difficultyLevel != null)
-                        Text(
-                          v.difficultyLevel!,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.45),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
                     ],
                   ),
                 ),

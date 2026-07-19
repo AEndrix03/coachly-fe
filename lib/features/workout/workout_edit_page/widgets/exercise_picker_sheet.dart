@@ -42,7 +42,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   // active filters
   String? _categoryId;
   String? _muscleId;
-  String? _difficulty;
   String? _mechanics;
   String? _forceType;
   bool? _bodyweight;
@@ -81,7 +80,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         scope: _scope,
         textFilter: text.length >= 2 || text.isEmpty ? text : null,
         langFilter: lang,
-        difficultyLevel: _difficulty,
         mechanicsType: _mechanics,
         forceType: _forceType,
         isUnilateral: _unilateral,
@@ -96,7 +94,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     setState(() {
       _categoryId = null;
       _muscleId = null;
-      _difficulty = null;
       _mechanics = null;
       _forceType = null;
       _bodyweight = null;
@@ -120,7 +117,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         number: 0,
         name: name,
         muscles: const [],
-        difficulty: _difficultyLabel(created.difficultyLevel),
+        difficulty: '',
         sets: '3x10',
         rest: '60s',
         weight: '-',
@@ -234,7 +231,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   int get _activeCount => [
     _categoryId,
     _muscleId,
-    _difficulty,
     _mechanics,
     _forceType,
     _bodyweight,
@@ -552,15 +548,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         exercises.map((e) => e.forceType).whereType<String>().toSet().toList()
           ..sort();
 
-    // Extract difficulties
-    final difficulties =
-        exercises
-            .map((e) => e.difficultyLevel)
-            .whereType<String>()
-            .toSet()
-            .toList()
-          ..sort();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -583,12 +570,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
           child: _showAdvanced
-              ? _buildAdvancedFilters(
-                  muscles,
-                  mechanics,
-                  forceTypes,
-                  difficulties,
-                )
+              ? _buildAdvancedFilters(muscles, mechanics, forceTypes)
               : const SizedBox.shrink(),
         ),
         const SizedBox(height: 8),
@@ -605,7 +587,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     List<_Option> muscles,
     List<String> mechanics,
     List<String> forceTypes,
-    List<String> difficulties,
   ) {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
@@ -650,20 +631,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               color: const Color(0xFFFF9800),
               onTap: (id) {
                 setState(() => _forceType = _forceType == id ? null : id);
-                _applyFilters();
-              },
-            ),
-          ],
-          if (difficulties.isNotEmpty) ...[
-            _buildFilterLabel(context.tr('exercise.difficulty')),
-            _buildHorizontalChips<String>(
-              items: difficulties,
-              selected: _difficulty,
-              getLabel: (s) => _difficultyLabel(s),
-              getId: (s) => s,
-              color: const Color(0xFFFF5252),
-              onTap: (id) {
-                setState(() => _difficulty = _difficulty == id ? null : id);
                 _applyFilters();
               },
             ),
@@ -936,7 +903,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         .where((s) => s.isNotEmpty)
         .take(2)
         .join(', ');
-    final difficulty = exercise.difficultyLevel;
     final mechanics = exercise.mechanicsType;
     final isBodyweight = exercise.isBodyweight ?? false;
 
@@ -952,7 +918,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             muscles: (exercise.muscles ?? const [])
                 .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? na)
                 .toList(),
-            difficulty: _difficultyLabel(difficulty),
+            // Kept only for the existing workout payload; it is not exposed in the UI.
+            difficulty: '',
             sets: defaults.sets,
             rest: '60s',
             weight: defaults.weight,
@@ -1039,9 +1006,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                         letterSpacing: -0.2,
                       ),
                     ),
-                    if (muscles.isNotEmpty ||
-                        difficulty != null ||
-                        mechanics != null) ...[
+                    if (muscles.isNotEmpty || mechanics != null) ...[
                       const SizedBox(height: 7),
                       Wrap(
                         spacing: 6,
@@ -1049,11 +1014,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                         children: [
                           if (muscles.isNotEmpty)
                             _cardTag(muscles, const Color(0xFF2196F3)),
-                          if (difficulty != null)
-                            _cardTag(
-                              _difficultyLabel(difficulty),
-                              _difficultyColor(difficulty),
-                            ),
                           if (mechanics != null)
                             _cardTag(
                               _mechanicsLabel(mechanics),
@@ -1170,25 +1130,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         .where((e) => !widget.excludedExerciseIds.contains(e.id))
         .toList();
   }
-
-  String _difficultyLabel(String? raw) {
-    if (raw == null || raw.trim().isEmpty) {
-      return context.tr('common.na');
-    }
-    return switch (raw.toLowerCase()) {
-      'beginner' => context.tr('exercise.difficulty.beginner'),
-      'intermediate' => context.tr('exercise.difficulty.intermediate'),
-      'advanced' => context.tr('exercise.difficulty.advanced'),
-      _ => raw,
-    };
-  }
-
-  Color _difficultyColor(String raw) => switch (raw.toLowerCase()) {
-    'beginner' => const Color(0xFF4CAF50),
-    'intermediate' => const Color(0xFFFF9800),
-    'advanced' => const Color(0xFFFF5252),
-    _ => Colors.white54,
-  };
 
   String _mechanicsLabel(String raw) => switch (raw.toLowerCase()) {
     'compound' => context.tr('exercise.mechanics.compound'),

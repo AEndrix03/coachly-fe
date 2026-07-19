@@ -19,7 +19,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
   final _tipsIt = TextEditingController();
   int _step = 0;
   bool _saving = false;
-  String _difficulty = 'beginner';
+  final String _difficulty = 'beginner';
   String _mechanics = 'compound';
   bool _bodyweight = true;
   bool _unilateral = false;
@@ -173,17 +173,6 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
     _field(_descriptionIt, 'Descrizione', lines: 4),
   ]);
   Widget _technique() => _stepBody([
-    DropdownButtonFormField(
-      initialValue: _difficulty,
-      items: const [
-        'beginner',
-        'intermediate',
-        'advanced',
-      ].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-      onChanged: (v) => setState(() => _difficulty = v!),
-      decoration: const InputDecoration(labelText: 'Difficoltà'),
-    ),
-    const SizedBox(height: 16),
     DropdownButtonFormField(
       initialValue: _mechanics,
       items: const [
