@@ -69,7 +69,8 @@ class _AppSyncBootstrap extends ConsumerStatefulWidget {
   ConsumerState<_AppSyncBootstrap> createState() => _AppSyncBootstrapState();
 }
 
-class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap> {
+class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap>
+    with WidgetsBindingObserver {
   bool _isAuthenticated(AsyncValue authState) {
     return authState.value?.isAuthenticated == true &&
         authState.value?.isTokenValid == true;
@@ -93,6 +94,7 @@ class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     ref.listenManual(authProvider, (previous, next) {
       _handleAuthState(previous, next);
     });
@@ -100,6 +102,22 @@ class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap> {
     Future.microtask(() {
       _handleAuthState(null, ref.read(authProvider));
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed ||
+        !_isAuthenticated(ref.read(authProvider))) {
+      return;
+    }
+
+    ref.read(appDataSyncServiceProvider).refreshExercisesOnAppResume();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
