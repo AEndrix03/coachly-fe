@@ -33,7 +33,7 @@ final class WorkoutListProvider
   WorkoutList create() => WorkoutList();
 }
 
-String _$workoutListHash() => r'3e19cd8aee8839ab8b93ebc3fa72894037f40692';
+String _$workoutListHash() => r'8a155a4ad013bd28b202ccc9395035b0f0cb3e08';
 
 abstract class _$WorkoutList extends $AsyncNotifier<List<WorkoutModel>> {
   FutureOr<List<WorkoutModel>> build();

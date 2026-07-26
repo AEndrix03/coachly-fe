@@ -11,7 +11,7 @@ _ExerciseDetailModel _$ExerciseDetailModelFromJson(
 ) => _ExerciseDetailModel(
   id: json['id'] as String? ?? null,
   createdBy: json['createdBy'] as String? ?? null,
-  isPersonal: json['isPersonal'] as bool? ?? false,
+  isPersonal: json['personal'] as bool? ?? false,
   nameI18n: json['nameI18n'] == null
       ? null
       : const MapConverter().fromJson(json['nameI18n']),
@@ -24,8 +24,8 @@ _ExerciseDetailModel _$ExerciseDetailModelFromJson(
   difficultyLevel: json['difficultyLevel'] as String? ?? null,
   mechanicsType: json['mechanicsType'] as String? ?? null,
   forceType: json['forceType'] as String? ?? null,
-  isUnilateral: json['isUnilateral'] as bool? ?? null,
-  isBodyweight: json['isBodyweight'] as bool? ?? null,
+  isUnilateral: json['unilateral'] as bool? ?? null,
+  isBodyweight: json['bodyweight'] as bool? ?? null,
   variants:
       (json['variants'] as List<dynamic>?)
           ?.map((e) => ExerciseVariantModel.fromJson(e as Map<String, dynamic>))
@@ -72,15 +72,15 @@ Map<String, dynamic> _$ExerciseDetailModelToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'createdBy': instance.createdBy,
-  'isPersonal': instance.isPersonal,
+  'personal': instance.isPersonal,
   'nameI18n': const MapConverter().toJson(instance.nameI18n),
   'descriptionI18n': const MapConverter().toJson(instance.descriptionI18n),
   'tipsI18n': const MapConverter().toJson(instance.tipsI18n),
   'difficultyLevel': instance.difficultyLevel,
   'mechanicsType': instance.mechanicsType,
   'forceType': instance.forceType,
-  'isUnilateral': instance.isUnilateral,
-  'isBodyweight': instance.isBodyweight,
+  'unilateral': instance.isUnilateral,
+  'bodyweight': instance.isBodyweight,
   'variants': instance.variants,
   'media': instance.media,
   'categories': instance.categories,

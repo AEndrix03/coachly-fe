@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:coachly/core/config/app_cache_policy.dart';
 import 'package:coachly/core/sync/local_database_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
@@ -56,6 +57,8 @@ class AppDataSyncService {
 
   /// Returns true if the last successful sync is older than [_cacheTtl].
   bool get _isCacheStale {
+    if (!AppCachePolicy.isEnabled) return true;
+
     final lastSync = _localDb.lastSyncTime;
     if (lastSync == null) return true;
     return DateTime.now().difference(lastSync) > _cacheTtl;

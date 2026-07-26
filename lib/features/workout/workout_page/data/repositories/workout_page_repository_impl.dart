@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:coachly/core/config/app_cache_policy.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
@@ -52,6 +53,10 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
   @override
   Future<ApiResponse<List<WorkoutModel>>> getWorkouts() async {
+    if (!AppCachePolicy.isEnabled) {
+      return _refreshFromRemoteDeduplicated();
+    }
+
     final localWorkouts = await _hiveService.getWorkouts();
     if (localWorkouts.isNotEmpty) {
       return ApiResponse.success(data: localWorkouts);
@@ -90,6 +95,10 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       final remoteResponse = await _apiService.fetchWorkouts();
       if (remoteResponse.success && remoteResponse.data != null) {
         remoteWorkouts = remoteResponse.data!;
+        if (!AppCachePolicy.isEnabled) {
+          return ApiResponse.success(data: remoteWorkouts);
+        }
+
         await _hiveService.patchWorkouts(remoteWorkouts);
       } else {
         return ApiResponse.error(
@@ -104,6 +113,12 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       final localWorkouts = await _hiveService.getWorkouts();
       return ApiResponse.success(data: localWorkouts);
     } catch (error) {
+      if (!AppCachePolicy.isEnabled) {
+        return ApiResponse.error(
+          message: 'Failed to fetch workouts: ${error.toString()}',
+        );
+      }
+
       final localWorkouts = await _hiveService.getWorkouts();
       if (localWorkouts.isNotEmpty) {
         return ApiResponse.success(
@@ -139,6 +154,21 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   @override
   Future<ApiResponse<WorkoutModel?>> getWorkout(String workoutId) async {
     try {
+      if (!AppCachePolicy.isEnabled) {
+        final response = await _refreshFromRemoteDeduplicated();
+        if (!response.success) {
+          return ApiResponse.error(
+            message: response.message ?? 'Failed to fetch workout',
+            statusCode: response.statusCode,
+            errors: response.errors,
+          );
+        }
+        final workout = response.data
+            ?.where((item) => item.id == workoutId)
+            .firstOrNull;
+        return ApiResponse.success(data: workout);
+      }
+
       var workout = await _hiveService.getWorkout(workoutId);
       if (workout == null) {
         await refreshFromRemote();

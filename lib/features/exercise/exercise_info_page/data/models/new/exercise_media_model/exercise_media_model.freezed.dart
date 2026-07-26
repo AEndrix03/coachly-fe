@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExerciseMediaModel {
 
- String get id; String get mediaType; String get mediaUrl; String get thumbnailUrl; String get mediaPurpose; String get viewAngle; bool get isPrimary; bool get isPublic;
+ String get id; String get mediaType; String get mediaUrl; String get thumbnailUrl; String get mediaPurpose; String get viewAngle;@JsonKey(name: 'primary') bool get isPrimary;@JsonKey(name: 'public') bool get isPublic;
 /// Create a copy of ExerciseMediaModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $ExerciseMediaModelCopyWith<$Res>  {
   factory $ExerciseMediaModelCopyWith(ExerciseMediaModel value, $Res Function(ExerciseMediaModel) _then) = _$ExerciseMediaModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String mediaType, String mediaUrl, String thumbnailUrl, String mediaPurpose, String viewAngle, bool isPrimary, bool isPublic
+ String id, String mediaType, String mediaUrl, String thumbnailUrl, String mediaPurpose, String viewAngle,@JsonKey(name: 'primary') bool isPrimary,@JsonKey(name: 'public') bool isPublic
 });
 
 
@@ -160,7 +160,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String mediaType,  String mediaUrl,  String thumbnailUrl,  String mediaPurpose,  String viewAngle,  bool isPrimary,  bool isPublic)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String mediaType,  String mediaUrl,  String thumbnailUrl,  String mediaPurpose,  String viewAngle, @JsonKey(name: 'primary')  bool isPrimary, @JsonKey(name: 'public')  bool isPublic)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExerciseMediaModel() when $default != null:
 return $default(_that.id,_that.mediaType,_that.mediaUrl,_that.thumbnailUrl,_that.mediaPurpose,_that.viewAngle,_that.isPrimary,_that.isPublic);case _:
@@ -181,7 +181,7 @@ return $default(_that.id,_that.mediaType,_that.mediaUrl,_that.thumbnailUrl,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String mediaType,  String mediaUrl,  String thumbnailUrl,  String mediaPurpose,  String viewAngle,  bool isPrimary,  bool isPublic)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String mediaType,  String mediaUrl,  String thumbnailUrl,  String mediaPurpose,  String viewAngle, @JsonKey(name: 'primary')  bool isPrimary, @JsonKey(name: 'public')  bool isPublic)  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseMediaModel():
 return $default(_that.id,_that.mediaType,_that.mediaUrl,_that.thumbnailUrl,_that.mediaPurpose,_that.viewAngle,_that.isPrimary,_that.isPublic);case _:
@@ -201,7 +201,7 @@ return $default(_that.id,_that.mediaType,_that.mediaUrl,_that.thumbnailUrl,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String mediaType,  String mediaUrl,  String thumbnailUrl,  String mediaPurpose,  String viewAngle,  bool isPrimary,  bool isPublic)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String mediaType,  String mediaUrl,  String thumbnailUrl,  String mediaPurpose,  String viewAngle, @JsonKey(name: 'primary')  bool isPrimary, @JsonKey(name: 'public')  bool isPublic)?  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseMediaModel() when $default != null:
 return $default(_that.id,_that.mediaType,_that.mediaUrl,_that.thumbnailUrl,_that.mediaPurpose,_that.viewAngle,_that.isPrimary,_that.isPublic);case _:
@@ -216,17 +216,17 @@ return $default(_that.id,_that.mediaType,_that.mediaUrl,_that.thumbnailUrl,_that
 @JsonSerializable()
 
 class _ExerciseMediaModel implements ExerciseMediaModel {
-  const _ExerciseMediaModel({required this.id, required this.mediaType, required this.mediaUrl, required this.thumbnailUrl, required this.mediaPurpose, required this.viewAngle, required this.isPrimary, required this.isPublic});
+  const _ExerciseMediaModel({this.id = '', this.mediaType = '', this.mediaUrl = '', this.thumbnailUrl = '', this.mediaPurpose = '', this.viewAngle = '', @JsonKey(name: 'primary') this.isPrimary = false, @JsonKey(name: 'public') this.isPublic = false});
   factory _ExerciseMediaModel.fromJson(Map<String, dynamic> json) => _$ExerciseMediaModelFromJson(json);
 
-@override final  String id;
-@override final  String mediaType;
-@override final  String mediaUrl;
-@override final  String thumbnailUrl;
-@override final  String mediaPurpose;
-@override final  String viewAngle;
-@override final  bool isPrimary;
-@override final  bool isPublic;
+@override@JsonKey() final  String id;
+@override@JsonKey() final  String mediaType;
+@override@JsonKey() final  String mediaUrl;
+@override@JsonKey() final  String thumbnailUrl;
+@override@JsonKey() final  String mediaPurpose;
+@override@JsonKey() final  String viewAngle;
+@override@JsonKey(name: 'primary') final  bool isPrimary;
+@override@JsonKey(name: 'public') final  bool isPublic;
 
 /// Create a copy of ExerciseMediaModel
 /// with the given fields replaced by the non-null parameter values.
@@ -261,7 +261,7 @@ abstract mixin class _$ExerciseMediaModelCopyWith<$Res> implements $ExerciseMedi
   factory _$ExerciseMediaModelCopyWith(_ExerciseMediaModel value, $Res Function(_ExerciseMediaModel) _then) = __$ExerciseMediaModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String mediaType, String mediaUrl, String thumbnailUrl, String mediaPurpose, String viewAngle, bool isPrimary, bool isPublic
+ String id, String mediaType, String mediaUrl, String thumbnailUrl, String mediaPurpose, String viewAngle,@JsonKey(name: 'primary') bool isPrimary,@JsonKey(name: 'public') bool isPublic
 });
 
 

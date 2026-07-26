@@ -10,16 +10,16 @@ _ExerciseEquipmentModel _$ExerciseEquipmentModelFromJson(
   Map<String, dynamic> json,
 ) => _ExerciseEquipmentModel(
   equipment: EquipmentModel.fromJson(json['equipment'] as Map<String, dynamic>),
-  isRequired: json['isRequired'] as bool,
-  isPrimary: json['isPrimary'] as bool,
-  quantityNeeded: (json['quantityNeeded'] as num).toInt(),
+  isRequired: json['required'] as bool? ?? false,
+  isPrimary: json['primary'] as bool? ?? false,
+  quantityNeeded: (json['quantityNeeded'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$ExerciseEquipmentModelToJson(
   _ExerciseEquipmentModel instance,
 ) => <String, dynamic>{
   'equipment': instance.equipment,
-  'isRequired': instance.isRequired,
-  'isPrimary': instance.isPrimary,
+  'required': instance.isRequired,
+  'primary': instance.isPrimary,
   'quantityNeeded': instance.quantityNeeded,
 };

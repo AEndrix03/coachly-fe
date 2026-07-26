@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExerciseEquipmentModel {
 
- EquipmentModel get equipment; bool get isRequired; bool get isPrimary; int get quantityNeeded;
+ EquipmentModel get equipment;@JsonKey(name: 'required') bool get isRequired;@JsonKey(name: 'primary') bool get isPrimary; int get quantityNeeded;
 /// Create a copy of ExerciseEquipmentModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $ExerciseEquipmentModelCopyWith<$Res>  {
   factory $ExerciseEquipmentModelCopyWith(ExerciseEquipmentModel value, $Res Function(ExerciseEquipmentModel) _then) = _$ExerciseEquipmentModelCopyWithImpl;
 @useResult
 $Res call({
- EquipmentModel equipment, bool isRequired, bool isPrimary, int quantityNeeded
+ EquipmentModel equipment,@JsonKey(name: 'required') bool isRequired,@JsonKey(name: 'primary') bool isPrimary, int quantityNeeded
 });
 
 
@@ -165,7 +165,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( EquipmentModel equipment,  bool isRequired,  bool isPrimary,  int quantityNeeded)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( EquipmentModel equipment, @JsonKey(name: 'required')  bool isRequired, @JsonKey(name: 'primary')  bool isPrimary,  int quantityNeeded)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExerciseEquipmentModel() when $default != null:
 return $default(_that.equipment,_that.isRequired,_that.isPrimary,_that.quantityNeeded);case _:
@@ -186,7 +186,7 @@ return $default(_that.equipment,_that.isRequired,_that.isPrimary,_that.quantityN
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( EquipmentModel equipment,  bool isRequired,  bool isPrimary,  int quantityNeeded)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( EquipmentModel equipment, @JsonKey(name: 'required')  bool isRequired, @JsonKey(name: 'primary')  bool isPrimary,  int quantityNeeded)  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseEquipmentModel():
 return $default(_that.equipment,_that.isRequired,_that.isPrimary,_that.quantityNeeded);case _:
@@ -206,7 +206,7 @@ return $default(_that.equipment,_that.isRequired,_that.isPrimary,_that.quantityN
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( EquipmentModel equipment,  bool isRequired,  bool isPrimary,  int quantityNeeded)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( EquipmentModel equipment, @JsonKey(name: 'required')  bool isRequired, @JsonKey(name: 'primary')  bool isPrimary,  int quantityNeeded)?  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseEquipmentModel() when $default != null:
 return $default(_that.equipment,_that.isRequired,_that.isPrimary,_that.quantityNeeded);case _:
@@ -221,13 +221,13 @@ return $default(_that.equipment,_that.isRequired,_that.isPrimary,_that.quantityN
 @JsonSerializable()
 
 class _ExerciseEquipmentModel implements ExerciseEquipmentModel {
-  const _ExerciseEquipmentModel({required this.equipment, required this.isRequired, required this.isPrimary, required this.quantityNeeded});
+  const _ExerciseEquipmentModel({required this.equipment, @JsonKey(name: 'required') this.isRequired = false, @JsonKey(name: 'primary') this.isPrimary = false, this.quantityNeeded = 0});
   factory _ExerciseEquipmentModel.fromJson(Map<String, dynamic> json) => _$ExerciseEquipmentModelFromJson(json);
 
 @override final  EquipmentModel equipment;
-@override final  bool isRequired;
-@override final  bool isPrimary;
-@override final  int quantityNeeded;
+@override@JsonKey(name: 'required') final  bool isRequired;
+@override@JsonKey(name: 'primary') final  bool isPrimary;
+@override@JsonKey() final  int quantityNeeded;
 
 /// Create a copy of ExerciseEquipmentModel
 /// with the given fields replaced by the non-null parameter values.
@@ -262,7 +262,7 @@ abstract mixin class _$ExerciseEquipmentModelCopyWith<$Res> implements $Exercise
   factory _$ExerciseEquipmentModelCopyWith(_ExerciseEquipmentModel value, $Res Function(_ExerciseEquipmentModel) _then) = __$ExerciseEquipmentModelCopyWithImpl;
 @override @useResult
 $Res call({
- EquipmentModel equipment, bool isRequired, bool isPrimary, int quantityNeeded
+ EquipmentModel equipment,@JsonKey(name: 'required') bool isRequired,@JsonKey(name: 'primary') bool isPrimary, int quantityNeeded
 });
 
 

@@ -22,8 +22,8 @@ _ExerciseVariantModel _$ExerciseVariantModelFromJson(
   difficultyLevel: json['difficultyLevel'] as String? ?? null,
   mechanicsType: json['mechanicsType'] as String? ?? null,
   forceType: json['forceType'] as String? ?? null,
-  isUnilateral: json['isUnilateral'] as bool? ?? null,
-  isBodyweight: json['isBodyweight'] as bool? ?? null,
+  isUnilateral: json['unilateral'] as bool? ?? null,
+  isBodyweight: json['bodyweight'] as bool? ?? null,
   difficultyDelta: (json['difficultyDelta'] as num?)?.toInt() ?? null,
 );
 
@@ -37,7 +37,7 @@ Map<String, dynamic> _$ExerciseVariantModelToJson(
   'difficultyLevel': instance.difficultyLevel,
   'mechanicsType': instance.mechanicsType,
   'forceType': instance.forceType,
-  'isUnilateral': instance.isUnilateral,
-  'isBodyweight': instance.isBodyweight,
+  'unilateral': instance.isUnilateral,
+  'bodyweight': instance.isBodyweight,
   'difficultyDelta': instance.difficultyDelta,
 };

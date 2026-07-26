@@ -1,3 +1,4 @@
+import 'package:coachly/core/config/app_cache_policy.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
@@ -17,26 +18,27 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     String exerciseId,
   ) async {
     try {
-      await _ensureLocalCache();
-      var exercise = await _hiveService.getExercise(exerciseId);
+      final cachedExercise = AppCachePolicy.isEnabled
+          ? await _hiveService.getExercise(exerciseId)
+          : null;
+      final remoteResponse = await _service.fetchExerciseDetails(exerciseId);
 
-      if (exercise == null) {
-        final syncResponse = await refreshFromRemote();
-        if (!syncResponse.success) {
-          return ApiResponse.error(
-            message: syncResponse.message ?? 'Failed to sync exercise cache',
-            statusCode: syncResponse.statusCode,
-            errors: syncResponse.errors,
-          );
+      if (remoteResponse.success && remoteResponse.data != null) {
+        if (AppCachePolicy.isEnabled) {
+          await _hiveService.saveExerciseDetail(remoteResponse.data!);
         }
-        exercise = await _hiveService.getExercise(exerciseId);
+        return ApiResponse.success(data: remoteResponse.data!);
       }
 
-      if (exercise == null) {
-        return ApiResponse.error(message: 'Exercise not found in local cache');
+      if (cachedExercise != null) {
+        return ApiResponse.success(data: cachedExercise);
       }
 
-      return ApiResponse.success(data: exercise);
+      return ApiResponse.error(
+        message: remoteResponse.message ?? 'Failed to load exercise detail',
+        statusCode: remoteResponse.statusCode,
+        errors: remoteResponse.errors,
+      );
     } catch (e) {
       return ApiResponse.error(message: 'Failed to load exercise: $e');
     }
@@ -45,6 +47,10 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   @override
   Future<ApiResponse<List<ExerciseModel>>> getAllExercises() async {
     try {
+      if (!AppCachePolicy.isEnabled) {
+        return _service.fetchAllExercises();
+      }
+
       await _ensureLocalCache();
       final exercises = await _hiveService.getExerciseSummaries();
       return ApiResponse.success(data: exercises);
@@ -59,6 +65,18 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     Set<String> excludedExerciseIds = const {},
   }) async {
     try {
+      if (!AppCachePolicy.isEnabled) {
+        final response = await _service.fetchFilteredExercises(filter);
+        if (!response.success || response.data == null) {
+          return response;
+        }
+        return ApiResponse.success(
+          data: response.data!
+              .where((exercise) => !excludedExerciseIds.contains(exercise.id))
+              .toList(),
+        );
+      }
+
       await _ensureLocalCache();
       final exercises = await _hiveService.getFilteredExercises(
         filter,
@@ -160,12 +178,20 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
       );
     }
 
+    if (!AppCachePolicy.isEnabled) {
+      return ApiResponse.success(data: response.data!);
+    }
+
     await _hiveService.saveExercises(response.data!);
     final localExercises = await _hiveService.getExercises();
     return ApiResponse.success(data: localExercises);
   }
 
   Future<void> _ensureLocalCache() async {
+    if (!AppCachePolicy.isEnabled) {
+      return;
+    }
+
     final isEmpty = await _hiveService.isEmpty();
     if (!isEmpty) {
       return;
