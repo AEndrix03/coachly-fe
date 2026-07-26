@@ -65,18 +65,7 @@ class AppDataSyncService {
     if (_isSyncing) return;
     if (_hasSyncedCurrentSession && !force && !_isCacheStale) return;
 
-    final connectivityResults = await Connectivity().checkConnectivity();
-    final isOnline = connectivityResults.any(
-      (r) => r != ConnectivityResult.none,
-    );
-    if (!isOnline) {
-      debugPrint('Sync skipped: device offline');
-      return;
-    }
-
-    final accessToken = await _authService.getAccessToken();
-    if (accessToken == null || !JwtValidator.isTokenValid(accessToken)) {
-      debugPrint('Sync skipped: JWT missing or invalid');
+    if (!await _canSync()) {
       return;
     }
 
@@ -101,6 +90,45 @@ class AppDataSyncService {
     } finally {
       _isSyncing = false;
     }
+  }
+
+  /// Refreshes the exercise catalogue whenever the app returns to foreground.
+  ///
+  /// The existing Hive cache remains available until the network response has
+  /// been saved. A running full sync already refreshes exercises, so concurrent
+  /// resume events do not issue duplicate requests.
+  Future<void> refreshExercisesOnAppResume() async {
+    if (_isSyncing || !await _canSync()) return;
+
+    _isSyncing = true;
+    try {
+      final result = await _exerciseRepository.refreshFromRemote();
+      if (result.success) {
+        _ref.invalidate(exerciseInfoProvider);
+        _ref.invalidate(exerciseListProvider);
+      }
+    } finally {
+      _isSyncing = false;
+    }
+  }
+
+  Future<bool> _canSync() async {
+    final connectivityResults = await Connectivity().checkConnectivity();
+    final isOnline = connectivityResults.any(
+      (result) => result != ConnectivityResult.none,
+    );
+    if (!isOnline) {
+      debugPrint('Sync skipped: device offline');
+      return false;
+    }
+
+    final accessToken = await _authService.getAccessToken();
+    if (accessToken == null || !JwtValidator.isTokenValid(accessToken)) {
+      debugPrint('Sync skipped: JWT missing or invalid');
+      return false;
+    }
+
+    return true;
   }
 
   void resetSession() {
