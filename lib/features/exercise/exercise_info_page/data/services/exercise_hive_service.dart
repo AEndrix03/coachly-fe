@@ -44,6 +44,16 @@ class ExerciseHiveService {
     }
   }
 
+  /// Stores a fully populated detail without replacing the cached catalogue.
+  Future<void> saveExerciseDetail(ExerciseDetailModel exercise) async {
+    final id = exercise.id;
+    if (id == null || id.isEmpty) {
+      return;
+    }
+
+    await _localDbService.exercises.put(id, exercise.toJson());
+  }
+
   Future<bool> isEmpty() async {
     return _localDbService.exercises.isEmpty;
   }

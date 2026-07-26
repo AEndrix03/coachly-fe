@@ -17,26 +17,26 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     String exerciseId,
   ) async {
     try {
-      await _ensureLocalCache();
-      var exercise = await _hiveService.getExercise(exerciseId);
+      final cachedExercise = await _hiveService.getExercise(exerciseId);
+      final remoteResponse = await _service.fetchExerciseDetails(exerciseId);
 
-      if (exercise == null) {
-        final syncResponse = await refreshFromRemote();
-        if (!syncResponse.success) {
-          return ApiResponse.error(
-            message: syncResponse.message ?? 'Failed to sync exercise cache',
-            statusCode: syncResponse.statusCode,
-            errors: syncResponse.errors,
-          );
-        }
-        exercise = await _hiveService.getExercise(exerciseId);
+      if (remoteResponse.success && remoteResponse.data != null) {
+        await _hiveService.saveExerciseDetail(remoteResponse.data!);
+        return ApiResponse.success(data: remoteResponse.data!);
       }
 
-      if (exercise == null) {
-        return ApiResponse.error(message: 'Exercise not found in local cache');
+      // The catalogue cache contains summaries, while this entry can be a full
+      // detail previously fetched from the API. It is used only as an offline
+      // fallback; online access must always use the detail endpoint.
+      if (cachedExercise != null) {
+        return ApiResponse.success(data: cachedExercise);
       }
 
-      return ApiResponse.success(data: exercise);
+      return ApiResponse.error(
+        message: remoteResponse.message ?? 'Failed to load exercise detail',
+        statusCode: remoteResponse.statusCode,
+        errors: remoteResponse.errors,
+      );
     } catch (e) {
       return ApiResponse.error(message: 'Failed to load exercise: $e');
     }
