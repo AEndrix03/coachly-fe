@@ -30,6 +30,9 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
         return ApiResponse.success(data: remoteResponse.data!);
       }
 
+      // The catalogue cache contains summaries, while this entry can be a full
+      // detail previously fetched from the API. It is used only as an offline
+      // fallback; online access must always use the detail endpoint.
       if (cachedExercise != null) {
         return ApiResponse.success(data: cachedExercise);
       }
