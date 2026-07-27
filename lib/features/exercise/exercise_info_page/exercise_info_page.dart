@@ -10,7 +10,6 @@ import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ExercisePage extends ConsumerStatefulWidget {
@@ -48,16 +47,25 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
                 onRetry: () => ref
                     .read(exerciseInfoProvider.notifier)
                     .loadExerciseDetail(widget.id),
-                onBack: () => context.pop(),
+                onBack: () => Navigator.of(context).maybePop(),
               )
             : state.isLoadingDetail || !state.hasSelectedExercise
             ? const _SkeletonState(key: ValueKey('loading'))
             : _ContentState(
                 key: ValueKey(state.selectedExercise!.id),
                 exercise: state.selectedExercise!,
+                onOpenVariant: _openVariant,
               ),
       ),
     );
+  }
+
+  Future<void> _openVariant(String exerciseId) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(builder: (_) => ExercisePage(id: exerciseId)),
+    );
+    if (!mounted) return;
+    await ref.read(exerciseInfoProvider.notifier).loadExerciseDetail(widget.id);
   }
 }
 
@@ -225,8 +233,13 @@ class _ErrorState extends StatelessWidget {
 
 class _ContentState extends ConsumerWidget {
   final ExerciseDetailModel exercise;
+  final ValueChanged<String> onOpenVariant;
 
-  const _ContentState({super.key, required this.exercise});
+  const _ContentState({
+    super.key,
+    required this.exercise,
+    required this.onOpenVariant,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -386,11 +399,7 @@ class _ContentState extends ConsumerWidget {
                     child: _VariantsList(
                       variants: variants,
                       locale: locale,
-                      onOpenVariant: (id) => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => ExercisePage(id: id),
-                        ),
-                      ),
+                      onOpenVariant: onOpenVariant,
                     ),
                   ),
                 ],
@@ -1082,16 +1091,27 @@ class _VariantsList extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4CAF50).withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(10),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF4CAF50), Color(0xFF22C55E)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(13),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF22C55E).withValues(alpha: 0.25),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: const Icon(
                     Icons.add_rounded,
-                    color: Color(0xFF86EFAC),
-                    size: 20,
+                    color: Colors.white,
+                    size: 24,
                   ),
                 ),
               ],
@@ -1142,7 +1162,7 @@ class _TipsList extends StatelessWidget {
                 ),
                 child: Text(
                   '${entry.key + 1}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: numberColor,
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
