@@ -873,13 +873,10 @@ class _SafetyList extends StatelessWidget {
               ),
               if (note.isNotEmpty) ...[
                 const SizedBox(height: 10),
-                Text(
-                  note,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.82),
-                    fontSize: 13,
-                    height: 1.5,
-                  ),
+                _TipsList(
+                  tips: note,
+                  accentColor: const Color(0xFFFF7043),
+                  numberColor: const Color(0xFFFFAB91),
                 ),
               ],
             ],
@@ -1108,14 +1105,21 @@ class _VariantsList extends StatelessWidget {
 
 class _TipsList extends StatelessWidget {
   final String tips;
+  final Color accentColor;
+  final Color numberColor;
 
-  const _TipsList({required this.tips});
+  const _TipsList({
+    required this.tips,
+    this.accentColor = const Color(0xFFF59E0B),
+    this.numberColor = const Color(0xFFFBBF24),
+  });
 
   @override
   Widget build(BuildContext context) {
     final items = tips
         .split('\n')
         .map((tip) => tip.replaceFirst(RegExp(r'^\\s*[•-]\\s*'), '').trim())
+        .map(_stripLeadingMarker)
         .where((tip) => tip.isNotEmpty)
         .toList();
 
@@ -1133,13 +1137,13 @@ class _TipsList extends StatelessWidget {
                 alignment: Alignment.center,
                 margin: const EdgeInsets.only(top: 1),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF59E0B).withValues(alpha: 0.16),
+                  color: accentColor.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   '${entry.key + 1}',
                   style: const TextStyle(
-                    color: Color(0xFFFBBF24),
+                    color: numberColor,
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
                   ),
@@ -1165,6 +1169,15 @@ class _TipsList extends StatelessWidget {
 }
 
 // ─────────────────────────── back button ─────────────────────────────────────
+
+String _stripLeadingMarker(String value) {
+  final trimmed = value.trimLeft();
+  final bullet = String.fromCharCode(0x2022);
+  if (trimmed.startsWith(bullet) || trimmed.startsWith('-')) {
+    return trimmed.substring(1).trimLeft();
+  }
+  return trimmed;
+}
 
 class _BackButton extends StatelessWidget {
   final VoidCallback onBack;
