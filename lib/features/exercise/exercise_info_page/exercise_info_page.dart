@@ -1010,57 +1010,67 @@ class _VariantsList extends StatelessWidget {
         final isLast = entry.key == variants.length - 1;
         final name =
             v.nameI18n?.fromI18n(locale) ?? v.id ?? context.tr('common.na');
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF4CAF50).withValues(alpha: 0.25),
-                        const Color(0xFF4CAF50).withValues(alpha: 0.10),
+        return InkWell(
+          onTap: v.id == null || v.id!.isEmpty
+              ? null
+              : () => context.push('/exercises/${v.id}'),
+          borderRadius: BorderRadius.circular(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFF4CAF50).withValues(alpha: 0.25),
+                          const Color(0xFF4CAF50).withValues(alpha: 0.10),
+                        ],
+                      ),
+                      border: Border.all(
+                        color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.swap_horiz_rounded,
+                      color: Color(0xFF4CAF50),
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
-                    border: Border.all(
-                      color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
-                      width: 1,
-                    ),
                   ),
-                  child: const Icon(
-                    Icons.swap_horiz_rounded,
-                    color: Color(0xFF4CAF50),
-                    size: 18,
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.white.withValues(alpha: 0.45),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
+              ),
+              if (!isLast) ...[
+                const SizedBox(height: 12),
+                Divider(color: Colors.white.withValues(alpha: 0.06), height: 1),
+                const SizedBox(height: 12),
               ],
-            ),
-            if (!isLast) ...[
-              const SizedBox(height: 12),
-              Divider(color: Colors.white.withValues(alpha: 0.06), height: 1),
-              const SizedBox(height: 12),
             ],
-          ],
+          ),
         );
       }).toList(),
     );

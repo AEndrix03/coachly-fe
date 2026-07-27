@@ -61,6 +61,13 @@ GoRouter router(Ref ref) {
         path: '/exercises/create',
         builder: (context, state) => const ExerciseCreatePage(),
       ),
+      GoRoute(
+        path: '/exercises/:exerciseId',
+        pageBuilder: (context, state) => _fadeTransition(
+          state,
+          ExercisePage(id: state.pathParameters['exerciseId']!),
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);
