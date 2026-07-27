@@ -315,14 +315,7 @@ class _ContentState extends ConsumerWidget {
                     title: locale.languageCode == 'it'
                         ? 'CONSIGLI DI ESECUZIONE'
                         : 'EXECUTION TIPS',
-                    child: Text(
-                      tips,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.82),
-                        fontSize: 14,
-                        height: 1.6,
-                      ),
-                    ),
+                    child: _TipsList(tips: tips),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -390,7 +383,15 @@ class _ContentState extends ConsumerWidget {
                     icon: Icons.swap_horiz_rounded,
                     color: const Color(0xFF4CAF50),
                     title: context.tr('exercise.variants'),
-                    child: _VariantsList(variants: variants, locale: locale),
+                    child: _VariantsList(
+                      variants: variants,
+                      locale: locale,
+                      onOpenVariant: (id) => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => ExercisePage(id: id),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
                 if (tips.isEmpty)
@@ -998,8 +999,13 @@ class _EquipmentList extends StatelessWidget {
 class _VariantsList extends StatelessWidget {
   final List<ExerciseVariantModel> variants;
   final Locale locale;
+  final ValueChanged<String> onOpenVariant;
 
-  const _VariantsList({required this.variants, required this.locale});
+  const _VariantsList({
+    required this.variants,
+    required this.locale,
+    required this.onOpenVariant,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1007,68 +1013,149 @@ class _VariantsList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: variants.asMap().entries.map((entry) {
         final v = entry.value;
-        final isLast = entry.key == variants.length - 1;
         final name =
             v.nameI18n?.fromI18n(locale) ?? v.id ?? context.tr('common.na');
         return InkWell(
           onTap: v.id == null || v.id!.isEmpty
               ? null
-              : () => context.push('/exercises/${v.id}'),
-          borderRadius: BorderRadius.circular(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color(0xFF4CAF50).withValues(alpha: 0.25),
-                          const Color(0xFF4CAF50).withValues(alpha: 0.10),
-                        ],
-                      ),
-                      border: Border.all(
-                        color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.swap_horiz_rounded,
-                      color: Color(0xFF4CAF50),
-                      size: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+              : () => onOpenVariant(v.id!),
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            margin: EdgeInsets.only(
+              bottom: entry.key == variants.length - 1 ? 0 : 10,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.035),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.18),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF4CAF50).withValues(alpha: 0.25),
+                        const Color(0xFF4CAF50).withValues(alpha: 0.10),
                       ],
                     ),
+                    border: Border.all(
+                      color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                      width: 1,
+                    ),
                   ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: Colors.white.withValues(alpha: 0.45),
+                  child: const Icon(
+                    Icons.swap_horiz_rounded,
+                    color: Color(0xFF4CAF50),
+                    size: 18,
                   ),
-                ],
-              ),
-              if (!isLast) ...[
-                const SizedBox(height: 12),
-                Divider(color: Colors.white.withValues(alpha: 0.06), height: 1),
-                const SizedBox(height: 12),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        locale.languageCode == 'it'
+                            ? 'Apri dettagli variante'
+                            : 'Open variant details',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.48),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4CAF50).withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.add_rounded,
+                    color: Color(0xFF86EFAC),
+                    size: 20,
+                  ),
+                ),
               ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _TipsList extends StatelessWidget {
+  final String tips;
+
+  const _TipsList({required this.tips});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = tips
+        .split('\n')
+        .map((tip) => tip.replaceFirst(RegExp(r'^\\s*[•-]\\s*'), '').trim())
+        .where((tip) => tip.isNotEmpty)
+        .toList();
+
+    return Column(
+      children: items.asMap().entries.map((entry) {
+        final isLast = entry.key == items.length - 1;
+        return Padding(
+          padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 25,
+                height: 25,
+                alignment: Alignment.center,
+                margin: const EdgeInsets.only(top: 1),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '${entry.key + 1}',
+                  style: const TextStyle(
+                    color: Color(0xFFFBBF24),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(
+                  entry.value,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.84),
+                    fontSize: 14,
+                    height: 1.45,
+                  ),
+                ),
+              ),
             ],
           ),
         );
