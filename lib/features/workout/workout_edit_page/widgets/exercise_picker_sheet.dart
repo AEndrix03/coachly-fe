@@ -34,7 +34,7 @@ class ExercisePickerSheet extends ConsumerStatefulWidget {
 
 class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   final _searchCtrl = TextEditingController();
-  final _debouncer = Debouncer(delay: const Duration(milliseconds: 400));
+  final _debouncer = Debouncer(delay: const Duration(milliseconds: 350));
 
   bool _showAdvanced = false;
   String _scope = 'community';
@@ -474,17 +474,23 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   /// so options don't disappear when categorical filters are applied.
   Widget _buildOptionsSource() {
     final locale = ref.read(languageProvider);
-    final lang = '${locale.languageCode}_${locale.countryCode}';
-    final text = _searchCtrl.text;
+    final lang = locale.countryCode == null || locale.countryCode!.isEmpty
+        ? locale.languageCode
+        : '${locale.languageCode}_${locale.countryCode}';
     final baseFilter = ExerciseFilterModel(
       scope: _scope,
       langFilter: lang,
-      textFilter: text.length >= 2 || text.isEmpty ? text : null,
+      // Use the applied filter, never the live TextEditingController value:
+      // this keeps keystrokes behind the debounce boundary.
+      textFilter: _filter.textFilter,
     );
 
     return Consumer(
       builder: (context, ref, _) {
-        final all = ref.watch(exerciseListProvider(filter: baseFilter));
+        // With no advanced filter, this is the same provider watched by the
+        // list below. Riverpod then shares one request instead of issuing two.
+        final filterForOptions = _hasAdvancedFilters ? baseFilter : _filter;
+        final all = ref.watch(exerciseListProvider(filter: filterForOptions));
         return all.maybeWhen(
           data: (exercises) => _buildFilterPanel(exercises),
           orElse: () => const SizedBox.shrink(),
@@ -492,6 +498,14 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       },
     );
   }
+
+  bool get _hasAdvancedFilters =>
+      _categoryId != null ||
+      _muscleId != null ||
+      _mechanics != null ||
+      _forceType != null ||
+      _bodyweight != null ||
+      _unilateral != null;
 
   Widget _buildFilterPanel(List<ExerciseDetailModel> exercises) {
     final locale = ref.read(languageProvider);
