@@ -14,8 +14,13 @@ import 'package:shimmer/shimmer.dart';
 
 class ExercisePage extends ConsumerStatefulWidget {
   final String id;
+  final bool isVariantDetail;
 
-  const ExercisePage({super.key, required this.id});
+  const ExercisePage({
+    super.key,
+    required this.id,
+    this.isVariantDetail = false,
+  });
 
   @override
   ConsumerState<ExercisePage> createState() => _ExercisePageState();
@@ -37,6 +42,9 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F1E),
+      floatingActionButton: widget.isVariantDetail
+          ? _VariantAddAffordance()
+          : null,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         child: state.hasError
@@ -62,7 +70,9 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
 
   Future<void> _openVariant(String exerciseId) async {
     await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(builder: (_) => ExercisePage(id: exerciseId)),
+      MaterialPageRoute<void>(
+        builder: (_) => ExercisePage(id: exerciseId, isVariantDetail: true),
+      ),
     );
     if (!mounted) return;
     await ref.read(exerciseInfoProvider.notifier).loadExerciseDetail(widget.id);
@@ -1090,35 +1100,58 @@ class _VariantsList extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF4CAF50), Color(0xFF22C55E)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(13),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF22C55E).withValues(alpha: 0.25),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.add_rounded,
-                    color: Colors.white,
-                    size: 24,
-                  ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: Colors.white.withValues(alpha: 0.45),
                 ),
               ],
             ),
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+class _VariantAddAffordance extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        height: 52,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4CAF50), Color(0xFF22C55E)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF22C55E).withValues(alpha: 0.3),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add_rounded, color: Colors.white, size: 24),
+            SizedBox(width: 8),
+            Text(
+              'AGGIUNGI',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.4,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
