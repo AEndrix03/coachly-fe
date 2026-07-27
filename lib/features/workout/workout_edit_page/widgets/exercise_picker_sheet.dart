@@ -73,7 +73,9 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   void _applyFilters() {
     final locale = ref.read(languageProvider);
-    final lang = '${locale.languageCode}_${locale.countryCode}';
+    final lang = locale.countryCode == null || locale.countryCode!.isEmpty
+        ? locale.languageCode
+        : '${locale.languageCode}_${locale.countryCode}';
     final text = _searchCtrl.text;
     setState(() {
       _filter = ExerciseFilterModel(
@@ -504,7 +506,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           id,
           () => _Option(
             id: id,
-            label: cat.nameI18n?.fromI18n(locale) ?? id,
+            label:
+                (cat.nameI18n as Map<String, String>?)?.fromI18n(locale) ?? id,
             isPrimary: cat.isPrimary ?? false,
           ),
         );
@@ -526,7 +529,11 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           id,
           () => _Option(
             id: id,
-            label: em.muscle?.nameI18n.fromI18n(locale) ?? id,
+            label:
+                (em.muscle?.nameI18n as Map<String, String>?)?.fromI18n(
+                  locale,
+                ) ??
+                id,
           ),
         );
       }
