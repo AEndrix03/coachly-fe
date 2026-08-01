@@ -887,14 +887,20 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             if (visible.isEmpty) return _buildEmptyList();
             return Stack(
               children: [
-                Scrollbar(
+                RawScrollbar(
                   controller: _listScrollController,
+                  thumbVisibility: true,
                   interactive: true,
-                  thickness: 4,
-                  radius: const Radius.circular(4),
+                  thickness: 8,
+                  minThumbLength: 48,
+                  radius: const Radius.circular(8),
+                  mainAxisMargin: 8,
+                  crossAxisMargin: 3,
                   child: ListView.builder(
                     controller: _listScrollController,
-                    cacheExtent: 0,
+                    // Keep just a small viewport ahead of the user. The list
+                    // remains lazy while avoiding rebuilds during a fast drag.
+                    cacheExtent: 250,
                     addAutomaticKeepAlives: false,
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                     itemCount: visible.length,
