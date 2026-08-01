@@ -17,9 +17,21 @@ class AppNavigationBar extends StatefulWidget {
 class _AppNavigationBarState extends State<AppNavigationBar>
     with TickerProviderStateMixin {
   static const _tabs = [
-    _NavTab(icon: Icons.people, labelKey: 'nav.community'),
-    _NavTab(icon: Icons.fitness_center, labelKey: 'nav.workouts'),
-    _NavTab(icon: Ionicons.person_circle_outline, labelKey: 'nav.profile'),
+    _NavTab(
+      icon: Icons.people,
+      labelKey: 'nav.community',
+      location: '/community',
+    ),
+    _NavTab(
+      icon: Icons.fitness_center,
+      labelKey: 'nav.workouts',
+      location: '/workouts',
+    ),
+    _NavTab(
+      icon: Ionicons.person_circle_outline,
+      labelKey: 'nav.profile',
+      location: '/profile',
+    ),
   ];
 
   late final List<AnimationController> _bounceControllers;
@@ -73,7 +85,7 @@ class _AppNavigationBarState extends State<AppNavigationBar>
   void _onTap(int index, int currentIndex) {
     if (index == currentIndex) return;
     _bounceControllers[index].forward(from: 0.0);
-    widget.navigationShell.goBranch(index);
+    context.go(_tabs[index].location);
   }
 
   @override
@@ -227,6 +239,11 @@ class _NavItem extends StatelessWidget {
 class _NavTab {
   final IconData icon;
   final String labelKey;
+  final String location;
 
-  const _NavTab({required this.icon, required this.labelKey});
+  const _NavTab({
+    required this.icon,
+    required this.labelKey,
+    required this.location,
+  });
 }
