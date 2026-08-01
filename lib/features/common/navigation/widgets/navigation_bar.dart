@@ -4,7 +4,6 @@ import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppNavigationBar extends StatefulWidget {
   const AppNavigationBar({super.key, required this.navigationShell});
@@ -20,8 +19,6 @@ class _AppNavigationBarState extends State<AppNavigationBar>
   static const _tabs = [
     _NavTab(icon: Icons.people, labelKey: 'nav.community'),
     _NavTab(icon: Icons.fitness_center, labelKey: 'nav.workouts'),
-    _NavTab(icon: LucideIcons.target, labelKey: 'nav.coach'),
-    _NavTab(icon: Icons.tips_and_updates_rounded, labelKey: 'nav.ideas'),
     _NavTab(icon: Ionicons.person_circle_outline, labelKey: 'nav.profile'),
   ];
 
