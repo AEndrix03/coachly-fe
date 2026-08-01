@@ -889,12 +889,13 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               children: [
                 Scrollbar(
                   controller: _listScrollController,
-                  thumbVisibility: true,
                   interactive: true,
                   thickness: 4,
                   radius: const Radius.circular(4),
                   child: ListView.builder(
                     controller: _listScrollController,
+                    cacheExtent: 0,
+                    addAutomaticKeepAlives: false,
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                     itemCount: visible.length,
                     itemBuilder: (_, i) => _buildCard(visible[i]),
@@ -910,12 +911,27 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                       opacity: _showScrollToTop ? 1 : 0,
                       child: Tooltip(
                         message: context.tr('common.back_to_top'),
-                        child: FloatingActionButton.small(
-                          heroTag: null,
-                          onPressed: _scrollToTop,
-                          backgroundColor: const Color(0xFF2196F3),
-                          foregroundColor: Colors.white,
-                          child: const Icon(Icons.vertical_align_top_rounded),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _scrollToTop,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Ink(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF2196F3,
+                                ).withValues(alpha: 0.85),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.vertical_align_top_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
