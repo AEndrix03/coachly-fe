@@ -928,30 +928,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     final isBodyweight = exercise.isBodyweight ?? false;
 
     return GestureDetector(
-      onTap: () {
-        final defaults = _lastSessionDefaults(exercise.id ?? '');
-        widget.onExerciseSelected(
-          EditableExerciseModel(
-            id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
-            exerciseId: exercise.id ?? '',
-            number: 0,
-            name: name,
-            muscles: (exercise.muscles ?? const [])
-                .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? na)
-                .toList(),
-            // Kept only for the existing workout payload; it is not exposed in the UI.
-            difficulty: '',
-            sets: defaults.sets,
-            rest: '60s',
-            weight: defaults.weight,
-            progress: '0',
-            notes: '',
-            accentColorHex: '#2196F3',
-            variants: exercise.variants ?? const [],
-          ),
-        );
-        Navigator.pop(context);
-      },
+      onTap: () => context.push('/exercises/${exercise.id}'),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
@@ -1047,28 +1024,37 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                 ),
               ),
               const SizedBox(width: 10),
-              // Add button
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF2196F3).withValues(alpha: 0.40),
-                      blurRadius: 10,
-                      spreadRadius: -3,
-                      offset: const Offset(0, 3),
+              Semantics(
+                button: true,
+                label: context.tr('workout.edit.add_exercise'),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _addExercise(exercise, name, locale, na),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(
+                            0xFF2196F3,
+                          ).withValues(alpha: 0.40),
+                          blurRadius: 10,
+                          spreadRadius: -3,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.add_rounded,
-                  color: Colors.white,
-                  size: 20,
+                    child: const Icon(
+                      Icons.add_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -1076,6 +1062,36 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         ),
       ),
     );
+  }
+
+  void _addExercise(
+    ExerciseDetailModel exercise,
+    String name,
+    Locale locale,
+    String notAvailable,
+  ) {
+    final defaults = _lastSessionDefaults(exercise.id ?? '');
+    widget.onExerciseSelected(
+      EditableExerciseModel(
+        id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
+        exerciseId: exercise.id ?? '',
+        number: 0,
+        name: name,
+        muscles: (exercise.muscles ?? const [])
+            .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? notAvailable)
+            .toList(),
+        // Kept only for the existing workout payload; it is not exposed in the UI.
+        difficulty: '',
+        sets: defaults.sets,
+        rest: '60s',
+        weight: defaults.weight,
+        progress: '0',
+        notes: '',
+        accentColorHex: '#2196F3',
+        variants: exercise.variants ?? const [],
+      ),
+    );
+    Navigator.pop(context);
   }
 
   Widget _cardTag(String label, Color color) {
