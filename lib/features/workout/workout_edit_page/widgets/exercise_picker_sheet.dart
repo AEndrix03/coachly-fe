@@ -887,24 +887,23 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             if (visible.isEmpty) return _buildEmptyList();
             return Stack(
               children: [
-                RawScrollbar(
+                ListView.builder(
                   controller: _listScrollController,
-                  thumbVisibility: true,
-                  interactive: true,
-                  thickness: 8,
-                  minThumbLength: 48,
-                  radius: const Radius.circular(8),
-                  mainAxisMargin: 8,
-                  crossAxisMargin: 3,
-                  child: ListView.builder(
+                  // Keep just a small viewport ahead of the user. The list
+                  // remains lazy while avoiding rebuilds during a fast drag.
+                  cacheExtent: 250,
+                  addAutomaticKeepAlives: false,
+                  padding: const EdgeInsets.fromLTRB(16, 8, 24, 24),
+                  itemCount: visible.length,
+                  itemBuilder: (_, i) => _buildCard(visible[i]),
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: 30,
+                  child: _ExerciseListScrollRail(
                     controller: _listScrollController,
-                    // Keep just a small viewport ahead of the user. The list
-                    // remains lazy while avoiding rebuilds during a fast drag.
-                    cacheExtent: 250,
-                    addAutomaticKeepAlives: false,
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                    itemCount: visible.length,
-                    itemBuilder: (_, i) => _buildCard(visible[i]),
                   ),
                 ),
                 Positioned(
@@ -1271,6 +1270,115 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 }
 
 // ─────────────────────────── data class ──────────────────────────────────────
+
+/// A wide touch target with a lightweight, app-styled scroll thumb.
+///
+/// [RawScrollbar]'s hit area is only as wide as its thumb, which is difficult
+/// to grab in a long exercise catalogue. This rail maps a drag directly to the
+/// list offset and rebuilds only itself while the list scrolls.
+class _ExerciseListScrollRail extends StatelessWidget {
+  static const _minThumbLength = 52.0;
+
+  final ScrollController controller;
+
+  const _ExerciseListScrollRail({required this.controller});
+
+  void _moveTo(double localY, double trackHeight) {
+    if (!controller.hasClients) return;
+    final position = controller.position;
+    final maxScroll = position.maxScrollExtent;
+    if (maxScroll <= 0 || trackHeight <= 0) return;
+
+    final contentHeight = maxScroll + position.viewportDimension;
+    final thumbHeight = (trackHeight * trackHeight / contentHeight)
+        .clamp(_minThumbLength, trackHeight)
+        .toDouble();
+    final travel = trackHeight - thumbHeight;
+    if (travel <= 0) return;
+
+    final thumbTop = (localY - thumbHeight / 2).clamp(0.0, travel).toDouble();
+    controller.jumpTo(thumbTop / travel * maxScroll);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final trackHeight = constraints.maxHeight;
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: (details) =>
+              _moveTo(details.localPosition.dy, trackHeight),
+          onPanStart: (details) =>
+              _moveTo(details.localPosition.dy, trackHeight),
+          onPanUpdate: (details) =>
+              _moveTo(details.localPosition.dy, trackHeight),
+          child: AnimatedBuilder(
+            animation: controller,
+            builder: (context, _) {
+              if (!controller.hasClients) return const SizedBox.expand();
+              final position = controller.position;
+              final maxScroll = position.maxScrollExtent;
+              if (maxScroll <= 0 || trackHeight <= 0) {
+                return const SizedBox.expand();
+              }
+
+              final contentHeight = maxScroll + position.viewportDimension;
+              final thumbHeight = (trackHeight * trackHeight / contentHeight)
+                  .clamp(_minThumbLength, trackHeight)
+                  .toDouble();
+              final travel = trackHeight - thumbHeight;
+              final thumbTop = travel <= 0
+                  ? 0.0
+                  : (position.pixels / maxScroll * travel)
+                        .clamp(0.0, travel)
+                        .toDouble();
+
+              return Stack(
+                children: [
+                  Center(
+                    child: Container(
+                      width: 3,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2A3E).withValues(alpha: 0.75),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: thumbTop,
+                    left: 8,
+                    right: 8,
+                    height: thumbHeight,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF2196F3,
+                            ).withValues(alpha: 0.3),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
 
 class _Option {
   final String id;
