@@ -19,6 +19,7 @@ class AppStrings {
     'common.build': {'en': 'Build', 'it': 'Build'},
     'common.error': {'en': 'Error', 'it': 'Errore'},
     'common.go_back': {'en': 'Go back', 'it': 'Torna indietro'},
+    'common.back_to_top': {'en': 'Back to top', 'it': 'Torna in alto'},
     'common.confirm': {'en': 'Confirm', 'it': 'Conferma'},
     'common.cancel': {'en': 'Cancel', 'it': 'Annulla'},
     'common.edit': {'en': 'Edit', 'it': 'Modifica'},

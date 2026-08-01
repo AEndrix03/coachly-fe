@@ -35,8 +35,10 @@ class ExercisePickerSheet extends ConsumerStatefulWidget {
 class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   final _searchCtrl = TextEditingController();
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 350));
+  final _listScrollController = ScrollController();
 
   bool _showAdvanced = false;
+  bool _showScrollToTop = false;
   String _scope = 'community';
 
   // active filters
@@ -55,6 +57,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   void initState() {
     super.initState();
     _searchCtrl.addListener(_onSearch);
+    _listScrollController.addListener(_onListScroll);
   }
 
   @override
@@ -62,6 +65,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     _searchCtrl.removeListener(_onSearch);
     _searchCtrl.dispose();
     _debouncer.dispose();
+    _listScrollController.removeListener(_onListScroll);
+    _listScrollController.dispose();
     super.dispose();
   }
 
@@ -69,6 +74,21 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   void _onSearch() {
     _debouncer.run(_applyFilters);
+  }
+
+  void _onListScroll() {
+    final shouldShow = _listScrollController.offset > 320;
+    if (shouldShow != _showScrollToTop) {
+      setState(() => _showScrollToTop = shouldShow);
+    }
+  }
+
+  void _scrollToTop() {
+    _listScrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   void _applyFilters() {
@@ -865,10 +885,43 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           data: (exercises) {
             final visible = _excludeSelected(exercises);
             if (visible.isEmpty) return _buildEmptyList();
-            return ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              itemCount: visible.length,
-              itemBuilder: (_, i) => _buildCard(visible[i]),
+            return Stack(
+              children: [
+                Scrollbar(
+                  controller: _listScrollController,
+                  thumbVisibility: true,
+                  interactive: true,
+                  thickness: 4,
+                  radius: const Radius.circular(4),
+                  child: ListView.builder(
+                    controller: _listScrollController,
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    itemCount: visible.length,
+                    itemBuilder: (_, i) => _buildCard(visible[i]),
+                  ),
+                ),
+                Positioned(
+                  right: 20,
+                  bottom: 20,
+                  child: IgnorePointer(
+                    ignoring: !_showScrollToTop,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 180),
+                      opacity: _showScrollToTop ? 1 : 0,
+                      child: Tooltip(
+                        message: context.tr('common.back_to_top'),
+                        child: FloatingActionButton.small(
+                          heroTag: null,
+                          onPressed: _scrollToTop,
+                          backgroundColor: const Color(0xFF2196F3),
+                          foregroundColor: Colors.white,
+                          child: const Icon(Icons.vertical_align_top_rounded),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         );
