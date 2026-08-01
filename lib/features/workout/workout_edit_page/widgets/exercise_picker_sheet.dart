@@ -928,7 +928,18 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     final isBodyweight = exercise.isBodyweight ?? false;
 
     return GestureDetector(
-      onTap: () => context.push('/exercises/${exercise.id}'),
+      onTap: () async {
+        final selectedExercise = await context.push<ExerciseDetailModel>(
+          '/exercises/${exercise.id}',
+        );
+        if (!mounted || selectedExercise == null) return;
+
+        final selectedName =
+            selectedExercise.nameI18n?.fromI18n(locale) ??
+            selectedExercise.id ??
+            na;
+        _addExercise(selectedExercise, selectedName, locale, na);
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(

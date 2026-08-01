@@ -42,8 +42,10 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F1E),
-      floatingActionButton: widget.isVariantDetail
-          ? _VariantAddAffordance()
+      floatingActionButton: state.hasSelectedExercise
+          ? _ExerciseAddAffordance(
+              onTap: () => Navigator.of(context).pop(state.selectedExercise),
+            )
           : null,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
@@ -1113,10 +1115,16 @@ class _VariantsList extends StatelessWidget {
   }
 }
 
-class _VariantAddAffordance extends StatelessWidget {
+class _ExerciseAddAffordance extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ExerciseAddAffordance({required this.onTap});
+
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
       child: Container(
         height: 52,
         padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -1135,14 +1143,14 @@ class _VariantAddAffordance extends StatelessWidget {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add_rounded, color: Colors.white, size: 24),
-            SizedBox(width: 8),
+            const Icon(Icons.add_rounded, color: Colors.white, size: 24),
+            const SizedBox(width: 8),
             Text(
-              'AGGIUNGI',
-              style: TextStyle(
+              context.tr('workout.edit.add_exercise').toUpperCase(),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
