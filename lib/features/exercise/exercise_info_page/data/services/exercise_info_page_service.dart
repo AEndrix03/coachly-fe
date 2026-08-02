@@ -32,12 +32,10 @@ class ExerciseInfoPageService {
     );
   }
 
-  /// Fetch filtered exercises
+  /// Fetch the complete filtered catalogue in one response.
   Future<ApiResponse<List<ExerciseDetailModel>>> fetchFilteredExercises(
-    ExerciseFilterModel filter, {
-    int offset = 0,
-    int limit = 50,
-  }) async {
+    ExerciseFilterModel filter,
+  ) async {
     final Map<String, String> queryParameters = {};
     if (filter.scope != null && filter.scope!.isNotEmpty) {
       queryParameters['scope'] = filter.scope!;
@@ -70,9 +68,6 @@ class ExerciseInfoPageService {
     if (filter.muscleIds != null && filter.muscleIds!.isNotEmpty) {
       queryParameters['muscleIds'] = filter.muscleIds!.join(',');
     }
-    queryParameters['offset'] = offset.toString();
-    queryParameters['limit'] = limit.clamp(1, 100).toString();
-
     return await _apiClient.get<List<ExerciseDetailModel>>(
       '/exercises/filtered',
       queryParameters: queryParameters,

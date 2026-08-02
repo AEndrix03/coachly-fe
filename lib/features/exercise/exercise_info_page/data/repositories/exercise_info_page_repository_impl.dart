@@ -169,27 +169,17 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
 
   @override
   Future<ApiResponse<List<ExerciseDetailModel>>> refreshFromRemote() async {
-    const pageSize = 50;
-    var offset = 0;
-    final exercises = <ExerciseDetailModel>[];
-    while (true) {
-      final response = await _service.fetchFilteredExercises(
-        const ExerciseFilterModel(scope: 'community'),
-        offset: offset,
-        limit: pageSize,
+    final response = await _service.fetchFilteredExercises(
+      const ExerciseFilterModel(scope: 'community'),
+    );
+    if (!response.success || response.data == null) {
+      return ApiResponse.error(
+        message: response.message ?? 'Failed to refresh exercises from remote',
+        statusCode: response.statusCode,
+        errors: response.errors,
       );
-      if (!response.success || response.data == null) {
-        return ApiResponse.error(
-          message:
-              response.message ?? 'Failed to refresh exercises from remote',
-          statusCode: response.statusCode,
-          errors: response.errors,
-        );
-      }
-      exercises.addAll(response.data!);
-      if (response.data!.length < pageSize) break;
-      offset += pageSize;
     }
+    final exercises = response.data!;
 
     if (!AppCachePolicy.isEnabled) {
       return ApiResponse.success(data: exercises);
