@@ -179,8 +179,6 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
         errors: response.errors,
       );
     }
-    final exercises = response.data!;
-
     if (!AppCachePolicy.isEnabled) {
       return ApiResponse.success(data: response.data!);
     }
