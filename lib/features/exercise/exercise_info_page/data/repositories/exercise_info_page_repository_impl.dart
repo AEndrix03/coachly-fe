@@ -182,10 +182,10 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     final exercises = response.data!;
 
     if (!AppCachePolicy.isEnabled) {
-      return ApiResponse.success(data: exercises);
+      return ApiResponse.success(data: response.data!);
     }
 
-    await _hiveService.saveExercises(exercises);
+    await _hiveService.saveExercises(response.data!);
     final localExercises = await _hiveService.getExercises();
     return ApiResponse.success(data: localExercises);
   }

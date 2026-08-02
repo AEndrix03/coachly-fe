@@ -8,11 +8,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/auth/pages/login_page/login_page.dart';
 import '../features/common/navigation/widgets/navigation_bar.dart';
-import '../features/coach/presentation/coach_discovery_page.dart';
 import '../features/exercise/personal_exercises_page/personal_exercises_page.dart';
 import '../features/exercise/exercise_info_page/exercise_info_page.dart';
 import '../features/exercise/exercise_create_page/exercise_create_page.dart';
-import '../features/feedback/feedback_page.dart';
 import '../features/home/home.dart';
 import '../features/profile/profile_page.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
@@ -137,22 +135,6 @@ GoRouter router(Ref ref) {
                     ],
                   ),
                 ],
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/coach',
-                builder: (context, state) => const CoachDiscoveryPage(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/feedback',
-                builder: (context, state) => const FeedbackPage(),
               ),
             ],
           ),
