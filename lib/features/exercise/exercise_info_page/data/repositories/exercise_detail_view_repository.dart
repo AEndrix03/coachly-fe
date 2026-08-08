@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 abstract interface class ExerciseDetailViewRepository {
   Future<ExerciseDetailViewData> getExercise(String exerciseId, Locale locale);
+
+  Future<List<ExerciseDetailViewData>> getExercises(Locale locale);
 }
 
 class ExerciseDetailViewRepositoryImpl implements ExerciseDetailViewRepository {
@@ -14,5 +16,10 @@ class ExerciseDetailViewRepositoryImpl implements ExerciseDetailViewRepository {
   @override
   Future<ExerciseDetailViewData> getExercise(String exerciseId, Locale locale) {
     return _service.fetch(exerciseId, locale);
+  }
+
+  @override
+  Future<List<ExerciseDetailViewData>> getExercises(Locale locale) {
+    return _service.fetchAll(locale);
   }
 }

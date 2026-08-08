@@ -26,12 +26,12 @@ void main() {
       expect(data.description, 'Trazione verticale al cavo.');
       expect(data.movementProfile.pattern, 'Trazione verticale');
       expect(data.movementProfile.resistanceSource, 'Cavo');
-      expect(data.movementProfile.kineticChain, isNull);
+      expect(data.movementProfile.kineticChain, 'Aperta');
       expect(data.execution.steps, [
         'Blocca le cosce.',
         'Controlla il ritorno.',
       ]);
-      expect(data.execution.commonMistakes, isEmpty);
+      expect(data.execution.commonMistakes, ['Non oscillare il busto.']);
       expect(data.muscles.single.role, MuscleRole.primary);
       expect(data.muscles.single.tension.shortened, TensionLevel.moderate);
       expect(data.biomechanics.jointActions.single.joint, 'Gomito');
@@ -44,6 +44,36 @@ void main() {
       expect(data.safetyNote, 'Non tirare dietro al collo.');
     },
   );
+
+  test('loads the complete catalogue from the filtered endpoint', () async {
+    final client = MockClient((request) async {
+      expect(request.url.path, '/api/exercises/filtered');
+      return http.Response(
+        jsonEncode([
+          _exerciseDetailJson,
+          {
+            ..._exerciseDetailJson,
+            'id': 'squat-id',
+            'code': 'BACK_SQUAT',
+            'nameI18n': {'it': 'Back Squat'},
+          },
+        ]),
+        200,
+      );
+    });
+    final service = ApiExerciseDetailViewService(
+      ApiClient(client: client, baseUrl: 'https://coachly.test/api'),
+    );
+
+    final catalog = await service.fetchAll(const Locale('it'));
+
+    expect(catalog, hasLength(2));
+    expect(catalog.map((exercise) => exercise.id), ['exercise-id', 'squat-id']);
+    expect(catalog.map((exercise) => exercise.name), [
+      'Lat Pulldown',
+      'Back Squat',
+    ]);
+  });
 }
 
 const _exerciseDetailJson = <String, Object?>{
@@ -56,8 +86,12 @@ const _exerciseDetailJson = <String, Object?>{
   'exerciseKind': 'resistance',
   'technicalDemand': 'moderate',
   'jointClass': 'multi_joint',
+  'kineticChain': 'open',
   'unilateral': false,
   'bodyweight': false,
+  'commonMistakesI18n': {
+    'it': ['Non oscillare il busto.'],
+  },
   'movementProfile': {
     'patterns': [
       {

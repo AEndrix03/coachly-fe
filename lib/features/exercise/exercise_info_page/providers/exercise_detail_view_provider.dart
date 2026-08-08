@@ -16,9 +16,28 @@ final exerciseDetailViewRepositoryProvider =
       );
     });
 
-final exerciseDetailViewProvider =
-    FutureProvider.family<ExerciseDetailViewData, String>((ref, exerciseId) {
+final exerciseDetailCatalogProvider =
+    FutureProvider<List<ExerciseDetailViewData>>((ref) {
       final locale = ref.watch(languageProvider);
+      return ref
+          .watch(exerciseDetailViewRepositoryProvider)
+          .getExercises(locale);
+    });
+
+final exerciseDetailViewProvider =
+    FutureProvider.family<ExerciseDetailViewData, String>((
+      ref,
+      exerciseId,
+    ) async {
+      final locale = ref.watch(languageProvider);
+      try {
+        final catalog = await ref.watch(exerciseDetailCatalogProvider.future);
+        for (final exercise in catalog) {
+          if (exercise.id == exerciseId) return exercise;
+        }
+      } catch (_) {
+        // A detail route remains usable even if the catalogue refresh fails.
+      }
       return ref
           .watch(exerciseDetailViewRepositoryProvider)
           .getExercise(exerciseId, locale);

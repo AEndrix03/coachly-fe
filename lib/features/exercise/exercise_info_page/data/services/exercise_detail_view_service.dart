@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 abstract interface class ExerciseDetailViewService {
   Future<ExerciseDetailViewData> fetch(String exerciseId, Locale locale);
+
+  Future<List<ExerciseDetailViewData>> fetchAll(Locale locale);
 }
 
 class ApiExerciseDetailViewService implements ExerciseDetailViewService {
@@ -26,6 +28,27 @@ class ApiExerciseDetailViewService implements ExerciseDetailViewService {
     }
 
     return _toViewData(exercise, exerciseId, locale);
+  }
+
+  @override
+  Future<List<ExerciseDetailViewData>> fetchAll(Locale locale) async {
+    final response = await _apiClient.get<List<ExerciseDetailApiDto>>(
+      '/exercises/filtered',
+      fromJson: (json) => (json as List)
+          .map(
+            (item) => ExerciseDetailApiDto.fromJson(
+              Map<String, dynamic>.from(item as Map),
+            ),
+          )
+          .toList(growable: false),
+    );
+    final exercises = response.data;
+    if (!response.success || exercises == null) {
+      throw StateError(response.message ?? 'Impossibile caricare gli esercizi');
+    }
+    return exercises
+        .map((exercise) => _toViewData(exercise, exercise.id, locale))
+        .toList(growable: false);
   }
 
   static ExerciseDetailViewData _toViewData(
@@ -66,7 +89,9 @@ class ApiExerciseDetailViewService implements ExerciseDetailViewService {
         pattern: pattern,
         jointClass: _label(exercise.jointClass),
         resistanceSource: _label(biomechanics?.resistanceSource),
-        kineticChain: null,
+        kineticChain: exercise.kineticChain == null
+            ? null
+            : _label(exercise.kineticChain),
         laterality: exercise.unilateral ? 'Unilaterale' : 'Bilaterale',
       ),
       muscles: [
@@ -124,7 +149,7 @@ class ApiExerciseDetailViewService implements ExerciseDetailViewService {
       ],
       execution: ExerciseExecutionViewData(
         steps: _executionSteps(exercise.tipsI18n.fromI18n(locale)),
-        commonMistakes: const [],
+        commonMistakes: _localizedList(exercise.commonMistakesI18n, locale),
       ),
       variants: [
         for (final variant in exercise.variants)
@@ -164,6 +189,33 @@ class ApiExerciseDetailViewService implements ExerciseDetailViewService {
   }) {
     final localized = values.fromI18n(locale).trim();
     return localized.isEmpty ? fallback : localized;
+  }
+
+  static List<String> _localizedList(
+    Map<String, List<String>> values,
+    Locale locale,
+  ) {
+    if (values.isEmpty) return const [];
+    final language = locale.languageCode.toLowerCase();
+    final country = locale.countryCode?.toLowerCase();
+    final candidates = [
+      if (country != null && country.isNotEmpty) '${language}_$country',
+      language,
+      'en',
+      'en_us',
+    ];
+    final normalized = {
+      for (final entry in values.entries)
+        entry.key.toLowerCase().replaceAll('-', '_'): entry.value,
+    };
+    for (final candidate in candidates) {
+      final items = normalized[candidate];
+      if (items != null && items.isNotEmpty) return items;
+    }
+    return normalized.values.firstWhere(
+      (items) => items.isNotEmpty,
+      orElse: () => const [],
+    );
   }
 
   static List<String> _executionSteps(String tips) => tips
@@ -219,6 +271,8 @@ class ApiExerciseDetailViewService implements ExerciseDetailViewService {
       'conditioning': 'Condizionamento',
       'single_joint': 'Monoarticolare',
       'multi_joint': 'Multiarticolare',
+      'open': 'Aperta',
+      'closed': 'Chiusa',
       'low': 'Bassa',
       'moderate': 'Moderata',
       'high': 'Alta',

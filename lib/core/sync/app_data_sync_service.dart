@@ -6,6 +6,7 @@ import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository.dart';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
@@ -88,6 +89,7 @@ class AppDataSyncService {
         _ref.invalidate(workoutListProvider);
         _ref.invalidate(recentWorkoutsProvider);
         _ref.invalidate(exerciseInfoProvider);
+        _ref.invalidate(exerciseDetailCatalogProvider);
         _ref.invalidate(exerciseListProvider);
       }
     } finally {
@@ -108,6 +110,7 @@ class AppDataSyncService {
       final result = await _exerciseRepository.refreshFromRemote();
       if (result.success) {
         _ref.invalidate(exerciseInfoProvider);
+        _ref.invalidate(exerciseDetailCatalogProvider);
         _ref.invalidate(exerciseListProvider);
       }
     } finally {

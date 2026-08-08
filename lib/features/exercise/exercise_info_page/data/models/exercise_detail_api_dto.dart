@@ -8,8 +8,10 @@ class ExerciseDetailApiDto {
   final String? exerciseKind;
   final String? technicalDemand;
   final String? jointClass;
+  final String? kineticChain;
   final bool unilateral;
   final bool bodyweight;
+  final Map<String, List<String>> commonMistakesI18n;
   final ExerciseMovementProfileApiDto movementProfile;
   final List<ExerciseMuscleApiDto> muscles;
   final ExerciseBiomechanicsApiDto? biomechanics;
@@ -28,8 +30,10 @@ class ExerciseDetailApiDto {
     required this.exerciseKind,
     required this.technicalDemand,
     required this.jointClass,
+    required this.kineticChain,
     required this.unilateral,
     required this.bodyweight,
+    required this.commonMistakesI18n,
     required this.movementProfile,
     required this.muscles,
     required this.biomechanics,
@@ -50,10 +54,12 @@ class ExerciseDetailApiDto {
       exerciseKind: _nullableString(json['exerciseKind']),
       technicalDemand: _nullableString(json['technicalDemand']),
       jointClass: _nullableString(json['jointClass']),
+      kineticChain: _nullableString(json['kineticChain']),
       // Jackson normally strips the `is` prefix from Java boolean getters.
       // Accept both forms so the adapter is robust to mapper configuration.
       unilateral: _bool(json['unilateral'] ?? json['isUnilateral']),
       bodyweight: _bool(json['bodyweight'] ?? json['isBodyweight']),
+      commonMistakesI18n: _i18nList(json['commonMistakesI18n']),
       movementProfile: ExerciseMovementProfileApiDto.fromJson(
         _jsonMap(json['movementProfile']),
       ),
@@ -334,7 +340,32 @@ Map<String, String> _i18n(Object? value) {
   if (value is! Map) return const {};
   return {
     for (final entry in value.entries)
-      if (entry.value != null) entry.key.toString(): entry.value.toString(),
+      if (entry.value != null)
+        entry.key.toString(): entry.value is List
+            ? (entry.value as List).join('\n')
+            : entry.value.toString(),
+  };
+}
+
+Map<String, List<String>> _i18nList(Object? value) {
+  if (value is! Map) return const {};
+  return {
+    for (final entry in value.entries)
+      entry.key.toString(): switch (entry.value) {
+        final List items =>
+          items
+              .where((item) => item != null)
+              .map((item) => item.toString().trim())
+              .where((item) => item.isNotEmpty)
+              .toList(growable: false),
+        final String text =>
+          text
+              .split(RegExp(r'\r?\n|•'))
+              .map((item) => item.trim())
+              .where((item) => item.isNotEmpty)
+              .toList(growable: false),
+        _ => const <String>[],
+      },
   };
 }
 
