@@ -1,5 +1,6 @@
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +69,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                         'Descrivono i principali movimenti delle articolazioni durante l’esercizio.',
                     whyItMatters:
                         'Rendono più semplice confrontare esercizi che sembrano simili ma seguono traiettorie diverse.',
+                    guideTopic: CoachlyGuideTopic.jointActions,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -93,6 +95,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                         'Indica quanto controllo esterno fornisce l’esercizio e quanta stabilizzazione devi produrre tu.',
                     whyItMatters:
                         'Più stabilità può aiutare a concentrarsi sul target, ma non rende automaticamente un esercizio migliore.',
+                    guideTopic: CoachlyGuideTopic.stability,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -116,6 +119,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                         'Indica cosa genera la resistenza contro cui lavori, per esempio un cavo, un peso libero, una macchina o il peso corporeo.',
                     whyItMatters:
                         'La fonte influenza la direzione e la continuità della forza durante il movimento, senza determinare da sola quanto un esercizio sia efficace.',
+                    guideTopic: CoachlyGuideTopic.resistanceSources,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -135,6 +139,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                           'Descrive come la richiesta esterna tende a cambiare dall’inizio alla fine del range di movimento.',
                       whyItMatters:
                           'Aiuta a capire in quali parti del gesto l’esercizio può risultare relativamente più o meno impegnativo.',
+                      guideTopic: CoachlyGuideTopic.resistanceProfile,
                       disclaimer:
                           'È un profilo qualitativo indicativo, non una misurazione precisa della forza in ogni punto del movimento.',
                     ),
@@ -194,6 +199,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                                 'Le indicazioni sintetizzano un modello qualitativo del movimento, non una misura diretta su ogni atleta.',
                             whyItMatters:
                                 'Separare stime, osservazioni e misurazioni evita una falsa precisione.',
+                            guideTopic: CoachlyGuideTopic.dataMethodology,
                           ),
                           style: TextButton.styleFrom(
                             minimumSize: const Size(44, 44),

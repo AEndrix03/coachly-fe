@@ -1,5 +1,6 @@
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
 import 'package:flutter/material.dart';
@@ -348,6 +349,7 @@ class _SelectedMusclePanel extends StatelessWidget {
                   'Mostra qualitativamente dove il muscolo riceve tensione significativa durante il movimento.',
               whyItMatters:
                   'Aiuta a confrontare esercizi simili senza ridurre un movimento complesso a una percentuale.',
+              guideTopic: CoachlyGuideTopic.tensionInRom,
               disclaimer:
                   'Non rappresenta una misura EMG né una percentuale di crescita.',
             ),

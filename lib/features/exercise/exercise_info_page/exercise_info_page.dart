@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -1297,6 +1298,7 @@ class _BiomechanicsPreview extends StatelessWidget {
                 'Indica quanto controllo esterno offre l’esercizio e quanta stabilizzazione devi produrre tu.',
             whyItMatters:
                 'Un esercizio stabile può aiutare a concentrarsi sul target, senza essere automaticamente migliore.',
+            guideTopic: CoachlyGuideTopic.stability,
           ),
         ),
         const SizedBox(height: 12),

@@ -1,6 +1,7 @@
 import 'package:coachly/features/exercise/exercise_info_page/data/fixtures/exercise_detail_mock_fixture.dart';
 import 'package:coachly/features/exercise/exercise_info_page/exercise_info_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_biomechanics_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_muscles_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_variants_page.dart';
@@ -104,6 +105,27 @@ void main() {
     await openInfo('Profilo di resistenza');
     expect(find.textContaining('range di movimento'), findsOneWidget);
     expect(find.textContaining('profilo qualitativo'), findsOneWidget);
+    await tester.tap(find.textContaining('Approfondisci'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('coachly-guide-resistanceProfile')),
+      findsOneWidget,
+    );
+    expect(find.text('Come si legge il grafico'), findsOneWidget);
+  });
+
+  testWidgets('renders every Coachly concept guide', (tester) async {
+    for (final topic in CoachlyGuideTopic.values) {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: exerciseDetailTheme(ThemeData.dark()),
+          home: CoachlyConceptGuidePage(topic: topic),
+        ),
+      );
+      expect(find.byKey(Key('coachly-guide-${topic.name}')), findsOneWidget);
+      expect(find.text(topic.title), findsOneWidget);
+      expect(find.text(topic.intro), findsOneWidget);
+    }
   });
 
   testWidgets('invokes add exercise callback', (tester) async {

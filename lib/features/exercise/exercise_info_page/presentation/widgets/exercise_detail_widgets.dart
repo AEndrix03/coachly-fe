@@ -2,7 +2,9 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -595,6 +597,7 @@ Future<void> showCoachlyInfoSheet(
   required String title,
   required String description,
   required String whyItMatters,
+  required CoachlyGuideTopic guideTopic,
   String? disclaimer,
 }) {
   final colors = context.exerciseTheme;
@@ -691,7 +694,24 @@ Future<void> showCoachlyInfoSheet(
             const SizedBox(height: 4),
             Center(
               child: TextButton(
-                onPressed: () => Navigator.of(sheetContext).pop(),
+                onPressed: () {
+                  final navigator = Navigator.of(context);
+                  final reduceMotion = MediaQuery.disableAnimationsOf(context);
+                  HapticFeedback.lightImpact();
+                  Navigator.of(sheetContext).pop();
+                  final route = reduceMotion
+                      ? PageRouteBuilder<void>(
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
+                          pageBuilder: (_, _, _) =>
+                              CoachlyConceptGuidePage(topic: guideTopic),
+                        )
+                      : CupertinoPageRoute<void>(
+                          builder: (_) =>
+                              CoachlyConceptGuidePage(topic: guideTopic),
+                        );
+                  navigator.push<void>(route);
+                },
                 child: Text(
                   'Approfondisci  →',
                   style: TextStyle(color: colors.primary),
