@@ -242,6 +242,21 @@ void main() {
           .right,
       0,
     );
+    final destinationBeforeOverlayDrag = tester.getTopLeft(
+      find.byKey(const Key('quick-nav-destination-biomechanics')),
+    );
+    await tester.drag(
+      find.byKey(const Key('floating-quick-nav-biomechanics')),
+      const Offset(0, 180),
+    );
+    await tester.pumpAndSettle();
+    final destinationAfterOverlayDrag = tester.getTopLeft(
+      find.byKey(const Key('quick-nav-destination-biomechanics')),
+    );
+    expect(
+      destinationAfterOverlayDrag.dy,
+      greaterThan(destinationBeforeOverlayDrag.dy),
+    );
     expect(
       tester
           .widget<Opacity>(
@@ -267,5 +282,20 @@ void main() {
     expect(variantsTop.dy, greaterThan(musclesTop.dy));
     expect(musclesTop.dx, biomechanicsTop.dx);
     expect(variantsTop.dx, biomechanicsTop.dx);
+  });
+
+  testWidgets('overview keeps ballistic motion after finger release', (
+    tester,
+  ) async {
+    await tester.pumpWidget(overview());
+    final scrollView = find.byKey(const Key('exercise-overview-scroll'));
+    await tester.fling(scrollView, const Offset(0, -520), 1500);
+    await tester.pump();
+    final positionAfterRelease = tester.getTopLeft(find.text('Come eseguirlo'));
+    await tester.pump(const Duration(milliseconds: 80));
+    final positionDuringBallistic = tester.getTopLeft(
+      find.text('Come eseguirlo'),
+    );
+    expect(positionDuringBallistic.dy, lessThan(positionAfterRelease.dy));
   });
 }

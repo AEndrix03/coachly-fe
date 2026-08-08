@@ -15,6 +15,7 @@ import 'package:go_router/go_router.dart';
 enum ExerciseQuickNavItem { biomechanics, muscles, variants }
 
 const _quickNavRailGutter = 54.0;
+const _quickNavDeployStartViewportFactor = 0.82;
 
 double _quickNavEntryProgress({
   required double offset,
@@ -33,7 +34,7 @@ double _quickNavDeployProgress({
   final firstDestinationTop = destinationDocumentRects?.firstOrNull?.top;
   if (firstDestinationTop == null || viewportHeight <= 0) return 0;
   final destinationViewportTop = firstDestinationTop - offset;
-  final morphStart = viewportHeight * 0.74;
+  final morphStart = viewportHeight * _quickNavDeployStartViewportFactor;
   return ((morphStart - destinationViewportTop) / 150).clamp(0.0, 1.0);
 }
 
@@ -260,6 +261,9 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
           CustomScrollView(
             key: const Key('exercise-overview-scroll'),
             controller: _scrollController,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             slivers: [
               _ExerciseHeader(
                 title: widget.data.name,
@@ -361,6 +365,8 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
             sourceDocumentTop: () => _sourceDocumentTop,
             destinationDocumentRects: () => _destinationDocumentRects,
             onTap: _openDetail,
+            onVerticalDragUpdate: _handleOverlayVerticalDragUpdate,
+            onVerticalDragEnd: _handleOverlayVerticalDragEnd,
           ),
         ],
       ),
@@ -370,6 +376,23 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   void _openDetail(ExerciseQuickNavItem item) {
     HapticFeedback.lightImpact();
     context.push(item.path(widget.data.id));
+  }
+
+  void _handleOverlayVerticalDragUpdate(DragUpdateDetails details) {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    final target = (_scrollController.offset - details.delta.dy)
+        .clamp(position.minScrollExtent, position.maxScrollExtent)
+        .toDouble();
+    _scrollController.jumpTo(target);
+  }
+
+  void _handleOverlayVerticalDragEnd(DragEndDetails details) {
+    if (!_scrollController.hasClients) return;
+    final position = _scrollController.position;
+    if (position is ScrollPositionWithSingleContext) {
+      position.goBallistic(-details.velocity.pixelsPerSecond.dy);
+    }
   }
 }
 
@@ -663,6 +686,8 @@ class ExerciseQuickNavMorph extends StatelessWidget {
   final double? Function() sourceDocumentTop;
   final List<Rect>? Function() destinationDocumentRects;
   final ValueChanged<ExerciseQuickNavItem> onTap;
+  final GestureDragUpdateCallback onVerticalDragUpdate;
+  final GestureDragEndCallback onVerticalDragEnd;
 
   const ExerciseQuickNavMorph({
     super.key,
@@ -670,6 +695,8 @@ class ExerciseQuickNavMorph extends StatelessWidget {
     required this.sourceDocumentTop,
     required this.destinationDocumentRects,
     required this.onTap,
+    required this.onVerticalDragUpdate,
+    required this.onVerticalDragEnd,
   });
 
   @override
@@ -757,6 +784,8 @@ class ExerciseQuickNavMorph extends StatelessWidget {
                           ),
                       colors: colors,
                       onTap: () => onTap(ExerciseQuickNavItem.values[index]),
+                      onVerticalDragUpdate: onVerticalDragUpdate,
+                      onVerticalDragEnd: onVerticalDragEnd,
                     ),
                 ],
               ),
@@ -777,6 +806,8 @@ class _MorphButton extends StatelessWidget {
   final Rect destinationRect;
   final CoachlyExerciseTheme colors;
   final VoidCallback onTap;
+  final GestureDragUpdateCallback onVerticalDragUpdate;
+  final GestureDragEndCallback onVerticalDragEnd;
 
   const _MorphButton({
     required this.item,
@@ -787,6 +818,8 @@ class _MorphButton extends StatelessWidget {
     required this.destinationRect,
     required this.colors,
     required this.onTap,
+    required this.onVerticalDragUpdate,
+    required this.onVerticalDragEnd,
   });
 
   @override
@@ -797,91 +830,100 @@ class _MorphButton extends StatelessWidget {
     final radius = lerpDouble(23, 16, deployProgress)!;
     return Positioned.fromRect(
       rect: rect,
-      child: Semantics(
-        button: true,
-        label: item.actionLabel,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            key: Key('floating-quick-nav-${item.name}'),
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(radius),
-            child: Container(
-              decoration: BoxDecoration(
-                color: colors.surfaceElevated,
-                borderRadius: BorderRadius.circular(radius),
-                border: Border.all(
-                  color: Color.lerp(
-                    colors.border,
-                    colors.primary.withValues(alpha: 0.18),
-                    0.35,
-                  )!,
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x22000000),
-                    blurRadius: 12,
-                    offset: Offset(0, 4),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onVerticalDragUpdate: onVerticalDragUpdate,
+        onVerticalDragEnd: onVerticalDragEnd,
+        child: Semantics(
+          button: true,
+          label: item.actionLabel,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              key: Key('floating-quick-nav-${item.name}'),
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(radius),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: colors.surfaceElevated,
+                  borderRadius: BorderRadius.circular(radius),
+                  border: Border.all(
+                    color: Color.lerp(
+                      colors.border,
+                      colors.primary.withValues(alpha: 0.18),
+                      0.35,
+                    )!,
                   ),
-                ],
-              ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final iconProgress = Curves.easeInOutCubic.transform(
-                    deployProgress,
-                  );
-                  final centeredIconLeft = (constraints.maxWidth - 20) / 2;
-                  final iconLeft = lerpDouble(
-                    centeredIconLeft,
-                    16,
-                    iconProgress,
-                  )!;
-                  return Stack(
-                    children: [
-                      Positioned(
-                        left: iconLeft,
-                        top: (constraints.maxHeight - 20) / 2,
-                        child: Icon(item.icon, size: 20, color: colors.primary),
-                      ),
-                      if (deployProgress > 0.3) ...[
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x22000000),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final iconProgress = Curves.easeInOutCubic.transform(
+                      deployProgress,
+                    );
+                    final centeredIconLeft = (constraints.maxWidth - 20) / 2;
+                    final iconLeft = lerpDouble(
+                      centeredIconLeft,
+                      16,
+                      iconProgress,
+                    )!;
+                    return Stack(
+                      children: [
                         Positioned(
-                          left: 48,
-                          right: 44,
-                          top: 0,
-                          bottom: 0,
-                          child: Opacity(
-                            opacity: labelOpacity,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                item.actionLabel,
-                                maxLines: 1,
-                                overflow: TextOverflow.fade,
-                                style: TextStyle(
-                                  color: colors.textPrimary,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
+                          left: iconLeft,
+                          top: (constraints.maxHeight - 20) / 2,
+                          child: Icon(
+                            item.icon,
+                            size: 20,
+                            color: colors.primary,
+                          ),
+                        ),
+                        if (deployProgress > 0.3) ...[
+                          Positioned(
+                            left: 48,
+                            right: 44,
+                            top: 0,
+                            bottom: 0,
+                            child: Opacity(
+                              opacity: labelOpacity,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  item.actionLabel,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.fade,
+                                  style: TextStyle(
+                                    color: colors.textPrimary,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          right: 12,
-                          top: (constraints.maxHeight - 21) / 2,
-                          child: Opacity(
-                            opacity: labelOpacity,
-                            child: Icon(
-                              Icons.chevron_right_rounded,
-                              color: colors.textSecondary,
-                              size: 21,
+                          Positioned(
+                            right: 12,
+                            top: (constraints.maxHeight - 21) / 2,
+                            child: Opacity(
+                              opacity: labelOpacity,
+                              child: Icon(
+                                Icons.chevron_right_rounded,
+                                color: colors.textSecondary,
+                                size: 21,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
