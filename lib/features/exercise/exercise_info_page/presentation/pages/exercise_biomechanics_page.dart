@@ -107,7 +107,17 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 28),
-                const ExerciseSectionTitle('Fonte di resistenza'),
+                ExerciseSectionTitle(
+                  'Fonte di resistenza',
+                  onInfo: () => showCoachlyInfoSheet(
+                    context,
+                    title: 'Fonte di resistenza',
+                    description:
+                        'Indica cosa genera la resistenza contro cui lavori, per esempio un cavo, un peso libero, una macchina o il peso corporeo.',
+                    whyItMatters:
+                        'La fonte influenza la direzione e la continuità della forza durante il movimento, senza determinare da sola quanto un esercizio sia efficace.',
+                  ),
+                ),
                 const SizedBox(height: 12),
                 _HeroMetric(
                   value: data.movementProfile.resistanceSource,
@@ -116,7 +126,19 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                 ),
                 if (biomechanics.resistanceProfile.isNotEmpty) ...[
                   const SizedBox(height: 28),
-                  const ExerciseSectionTitle('Profilo di resistenza'),
+                  ExerciseSectionTitle(
+                    'Profilo di resistenza',
+                    onInfo: () => showCoachlyInfoSheet(
+                      context,
+                      title: 'Profilo di resistenza',
+                      description:
+                          'Descrive come la richiesta esterna tende a cambiare dall’inizio alla fine del range di movimento.',
+                      whyItMatters:
+                          'Aiuta a capire in quali parti del gesto l’esercizio può risultare relativamente più o meno impegnativo.',
+                      disclaimer:
+                          'È un profilo qualitativo indicativo, non una misurazione precisa della forza in ogni punto del movimento.',
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),

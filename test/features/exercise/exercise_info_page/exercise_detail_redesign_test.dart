@@ -64,6 +64,48 @@ void main() {
     expect(find.text('Ho capito'), findsOneWidget);
   });
 
+  testWidgets('biomechanics explains both resistance concepts', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: exerciseDetailTheme(ThemeData.dark()),
+        home: const ExerciseBiomechanicsContent(
+          data: latPulldownExerciseFixture,
+        ),
+      ),
+    );
+
+    Future<void> openInfo(String title) async {
+      final sectionTitle = find.byWidgetPredicate(
+        (widget) => widget is ExerciseSectionTitle && widget.title == title,
+      );
+      await tester.scrollUntilVisible(
+        sectionTitle,
+        320,
+        scrollable: find.byKey(const Key('biomechanics-page-scroll')),
+      );
+      final section = find.ancestor(
+        of: sectionTitle,
+        matching: find.byType(Row),
+      );
+      await tester.tap(
+        find.descendant(
+          of: section.first,
+          matching: find.byTooltip('Informazioni'),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    await openInfo('Fonte di resistenza');
+    expect(find.textContaining('cavo, un peso libero'), findsOneWidget);
+    await tester.tap(find.text('Ho capito'));
+    await tester.pumpAndSettle();
+
+    await openInfo('Profilo di resistenza');
+    expect(find.textContaining('range di movimento'), findsOneWidget);
+    expect(find.textContaining('profilo qualitativo'), findsOneWidget);
+  });
+
   testWidgets('invokes add exercise callback', (tester) async {
     var additions = 0;
     await tester.pumpWidget(overview(onAdd: () => additions++));
