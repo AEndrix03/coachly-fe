@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
@@ -18,6 +19,12 @@ extension on ExerciseQuickNavItem {
     ExerciseQuickNavItem.biomechanics => 'Biomeccanica',
     ExerciseQuickNavItem.muscles => 'Muscoli',
     ExerciseQuickNavItem.variants => 'Varianti',
+  };
+
+  String get actionLabel => switch (this) {
+    ExerciseQuickNavItem.biomechanics => 'Analizza la biomeccanica',
+    ExerciseQuickNavItem.muscles => 'Esplora i muscoli',
+    ExerciseQuickNavItem.variants => 'Esplora le varianti',
   };
 
   IconData get icon => switch (this) {
@@ -92,8 +99,6 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   bool _favorite = false;
   bool _expandedExecution = false;
   bool _expandedMistakes = false;
-  bool _measurementScheduled = false;
-  double _lastDestinationMeasurementAttempt = double.negativeInfinity;
 
   @override
   void initState() {
@@ -121,17 +126,6 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
 
   void _handleScroll() {
     _scrollOffset.value = _scrollController.offset;
-    if (_destinationDocumentRects == null &&
-        !_measurementScheduled &&
-        (_scrollController.offset - _lastDestinationMeasurementAttempt).abs() >
-            280) {
-      _lastDestinationMeasurementAttempt = _scrollController.offset;
-      _measurementScheduled = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _measurementScheduled = false;
-        _measureAnchors();
-      });
-    }
   }
 
   void _measureAnchors({bool force = false}) {
@@ -247,6 +241,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                     ExerciseQuickNavDestination(
                       keys: _destinationKeys,
                       onTap: _openDetail,
+                      onLaidOut: () => _measureAnchors(force: true),
                     ),
                     const SizedBox(height: 128),
                   ],
@@ -417,51 +412,88 @@ class ExerciseQuickNavAnchor extends StatelessWidget {
   }
 }
 
-class ExerciseQuickNavDestination extends StatelessWidget {
+class ExerciseQuickNavDestination extends StatefulWidget {
   final List<GlobalKey> keys;
   final ValueChanged<ExerciseQuickNavItem> onTap;
+  final VoidCallback onLaidOut;
 
   const ExerciseQuickNavDestination({
     super.key,
     required this.keys,
     required this.onTap,
+    required this.onLaidOut,
   });
+
+  @override
+  State<ExerciseQuickNavDestination> createState() =>
+      _ExerciseQuickNavDestinationState();
+}
+
+class _ExerciseQuickNavDestinationState
+    extends State<ExerciseQuickNavDestination> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.onLaidOut();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
-    return Row(
+    return Column(
       children: [
         for (
           var index = 0;
           index < ExerciseQuickNavItem.values.length;
           index++
         ) ...[
-          if (index > 0) const SizedBox(width: 8),
-          Expanded(
-            child: SizedBox(
-              key: keys[index],
-              height: 52,
-              child: OutlinedButton(
-                onPressed: () => onTap(ExerciseQuickNavItem.values[index]),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  foregroundColor: colors.textPrimary,
-                  side: BorderSide(color: colors.border),
-                  backgroundColor: colors.surfaceElevated,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+          if (index > 0) const SizedBox(height: 10),
+          SizedBox(
+            key: widget.keys[index],
+            width: double.infinity,
+            height: 58,
+            child: OutlinedButton(
+              key: Key(
+                'quick-nav-destination-${ExerciseQuickNavItem.values[index].name}',
+              ),
+              onPressed: () => widget.onTap(ExerciseQuickNavItem.values[index]),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                foregroundColor: colors.textPrimary,
+                side: BorderSide(color: colors.border),
+                backgroundColor: colors.surfaceElevated,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
-                  ExerciseQuickNavItem.values[index].label,
-                  maxLines: 1,
-                  overflow: TextOverflow.fade,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    ExerciseQuickNavItem.values[index].icon,
+                    color: colors.primary,
+                    size: 20,
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      ExerciseQuickNavItem.values[index].actionLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: colors.textSecondary,
+                    size: 21,
+                  ),
+                ],
               ),
             ),
           ),
@@ -495,24 +527,40 @@ class ExerciseQuickNavMorph extends StatelessWidget {
           valueListenable: scrollOffset,
           builder: (context, offset, _) {
             final sourceTop = sourceDocumentTop();
-            if (sourceTop == null || offset < sourceTop + 54) {
+            if (sourceTop == null) {
               return const SizedBox.shrink();
             }
             final size = MediaQuery.sizeOf(context);
             final safeTop = MediaQuery.paddingOf(context).top;
+            final entryStart = sourceTop - safeTop - 62;
+            final entryProgress = ((offset - entryStart) / 150).clamp(0.0, 1.0);
+            if (entryProgress <= 0) return const SizedBox.shrink();
+
             final destinations = destinationDocumentRects();
             final destinationViewportRects = destinations
                 ?.map((rect) => rect.translate(0, -offset))
                 .toList();
             final firstDestinationTop = destinationViewportRects?.first.top;
             final morphStart = size.height * 0.74;
-            final progress = firstDestinationTop == null
+            final deployProgress = firstDestinationTop == null
                 ? 0.0
                 : ((morphStart - firstDestinationTop) / 150).clamp(0.0, 1.0);
             final reduceMotion = MediaQuery.disableAnimationsOf(context);
-            final effectiveProgress = reduceMotion
-                ? (progress > 0.5 ? 1.0 : 0.0)
-                : progress;
+            final effectiveEntryProgress = reduceMotion
+                ? (entryProgress > 0.5 ? 1.0 : 0.0)
+                : entryProgress;
+            final effectiveDeployProgress = reduceMotion
+                ? (deployProgress > 0.5 ? 1.0 : 0.0)
+                : deployProgress;
+
+            final rowWidth = size.width - 40;
+            const sourceItemWidth = 82.0;
+            const sourceBubbleSize = 48.0;
+            final freeSpace = math.max(
+              0.0,
+              rowWidth - sourceItemWidth * ExerciseQuickNavItem.values.length,
+            );
+            final itemSpace = freeSpace / ExerciseQuickNavItem.values.length;
 
             return RepaintBoundary(
               child: Stack(
@@ -524,8 +572,18 @@ class ExerciseQuickNavMorph extends StatelessWidget {
                   )
                     _MorphButton(
                       item: ExerciseQuickNavItem.values[index],
-                      progress: effectiveProgress,
-                      sourceRect: Rect.fromLTWH(
+                      entryProgress: effectiveEntryProgress,
+                      deployProgress: effectiveDeployProgress,
+                      naturalRect: Rect.fromLTWH(
+                        20 +
+                            itemSpace / 2 +
+                            index * (sourceItemWidth + itemSpace) +
+                            (sourceItemWidth - sourceBubbleSize) / 2,
+                        sourceTop - offset,
+                        sourceBubbleSize,
+                        sourceBubbleSize,
+                      ),
+                      railRect: Rect.fromLTWH(
                         size.width - 62,
                         safeTop + size.height * 0.34 + index * 58,
                         46,
@@ -534,10 +592,10 @@ class ExerciseQuickNavMorph extends StatelessWidget {
                       destinationRect:
                           destinationViewportRects?[index] ??
                           Rect.fromLTWH(
-                            20 + index * ((size.width - 56) / 3),
-                            size.height - 120,
-                            (size.width - 56) / 3,
-                            52,
+                            20,
+                            size.height - 264 + index * 68,
+                            size.width - 40,
+                            58,
                           ),
                       colors: colors,
                       onTap: () => onTap(ExerciseQuickNavItem.values[index]),
@@ -554,16 +612,20 @@ class ExerciseQuickNavMorph extends StatelessWidget {
 
 class _MorphButton extends StatelessWidget {
   final ExerciseQuickNavItem item;
-  final double progress;
-  final Rect sourceRect;
+  final double entryProgress;
+  final double deployProgress;
+  final Rect naturalRect;
+  final Rect railRect;
   final Rect destinationRect;
   final CoachlyExerciseTheme colors;
   final VoidCallback onTap;
 
   const _MorphButton({
     required this.item,
-    required this.progress,
-    required this.sourceRect,
+    required this.entryProgress,
+    required this.deployProgress,
+    required this.naturalRect,
+    required this.railRect,
     required this.destinationRect,
     required this.colors,
     required this.onTap,
@@ -571,25 +633,25 @@ class _MorphButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rect = Rect.lerp(sourceRect, destinationRect, progress)!;
-    final labelOpacity = ((progress - 0.38) / 0.62).clamp(0.0, 1.0);
+    final entryRect = Rect.lerp(naturalRect, railRect, entryProgress)!;
+    final rect = Rect.lerp(entryRect, destinationRect, deployProgress)!;
+    final labelOpacity = ((deployProgress - 0.34) / 0.66).clamp(0.0, 1.0);
+    final radius = lerpDouble(23, 16, deployProgress)!;
     return Positioned.fromRect(
       rect: rect,
       child: Semantics(
         button: true,
-        label: 'Apri ${item.label}',
+        label: item.actionLabel,
         child: Material(
           color: Colors.transparent,
           child: InkWell(
             key: Key('floating-quick-nav-${item.name}'),
             onTap: onTap,
-            borderRadius: BorderRadius.circular(lerpDouble(23, 16, progress)!),
+            borderRadius: BorderRadius.circular(radius),
             child: Container(
               decoration: BoxDecoration(
                 color: colors.surfaceElevated,
-                borderRadius: BorderRadius.circular(
-                  lerpDouble(23, 16, progress)!,
-                ),
+                borderRadius: BorderRadius.circular(radius),
                 border: Border.all(
                   color: Color.lerp(
                     colors.border,
@@ -606,29 +668,38 @@ class _MorphButton extends StatelessWidget {
                 ],
               ),
               child: Row(
-                mainAxisAlignment: progress < 0.1
+                mainAxisAlignment: deployProgress < 0.1
                     ? MainAxisAlignment.center
                     : MainAxisAlignment.start,
                 children: [
-                  SizedBox(width: lerpDouble(0, 10, progress)),
+                  SizedBox(width: lerpDouble(0, 16, deployProgress)),
                   Icon(item.icon, size: 20, color: colors.primary),
-                  if (progress > 0.35) ...[
-                    SizedBox(width: lerpDouble(0, 5, progress)),
+                  if (deployProgress > 0.3) ...[
+                    SizedBox(width: lerpDouble(0, 12, deployProgress)),
                     Expanded(
                       child: Opacity(
                         opacity: labelOpacity,
                         child: Text(
-                          item.label,
+                          item.actionLabel,
                           maxLines: 1,
                           overflow: TextOverflow.fade,
                           style: TextStyle(
                             color: colors.textPrimary,
-                            fontSize: 10,
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
+                    Opacity(
+                      opacity: labelOpacity,
+                      child: Icon(
+                        Icons.chevron_right_rounded,
+                        color: colors.textSecondary,
+                        size: 21,
+                      ),
+                    ),
+                    SizedBox(width: lerpDouble(0, 12, deployProgress)),
                   ],
                 ],
               ),

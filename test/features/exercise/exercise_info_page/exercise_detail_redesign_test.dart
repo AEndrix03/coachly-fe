@@ -180,4 +180,33 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('floating-quick-nav-muscles')), findsNothing);
   });
+
+  testWidgets('bottom navigation is a vertical editorial action list', (
+    tester,
+  ) async {
+    await tester.pumpWidget(overview());
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('quick-nav-destination-biomechanics')),
+      650,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Analizza la biomeccanica'), findsWidgets);
+    expect(find.text('Esplora i muscoli'), findsWidgets);
+    expect(find.text('Esplora le varianti'), findsWidgets);
+
+    final biomechanicsTop = tester.getTopLeft(
+      find.byKey(const Key('quick-nav-destination-biomechanics')),
+    );
+    final musclesTop = tester.getTopLeft(
+      find.byKey(const Key('quick-nav-destination-muscles')),
+    );
+    final variantsTop = tester.getTopLeft(
+      find.byKey(const Key('quick-nav-destination-variants')),
+    );
+    expect(musclesTop.dy, greaterThan(biomechanicsTop.dy));
+    expect(variantsTop.dy, greaterThan(musclesTop.dy));
+    expect(musclesTop.dx, biomechanicsTop.dx);
+    expect(variantsTop.dx, biomechanicsTop.dx);
+  });
 }
