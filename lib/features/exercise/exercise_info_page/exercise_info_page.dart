@@ -226,11 +226,6 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                     ),
                     const SizedBox(height: 36),
                     _EquipmentSection(equipment: widget.data.equipment),
-                    const SizedBox(height: 36),
-                    _VariantsPreview(
-                      data: widget.data,
-                      onOpen: () => _openDetail(ExerciseQuickNavItem.variants),
-                    ),
                     if (widget.data.safetyNote.isNotEmpty) ...[
                       const SizedBox(height: 36),
                       _SafetySection(note: widget.data.safetyNote),
@@ -1121,68 +1116,6 @@ class _EquipmentSection extends StatelessWidget {
               ],
             ),
           ),
-      ],
-    );
-  }
-}
-
-class _VariantsPreview extends StatelessWidget {
-  final ExerciseDetailViewData data;
-  final VoidCallback onOpen;
-
-  const _VariantsPreview({required this.data, required this.onOpen});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.exerciseTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const ExerciseSectionTitle('Varianti'),
-        const SizedBox(height: 10),
-        for (final variant in data.variants.take(3))
-          InkWell(
-            onTap: onOpen,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          variant.name,
-                          style: TextStyle(
-                            color: colors.textPrimary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          variant.relationAxis,
-                          style: TextStyle(
-                            color: colors.textSecondary,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: colors.textSecondary,
-                    size: 20,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ExerciseLinkButton(
-          label: 'Vedi ${data.variants.length} varianti',
-          onTap: onOpen,
-        ),
       ],
     );
   }

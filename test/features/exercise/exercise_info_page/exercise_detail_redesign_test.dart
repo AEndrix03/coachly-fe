@@ -185,6 +185,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(overview());
+    expect(find.text('Close Grip Lat Pulldown'), findsNothing);
     await tester.scrollUntilVisible(
       find.byKey(const Key('quick-nav-destination-biomechanics')),
       650,
