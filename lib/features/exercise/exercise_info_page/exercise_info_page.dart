@@ -116,6 +116,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
   final ValueNotifier<double> _railGutter = ValueNotifier(0);
+  final ValueNotifier<int> _anchorRevision = ValueNotifier(0);
   final GlobalKey _stackKey = GlobalKey();
   final GlobalKey _sourceKey = GlobalKey();
   final List<GlobalKey> _destinationKeys = List.generate(3, (_) => GlobalKey());
@@ -131,10 +132,12 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   int _lastDeployMeasurementBucket = -1;
   bool _anchorRefreshScheduled = false;
   Drag? _overlayDrag;
+  late final Listenable _quickNavChanges;
 
   @override
   void initState() {
     super.initState();
+    _quickNavChanges = Listenable.merge([_scrollOffset, _anchorRevision]);
     _scrollController.addListener(_handleScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) => _measureAnchors());
   }
@@ -160,6 +163,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
       ..dispose();
     _scrollOffset.dispose();
     _railGutter.dispose();
+    _anchorRevision.dispose();
     super.dispose();
   }
 
@@ -249,7 +253,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
       }).toList();
     }
     _updateRailGutter();
-    if (mounted) setState(() {});
+    _anchorRevision.value++;
   }
 
   @override
@@ -285,6 +289,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                     _Entrance(
                       delay: const Duration(milliseconds: 45),
                       child: _QuickNavSourceVisibility(
+                        changes: _quickNavChanges,
                         scrollOffset: _scrollOffset,
                         sourceDocumentTop: () => _sourceDocumentTop,
                         child: ExerciseQuickNavAnchor(
@@ -361,6 +366,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
             ],
           ),
           ExerciseQuickNavMorph(
+            changes: _quickNavChanges,
             scrollOffset: _scrollOffset,
             sourceDocumentTop: () => _sourceDocumentTop,
             destinationDocumentRects: () => _destinationDocumentRects,
@@ -436,15 +442,23 @@ class _ExerciseHeader extends StatelessWidget {
       ),
       title: ValueListenableBuilder<double>(
         valueListenable: scrollOffset,
-        builder: (_, offset, _) => Opacity(
-          opacity: ((offset - 72) / 52).clamp(0, 1),
-          child: Text(
+        builder: (_, offset, _) {
+          final opacity = ((offset - 72) / 52).clamp(0.0, 1.0);
+          return Text(
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-          ),
-        ),
+            style: TextStyle(
+              color: Color.lerp(
+                Colors.transparent,
+                colors.textPrimary,
+                opacity,
+              ),
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+            ),
+          );
+        },
       ),
       centerTitle: true,
       actions: [
@@ -553,11 +567,13 @@ class ExerciseQuickNavAnchor extends StatelessWidget {
 }
 
 class _QuickNavSourceVisibility extends StatelessWidget {
+  final Listenable changes;
   final ValueListenable<double> scrollOffset;
   final double? Function() sourceDocumentTop;
   final Widget child;
 
   const _QuickNavSourceVisibility({
+    required this.changes,
     required this.scrollOffset,
     required this.sourceDocumentTop,
     required this.child,
@@ -565,10 +581,11 @@ class _QuickNavSourceVisibility extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<double>(
-      valueListenable: scrollOffset,
+    return ListenableBuilder(
+      listenable: changes,
       child: child,
-      builder: (context, offset, child) {
+      builder: (context, child) {
+        final offset = scrollOffset.value;
         final sourceTop = sourceDocumentTop();
         final isMoving =
             sourceTop != null &&
@@ -692,6 +709,7 @@ class _ExerciseQuickNavDestinationState
 }
 
 class ExerciseQuickNavMorph extends StatelessWidget {
+  final Listenable changes;
   final ValueListenable<double> scrollOffset;
   final double? Function() sourceDocumentTop;
   final List<Rect>? Function() destinationDocumentRects;
@@ -703,6 +721,7 @@ class ExerciseQuickNavMorph extends StatelessWidget {
 
   const ExerciseQuickNavMorph({
     super.key,
+    required this.changes,
     required this.scrollOffset,
     required this.sourceDocumentTop,
     required this.destinationDocumentRects,
@@ -717,97 +736,92 @@ class ExerciseQuickNavMorph extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
     return Positioned.fill(
-      child: IgnorePointer(
-        ignoring: false,
-        child: ValueListenableBuilder<double>(
-          valueListenable: scrollOffset,
-          builder: (context, offset, _) {
-            final sourceTop = sourceDocumentTop();
-            if (sourceTop == null) {
-              return const SizedBox.shrink();
-            }
-            final size = MediaQuery.sizeOf(context);
-            final safeTop = MediaQuery.paddingOf(context).top;
-            final entryProgress = _quickNavEntryProgress(
-              offset: offset,
-              sourceTop: sourceTop,
-              safeTop: safeTop,
-            );
-            if (entryProgress <= 0) return const SizedBox.shrink();
+      child: ListenableBuilder(
+        listenable: changes,
+        builder: (context, _) {
+          final offset = scrollOffset.value;
+          final sourceTop = sourceDocumentTop();
+          if (sourceTop == null) {
+            return const SizedBox.shrink();
+          }
+          final size = MediaQuery.sizeOf(context);
+          final safeTop = MediaQuery.paddingOf(context).top;
+          final entryProgress = _quickNavEntryProgress(
+            offset: offset,
+            sourceTop: sourceTop,
+            safeTop: safeTop,
+          );
+          if (entryProgress <= 0) return const SizedBox.shrink();
 
-            final destinations = destinationDocumentRects();
-            final destinationViewportRects = destinations
-                ?.map((rect) => rect.translate(0, -offset))
-                .toList();
-            final deployProgress = _quickNavDeployProgress(
-              offset: offset,
-              destinationDocumentRects: destinations,
-              viewportHeight: size.height,
-            );
-            final reduceMotion = MediaQuery.disableAnimationsOf(context);
-            final effectiveEntryProgress = reduceMotion
-                ? (entryProgress > 0.5 ? 1.0 : 0.0)
-                : entryProgress;
-            final effectiveDeployProgress = reduceMotion
-                ? (deployProgress > 0.5 ? 1.0 : 0.0)
-                : deployProgress;
+          final destinations = destinationDocumentRects();
+          final deployProgress = _quickNavDeployProgress(
+            offset: offset,
+            destinationDocumentRects: destinations,
+            viewportHeight: size.height,
+          );
+          final reduceMotion = MediaQuery.disableAnimationsOf(context);
+          final effectiveEntryProgress = reduceMotion
+              ? (entryProgress > 0.5 ? 1.0 : 0.0)
+              : entryProgress;
+          final effectiveDeployProgress = reduceMotion
+              ? (deployProgress > 0.5 ? 1.0 : 0.0)
+              : deployProgress;
 
-            final rowWidth = size.width - 40;
-            const sourceItemWidth = 82.0;
-            const sourceBubbleSize = 48.0;
-            final freeSpace = math.max(
-              0.0,
-              rowWidth - sourceItemWidth * ExerciseQuickNavItem.values.length,
-            );
-            final itemSpace = freeSpace / ExerciseQuickNavItem.values.length;
+          final rowWidth = size.width - 40;
+          const sourceItemWidth = 82.0;
+          const sourceBubbleSize = 48.0;
+          final freeSpace = math.max(
+            0.0,
+            rowWidth - sourceItemWidth * ExerciseQuickNavItem.values.length,
+          );
+          final itemSpace = freeSpace / ExerciseQuickNavItem.values.length;
 
-            return RepaintBoundary(
-              child: Stack(
-                children: [
-                  for (
-                    var index = 0;
-                    index < ExerciseQuickNavItem.values.length;
-                    index++
-                  )
-                    _MorphButton(
-                      item: ExerciseQuickNavItem.values[index],
-                      entryProgress: effectiveEntryProgress,
-                      deployProgress: effectiveDeployProgress,
-                      naturalRect: Rect.fromLTWH(
-                        20 +
-                            itemSpace / 2 +
-                            index * (sourceItemWidth + itemSpace) +
-                            (sourceItemWidth - sourceBubbleSize) / 2,
-                        sourceTop - offset,
-                        sourceBubbleSize,
-                        sourceBubbleSize,
-                      ),
-                      railRect: Rect.fromLTWH(
-                        size.width - 62,
-                        safeTop + size.height * 0.34 + index * 58,
-                        46,
-                        46,
-                      ),
-                      destinationRect:
-                          destinationViewportRects?[index] ??
-                          Rect.fromLTWH(
-                            20,
-                            size.height - 264 + index * 68,
-                            size.width - 40,
-                            58,
-                          ),
-                      colors: colors,
-                      onTap: () => onTap(ExerciseQuickNavItem.values[index]),
-                      onVerticalDragStart: onVerticalDragStart,
-                      onVerticalDragUpdate: onVerticalDragUpdate,
-                      onVerticalDragEnd: onVerticalDragEnd,
-                      onVerticalDragCancel: onVerticalDragCancel,
+          return RepaintBoundary(
+            child: Stack(
+              children: [
+                for (
+                  var index = 0;
+                  index < ExerciseQuickNavItem.values.length;
+                  index++
+                )
+                  _MorphButton(
+                    item: ExerciseQuickNavItem.values[index],
+                    entryProgress: effectiveEntryProgress,
+                    deployProgress: effectiveDeployProgress,
+                    naturalRect: Rect.fromLTWH(
+                      20 +
+                          itemSpace / 2 +
+                          index * (sourceItemWidth + itemSpace) +
+                          (sourceItemWidth - sourceBubbleSize) / 2,
+                      sourceTop - offset,
+                      sourceBubbleSize,
+                      sourceBubbleSize,
                     ),
-                ],
-              ),
-            );
-          },
-        ),
+                    railRect: Rect.fromLTWH(
+                      size.width - 62,
+                      safeTop + size.height * 0.34 + index * 58,
+                      46,
+                      46,
+                    ),
+                    destinationRect:
+                        destinations?[index].translate(0, -offset) ??
+                        Rect.fromLTWH(
+                          20,
+                          size.height - 264 + index * 68,
+                          size.width - 40,
+                          58,
+                        ),
+                    colors: colors,
+                    onTap: () => onTap(ExerciseQuickNavItem.values[index]),
+                    onVerticalDragStart: onVerticalDragStart,
+                    onVerticalDragUpdate: onVerticalDragUpdate,
+                    onVerticalDragEnd: onVerticalDragEnd,
+                    onVerticalDragCancel: onVerticalDragCancel,
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -884,67 +898,56 @@ class _MorphButton extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final iconProgress = Curves.easeInOutCubic.transform(
-                      deployProgress,
-                    );
-                    final centeredIconLeft = (constraints.maxWidth - 20) / 2;
-                    final iconLeft = lerpDouble(
-                      centeredIconLeft,
-                      16,
-                      iconProgress,
-                    )!;
-                    return Stack(
-                      children: [
-                        Positioned(
-                          left: iconLeft,
-                          top: (constraints.maxHeight - 20) / 2,
-                          child: Icon(
-                            item.icon,
-                            size: 20,
-                            color: colors.primary,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: lerpDouble(
+                        (rect.width - 20) / 2,
+                        16,
+                        Curves.easeInOutCubic.transform(deployProgress),
+                      ),
+                      top: (rect.height - 20) / 2,
+                      child: Icon(item.icon, size: 20, color: colors.primary),
+                    ),
+                    if (deployProgress > 0.3) ...[
+                      Positioned(
+                        left: 48,
+                        right: 44,
+                        top: 0,
+                        bottom: 0,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            item.actionLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.fade,
+                            style: TextStyle(
+                              color: Color.lerp(
+                                Colors.transparent,
+                                colors.textPrimary,
+                                labelOpacity,
+                              ),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                        if (deployProgress > 0.3) ...[
-                          Positioned(
-                            left: 48,
-                            right: 44,
-                            top: 0,
-                            bottom: 0,
-                            child: Opacity(
-                              opacity: labelOpacity,
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  item.actionLabel,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.fade,
-                                  style: TextStyle(
-                                    color: colors.textPrimary,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
+                      ),
+                      Positioned(
+                        right: 12,
+                        top: (rect.height - 21) / 2,
+                        child: Icon(
+                          Icons.chevron_right_rounded,
+                          color: Color.lerp(
+                            Colors.transparent,
+                            colors.textSecondary,
+                            labelOpacity,
                           ),
-                          Positioned(
-                            right: 12,
-                            top: (constraints.maxHeight - 21) / 2,
-                            child: Opacity(
-                              opacity: labelOpacity,
-                              child: Icon(
-                                Icons.chevron_right_rounded,
-                                color: colors.textSecondary,
-                                size: 21,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    );
-                  },
+                          size: 21,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ),

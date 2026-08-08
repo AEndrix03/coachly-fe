@@ -56,6 +56,8 @@ class _ExerciseVariantsContentState extends State<ExerciseVariantsContent> {
 
   @override
   Widget build(BuildContext context) {
+    final filters = _filters;
+    final variants = _variants;
     return ExerciseDetailScaffold(
       title: 'Varianti',
       exerciseName: widget.data.name,
@@ -71,15 +73,16 @@ class _ExerciseVariantsContentState extends State<ExerciseVariantsContent> {
                   vertical: 4,
                 ),
                 scrollDirection: Axis.horizontal,
-                itemCount: _filters.length,
+                itemCount: filters.length,
                 separatorBuilder: (_, _) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
-                  final filter = _filters[index];
+                  final filter = filters[index];
                   return FilterChip(
                     key: Key('variant-filter-$filter'),
                     selected: _filter == filter,
                     label: Text(filter),
                     onSelected: (_) {
+                      if (_filter == filter) return;
                       HapticFeedback.selectionClick();
                       setState(() => _filter = filter);
                     },
@@ -97,19 +100,22 @@ class _ExerciseVariantsContentState extends State<ExerciseVariantsContent> {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
             sliver: SliverList.separated(
-              itemCount: _variants.length,
+              itemCount: variants.length,
               separatorBuilder: (_, _) => const SizedBox(height: 12),
-              itemBuilder: (context, index) => VariantTile(
-                variant: _variants[index],
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  if (_variants[index].id.isNotEmpty) {
-                    context.push('/exercises/${_variants[index].id}');
-                  }
-                },
-              ),
+              itemBuilder: (context, index) {
+                final variant = variants[index];
+                return VariantTile(
+                  variant: variant,
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    if (variant.id.isNotEmpty) {
+                      context.push('/exercises/${variant.id}');
+                    }
+                  },
+                );
+              },
             ),
           ),
         ],

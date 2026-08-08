@@ -42,23 +42,23 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
         key: const Key('biomechanics-page-scroll'),
         slivers: [
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
             sliver: SliverList.list(
               children: [
                 const ExerciseSectionTitle('Profilo del movimento'),
-                const SizedBox(height: 14),
+                const SizedBox(height: 12),
                 _HeroMetric(
                   value: data.movementProfile.pattern,
                   label: 'Pattern principale',
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 _DataRows(
                   rows: [
                     ('Catena cinetica', data.movementProfile.kineticChain),
                     ('Lateralità', data.movementProfile.laterality),
                   ],
                 ),
-                const SizedBox(height: 34),
+                const SizedBox(height: 28),
                 ExerciseSectionTitle(
                   'Azioni articolari',
                   onInfo: () => showCoachlyInfoSheet(
@@ -83,7 +83,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                         (action.joint, action.action),
                     ],
                   ),
-                const SizedBox(height: 34),
+                const SizedBox(height: 28),
                 ExerciseSectionTitle(
                   'Caratteristiche di allenamento',
                   onInfo: () => showCoachlyInfoSheet(
@@ -96,8 +96,17 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _CharacteristicGrid(training: biomechanics.training),
-                const SizedBox(height: 34),
+                _DataRows(
+                  rows: [
+                    ('Stabilità richiesta', biomechanics.training.stability),
+                    ('Carico spinale', biomechanics.training.spinalLoad),
+                    (
+                      'Richiesta tecnica',
+                      biomechanics.training.technicalDemand,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
                 const ExerciseSectionTitle('Fonte di resistenza'),
                 const SizedBox(height: 12),
                 _HeroMetric(
@@ -106,7 +115,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                   compact: true,
                 ),
                 if (biomechanics.resistanceProfile.isNotEmpty) ...[
-                  const SizedBox(height: 34),
+                  const SizedBox(height: 28),
                   const ExerciseSectionTitle('Profilo di resistenza'),
                   const SizedBox(height: 12),
                   Container(
@@ -134,11 +143,11 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                     ),
                   ),
                 ],
-                const SizedBox(height: 34),
+                const SizedBox(height: 28),
                 const ExerciseSectionTitle('Dati e metodologia'),
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
                   decoration: BoxDecoration(
                     color: colors.surface,
                     borderRadius: BorderRadius.circular(20),
@@ -146,19 +155,16 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      _EvidenceRow(
-                        label: 'Origine',
-                        value: biomechanics.evidenceOrigin,
+                      _DataRows(
+                        rows: [
+                          ('Origine', biomechanics.evidenceOrigin),
+                          ('Affidabilità', biomechanics.evidenceConfidence),
+                        ],
                       ),
-                      const SizedBox(height: 14),
-                      _EvidenceRow(
-                        label: 'Affidabilità',
-                        value: biomechanics.evidenceConfidence,
-                      ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 4),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: TextButton.icon(
+                        child: TextButton(
                           onPressed: () => showCoachlyInfoSheet(
                             context,
                             title: 'Come Coachly interpreta i dati',
@@ -171,12 +177,16 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                             minimumSize: const Size(44, 44),
                             padding: EdgeInsets.zero,
                           ),
-                          icon: const Icon(
-                            Icons.info_outline_rounded,
-                            size: 18,
-                          ),
-                          label: const Text(
-                            'Come Coachly interpreta questi dati',
+                          child: const Row(
+                            children: [
+                              Icon(Icons.info_outline_rounded, size: 18),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Come Coachly interpreta questi dati',
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -210,7 +220,7 @@ class _HeroMetric extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
     return Container(
-      padding: EdgeInsets.all(compact ? 17 : 22),
+      padding: EdgeInsets.all(compact ? 16 : 20),
       decoration: BoxDecoration(
         color: colors.surfaceElevated,
         borderRadius: BorderRadius.circular(20),
@@ -248,7 +258,7 @@ class _DataRows extends StatelessWidget {
       children: [
         for (var index = 0; index < rows.length; index++) ...[
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -275,118 +285,6 @@ class _DataRows extends StatelessWidget {
           if (index != rows.length - 1)
             Divider(height: 1, color: colors.border),
         ],
-      ],
-    );
-  }
-}
-
-class _CharacteristicGrid extends StatelessWidget {
-  final ExerciseTrainingCharacteristicsViewData training;
-
-  const _CharacteristicGrid({required this.training});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final itemWidth = (constraints.maxWidth - 10) / 2;
-        return Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            _CharacteristicTile(
-              width: itemWidth,
-              label: 'Stabilità richiesta',
-              value: training.stability,
-            ),
-            _CharacteristicTile(
-              width: itemWidth,
-              label: 'Carico spinale',
-              value: training.spinalLoad,
-            ),
-            _CharacteristicTile(
-              width: itemWidth,
-              label: 'Richiesta tecnica',
-              value: training.technicalDemand,
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _CharacteristicTile extends StatelessWidget {
-  final double width;
-  final String label;
-  final String value;
-
-  const _CharacteristicTile({
-    required this.width,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.exerciseTheme;
-    return Container(
-      width: width,
-      constraints: const BoxConstraints(minHeight: 92),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(17),
-        border: Border.all(color: colors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: colors.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: TextStyle(color: colors.textSecondary, fontSize: 12),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EvidenceRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _EvidenceRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.exerciseTheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Text(label, style: TextStyle(color: colors.textSecondary)),
-        ),
-        const SizedBox(width: 16),
-        Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: TextStyle(
-              color: colors.textPrimary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
       ],
     );
   }

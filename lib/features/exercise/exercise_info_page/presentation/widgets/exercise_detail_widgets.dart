@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' show lerpDouble;
 
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
@@ -15,8 +16,10 @@ class ExerciseSectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Expanded(
+        Flexible(
+          fit: FlexFit.loose,
           child: Text(
             title,
             style: TextStyle(
@@ -27,17 +30,22 @@ class ExerciseSectionTitle extends StatelessWidget {
             ),
           ),
         ),
-        if (onInfo != null)
-          IconButton(
-            tooltip: 'Informazioni',
-            visualDensity: VisualDensity.compact,
-            onPressed: onInfo,
-            icon: Icon(
-              Icons.info_outline_rounded,
-              size: 20,
-              color: colors.textSecondary,
+        if (onInfo != null) ...[
+          const SizedBox(width: 6),
+          SizedBox.square(
+            dimension: 44,
+            child: IconButton(
+              tooltip: 'Informazioni',
+              padding: EdgeInsets.zero,
+              onPressed: onInfo,
+              icon: Icon(
+                Icons.info_outline_rounded,
+                size: 20,
+                color: colors.textSecondary,
+              ),
             ),
           ),
+        ],
       ],
     );
   }
@@ -242,7 +250,7 @@ class _HeroSheenState extends State<_HeroSheen>
   }
 }
 
-class MuscleAnatomyView extends StatelessWidget {
+class MuscleAnatomyView extends StatefulWidget {
   final List<MuscleViewData> muscles;
   final String? selectedMuscleId;
   final bool backView;
@@ -257,12 +265,52 @@ class MuscleAnatomyView extends StatelessWidget {
   });
 
   @override
+  State<MuscleAnatomyView> createState() => _MuscleAnatomyViewState();
+}
+
+class _MuscleAnatomyViewState extends State<MuscleAnatomyView>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _selectionController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 180),
+    value: 1,
+  );
+  bool _reduceMotion = false;
+  String? _previousSelectedMuscleId;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _reduceMotion = MediaQuery.disableAnimationsOf(context);
+    if (_reduceMotion) _selectionController.value = 1;
+  }
+
+  @override
+  void didUpdateWidget(covariant MuscleAnatomyView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedMuscleId != widget.selectedMuscleId) {
+      _previousSelectedMuscleId = oldWidget.selectedMuscleId;
+      if (_reduceMotion) {
+        _selectionController.value = 1;
+      } else {
+        _selectionController.forward(from: 0);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _selectionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final selected = muscles
-        .where((muscle) => muscle.id == selectedMuscleId)
+    final selected = widget.muscles
+        .where((muscle) => muscle.id == widget.selectedMuscleId)
         .firstOrNull;
     final label = selected == null
-        ? 'Modello anatomico, vista ${backView ? 'posteriore' : 'frontale'}'
+        ? 'Modello anatomico, vista ${widget.backView ? 'posteriore' : 'frontale'}'
         : '${selected.name}, ${muscleRoleLabel(selected.role)}, '
               'tensione ${tensionLabel(selected.tension.lengthened)} in allungamento, '
               '${tensionLabel(selected.tension.midRange)} nel medio ROM, '
@@ -274,21 +322,23 @@ class MuscleAnatomyView extends StatelessWidget {
       child: RepaintBoundary(
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTapUp: onMuscleSelected == null
+          onTapUp: widget.onMuscleSelected == null
               ? null
               : (details) {
-                  if (muscles.isEmpty) return;
+                  if (widget.muscles.isEmpty) return;
                   final index = (details.localPosition.dy ~/ 54).clamp(
                     0,
-                    muscles.length - 1,
+                    widget.muscles.length - 1,
                   );
-                  onMuscleSelected!(muscles[index].id);
+                  widget.onMuscleSelected!(widget.muscles[index].id);
                 },
           child: CustomPaint(
             painter: _AnatomyPainter(
               theme: context.exerciseTheme,
-              selectedMuscleId: selectedMuscleId,
-              backView: backView,
+              selectedMuscleId: widget.selectedMuscleId,
+              previousSelectedMuscleId: _previousSelectedMuscleId,
+              backView: widget.backView,
+              selectionAnimation: _selectionController,
             ),
             child: const SizedBox.expand(),
           ),
@@ -301,13 +351,17 @@ class MuscleAnatomyView extends StatelessWidget {
 class _AnatomyPainter extends CustomPainter {
   final CoachlyExerciseTheme theme;
   final String? selectedMuscleId;
+  final String? previousSelectedMuscleId;
   final bool backView;
+  final Animation<double> selectionAnimation;
 
-  const _AnatomyPainter({
+  _AnatomyPainter({
     required this.theme,
     required this.selectedMuscleId,
+    required this.previousSelectedMuscleId,
     required this.backView,
-  });
+    required this.selectionAnimation,
+  }) : super(repaint: selectionAnimation);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -369,13 +423,25 @@ class _AnatomyPainter extends CustomPainter {
       body,
     );
 
-    final dim = selectedMuscleId == null ? 1.0 : 0.5;
+    final selectionProgress = Curves.easeOut.transform(
+      selectionAnimation.value,
+    );
     void muscle(Path path, Color color, String id) {
-      final selected = selectedMuscleId == null || selectedMuscleId == id;
-      canvas.drawPath(
-        path,
-        Paint()..color = color.withValues(alpha: selected ? 0.92 : dim),
-      );
+      final alpha = switch (selectedMuscleId) {
+        null => 0.92,
+        final selectedId when selectedId == id => lerpDouble(
+          previousSelectedMuscleId == id ? 0.92 : 0.5,
+          0.92,
+          selectionProgress,
+        )!,
+        _ when previousSelectedMuscleId == id => lerpDouble(
+          0.92,
+          0.5,
+          selectionProgress,
+        )!,
+        _ => 0.5,
+      };
+      canvas.drawPath(path, Paint()..color = color.withValues(alpha: alpha));
     }
 
     final leftLat = Path()
@@ -435,6 +501,7 @@ class _AnatomyPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _AnatomyPainter oldDelegate) {
     return oldDelegate.selectedMuscleId != selectedMuscleId ||
+        oldDelegate.previousSelectedMuscleId != previousSelectedMuscleId ||
         oldDelegate.backView != backView ||
         oldDelegate.theme != theme;
   }

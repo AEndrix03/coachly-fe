@@ -74,6 +74,7 @@ class _ExerciseMusclesContentState extends State<ExerciseMusclesContent> {
                 _ModeSelector(
                   mode: _mode,
                   onChanged: (mode) {
+                    if (_mode == mode) return;
                     HapticFeedback.selectionClick();
                     setState(() => _mode = mode);
                   },
@@ -111,13 +112,19 @@ class _ExerciseMusclesContentState extends State<ExerciseMusclesContent> {
             _ViewChip(
               label: 'Fronte',
               selected: !_backView,
-              onTap: () => setState(() => _backView = false),
+              onTap: () {
+                if (!_backView) return;
+                setState(() => _backView = false);
+              },
             ),
             const SizedBox(width: 8),
             _ViewChip(
               label: 'Retro',
               selected: _backView,
-              onTap: () => setState(() => _backView = true),
+              onTap: () {
+                if (_backView) return;
+                setState(() => _backView = true);
+              },
             ),
           ],
         ),
@@ -143,6 +150,7 @@ class _ExerciseMusclesContentState extends State<ExerciseMusclesContent> {
   }
 
   void _selectMuscle(String id) {
+    if (_selectedMuscleId == id) return;
     HapticFeedback.selectionClick();
     setState(() => _selectedMuscleId = id);
   }
@@ -189,7 +197,9 @@ class _ModeSelector extends StatelessWidget {
                   borderRadius: BorderRadius.circular(11),
                   onTap: () => onChanged(item),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
+                    duration: MediaQuery.disableAnimationsOf(context)
+                        ? Duration.zero
+                        : const Duration(milliseconds: 180),
                     alignment: Alignment.center,
                     constraints: const BoxConstraints(minHeight: 44),
                     decoration: BoxDecoration(
@@ -235,6 +245,7 @@ class _ViewChip extends StatelessWidget {
       label: Text(label),
       selected: selected,
       onSelected: (_) {
+        if (selected) return;
         HapticFeedback.selectionClick();
         onTap();
       },
@@ -399,7 +410,9 @@ class _MuscleTable extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             onTap: () => onSelected(muscle.id),
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
+              duration: MediaQuery.disableAnimationsOf(context)
+                  ? Duration.zero
+                  : const Duration(milliseconds: 180),
               width: double.infinity,
               padding: const EdgeInsets.all(17),
               decoration: BoxDecoration(
