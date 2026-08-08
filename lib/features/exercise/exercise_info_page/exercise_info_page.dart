@@ -6,8 +6,9 @@ import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_det
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart' show Drag;
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -129,6 +130,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   bool _reduceMotion = false;
   int _lastDeployMeasurementBucket = -1;
   bool _anchorRefreshScheduled = false;
+  Drag? _overlayDrag;
 
   @override
   void initState() {
@@ -152,6 +154,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
 
   @override
   void dispose() {
+    _overlayDrag?.cancel();
     _scrollController
       ..removeListener(_handleScroll)
       ..dispose();
@@ -261,9 +264,6 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
           CustomScrollView(
             key: const Key('exercise-overview-scroll'),
             controller: _scrollController,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
             slivers: [
               _ExerciseHeader(
                 title: widget.data.name,
@@ -365,8 +365,10 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
             sourceDocumentTop: () => _sourceDocumentTop,
             destinationDocumentRects: () => _destinationDocumentRects,
             onTap: _openDetail,
+            onVerticalDragStart: _handleOverlayVerticalDragStart,
             onVerticalDragUpdate: _handleOverlayVerticalDragUpdate,
             onVerticalDragEnd: _handleOverlayVerticalDragEnd,
+            onVerticalDragCancel: _handleOverlayVerticalDragCancel,
           ),
         ],
       ),
@@ -378,21 +380,29 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
     context.push(item.path(widget.data.id));
   }
 
-  void _handleOverlayVerticalDragUpdate(DragUpdateDetails details) {
+  void _handleOverlayVerticalDragStart(DragStartDetails details) {
     if (!_scrollController.hasClients) return;
     final position = _scrollController.position;
-    final target = (_scrollController.offset - details.delta.dy)
-        .clamp(position.minScrollExtent, position.maxScrollExtent)
-        .toDouble();
-    _scrollController.jumpTo(target);
+    if (position is! ScrollPositionWithSingleContext) return;
+
+    _overlayDrag?.cancel();
+    _overlayDrag = position.drag(details, () => _overlayDrag = null);
+  }
+
+  void _handleOverlayVerticalDragUpdate(DragUpdateDetails details) {
+    _overlayDrag?.update(details);
   }
 
   void _handleOverlayVerticalDragEnd(DragEndDetails details) {
-    if (!_scrollController.hasClients) return;
-    final position = _scrollController.position;
-    if (position is ScrollPositionWithSingleContext) {
-      position.goBallistic(-details.velocity.pixelsPerSecond.dy);
-    }
+    final drag = _overlayDrag;
+    _overlayDrag = null;
+    drag?.end(details);
+  }
+
+  void _handleOverlayVerticalDragCancel() {
+    final drag = _overlayDrag;
+    _overlayDrag = null;
+    drag?.cancel();
   }
 }
 
@@ -686,8 +696,10 @@ class ExerciseQuickNavMorph extends StatelessWidget {
   final double? Function() sourceDocumentTop;
   final List<Rect>? Function() destinationDocumentRects;
   final ValueChanged<ExerciseQuickNavItem> onTap;
+  final GestureDragStartCallback onVerticalDragStart;
   final GestureDragUpdateCallback onVerticalDragUpdate;
   final GestureDragEndCallback onVerticalDragEnd;
+  final GestureDragCancelCallback onVerticalDragCancel;
 
   const ExerciseQuickNavMorph({
     super.key,
@@ -695,8 +707,10 @@ class ExerciseQuickNavMorph extends StatelessWidget {
     required this.sourceDocumentTop,
     required this.destinationDocumentRects,
     required this.onTap,
+    required this.onVerticalDragStart,
     required this.onVerticalDragUpdate,
     required this.onVerticalDragEnd,
+    required this.onVerticalDragCancel,
   });
 
   @override
@@ -784,8 +798,10 @@ class ExerciseQuickNavMorph extends StatelessWidget {
                           ),
                       colors: colors,
                       onTap: () => onTap(ExerciseQuickNavItem.values[index]),
+                      onVerticalDragStart: onVerticalDragStart,
                       onVerticalDragUpdate: onVerticalDragUpdate,
                       onVerticalDragEnd: onVerticalDragEnd,
+                      onVerticalDragCancel: onVerticalDragCancel,
                     ),
                 ],
               ),
@@ -806,8 +822,10 @@ class _MorphButton extends StatelessWidget {
   final Rect destinationRect;
   final CoachlyExerciseTheme colors;
   final VoidCallback onTap;
+  final GestureDragStartCallback onVerticalDragStart;
   final GestureDragUpdateCallback onVerticalDragUpdate;
   final GestureDragEndCallback onVerticalDragEnd;
+  final GestureDragCancelCallback onVerticalDragCancel;
 
   const _MorphButton({
     required this.item,
@@ -818,8 +836,10 @@ class _MorphButton extends StatelessWidget {
     required this.destinationRect,
     required this.colors,
     required this.onTap,
+    required this.onVerticalDragStart,
     required this.onVerticalDragUpdate,
     required this.onVerticalDragEnd,
+    required this.onVerticalDragCancel,
   });
 
   @override
@@ -832,8 +852,10 @@ class _MorphButton extends StatelessWidget {
       rect: rect,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
+        onVerticalDragStart: onVerticalDragStart,
         onVerticalDragUpdate: onVerticalDragUpdate,
         onVerticalDragEnd: onVerticalDragEnd,
+        onVerticalDragCancel: onVerticalDragCancel,
         child: Semantics(
           button: true,
           label: item.actionLabel,
