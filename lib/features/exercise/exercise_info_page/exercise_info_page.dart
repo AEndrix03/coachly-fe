@@ -25,6 +25,18 @@ double _quickNavEntryProgress({
   return ((offset - entryStart) / 150).clamp(0.0, 1.0);
 }
 
+double _quickNavDeployProgress({
+  required double offset,
+  required List<Rect>? destinationDocumentRects,
+  required double viewportHeight,
+}) {
+  final firstDestinationTop = destinationDocumentRects?.firstOrNull?.top;
+  if (firstDestinationTop == null || viewportHeight <= 0) return 0;
+  final destinationViewportTop = firstDestinationTop - offset;
+  final morphStart = viewportHeight * 0.74;
+  return ((morphStart - destinationViewportTop) / 150).clamp(0.0, 1.0);
+}
+
 extension on ExerciseQuickNavItem {
   String get label => switch (this) {
     ExerciseQuickNavItem.biomechanics => 'Biomeccanica',
@@ -101,6 +113,7 @@ class ExerciseOverviewContent extends StatefulWidget {
 class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
+  final ValueNotifier<double> _railGutter = ValueNotifier(0);
   final GlobalKey _stackKey = GlobalKey();
   final GlobalKey _sourceKey = GlobalKey();
   final List<GlobalKey> _destinationKeys = List.generate(3, (_) => GlobalKey());
@@ -110,6 +123,11 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   bool _favorite = false;
   bool _expandedExecution = false;
   bool _expandedMistakes = false;
+  double _viewportHeight = 0;
+  double _safeTop = 0;
+  bool _reduceMotion = false;
+  int _lastDeployMeasurementBucket = -1;
+  bool _anchorRefreshScheduled = false;
 
   @override
   void initState() {
@@ -121,6 +139,11 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final media = MediaQuery.of(context);
+    _viewportHeight = media.size.height;
+    _safeTop = media.padding.top;
+    _reduceMotion = media.disableAnimations;
+    _updateRailGutter();
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => _measureAnchors(force: true),
     );
@@ -132,11 +155,59 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
       ..removeListener(_handleScroll)
       ..dispose();
     _scrollOffset.dispose();
+    _railGutter.dispose();
     super.dispose();
   }
 
   void _handleScroll() {
     _scrollOffset.value = _scrollController.offset;
+    _updateRailGutter();
+    _scheduleDestinationAnchorRefresh();
+  }
+
+  void _updateRailGutter() {
+    if (!_scrollController.hasClients || _sourceDocumentTop == null) {
+      _railGutter.value = 0;
+      return;
+    }
+    var entryProgress = _quickNavEntryProgress(
+      offset: _scrollController.offset,
+      sourceTop: _sourceDocumentTop!,
+      safeTop: _safeTop,
+    );
+    var deployProgress = _quickNavDeployProgress(
+      offset: _scrollController.offset,
+      destinationDocumentRects: _destinationDocumentRects,
+      viewportHeight: _viewportHeight,
+    );
+    if (_reduceMotion) {
+      entryProgress = entryProgress > 0.5 ? 1 : 0;
+      deployProgress = deployProgress > 0.5 ? 1 : 0;
+    }
+    _railGutter.value =
+        _quickNavRailGutter * entryProgress * (1 - deployProgress);
+  }
+
+  void _scheduleDestinationAnchorRefresh() {
+    final deployProgress = _quickNavDeployProgress(
+      offset: _scrollController.offset,
+      destinationDocumentRects: _destinationDocumentRects,
+      viewportHeight: _viewportHeight,
+    );
+    if (deployProgress <= 0) {
+      _lastDeployMeasurementBucket = -1;
+      return;
+    }
+    final bucket = (deployProgress * 4).floor().clamp(0, 4);
+    if (bucket == _lastDeployMeasurementBucket || _anchorRefreshScheduled) {
+      return;
+    }
+    _lastDeployMeasurementBucket = bucket;
+    _anchorRefreshScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _anchorRefreshScheduled = false;
+      _measureAnchors(force: true);
+    });
   }
 
   void _measureAnchors({bool force = false}) {
@@ -170,6 +241,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
         );
       }).toList();
     }
+    _updateRailGutter();
     if (mounted) setState(() {});
   }
 
@@ -216,10 +288,13 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                     ),
                     const SizedBox(height: 34),
                     _RailSafeSection(
+                      gutter: _railGutter,
                       child: _Description(text: widget.data.description),
                     ),
                     const SizedBox(height: 34),
                     _RailSafeSection(
+                      gutter: _railGutter,
+                      paddingKey: const Key('quick-nav-dynamic-gutter'),
                       child: _ExecutionSection(
                         execution: widget.data.execution,
                         expandedExecution: _expandedExecution,
@@ -234,6 +309,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                     ),
                     const SizedBox(height: 36),
                     _RailSafeSection(
+                      gutter: _railGutter,
                       child: _MusclesPreview(
                         data: widget.data,
                         onOpen: () => _openDetail(ExerciseQuickNavItem.muscles),
@@ -241,6 +317,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                     ),
                     const SizedBox(height: 36),
                     _RailSafeSection(
+                      gutter: _railGutter,
                       child: _BiomechanicsPreview(
                         data: widget.data,
                         onOpen: () =>
@@ -249,6 +326,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                     ),
                     const SizedBox(height: 36),
                     _RailSafeSection(
+                      gutter: _railGutter,
                       child: _EquipmentSection(
                         equipment: widget.data.equipment,
                       ),
@@ -256,6 +334,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                     if (widget.data.safetyNote.isNotEmpty) ...[
                       const SizedBox(height: 36),
                       _RailSafeSection(
+                        gutter: _railGutter,
                         child: _SafetySection(note: widget.data.safetyNote),
                       ),
                     ],
@@ -615,11 +694,11 @@ class ExerciseQuickNavMorph extends StatelessWidget {
             final destinationViewportRects = destinations
                 ?.map((rect) => rect.translate(0, -offset))
                 .toList();
-            final firstDestinationTop = destinationViewportRects?.first.top;
-            final morphStart = size.height * 0.74;
-            final deployProgress = firstDestinationTop == null
-                ? 0.0
-                : ((morphStart - firstDestinationTop) / 150).clamp(0.0, 1.0);
+            final deployProgress = _quickNavDeployProgress(
+              offset: offset,
+              destinationDocumentRects: destinations,
+              viewportHeight: size.height,
+            );
             final reduceMotion = MediaQuery.disableAnimationsOf(context);
             final effectiveEntryProgress = reduceMotion
                 ? (entryProgress > 0.5 ? 1.0 : 0.0)
@@ -809,15 +888,26 @@ class _MorphButton extends StatelessWidget {
 }
 
 class _RailSafeSection extends StatelessWidget {
+  final ValueListenable<double> gutter;
+  final Key? paddingKey;
   final Widget child;
 
-  const _RailSafeSection({required this.child});
+  const _RailSafeSection({
+    required this.gutter,
+    this.paddingKey,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: _quickNavRailGutter),
+    return ValueListenableBuilder<double>(
+      valueListenable: gutter,
       child: child,
+      builder: (_, value, child) => Padding(
+        key: paddingKey,
+        padding: EdgeInsets.only(right: value),
+        child: child,
+      ),
     );
   }
 }

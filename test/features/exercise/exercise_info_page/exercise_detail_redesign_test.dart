@@ -159,6 +159,16 @@ void main() {
     await tester.pumpWidget(overview());
     expect(find.byKey(const Key('floating-quick-nav-muscles')), findsNothing);
     expect(
+      (tester
+                  .widget<Padding>(
+                    find.byKey(const Key('quick-nav-dynamic-gutter')),
+                  )
+                  .padding
+              as EdgeInsets)
+          .right,
+      0,
+    );
+    expect(
       tester
           .widget<Opacity>(
             find.byKey(const Key('quick-nav-static-source-opacity')),
@@ -173,6 +183,16 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('floating-quick-nav-muscles')), findsOneWidget);
+    expect(
+      (tester
+                  .widget<Padding>(
+                    find.byKey(const Key('quick-nav-dynamic-gutter')),
+                  )
+                  .padding
+              as EdgeInsets)
+          .right,
+      closeTo(54, 0.1),
+    );
     expect(
       tester
           .widget<Opacity>(
