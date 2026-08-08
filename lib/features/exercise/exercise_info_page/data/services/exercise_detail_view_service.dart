@@ -1,5 +1,5 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/fixtures/exercise_detail_mock_fixture.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository.dart';
+import 'package:coachly/core/network/api_client.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/exercise_detail_api_dto.dart';
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/material.dart';
@@ -8,141 +8,267 @@ abstract interface class ExerciseDetailViewService {
   Future<ExerciseDetailViewData> fetch(String exerciseId, Locale locale);
 }
 
-class MockExerciseDetailViewService implements ExerciseDetailViewService {
-  const MockExerciseDetailViewService();
-
-  @override
-  Future<ExerciseDetailViewData> fetch(String exerciseId, Locale locale) async {
-    return latPulldownExerciseFixture;
-  }
-}
-
 class ApiExerciseDetailViewService implements ExerciseDetailViewService {
-  final IExerciseInfoPageRepository _repository;
+  final ApiClient _apiClient;
 
-  const ApiExerciseDetailViewService(this._repository);
+  const ApiExerciseDetailViewService(this._apiClient);
 
   @override
   Future<ExerciseDetailViewData> fetch(String exerciseId, Locale locale) async {
-    final response = await _repository.getExerciseDetail(exerciseId);
+    final response = await _apiClient.get<ExerciseDetailApiDto>(
+      '/exercises/$exerciseId/details',
+      fromJson: (json) =>
+          ExerciseDetailApiDto.fromJson(Map<String, dynamic>.from(json as Map)),
+    );
     final exercise = response.data;
     if (!response.success || exercise == null) {
       throw StateError(response.message ?? 'Impossibile caricare l’esercizio');
     }
 
-    final media =
-        exercise.media?.where((item) => item.isPrimary).firstOrNull ??
-        exercise.media?.firstOrNull;
-    final localizedName = exercise.nameI18n?.fromI18n(locale).trim();
-    final localizedDescription = exercise.descriptionI18n
-        ?.fromI18n(locale)
-        .trim();
-    final tips = exercise.tipsI18n?.fromI18n(locale).trim() ?? '';
-    final steps = tips
-        .split(RegExp(r'[\n•]+'))
-        .map((item) => item.trim())
-        .where((item) => item.isNotEmpty)
-        .toList();
+    return _toViewData(exercise, exerciseId, locale);
+  }
+
+  static ExerciseDetailViewData _toViewData(
+    ExerciseDetailApiDto exercise,
+    String requestedId,
+    Locale locale,
+  ) {
+    final primaryPattern = _primaryPattern(exercise.movementProfile.patterns);
+    final pattern = _localized(
+      primaryPattern?.nameI18n ?? const {},
+      locale,
+      fallback: _humanize(primaryPattern?.code),
+    );
+    final biomechanics = exercise.biomechanics;
+    final media = _preferredMedia(exercise.media);
+    final safetyNote = _safetyNote(exercise.safety, locale);
 
     return ExerciseDetailViewData(
-      id: exercise.id ?? exerciseId,
-      code: exercise.id ?? exerciseId,
-      name: localizedName?.isNotEmpty == true ? localizedName! : 'Esercizio',
-      description: localizedDescription?.isNotEmpty == true
-          ? localizedDescription!
-          : 'Scopri tecnica, muscoli coinvolti e caratteristiche del movimento.',
-      catalogStatus: exercise.isPersonal ? 'personal' : 'published',
-      exerciseKind: exercise.mechanicsType ?? 'Multi-joint',
-      unilateral: exercise.isUnilateral ?? false,
-      bodyweight: exercise.isBodyweight ?? false,
+      id: exercise.id.isNotEmpty ? exercise.id : requestedId,
+      code: exercise.code.isNotEmpty ? exercise.code : requestedId,
+      name: _localized(exercise.nameI18n, locale, fallback: 'Esercizio'),
+      description: exercise.descriptionI18n.fromI18n(locale).trim(),
+      catalogStatus: _label(exercise.catalogStatus),
+      exerciseKind: _label(exercise.exerciseKind),
+      unilateral: exercise.unilateral,
+      bodyweight: exercise.bodyweight,
       media: ExerciseMediaViewData(
         kind: media == null
             ? ExerciseMediaKind.placeholder
-            : media.mediaType.toLowerCase().contains('video')
+            : media.mediaType?.toLowerCase() == 'video'
             ? ExerciseMediaKind.video
             : ExerciseMediaKind.image,
         url: media?.mediaUrl,
         thumbnailUrl: media?.thumbnailUrl,
-        movementLabel: _humanize(exercise.forceType ?? 'Movement'),
+        movementLabel: pattern,
       ),
       movementProfile: ExerciseMovementProfileViewData(
-        pattern: _humanize(exercise.forceType ?? 'Movement'),
-        jointClass: _humanize(exercise.mechanicsType ?? 'Multi-joint'),
-        resistanceSource: exercise.isBodyweight.bodyweightLabel,
-        kineticChain: 'Non disponibile',
-        laterality: exercise.isUnilateral == true
-            ? 'Unilaterale'
-            : 'Bilaterale',
+        pattern: pattern,
+        jointClass: _label(exercise.jointClass),
+        resistanceSource: _label(biomechanics?.resistanceSource),
+        kineticChain: null,
+        laterality: exercise.unilateral ? 'Unilaterale' : 'Bilaterale',
       ),
       muscles: [
-        for (final item in exercise.muscles ?? const [])
+        for (final association in exercise.muscles)
           MuscleViewData(
-            id: item.muscle?.id ?? 'muscle',
-            name: item.muscle?.nameI18n.fromI18n(locale) ?? 'Muscolo',
-            role: MuscleRole.secondary,
-            tension: const MuscleTensionViewData(
-              lengthened: TensionLevel.moderate,
-              midRange: TensionLevel.moderate,
-              shortened: TensionLevel.moderate,
+            id: association.muscle.id.isNotEmpty
+                ? association.muscle.id
+                : association.muscle.code,
+            name: _localized(
+              association.muscle.nameI18n,
+              locale,
+              fallback: _humanize(association.muscle.code),
+            ),
+            role: _muscleRole(association.involvement),
+            tension: MuscleTensionViewData(
+              lengthened: _tension(association.tensionProfile?.lengthened),
+              midRange: _tension(association.tensionProfile?.midrange),
+              shortened: _tension(association.tensionProfile?.shortened),
             ),
           ),
       ],
       biomechanics: ExerciseBiomechanicsViewData(
         training: ExerciseTrainingCharacteristicsViewData(
-          stability: 'Non disponibile',
-          spinalLoad: 'Non disponibile',
-          technicalDemand: _humanize(exercise.difficultyLevel ?? 'Moderata'),
+          stability: _label(biomechanics?.stabilityDemand),
+          spinalLoad: _label(biomechanics?.spinalLoading),
+          technicalDemand: _label(exercise.technicalDemand),
         ),
-        jointActions: const [],
-        resistanceProfile: const [],
-        evidenceOrigin: 'Dati catalogo Coachly',
-        evidenceConfidence: 'In aggiornamento',
+        jointActions: [
+          for (final action in exercise.movementProfile.jointActions)
+            JointActionViewData(
+              joint: _label(action.jointCode),
+              action: _localized(
+                action.nameI18n,
+                locale,
+                fallback: _humanize(action.actionCode),
+              ),
+            ),
+        ],
+        resistanceProfile: _resistanceProfile(
+          biomechanics?.externalResistanceProfile,
+        ),
+        evidenceOrigin: _label(biomechanics?.evidenceBasis),
+        evidenceConfidence: _label(biomechanics?.confidence),
       ),
       equipment: [
-        for (final item in exercise.equipments ?? const [])
+        for (final association in exercise.equipments)
           EquipmentViewData(
-            name: item.equipment.nameI18n.fromI18n(locale),
-            required: item.isRequired,
+            name: _localized(
+              association.equipment.nameI18n,
+              locale,
+              fallback: _humanize(association.equipment.code),
+            ),
+            required: association.required,
           ),
       ],
       execution: ExerciseExecutionViewData(
-        steps: steps.isEmpty
-            ? const [
-                'Imposta una posizione stabile.',
-                'Esegui il movimento con controllo.',
-                'Mantieni una respirazione regolare.',
-              ]
-            : steps,
+        steps: _executionSteps(exercise.tipsI18n.fromI18n(locale)),
         commonMistakes: const [],
       ),
       variants: [
-        for (final item in exercise.variants ?? const [])
+        for (final variant in exercise.variants)
           VariantViewData(
-            id: item.id ?? '',
-            name: item.nameI18n?.fromI18n(locale) ?? 'Variante',
-            relationAxis: 'Tecnica',
-            similarity: VariantSimilarity.similar,
-            summary:
-                item.descriptionI18n?.fromI18n(locale) ??
-                'Una diversa interpretazione dello stesso pattern.',
+            id: variant.id,
+            name: _localized(variant.nameI18n, locale, fallback: 'Variante'),
+            relationAxis: _label(variant.variationAxis),
+            similarity: null,
+            summary: variant.descriptionI18n.fromI18n(locale).trim(),
           ),
       ],
-      safetyNote:
-          exercise.safety?.firstOrNull?.safetyNotesI18n.fromI18n(locale) ?? '',
+      safetyNote: safetyNote,
     );
   }
 
-  static String _humanize(String value) => value
-      .replaceAll('_', ' ')
-      .split(' ')
-      .where((part) => part.isNotEmpty)
-      .map(
-        (part) => '${part[0].toUpperCase()}${part.substring(1).toLowerCase()}',
-      )
-      .join(' ');
-}
+  static ExerciseMovementPatternApiDto? _primaryPattern(
+    List<ExerciseMovementPatternApiDto> patterns,
+  ) {
+    for (final pattern in patterns) {
+      if (pattern.role?.toLowerCase() == 'primary') return pattern;
+    }
+    return patterns.isEmpty ? null : patterns.first;
+  }
 
-extension on bool? {
-  String get bodyweightLabel =>
-      this is bool && this == true ? 'Corpo libero' : 'Attrezzatura';
+  static ExerciseMediaApiDto? _preferredMedia(List<ExerciseMediaApiDto> media) {
+    final visible = media.where((item) => item.public).toList(growable: false);
+    for (final item in visible) {
+      if (item.primary) return item;
+    }
+    return visible.isEmpty ? null : visible.first;
+  }
+
+  static String _localized(
+    Map<String, String> values,
+    Locale locale, {
+    required String fallback,
+  }) {
+    final localized = values.fromI18n(locale).trim();
+    return localized.isEmpty ? fallback : localized;
+  }
+
+  static List<String> _executionSteps(String tips) => tips
+      .split(RegExp(r'(?:\r?\n|•|\s+\d+[.)]\s+)'))
+      .map((item) => item.replaceFirst(RegExp(r'^\s*[-–]\s*'), '').trim())
+      .where((item) => item.isNotEmpty)
+      .toList(growable: false);
+
+  static String _safetyNote(ExerciseSafetyApiDto? safety, Locale locale) {
+    if (safety == null) return '';
+    final note = safety.notesI18n.fromI18n(locale).trim();
+    if (note.isNotEmpty) return note;
+    return switch (safety.spotterPolicy?.toLowerCase()) {
+      'recommended' => 'È consigliata l’assistenza di uno spotter.',
+      'recommended_high_effort' =>
+        'È consigliata l’assistenza di uno spotter nelle serie ad alta intensità.',
+      _ => '',
+    };
+  }
+
+  static MuscleRole _muscleRole(String? value) =>
+      switch (value?.toLowerCase()) {
+        'primary' => MuscleRole.primary,
+        'stabilizer' => MuscleRole.stabilizer,
+        _ => MuscleRole.secondary,
+      };
+
+  static TensionLevel _tension(String? value) => switch (value?.toLowerCase()) {
+    'low' => TensionLevel.low,
+    'moderate' => TensionLevel.moderate,
+    'high' => TensionLevel.high,
+    _ => TensionLevel.none,
+  };
+
+  static List<double> _resistanceProfile(String? value) =>
+      switch (value?.toLowerCase()) {
+        'early_rom' => const [0.9, 0.8, 0.68, 0.54, 0.42],
+        'mid_rom' => const [0.44, 0.64, 0.9, 0.64, 0.44],
+        'late_rom' => const [0.4, 0.52, 0.66, 0.8, 0.92],
+        'even' => const [0.68, 0.69, 0.68, 0.69, 0.68],
+        'variable' => const [0.48, 0.76, 0.56, 0.82, 0.58],
+        _ => const [],
+      };
+
+  static String _label(String? raw) {
+    final value = raw?.toLowerCase();
+    const labels = <String, String>{
+      'standard': 'Standard',
+      'verified': 'Verificato',
+      'draft': 'Bozza',
+      'resistance': 'Resistenza',
+      'mobility': 'Mobilità',
+      'conditioning': 'Condizionamento',
+      'single_joint': 'Monoarticolare',
+      'multi_joint': 'Multiarticolare',
+      'low': 'Bassa',
+      'moderate': 'Moderata',
+      'high': 'Alta',
+      'none': 'Nessuno',
+      'gravity': 'Gravità',
+      'cable': 'Cavo',
+      'band': 'Elastico',
+      'cam_machine': 'Macchina a camma',
+      'bodyweight_leverage': 'Peso corporeo',
+      'hydraulic': 'Resistenza idraulica',
+      'isometric_external': 'Resistenza isometrica esterna',
+      'shoulder': 'Spalla',
+      'elbow': 'Gomito',
+      'scapula': 'Scapola',
+      'hip': 'Anca',
+      'knee': 'Ginocchio',
+      'ankle': 'Caviglia',
+      'spine': 'Colonna',
+      'grip': 'Presa',
+      'unilateral': 'Unilaterale',
+      'equipment': 'Attrezzatura',
+      'stance': 'Posizione',
+      'angle': 'Angolo',
+      'rom': 'Range di movimento',
+      'resistance_source': 'Resistenza',
+      'technique': 'Tecnica',
+      'tempo': 'Tempo',
+      'assistance': 'Assistenza',
+      'measured': 'Misurazioni',
+      'literature': 'Letteratura',
+      'biomechanical_model': 'Modello biomeccanico',
+      'expert_curated': 'Revisione esperta',
+      'heuristic': 'Stima euristica',
+      'curated': 'Dati revisionati',
+      'modeled': 'Dati modellati',
+      'estimated': 'Dati stimati',
+    };
+    return labels[value] ?? _humanize(raw);
+  }
+
+  static String _humanize(String? value) {
+    if (value == null || value.trim().isEmpty) return '';
+    return value
+        .replaceAll('_', ' ')
+        .trim()
+        .split(RegExp(r'\s+'))
+        .map(
+          (part) =>
+              '${part[0].toUpperCase()}${part.substring(1).toLowerCase()}',
+        )
+        .join(' ');
+  }
 }

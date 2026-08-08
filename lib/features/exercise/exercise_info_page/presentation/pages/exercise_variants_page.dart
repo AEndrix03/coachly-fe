@@ -133,10 +133,14 @@ class VariantTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
+    final similarity = variant.similarity;
     return Semantics(
       button: true,
-      label:
-          '${variant.name}, ${variant.relationAxis}, ${_similarityLabel(variant.similarity)}',
+      label: [
+        variant.name,
+        variant.relationAxis,
+        if (similarity != null) _similarityLabel(similarity),
+      ].join(', '),
       child: InkWell(
         key: Key('variant-${variant.id}'),
         onTap: onTap,
@@ -190,13 +194,14 @@ class VariantTile extends StatelessWidget {
                             letterSpacing: 0.7,
                           ),
                         ),
-                        Text(
-                          _similarityLabel(variant.similarity),
-                          style: TextStyle(
-                            color: colors.textSecondary,
-                            fontSize: 11,
+                        if (variant.similarity case final similarity?)
+                          Text(
+                            _similarityLabel(similarity),
+                            style: TextStyle(
+                              color: colors.textSecondary,
+                              fontSize: 11,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 8),

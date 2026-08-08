@@ -4,7 +4,7 @@ enum ExerciseMediaKind { video, image, placeholder }
 
 enum MuscleRole { primary, secondary, stabilizer }
 
-enum TensionLevel { low, moderate, high }
+enum TensionLevel { none, low, moderate, high }
 
 enum VariantSimilarity { verySimilar, similar, different }
 
@@ -28,7 +28,7 @@ class ExerciseMovementProfileViewData {
   final String pattern;
   final String jointClass;
   final String resistanceSource;
-  final String kineticChain;
+  final String? kineticChain;
   final String laterality;
 
   const ExerciseMovementProfileViewData({
@@ -102,7 +102,7 @@ class VariantViewData {
   final String id;
   final String name;
   final String relationAxis;
-  final VariantSimilarity similarity;
+  final VariantSimilarity? similarity;
   final String summary;
 
   const VariantViewData({

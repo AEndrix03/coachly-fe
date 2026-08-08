@@ -732,6 +732,7 @@ String muscleRoleLabel(MuscleRole role) => switch (role) {
 };
 
 String tensionLabel(TensionLevel level) => switch (level) {
+  TensionLevel.none => 'assente',
   TensionLevel.low => 'bassa',
   TensionLevel.moderate => 'moderata',
   TensionLevel.high => 'alta',
@@ -746,6 +747,7 @@ class TensionDots extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
     final activeCount = switch (level) {
+      TensionLevel.none => 0,
       TensionLevel.low => 1,
       TensionLevel.moderate => 2,
       TensionLevel.high => 3,

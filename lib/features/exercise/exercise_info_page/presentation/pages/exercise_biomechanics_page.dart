@@ -55,7 +55,8 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 _DataRows(
                   rows: [
-                    ('Catena cinetica', data.movementProfile.kineticChain),
+                    if (data.movementProfile.kineticChain case final chain?)
+                      if (chain.isNotEmpty) ('Catena cinetica', chain),
                     ('Lateralità', data.movementProfile.laterality),
                   ],
                 ),
