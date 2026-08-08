@@ -158,6 +158,14 @@ void main() {
   ) async {
     await tester.pumpWidget(overview());
     expect(find.byKey(const Key('floating-quick-nav-muscles')), findsNothing);
+    expect(
+      tester
+          .widget<Opacity>(
+            find.byKey(const Key('quick-nav-static-source-opacity')),
+          )
+          .opacity,
+      1,
+    );
 
     await tester.drag(
       find.byKey(const Key('exercise-overview-scroll')),
@@ -165,6 +173,14 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('floating-quick-nav-muscles')), findsOneWidget);
+    expect(
+      tester
+          .widget<Opacity>(
+            find.byKey(const Key('quick-nav-static-source-opacity')),
+          )
+          .opacity,
+      0,
+    );
 
     await tester.scrollUntilVisible(find.text('Da ricordare'), 650);
     await tester.pumpAndSettle();
@@ -192,6 +208,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(
+      tester
+          .widget<Opacity>(
+            find.byKey(const Key('quick-nav-static-destination-opacity')),
+          )
+          .opacity,
+      0,
+    );
     expect(find.text('Analizza la biomeccanica'), findsWidgets);
     expect(find.text('Esplora i muscoli'), findsWidgets);
     expect(find.text('Esplora le varianti'), findsWidgets);

@@ -16,6 +16,15 @@ enum ExerciseQuickNavItem { biomechanics, muscles, variants }
 
 const _quickNavRailGutter = 54.0;
 
+double _quickNavEntryProgress({
+  required double offset,
+  required double sourceTop,
+  required double safeTop,
+}) {
+  final entryStart = sourceTop - safeTop - 62;
+  return ((offset - entryStart) / 150).clamp(0.0, 1.0);
+}
+
 extension on ExerciseQuickNavItem {
   String get label => switch (this) {
     ExerciseQuickNavItem.biomechanics => 'Biomeccanica',
@@ -196,9 +205,13 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                     const SizedBox(height: 18),
                     _Entrance(
                       delay: const Duration(milliseconds: 45),
-                      child: ExerciseQuickNavAnchor(
-                        key: _sourceKey,
-                        onTap: _openDetail,
+                      child: _QuickNavSourceVisibility(
+                        scrollOffset: _scrollOffset,
+                        sourceDocumentTop: () => _sourceDocumentTop,
+                        child: ExerciseQuickNavAnchor(
+                          key: _sourceKey,
+                          onTap: _openDetail,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 34),
@@ -423,6 +436,45 @@ class ExerciseQuickNavAnchor extends StatelessWidget {
   }
 }
 
+class _QuickNavSourceVisibility extends StatelessWidget {
+  final ValueListenable<double> scrollOffset;
+  final double? Function() sourceDocumentTop;
+  final Widget child;
+
+  const _QuickNavSourceVisibility({
+    required this.scrollOffset,
+    required this.sourceDocumentTop,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<double>(
+      valueListenable: scrollOffset,
+      child: child,
+      builder: (context, offset, child) {
+        final sourceTop = sourceDocumentTop();
+        final isMoving =
+            sourceTop != null &&
+            _quickNavEntryProgress(
+                  offset: offset,
+                  sourceTop: sourceTop,
+                  safeTop: MediaQuery.paddingOf(context).top,
+                ) >
+                0;
+        return IgnorePointer(
+          ignoring: isMoving,
+          child: Opacity(
+            key: const Key('quick-nav-static-source-opacity'),
+            opacity: isMoving ? 0 : 1,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+}
+
 class ExerciseQuickNavDestination extends StatefulWidget {
   final List<GlobalKey> keys;
   final ValueChanged<ExerciseQuickNavItem> onTap;
@@ -453,63 +505,72 @@ class _ExerciseQuickNavDestinationState
   @override
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
-    return Column(
-      children: [
-        for (
-          var index = 0;
-          index < ExerciseQuickNavItem.values.length;
-          index++
-        ) ...[
-          if (index > 0) const SizedBox(height: 10),
-          SizedBox(
-            key: widget.keys[index],
-            width: double.infinity,
-            height: 58,
-            child: OutlinedButton(
-              key: Key(
-                'quick-nav-destination-${ExerciseQuickNavItem.values[index].name}',
-              ),
-              onPressed: () => widget.onTap(ExerciseQuickNavItem.values[index]),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                foregroundColor: colors.textPrimary,
-                side: BorderSide(color: colors.border),
-                backgroundColor: colors.surfaceElevated,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    ExerciseQuickNavItem.values[index].icon,
-                    color: colors.primary,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      ExerciseQuickNavItem.values[index].actionLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+    return IgnorePointer(
+      child: ExcludeSemantics(
+        child: Opacity(
+          key: const Key('quick-nav-static-destination-opacity'),
+          opacity: 0,
+          child: Column(
+            children: [
+              for (
+                var index = 0;
+                index < ExerciseQuickNavItem.values.length;
+                index++
+              ) ...[
+                if (index > 0) const SizedBox(height: 10),
+                SizedBox(
+                  key: widget.keys[index],
+                  width: double.infinity,
+                  height: 58,
+                  child: OutlinedButton(
+                    key: Key(
+                      'quick-nav-destination-${ExerciseQuickNavItem.values[index].name}',
+                    ),
+                    onPressed: () =>
+                        widget.onTap(ExerciseQuickNavItem.values[index]),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      foregroundColor: colors.textPrimary,
+                      side: BorderSide(color: colors.border),
+                      backgroundColor: colors.surfaceElevated,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          ExerciseQuickNavItem.values[index].icon,
+                          color: colors.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            ExerciseQuickNavItem.values[index].actionLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          color: colors.textSecondary,
+                          size: 21,
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: colors.textSecondary,
-                    size: 21,
-                  ),
-                ],
-              ),
-            ),
+                ),
+              ],
+            ],
           ),
-        ],
-      ],
+        ),
+      ),
     );
   }
 }
@@ -543,8 +604,11 @@ class ExerciseQuickNavMorph extends StatelessWidget {
             }
             final size = MediaQuery.sizeOf(context);
             final safeTop = MediaQuery.paddingOf(context).top;
-            final entryStart = sourceTop - safeTop - 62;
-            final entryProgress = ((offset - entryStart) / 150).clamp(0.0, 1.0);
+            final entryProgress = _quickNavEntryProgress(
+              offset: offset,
+              sourceTop: sourceTop,
+              safeTop: safeTop,
+            );
             if (entryProgress <= 0) return const SizedBox.shrink();
 
             final destinations = destinationDocumentRects();
@@ -976,7 +1040,7 @@ class _MusclesPreview extends StatelessWidget {
         const ExerciseSectionTitle('Muscoli coinvolti'),
         const SizedBox(height: 14),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: colors.surface,
             borderRadius: BorderRadius.circular(20),
@@ -986,14 +1050,14 @@ class _MusclesPreview extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                width: 118,
-                height: 176,
+                width: 96,
+                height: 164,
                 child: _OptionalMuscleHero(
                   tag: 'exercise-muscles-${data.id}',
                   child: MuscleAnatomyView(muscles: data.muscles),
                 ),
               ),
-              const SizedBox(width: 18),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
