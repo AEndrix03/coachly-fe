@@ -263,16 +263,18 @@ class _DataRows extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
+                  flex: 1,
                   child: Text(
                     rows[index].$1,
                     style: TextStyle(color: colors.textSecondary),
                   ),
                 ),
                 const SizedBox(width: 18),
-                Flexible(
+                Expanded(
+                  flex: 1,
                   child: Text(
                     rows[index].$2,
-                    textAlign: TextAlign.end,
+                    textAlign: TextAlign.start,
                     style: TextStyle(
                       color: colors.textPrimary,
                       fontWeight: FontWeight.w500,
