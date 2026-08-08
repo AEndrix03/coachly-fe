@@ -184,8 +184,11 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
       entryProgress = entryProgress > 0.5 ? 1 : 0;
       deployProgress = deployProgress > 0.5 ? 1 : 0;
     }
+    final gutterRelease = deployProgress >= 0.78
+        ? 1.0
+        : Curves.easeOutCubic.transform(deployProgress);
     _railGutter.value =
-        _quickNavRailGutter * entryProgress * (1 - deployProgress);
+        _quickNavRailGutter * entryProgress * (1 - gutterRelease);
   }
 
   void _scheduleDestinationAnchorRefresh() {
@@ -335,6 +338,7 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                       const SizedBox(height: 36),
                       _RailSafeSection(
                         gutter: _railGutter,
+                        paddingKey: const Key('quick-nav-bottom-gutter'),
                         child: _SafetySection(note: widget.data.safetyNote),
                       ),
                     ],

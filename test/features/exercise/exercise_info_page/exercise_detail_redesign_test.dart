@@ -226,8 +226,22 @@ void main() {
       find.byKey(const Key('quick-nav-destination-biomechanics')),
       650,
     );
+    await tester.drag(
+      find.byKey(const Key('exercise-overview-scroll')),
+      const Offset(0, -1000),
+    );
     await tester.pumpAndSettle();
 
+    expect(
+      (tester
+                  .widget<Padding>(
+                    find.byKey(const Key('quick-nav-bottom-gutter')),
+                  )
+                  .padding
+              as EdgeInsets)
+          .right,
+      0,
+    );
     expect(
       tester
           .widget<Opacity>(
