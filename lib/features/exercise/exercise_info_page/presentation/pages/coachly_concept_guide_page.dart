@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 enum CoachlyGuideTopic {
   jointActions,
   stability,
+  trainingCharacteristics,
   resistanceSources,
   resistanceProfile,
   tensionInRom,
@@ -14,6 +15,8 @@ extension CoachlyGuideTopicCopy on CoachlyGuideTopic {
   String get title => switch (this) {
     CoachlyGuideTopic.jointActions => 'Azioni articolari',
     CoachlyGuideTopic.stability => 'Stabilità richiesta',
+    CoachlyGuideTopic.trainingCharacteristics =>
+      'Caratteristiche di allenamento',
     CoachlyGuideTopic.resistanceSources => 'Fonti di resistenza',
     CoachlyGuideTopic.resistanceProfile => 'Profilo di resistenza',
     CoachlyGuideTopic.tensionInRom => 'Tensione nel ROM',
@@ -25,6 +28,8 @@ extension CoachlyGuideTopicCopy on CoachlyGuideTopic {
       'Un modo semplice per descrivere quali articolazioni si muovono e in quale direzione durante un esercizio.',
     CoachlyGuideTopic.stability =>
       'Quanto supporto ricevi dall’esterno e quanto controllo deve produrre il tuo corpo mentre applichi forza.',
+    CoachlyGuideTopic.trainingCharacteristics =>
+      'Tre coordinate per capire quanto controllo, carico sulla colonna e precisione tecnica richiede un esercizio.',
     CoachlyGuideTopic.resistanceSources =>
       'La resistenza non arriva sempre dalla stessa direzione: capire la fonte rende più leggibile tutto il movimento.',
     CoachlyGuideTopic.resistanceProfile =>
@@ -116,6 +121,8 @@ class CoachlyConceptGuidePage extends StatelessWidget {
   Widget _topicVisual(CoachlyGuideTopic topic) => switch (topic) {
     CoachlyGuideTopic.jointActions => const _JointActionsVisual(),
     CoachlyGuideTopic.stability => const _StabilityVisual(),
+    CoachlyGuideTopic.trainingCharacteristics =>
+      const _TrainingCharacteristicsVisual(),
     CoachlyGuideTopic.resistanceSources => const _ResistanceSourcesVisual(),
     CoachlyGuideTopic.resistanceProfile => const _ResistanceProfileVisual(),
     CoachlyGuideTopic.tensionInRom => const _TensionRomVisual(),
@@ -185,6 +192,43 @@ class CoachlyConceptGuidePage extends StatelessWidget {
         title: 'Domanda pratica',
         body:
             'Il limite della serie è il muscolo che vuoi allenare oppure il tentativo di mantenere posizione e traiettoria? La risposta aiuta a scegliere il livello di stabilità adatto.',
+      ),
+    ],
+    CoachlyGuideTopic.trainingCharacteristics => const [
+      _GuideSection(
+        title: 'Tre informazioni, non un voto',
+        body:
+            'Stabilità richiesta, carico spinale e richiesta tecnica descrivono aspetti diversi dell’esercizio. Un valore alto o basso non rende automaticamente il movimento migliore o peggiore.',
+      ),
+      _GuideSection(
+        title: 'Come leggerle',
+        child: _DefinitionList(
+          items: [
+            (
+              'Stabilità richiesta',
+              'Quanto controllo devi produrre rispetto al supporto offerto da macchina, panca e appoggi.',
+            ),
+            (
+              'Carico spinale',
+              'Quanto la colonna tende a partecipare alla gestione del carico esterno e della posizione.',
+            ),
+            (
+              'Richiesta tecnica',
+              'Quanto coordinazione, precisione e pratica servono per ripetere bene il gesto.',
+            ),
+          ],
+        ),
+      ),
+      _GuideCallout(
+        icon: Icons.tune_rounded,
+        title: 'Usale nel contesto',
+        body:
+            'Dopo molto lavoro per schiena o gambe potresti preferire più supporto e minor carico spinale. Quando vuoi allenare anche il controllo del gesto, una richiesta tecnica maggiore può invece essere intenzionale.',
+      ),
+      _GuideSection(
+        title: 'Per confrontare due esercizi',
+        body:
+            'Parti dal target e dal pattern, poi usa queste tre caratteristiche per capire quale variante si integra meglio nella seduta e quale costo di fatica o apprendimento comporta.',
       ),
     ],
     CoachlyGuideTopic.resistanceSources => const [
@@ -881,6 +925,80 @@ class _MotionGlyph extends StatelessWidget {
           label,
           textAlign: TextAlign.center,
           style: TextStyle(color: colors.textSecondary, fontSize: 12),
+        ),
+      ],
+    );
+  }
+}
+
+class _TrainingCharacteristicsVisual extends StatelessWidget {
+  const _TrainingCharacteristicsVisual();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        _TrainingMetric(
+          icon: Icons.balance_rounded,
+          label: 'Stabilità',
+          value: 'Controllo',
+        ),
+        SizedBox(height: 12),
+        _TrainingMetric(
+          icon: Icons.vertical_align_center_rounded,
+          label: 'Carico spinale',
+          value: 'Stress',
+        ),
+        SizedBox(height: 12),
+        _TrainingMetric(
+          icon: Icons.gesture_rounded,
+          label: 'Tecnica',
+          value: 'Precisione',
+        ),
+      ],
+    );
+  }
+}
+
+class _TrainingMetric extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _TrainingMetric({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Row(
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: colors.surfaceElevated,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(icon, color: colors.primary, size: 21),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(color: colors.textSecondary, fontSize: 13),
         ),
       ],
     );

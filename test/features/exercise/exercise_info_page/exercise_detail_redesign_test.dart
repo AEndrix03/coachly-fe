@@ -65,7 +65,9 @@ void main() {
     expect(find.text('Ho capito'), findsOneWidget);
   });
 
-  testWidgets('biomechanics explains both resistance concepts', (tester) async {
+  testWidgets('biomechanics explains grouped and resistance concepts', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: exerciseDetailTheme(ThemeData.dark()),
@@ -96,6 +98,12 @@ void main() {
       );
       await tester.pumpAndSettle();
     }
+
+    await openInfo('Caratteristiche di allenamento');
+    expect(find.textContaining('tre aspetti distinti'), findsOneWidget);
+    expect(find.text('Caratteristiche di allenamento'), findsNWidgets(2));
+    await tester.tap(find.text('Ho capito'));
+    await tester.pumpAndSettle();
 
     await openInfo('Fonte di resistenza');
     expect(find.textContaining('cavo, un peso libero'), findsOneWidget);

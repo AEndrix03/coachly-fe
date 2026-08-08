@@ -91,12 +91,12 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                   'Caratteristiche di allenamento',
                   onInfo: () => showCoachlyInfoSheet(
                     context,
-                    title: 'Stabilità richiesta',
+                    title: 'Caratteristiche di allenamento',
                     description:
-                        'Indica quanto controllo esterno fornisce l’esercizio e quanta stabilizzazione devi produrre tu.',
+                        'Riassumono stabilità richiesta, carico spinale e difficoltà tecnica: tre aspetti distinti del modo in cui affronti l’esercizio.',
                     whyItMatters:
-                        'Più stabilità può aiutare a concentrarsi sul target, ma non rende automaticamente un esercizio migliore.',
-                    guideTopic: CoachlyGuideTopic.stability,
+                        'Aiutano a scegliere e confrontare gli esercizi in base al contesto, senza trasformare una singola caratteristica in un giudizio di qualità.',
+                    guideTopic: CoachlyGuideTopic.trainingCharacteristics,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -129,23 +129,47 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                   label: 'Resistenza esterna',
                   compact: true,
                 ),
-                if (biomechanics.resistanceProfile.isNotEmpty) ...[
-                  const SizedBox(height: 28),
-                  ExerciseSectionTitle(
-                    'Profilo di resistenza',
-                    onInfo: () => showCoachlyInfoSheet(
-                      context,
-                      title: 'Profilo di resistenza',
-                      description:
-                          'Descrive come la richiesta esterna tende a cambiare dall’inizio alla fine del range di movimento.',
-                      whyItMatters:
-                          'Aiuta a capire in quali parti del gesto l’esercizio può risultare relativamente più o meno impegnativo.',
-                      guideTopic: CoachlyGuideTopic.resistanceProfile,
-                      disclaimer:
-                          'È un profilo qualitativo indicativo, non una misurazione precisa della forza in ogni punto del movimento.',
-                    ),
+                const SizedBox(height: 28),
+                ExerciseSectionTitle(
+                  'Profilo di resistenza',
+                  onInfo: () => showCoachlyInfoSheet(
+                    context,
+                    title: 'Profilo di resistenza nel ROM',
+                    description:
+                        'Descrive come la richiesta esterna tende a cambiare dall’inizio alla fine del range di movimento.',
+                    whyItMatters:
+                        'Aiuta a capire in quali parti del gesto l’esercizio può risultare relativamente più o meno impegnativo.',
+                    guideTopic: CoachlyGuideTopic.resistanceProfile,
+                    disclaimer:
+                        'È un profilo qualitativo indicativo, non una misurazione precisa della forza in ogni punto del movimento.',
                   ),
-                  const SizedBox(height: 12),
+                ),
+                const SizedBox(height: 12),
+                if (biomechanics.resistanceProfile.isEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: colors.border),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.show_chart_rounded,
+                          color: colors.textSecondary,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Profilo non ancora disponibile',
+                            style: TextStyle(color: colors.textSecondary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
                   Container(
                     padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
                     decoration: BoxDecoration(
@@ -170,7 +194,6 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                       ],
                     ),
                   ),
-                ],
                 const SizedBox(height: 28),
                 const ExerciseSectionTitle('Dati e metodologia'),
                 const SizedBox(height: 12),
