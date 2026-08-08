@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ExerciseTechniqueTab extends ConsumerWidget {
   final String description;
-  final List<ExerciseSafetyModel> safety;
+  final ExerciseSafetyModel? safety;
   final List<ExerciseEquipmentModel> equipments;
 
   const ExerciseTechniqueTab({
@@ -28,15 +28,15 @@ class ExerciseTechniqueTab extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (hasDescription) _buildDescriptionCard(context, description),
-          if (safety.isNotEmpty) ...[
+          if (safety != null) ...[
             SizedBox(height: hasDescription ? 20 : 0),
-            _buildSafetySection(context, safety, locale),
+            _buildSafetySection(context, safety!, locale),
           ],
           if (equipments.isNotEmpty) ...[
             const SizedBox(height: 20),
             _buildEquipmentSection(context, equipments, locale),
           ],
-          if (!hasDescription && safety.isEmpty && equipments.isEmpty)
+          if (!hasDescription && safety == null && equipments.isEmpty)
             _buildEmptyState(context),
         ],
       ),
@@ -102,7 +102,7 @@ class ExerciseTechniqueTab extends ConsumerWidget {
 
   Widget _buildSafetySection(
     BuildContext context,
-    List<ExerciseSafetyModel> safetyItems,
+    ExerciseSafetyModel safety,
     Locale locale,
   ) {
     return Container(
@@ -144,12 +144,29 @@ class ExerciseTechniqueTab extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 14),
-          ...safetyItems.map(
-            (item) => _buildSafetyPoint(item.safetyNotesI18n.fromI18n(locale)),
-          ),
+          for (final note in _localizedSafetyNotes(safety, locale))
+            _buildSafetyPoint(note),
         ],
       ),
     );
+  }
+
+  List<String> _localizedSafetyNotes(
+    ExerciseSafetyModel safety,
+    Locale locale,
+  ) {
+    final localizedLists = safety.notesListI18n;
+    if (localizedLists != null && localizedLists.isNotEmpty) {
+      final language = locale.languageCode.toLowerCase();
+      final notes = localizedLists[language] ?? localizedLists['en'];
+      if (notes != null && notes.isNotEmpty) return notes;
+      return localizedLists.values.firstWhere(
+        (items) => items.isNotEmpty,
+        orElse: () => const [],
+      );
+    }
+    final legacyNote = safety.notesI18n?.fromI18n(locale).trim() ?? '';
+    return legacyNote.isEmpty ? const [] : [legacyNote];
   }
 
   Widget _buildSafetyPoint(String text) {

@@ -8,17 +8,24 @@ part of 'exercise_safety_model.dart';
 
 _ExerciseSafetyModel _$ExerciseSafetyModelFromJson(Map<String, dynamic> json) =>
     _ExerciseSafetyModel(
-      id: json['id'] as String,
-      overallRiskLevel: json['overallRiskLevel'] as String,
-      spotterRequired: json['spotterRequired'] as bool,
-      safetyNotesI18n: Map<String, String>.from(json['safetyNotesI18n'] as Map),
+      spotterPolicy: json['spotterPolicy'] as String? ?? null,
+      notesI18n: json['notesI18n'] == null
+          ? null
+          : const MapConverter().fromJson(json['notesI18n']),
+      notesListI18n:
+          (json['notesListI18n'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(
+              k,
+              (e as List<dynamic>).map((e) => e as String).toList(),
+            ),
+          ) ??
+          null,
     );
 
 Map<String, dynamic> _$ExerciseSafetyModelToJson(
   _ExerciseSafetyModel instance,
 ) => <String, dynamic>{
-  'id': instance.id,
-  'overallRiskLevel': instance.overallRiskLevel,
-  'spotterRequired': instance.spotterRequired,
-  'safetyNotesI18n': instance.safetyNotesI18n,
+  'spotterPolicy': instance.spotterPolicy,
+  'notesI18n': const MapConverter().toJson(instance.notesI18n),
+  'notesListI18n': instance.notesListI18n,
 };

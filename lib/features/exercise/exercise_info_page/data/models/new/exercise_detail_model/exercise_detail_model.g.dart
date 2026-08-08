@@ -21,9 +21,16 @@ _ExerciseDetailModel _$ExerciseDetailModelFromJson(
   tipsI18n: json['tipsI18n'] == null
       ? null
       : const MapConverter().fromJson(json['tipsI18n']),
+  commonMistakesI18n:
+      (json['commonMistakesI18n'] as Map<String, dynamic>?)?.map(
+        (k, e) =>
+            MapEntry(k, (e as List<dynamic>).map((e) => e as String).toList()),
+      ) ??
+      null,
   difficultyLevel: json['difficultyLevel'] as String? ?? null,
   mechanicsType: json['mechanicsType'] as String? ?? null,
   forceType: json['forceType'] as String? ?? null,
+  kineticChain: json['kineticChain'] as String? ?? null,
   isUnilateral: json['unilateral'] as bool? ?? null,
   isBodyweight: json['bodyweight'] as bool? ?? null,
   variants:
@@ -43,11 +50,9 @@ _ExerciseDetailModel _$ExerciseDetailModelFromJson(
           )
           .toList() ??
       null,
-  safety:
-      (json['safety'] as List<dynamic>?)
-          ?.map((e) => ExerciseSafetyModel.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      null,
+  safety: json['safety'] == null
+      ? null
+      : ExerciseSafetyModel.fromJson(json['safety'] as Map<String, dynamic>),
   muscles:
       (json['muscles'] as List<dynamic>?)
           ?.map((e) => ExerciseMuscleModel.fromJson(e as Map<String, dynamic>))
@@ -76,9 +81,11 @@ Map<String, dynamic> _$ExerciseDetailModelToJson(
   'nameI18n': const MapConverter().toJson(instance.nameI18n),
   'descriptionI18n': const MapConverter().toJson(instance.descriptionI18n),
   'tipsI18n': const MapConverter().toJson(instance.tipsI18n),
+  'commonMistakesI18n': instance.commonMistakesI18n,
   'difficultyLevel': instance.difficultyLevel,
   'mechanicsType': instance.mechanicsType,
   'forceType': instance.forceType,
+  'kineticChain': instance.kineticChain,
   'unilateral': instance.isUnilateral,
   'bodyweight': instance.isBodyweight,
   'variants': instance.variants,

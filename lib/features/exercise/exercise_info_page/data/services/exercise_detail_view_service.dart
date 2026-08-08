@@ -226,6 +226,8 @@ class ApiExerciseDetailViewService implements ExerciseDetailViewService {
 
   static String _safetyNote(ExerciseSafetyApiDto? safety, Locale locale) {
     if (safety == null) return '';
+    final notes = _localizedList(safety.notesListI18n, locale);
+    if (notes.isNotEmpty) return notes.join('\n');
     final note = safety.notesI18n.fromI18n(locale).trim();
     if (note.isNotEmpty) return note;
     return switch (safety.spotterPolicy?.toLowerCase()) {

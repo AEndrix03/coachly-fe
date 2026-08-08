@@ -8,6 +8,17 @@ void main() {
       'personal': false,
       'unilateral': true,
       'bodyweight': false,
+      'kineticChain': 'closed',
+      'commonMistakesI18n': {
+        'it': ['Non perdere il controllo.'],
+      },
+      'safety': {
+        'spotterPolicy': 'recommended_high_effort',
+        'notesI18n': {'it': 'Nota legacy.'},
+        'notesListI18n': {
+          'it': ['Usa uno spotter nelle serie pesanti.'],
+        },
+      },
       'categories': [
         {
           'id': 'category-1',
@@ -43,6 +54,12 @@ void main() {
     expect(exercise.isPersonal, isFalse);
     expect(exercise.isUnilateral, isTrue);
     expect(exercise.isBodyweight, isFalse);
+    expect(exercise.kineticChain, 'closed');
+    expect(exercise.commonMistakesI18n!['it'], ['Non perdere il controllo.']);
+    expect(exercise.safety!.spotterPolicy, 'recommended_high_effort');
+    expect(exercise.safety!.notesListI18n!['it'], [
+      'Usa uno spotter nelle serie pesanti.',
+    ]);
     expect(exercise.categories!.single.isPrimary, isTrue);
     expect(exercise.equipments!.single.isRequired, isTrue);
     expect(exercise.equipments!.single.isPrimary, isFalse);

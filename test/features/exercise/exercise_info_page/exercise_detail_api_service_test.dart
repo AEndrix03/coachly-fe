@@ -41,7 +41,10 @@ void main() {
       expect(data.variants.single.relationAxis, 'Presa');
       expect(data.variants.single.similarity, isNull);
       expect(data.media.kind, ExerciseMediaKind.video);
-      expect(data.safetyNote, 'Non tirare dietro al collo.');
+      expect(
+        data.safetyNote,
+        'Non tirare dietro al collo.\nMantieni il controllo.',
+      );
     },
   );
 
@@ -134,7 +137,10 @@ const _exerciseDetailJson = <String, Object?>{
   },
   'safety': {
     'spotterPolicy': 'none',
-    'notesI18n': {'it': 'Non tirare dietro al collo.'},
+    'notesI18n': {'it': 'Nota legacy.'},
+    'notesListI18n': {
+      'it': ['Non tirare dietro al collo.', 'Mantieni il controllo.'],
+    },
   },
   'equipments': [
     {

@@ -224,16 +224,19 @@ class ExerciseBiomechanicsApiDto {
 class ExerciseSafetyApiDto {
   final String? spotterPolicy;
   final Map<String, String> notesI18n;
+  final Map<String, List<String>> notesListI18n;
 
   const ExerciseSafetyApiDto({
     required this.spotterPolicy,
     required this.notesI18n,
+    required this.notesListI18n,
   });
 
   factory ExerciseSafetyApiDto.fromJson(Map<String, dynamic> json) {
     return ExerciseSafetyApiDto(
       spotterPolicy: _nullableString(json['spotterPolicy']),
       notesI18n: _i18n(json['notesI18n']),
+      notesListI18n: _i18nList(json['notesListI18n']),
     );
   }
 }
