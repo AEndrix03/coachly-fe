@@ -1,18 +1,36 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_equipment_model/exercise_equipment_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_muscle_model/exercise_muscle_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_media_model/exercise_media_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_safety_model/exercise_safety_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_variant_model/exercise_variant_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart';
-import 'package:coachly/shared/i18n/app_strings.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shimmer/shimmer.dart';
+import 'dart:ui';
 
-class ExercisePage extends ConsumerStatefulWidget {
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+enum ExerciseQuickNavItem { biomechanics, muscles, variants }
+
+extension on ExerciseQuickNavItem {
+  String get label => switch (this) {
+    ExerciseQuickNavItem.biomechanics => 'Biomeccanica',
+    ExerciseQuickNavItem.muscles => 'Muscoli',
+    ExerciseQuickNavItem.variants => 'Varianti',
+  };
+
+  IconData get icon => switch (this) {
+    ExerciseQuickNavItem.biomechanics => Icons.insights_rounded,
+    ExerciseQuickNavItem.muscles => Icons.accessibility_new_rounded,
+    ExerciseQuickNavItem.variants => Icons.alt_route_rounded,
+  };
+
+  String path(String exerciseId) =>
+      '/exercises/$exerciseId/${name.toLowerCase()}';
+}
+
+class ExercisePage extends ConsumerWidget {
   final String id;
   final bool isVariantDetail;
 
@@ -23,211 +41,370 @@ class ExercisePage extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ExercisePage> createState() => _ExercisePageState();
-}
-
-class _ExercisePageState extends ConsumerState<ExercisePage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      ref.read(exerciseInfoProvider.notifier).loadExerciseDetail(widget.id);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final state = ref.watch(exerciseInfoProvider);
-
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1E),
-      floatingActionButton: state.hasSelectedExercise
-          ? _ExerciseAddAffordance(
-              onTap: () => Navigator.of(context).pop(state.selectedExercise),
-            )
-          : null,
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: state.hasError
-            ? _ErrorState(
-                key: const ValueKey('error'),
-                message:
-                    state.errorMessage ?? context.tr('exercise.unknown_error'),
-                onRetry: () => ref
-                    .read(exerciseInfoProvider.notifier)
-                    .loadExerciseDetail(widget.id),
-                onBack: () => Navigator.of(context).maybePop(),
-              )
-            : state.isLoadingDetail || !state.hasSelectedExercise
-            ? const _SkeletonState(key: ValueKey('loading'))
-            : _ContentState(
-                key: ValueKey(state.selectedExercise!.id),
-                exercise: state.selectedExercise!,
-                onOpenVariant: _openVariant,
-              ),
-      ),
-    );
-  }
-
-  Future<void> _openVariant(String exerciseId) async {
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute<void>(
-        builder: (_) => ExercisePage(id: exerciseId, isVariantDetail: true),
-      ),
-    );
-    if (!mounted) return;
-    await ref.read(exerciseInfoProvider.notifier).loadExerciseDetail(widget.id);
-  }
-}
-
-// ─────────────────────────── skeleton ────────────────────────────────────────
-
-class _SkeletonState extends StatelessWidget {
-  const _SkeletonState({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: const Color(0xFF1A1A2E),
-      highlightColor: const Color(0xFF2A2A4E),
-      child: SingleChildScrollView(
-        physics: const NeverScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header gradient placeholder
-            Container(
-              height: 200,
-              decoration: const BoxDecoration(
-                color: Color(0xFF1A1A2E),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(28),
-                  bottomRight: Radius.circular(28),
-                ),
-              ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncData = ref.watch(exerciseDetailViewProvider(id));
+    return Theme(
+      data: exerciseDetailTheme(Theme.of(context)),
+      child: asyncData.when(
+        loading: () => const ExerciseLoadingView(),
+        error: (_, _) => ExerciseErrorView(
+          onRetry: () => ref.invalidate(exerciseDetailViewProvider(id)),
+        ),
+        data: (data) => ExerciseOverviewContent(
+          data: data,
+          onAdd: () => Navigator.of(context).pop(
+            ExerciseDetailModel(
+              id: data.id,
+              nameI18n: {'it': data.name, 'en': data.name},
+              descriptionI18n: {'it': data.description, 'en': data.description},
             ),
-            const SizedBox(height: 24),
-            // Stats row
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: List.generate(
-                  3,
-                  (_) => Expanded(
-                    child: Container(
-                      height: 72,
-                      margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A2E),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Section blocks
-            ...List.generate(
-              3,
-              (i) => Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-                child: Container(
-                  height: i == 0 ? 140 : 100,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A2E),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-// ─────────────────────────── error ───────────────────────────────────────────
+class ExerciseOverviewContent extends StatefulWidget {
+  final ExerciseDetailViewData data;
+  final VoidCallback onAdd;
 
-class _ErrorState extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  final VoidCallback onBack;
-
-  const _ErrorState({
+  const ExerciseOverviewContent({
     super.key,
-    required this.message,
-    required this.onRetry,
-    required this.onBack,
+    required this.data,
+    required this.onAdd,
+  });
+
+  @override
+  State<ExerciseOverviewContent> createState() =>
+      _ExerciseOverviewContentState();
+}
+
+class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
+  final ScrollController _scrollController = ScrollController();
+  final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
+  final GlobalKey _stackKey = GlobalKey();
+  final GlobalKey _sourceKey = GlobalKey();
+  final List<GlobalKey> _destinationKeys = List.generate(3, (_) => GlobalKey());
+
+  double? _sourceDocumentTop;
+  List<Rect>? _destinationDocumentRects;
+  bool _favorite = false;
+  bool _expandedExecution = false;
+  bool _expandedMistakes = false;
+  bool _measurementScheduled = false;
+  double _lastDestinationMeasurementAttempt = double.negativeInfinity;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_handleScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measureAnchors());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _measureAnchors(force: true),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_handleScroll)
+      ..dispose();
+    _scrollOffset.dispose();
+    super.dispose();
+  }
+
+  void _handleScroll() {
+    _scrollOffset.value = _scrollController.offset;
+    if (_destinationDocumentRects == null &&
+        !_measurementScheduled &&
+        (_scrollController.offset - _lastDestinationMeasurementAttempt).abs() >
+            280) {
+      _lastDestinationMeasurementAttempt = _scrollController.offset;
+      _measurementScheduled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _measurementScheduled = false;
+        _measureAnchors();
+      });
+    }
+  }
+
+  void _measureAnchors({bool force = false}) {
+    if (!mounted || !_scrollController.hasClients) return;
+    final stackBox = _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    final sourceBox =
+        _sourceKey.currentContext?.findRenderObject() as RenderBox?;
+    if (stackBox == null || !stackBox.hasSize) return;
+    final stackOrigin = stackBox.localToGlobal(Offset.zero);
+    if (sourceBox != null &&
+        sourceBox.hasSize &&
+        (_sourceDocumentTop == null || force)) {
+      _sourceDocumentTop =
+          sourceBox.localToGlobal(Offset.zero).dy -
+          stackOrigin.dy +
+          _scrollController.offset;
+    }
+
+    final boxes = _destinationKeys
+        .map((key) => key.currentContext?.findRenderObject())
+        .whereType<RenderBox>()
+        .toList();
+    if (boxes.length == _destinationKeys.length) {
+      _destinationDocumentRects = boxes.map((box) {
+        final origin = box.localToGlobal(Offset.zero) - stackOrigin;
+        return Rect.fromLTWH(
+          origin.dx,
+          origin.dy + _scrollController.offset,
+          box.size.width,
+          box.size.height,
+        );
+      }).toList();
+    }
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Scaffold(
+      backgroundColor: colors.background,
+      bottomNavigationBar: ExerciseAddAction(onTap: widget.onAdd),
+      body: Stack(
+        key: _stackKey,
+        children: [
+          CustomScrollView(
+            key: const Key('exercise-overview-scroll'),
+            controller: _scrollController,
+            slivers: [
+              _ExerciseHeader(
+                title: widget.data.name,
+                scrollOffset: _scrollOffset,
+                favorite: _favorite,
+                onFavorite: () => setState(() => _favorite = !_favorite),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                sliver: SliverList.list(
+                  children: [
+                    _Entrance(child: _Identity(data: widget.data)),
+                    const SizedBox(height: 22),
+                    _Entrance(
+                      delay: const Duration(milliseconds: 25),
+                      child: ExerciseMediaHero(media: widget.data.media),
+                    ),
+                    const SizedBox(height: 18),
+                    _Entrance(
+                      delay: const Duration(milliseconds: 45),
+                      child: ExerciseQuickNavAnchor(
+                        key: _sourceKey,
+                        onTap: _openDetail,
+                      ),
+                    ),
+                    const SizedBox(height: 34),
+                    _Description(text: widget.data.description),
+                    const SizedBox(height: 34),
+                    _ExecutionSection(
+                      execution: widget.data.execution,
+                      expandedExecution: _expandedExecution,
+                      expandedMistakes: _expandedMistakes,
+                      onToggleExecution: () => setState(
+                        () => _expandedExecution = !_expandedExecution,
+                      ),
+                      onToggleMistakes: () => setState(
+                        () => _expandedMistakes = !_expandedMistakes,
+                      ),
+                    ),
+                    const SizedBox(height: 36),
+                    _MusclesPreview(
+                      data: widget.data,
+                      onOpen: () => _openDetail(ExerciseQuickNavItem.muscles),
+                    ),
+                    const SizedBox(height: 36),
+                    _BiomechanicsPreview(
+                      data: widget.data,
+                      onOpen: () =>
+                          _openDetail(ExerciseQuickNavItem.biomechanics),
+                    ),
+                    const SizedBox(height: 36),
+                    _EquipmentSection(equipment: widget.data.equipment),
+                    const SizedBox(height: 36),
+                    _VariantsPreview(
+                      data: widget.data,
+                      onOpen: () => _openDetail(ExerciseQuickNavItem.variants),
+                    ),
+                    if (widget.data.safetyNote.isNotEmpty) ...[
+                      const SizedBox(height: 36),
+                      _SafetySection(note: widget.data.safetyNote),
+                    ],
+                    const SizedBox(height: 40),
+                    Divider(color: colors.border),
+                    const SizedBox(height: 24),
+                    ExerciseQuickNavDestination(
+                      keys: _destinationKeys,
+                      onTap: _openDetail,
+                    ),
+                    const SizedBox(height: 128),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          ExerciseQuickNavMorph(
+            scrollOffset: _scrollOffset,
+            sourceDocumentTop: () => _sourceDocumentTop,
+            destinationDocumentRects: () => _destinationDocumentRects,
+            onTap: _openDetail,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openDetail(ExerciseQuickNavItem item) {
+    HapticFeedback.lightImpact();
+    context.push(item.path(widget.data.id));
+  }
+}
+
+class _ExerciseHeader extends StatelessWidget {
+  final String title;
+  final ValueListenable<double> scrollOffset;
+  final bool favorite;
+  final VoidCallback onFavorite;
+
+  const _ExerciseHeader({
+    required this.title,
+    required this.scrollOffset,
+    required this.favorite,
+    required this.onFavorite,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: _BackButton(onBack: onBack),
-            ),
+    final colors = context.exerciseTheme;
+    return SliverAppBar(
+      pinned: true,
+      floating: false,
+      elevation: 0,
+      backgroundColor: colors.background.withValues(alpha: 0.96),
+      surfaceTintColor: Colors.transparent,
+      foregroundColor: colors.textPrimary,
+      leading: IconButton(
+        tooltip: 'Indietro',
+        onPressed: () => Navigator.of(context).maybePop(),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+      ),
+      title: ValueListenableBuilder<double>(
+        valueListenable: scrollOffset,
+        builder: (_, offset, _) => Opacity(
+          opacity: ((offset - 72) / 52).clamp(0, 1),
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
           ),
-          Expanded(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
+        ),
+      ),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          key: const Key('exercise-favorite'),
+          tooltip: favorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti',
+          onPressed: onFavorite,
+          icon: Icon(
+            favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            color: favorite ? colors.primary : colors.textPrimary,
+          ),
+        ),
+        PopupMenuButton<String>(
+          tooltip: 'Altre azioni',
+          color: colors.surfaceElevated,
+          icon: const Icon(Icons.more_horiz_rounded),
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: 'share', child: Text('Condividi')),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _Identity extends StatelessWidget {
+  final ExerciseDetailViewData data;
+
+  const _Identity({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          data.name,
+          style: TextStyle(
+            color: colors.textPrimary,
+            fontSize: 30,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.8,
+          ),
+        ),
+        const SizedBox(height: 9),
+        Text(
+          '${data.movementProfile.pattern}  ·  ${data.movementProfile.jointClass}  ·  ${data.movementProfile.resistanceSource}',
+          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+        ),
+      ],
+    );
+  }
+}
+
+class ExerciseQuickNavAnchor extends StatelessWidget {
+  final ValueChanged<ExerciseQuickNavItem> onTap;
+
+  const ExerciseQuickNavAnchor({super.key, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        for (final item in ExerciseQuickNavItem.values)
+          Semantics(
+            button: true,
+            label: 'Apri ${item.label}',
+            child: InkResponse(
+              key: Key('quick-nav-${item.name}'),
+              radius: 34,
+              onTap: () => onTap(item),
+              child: SizedBox(
+                width: 82,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.error_outline_rounded,
-                      size: 56,
-                      color: Color(0xFFFF5252),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      context.tr('exercise.load_failed'),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: colors.surfaceElevated,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: colors.border),
                       ),
+                      child: Icon(item.icon, color: colors.primary, size: 21),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 7),
                     Text(
-                      message,
-                      textAlign: TextAlign.center,
+                      item.label,
+                      maxLines: 1,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    GestureDetector(
-                      onTap: onRetry,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 28,
-                          vertical: 14,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                          ),
-                        ),
-                        child: Text(
-                          context.tr('exercise.retry'),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        color: colors.textSecondary,
+                        fontSize: 11,
                       ),
                     ),
                   ],
@@ -235,1035 +412,825 @@ class _ErrorState extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────── content ─────────────────────────────────────────
-
-class _ContentState extends ConsumerWidget {
-  final ExerciseDetailModel exercise;
-  final ValueChanged<String> onOpenVariant;
-
-  const _ContentState({
-    super.key,
-    required this.exercise,
-    required this.onOpenVariant,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final locale = ref.watch(languageProvider);
-    final name =
-        exercise.nameI18n?.fromI18n(locale) ??
-        exercise.id ??
-        context.tr('exercise.fallback_name');
-    final description = exercise.descriptionI18n?.fromI18n(locale).trim() ?? '';
-    final tips = exercise.tipsI18n?.fromI18n(locale).trim() ?? '';
-    final muscles = exercise.muscles ?? const [];
-    final safety = exercise.safety ?? const [];
-    final equipments = exercise.equipments ?? const [];
-    final variants = exercise.variants ?? const [];
-    final categories = exercise.categories ?? const [];
-    final tags = exercise.tags ?? const [];
-
-    return CustomScrollView(
-      slivers: [
-        // ── Gradient header ──────────────────────────────────────────────────
-        SliverToBoxAdapter(
-          child: _ExerciseHero(
-            name: name,
-            mechanics: exercise.mechanicsType,
-            forceType: exercise.forceType,
-            isBodyweight: exercise.isBodyweight ?? false,
-          ),
-        ),
-        // ── Sections ─────────────────────────────────────────────────────────
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SectionBlock(
-                  icon: Icons.menu_book_rounded,
-                  color: const Color(0xFF2196F3),
-                  title: context.tr('workout.description'),
-                  child: description.isEmpty
-                      ? _EmptyDetail(
-                          locale.languageCode == 'it'
-                              ? 'Nessuna descrizione configurata'
-                              : 'No description configured',
-                        )
-                      : Text(
-                          description,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.82),
-                            fontSize: 14,
-                            height: 1.6,
-                          ),
-                        ),
-                ),
-                const SizedBox(height: 20),
-                _SectionBlock(
-                  icon: Icons.perm_media_outlined,
-                  color: const Color(0xFF38BDF8),
-                  title: 'MEDIA',
-                  child: exercise.media?.isEmpty ?? true
-                      ? _EmptyDetail(
-                          locale.languageCode == 'it'
-                              ? 'Nessun contenuto media configurato'
-                              : 'No media configured',
-                        )
-                      : _MediaList(media: exercise.media!),
-                ),
-                const SizedBox(height: 20),
-                _SectionBlock(
-                  icon: Icons.fitness_center_rounded,
-                  color: const Color(0xFF9C27B0),
-                  title: context.tr('exercise.muscles_involved'),
-                  child: muscles.isEmpty
-                      ? _EmptyDetail(
-                          locale.languageCode == 'it'
-                              ? 'Nessun muscolo configurato'
-                              : 'No muscles configured',
-                        )
-                      : _MusclesList(muscles: muscles, locale: locale),
-                ),
-                const SizedBox(height: 20),
-                if (tips.isNotEmpty) ...[
-                  _SectionBlock(
-                    icon: Icons.tips_and_updates_rounded,
-                    color: const Color(0xFFF59E0B),
-                    title: locale.languageCode == 'it'
-                        ? 'CONSIGLI DI ESECUZIONE'
-                        : 'EXECUTION TIPS',
-                    child: _TipsList(tips: tips),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                if (categories.isNotEmpty) ...[
-                  _SectionBlock(
-                    icon: Icons.account_tree_rounded,
-                    color: const Color(0xFF60A5FA),
-                    title: locale.languageCode == 'it'
-                        ? 'CATEGORIE'
-                        : 'CATEGORIES',
-                    child: _TextChips(
-                      labels: categories
-                          .map(
-                            (category) => category.nameI18n?.fromI18n(locale),
-                          )
-                          .whereType<String>()
-                          .where((label) => label.isNotEmpty)
-                          .toList(),
-                      color: const Color(0xFF60A5FA),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                if (safety.isNotEmpty) ...[
-                  _SectionBlock(
-                    icon: Icons.warning_rounded,
-                    color: const Color(0xFFFF9800),
-                    title: context.tr('exercise.safety_tips'),
-                    child: _SafetyList(safety: safety, locale: locale),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                if (equipments.isNotEmpty) ...[
-                  _SectionBlock(
-                    icon: Icons.build_rounded,
-                    color: const Color(0xFF00BCD4),
-                    title: context.tr('exercise.equipment'),
-                    child: _EquipmentList(
-                      equipments: equipments,
-                      locale: locale,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                if (tags.isNotEmpty) ...[
-                  _SectionBlock(
-                    icon: Icons.sell_outlined,
-                    color: const Color(0xFFF472B6),
-                    title: locale.languageCode == 'it' ? 'TAG' : 'TAGS',
-                    child: _TextChips(
-                      labels: tags
-                          .map(
-                            (tag) => tag.nameI18n?.fromI18n(locale) ?? tag.code,
-                          )
-                          .whereType<String>()
-                          .where((label) => label.isNotEmpty)
-                          .toList(),
-                      color: const Color(0xFFF472B6),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-                if (variants.isNotEmpty) ...[
-                  _SectionBlock(
-                    icon: Icons.swap_horiz_rounded,
-                    color: const Color(0xFF4CAF50),
-                    title: context.tr('exercise.variants'),
-                    child: _VariantsList(
-                      variants: variants,
-                      locale: locale,
-                      onOpenVariant: onOpenVariant,
-                    ),
-                  ),
-                ],
-                if (tips.isEmpty)
-                  _missingSection(
-                    icon: Icons.tips_and_updates_rounded,
-                    color: const Color(0xFFF59E0B),
-                    title: locale.languageCode == 'it'
-                        ? 'CONSIGLI DI ESECUZIONE'
-                        : 'EXECUTION TIPS',
-                    message: locale.languageCode == 'it'
-                        ? 'Nessun consiglio configurato'
-                        : 'No execution tips configured',
-                  ),
-                if (categories.isEmpty)
-                  _missingSection(
-                    icon: Icons.account_tree_rounded,
-                    color: const Color(0xFF60A5FA),
-                    title: locale.languageCode == 'it'
-                        ? 'CATEGORIE'
-                        : 'CATEGORIES',
-                    message: locale.languageCode == 'it'
-                        ? 'Nessuna categoria configurata'
-                        : 'No categories configured',
-                  ),
-                if (safety.isEmpty)
-                  _missingSection(
-                    icon: Icons.warning_rounded,
-                    color: const Color(0xFFFF9800),
-                    title: context.tr('exercise.safety_tips'),
-                    message: locale.languageCode == 'it'
-                        ? 'Nessuna indicazione di sicurezza configurata'
-                        : 'No safety guidance configured',
-                  ),
-                if (equipments.isEmpty)
-                  _missingSection(
-                    icon: Icons.build_rounded,
-                    color: const Color(0xFF00BCD4),
-                    title: context.tr('exercise.equipment'),
-                    message: locale.languageCode == 'it'
-                        ? 'Nessuna attrezzatura configurata'
-                        : 'No equipment configured',
-                  ),
-                if (tags.isEmpty)
-                  _missingSection(
-                    icon: Icons.sell_outlined,
-                    color: const Color(0xFFF472B6),
-                    title: locale.languageCode == 'it' ? 'TAG' : 'TAGS',
-                    message: locale.languageCode == 'it'
-                        ? 'Nessun tag configurato'
-                        : 'No tags configured',
-                  ),
-                if (variants.isEmpty)
-                  _missingSection(
-                    icon: Icons.swap_horiz_rounded,
-                    color: const Color(0xFF4CAF50),
-                    title: context.tr('exercise.variants'),
-                    message: locale.languageCode == 'it'
-                        ? 'Nessuna variante configurata'
-                        : 'No variants configured',
-                    last: true,
-                  ),
-              ],
-            ),
-          ),
-        ),
       ],
     );
   }
-
-  Widget _missingSection({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String message,
-    bool last = false,
-  }) => Column(
-    children: [
-      _SectionBlock(
-        icon: icon,
-        color: color,
-        title: title,
-        child: _EmptyDetail(message),
-      ),
-      if (!last) const SizedBox(height: 20),
-    ],
-  );
 }
 
-// ─────────────────────────── hero header ─────────────────────────────────────
+class ExerciseQuickNavDestination extends StatelessWidget {
+  final List<GlobalKey> keys;
+  final ValueChanged<ExerciseQuickNavItem> onTap;
 
-class _ExerciseHero extends StatelessWidget {
-  final String name;
-  final String? mechanics;
-  final String? forceType;
-  final bool isBodyweight;
-
-  const _ExerciseHero({
-    required this.name,
-    required this.mechanics,
-    required this.forceType,
-    required this.isBodyweight,
+  const ExerciseQuickNavDestination({
+    super.key,
+    required this.keys,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1565C0), Color(0xFF6A1B9A)],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  _BackButton(onBack: () => Navigator.of(context).pop()),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                        height: 1.2,
-                      ),
-                    ),
+    final colors = context.exerciseTheme;
+    return Row(
+      children: [
+        for (
+          var index = 0;
+          index < ExerciseQuickNavItem.values.length;
+          index++
+        ) ...[
+          if (index > 0) const SizedBox(width: 8),
+          Expanded(
+            child: SizedBox(
+              key: keys[index],
+              height: 52,
+              child: OutlinedButton(
+                onPressed: () => onTap(ExerciseQuickNavItem.values[index]),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  foregroundColor: colors.textPrimary,
+                  side: BorderSide(color: colors.border),
+                  backgroundColor: colors.surfaceElevated,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                ],
+                ),
+                child: Text(
+                  ExerciseQuickNavItem.values[index].label,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
-              // Stat chips
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  if (mechanics != null)
-                    _HeroChip(
-                      label: _mechanicsLabel(context, mechanics!),
-                      icon: Icons.sync_alt_rounded,
-                      color: Colors.white.withValues(alpha: 0.85),
-                    ),
-                  if (forceType != null)
-                    _HeroChip(
-                      label: _forceLabel(context, forceType!),
-                      icon: Icons.bolt_rounded,
-                      color: const Color(0xFFFFD740),
-                    ),
-                  if (isBodyweight)
-                    _HeroChip(
-                      label: context.tr('exercise.bodyweight'),
-                      icon: Icons.self_improvement_rounded,
-                      color: const Color(0xFF69F0AE),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _mechanicsLabel(BuildContext context, String raw) =>
-      switch (raw.toLowerCase()) {
-        'compound' => context.tr('exercise.mechanics.compound'),
-        'isolation' => context.tr('exercise.mechanics.isolation'),
-        _ => raw,
-      };
-
-  String _forceLabel(BuildContext context, String raw) =>
-      switch (raw.toLowerCase()) {
-        'push' => context.tr('exercise.force.push'),
-        'pull' => context.tr('exercise.force.pull'),
-        'legs' => context.tr('exercise.force.legs'),
-        'core' => context.tr('exercise.force.core'),
-        'static' => context.tr('exercise.force.static'),
-        _ => raw,
-      };
-}
-
-class _HeroChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color color;
-
-  const _HeroChip({
-    required this.label,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.25),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: color),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.2,
             ),
           ),
         ],
+      ],
+    );
+  }
+}
+
+class ExerciseQuickNavMorph extends StatelessWidget {
+  final ValueListenable<double> scrollOffset;
+  final double? Function() sourceDocumentTop;
+  final List<Rect>? Function() destinationDocumentRects;
+  final ValueChanged<ExerciseQuickNavItem> onTap;
+
+  const ExerciseQuickNavMorph({
+    super.key,
+    required this.scrollOffset,
+    required this.sourceDocumentTop,
+    required this.destinationDocumentRects,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Positioned.fill(
+      child: IgnorePointer(
+        ignoring: false,
+        child: ValueListenableBuilder<double>(
+          valueListenable: scrollOffset,
+          builder: (context, offset, _) {
+            final sourceTop = sourceDocumentTop();
+            if (sourceTop == null || offset < sourceTop + 54) {
+              return const SizedBox.shrink();
+            }
+            final size = MediaQuery.sizeOf(context);
+            final safeTop = MediaQuery.paddingOf(context).top;
+            final destinations = destinationDocumentRects();
+            final destinationViewportRects = destinations
+                ?.map((rect) => rect.translate(0, -offset))
+                .toList();
+            final firstDestinationTop = destinationViewportRects?.first.top;
+            final morphStart = size.height * 0.74;
+            final progress = firstDestinationTop == null
+                ? 0.0
+                : ((morphStart - firstDestinationTop) / 150).clamp(0.0, 1.0);
+            final reduceMotion = MediaQuery.disableAnimationsOf(context);
+            final effectiveProgress = reduceMotion
+                ? (progress > 0.5 ? 1.0 : 0.0)
+                : progress;
+
+            return RepaintBoundary(
+              child: Stack(
+                children: [
+                  for (
+                    var index = 0;
+                    index < ExerciseQuickNavItem.values.length;
+                    index++
+                  )
+                    _MorphButton(
+                      item: ExerciseQuickNavItem.values[index],
+                      progress: effectiveProgress,
+                      sourceRect: Rect.fromLTWH(
+                        size.width - 62,
+                        safeTop + size.height * 0.34 + index * 58,
+                        46,
+                        46,
+                      ),
+                      destinationRect:
+                          destinationViewportRects?[index] ??
+                          Rect.fromLTWH(
+                            20 + index * ((size.width - 56) / 3),
+                            size.height - 120,
+                            (size.width - 56) / 3,
+                            52,
+                          ),
+                      colors: colors,
+                      onTap: () => onTap(ExerciseQuickNavItem.values[index]),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 }
 
-// ─────────────────────────── section block ───────────────────────────────────
+class _MorphButton extends StatelessWidget {
+  final ExerciseQuickNavItem item;
+  final double progress;
+  final Rect sourceRect;
+  final Rect destinationRect;
+  final CoachlyExerciseTheme colors;
+  final VoidCallback onTap;
 
-class _SectionBlock extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String title;
-  final Widget child;
-
-  const _SectionBlock({
-    required this.icon,
-    required this.color,
-    required this.title,
-    required this.child,
+  const _MorphButton({
+    required this.item,
+    required this.progress,
+    required this.sourceRect,
+    required this.destinationRect,
+    required this.colors,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final rect = Rect.lerp(sourceRect, destinationRect, progress)!;
+    final labelOpacity = ((progress - 0.38) / 0.62).clamp(0.0, 1.0);
+    return Positioned.fromRect(
+      rect: rect,
+      child: Semantics(
+        button: true,
+        label: 'Apri ${item.label}',
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            key: Key('floating-quick-nav-${item.name}'),
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(lerpDouble(23, 16, progress)!),
+            child: Container(
+              decoration: BoxDecoration(
+                color: colors.surfaceElevated,
+                borderRadius: BorderRadius.circular(
+                  lerpDouble(23, 16, progress)!,
+                ),
+                border: Border.all(
+                  color: Color.lerp(
+                    colors.border,
+                    colors.primary.withValues(alpha: 0.18),
+                    0.35,
+                  )!,
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x22000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: progress < 0.1
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: lerpDouble(0, 10, progress)),
+                  Icon(item.icon, size: 20, color: colors.primary),
+                  if (progress > 0.35) ...[
+                    SizedBox(width: lerpDouble(0, 5, progress)),
+                    Expanded(
+                      child: Opacity(
+                        opacity: labelOpacity,
+                        child: Text(
+                          item.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.fade,
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Description extends StatefulWidget {
+  final String text;
+
+  const _Description({required this.text});
+
+  @override
+  State<_Description> createState() => _DescriptionState();
+}
+
+class _DescriptionState extends State<_Description> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section header
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: Icon(icon, color: color, size: 15),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          child: Text(
+            widget.text,
+            maxLines: _expanded ? null : 3,
+            overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 16,
+              height: 1.55,
+              letterSpacing: -0.1,
             ),
-            const SizedBox(width: 9),
-            Text(
-              title,
+          ),
+        ),
+        if (widget.text.length > 150)
+          TextButton(
+            onPressed: () => setState(() => _expanded = !_expanded),
+            child: Text(_expanded ? 'Mostra meno' : 'Mostra altro'),
+          ),
+      ],
+    );
+  }
+}
+
+class _ExecutionSection extends StatelessWidget {
+  final ExerciseExecutionViewData execution;
+  final bool expandedExecution;
+  final bool expandedMistakes;
+  final VoidCallback onToggleExecution;
+  final VoidCallback onToggleMistakes;
+
+  const _ExecutionSection({
+    required this.execution,
+    required this.expandedExecution,
+    required this.expandedMistakes,
+    required this.onToggleExecution,
+    required this.onToggleMistakes,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    final steps = expandedExecution
+        ? execution.steps
+        : execution.steps.take(3).toList();
+    final mistakes = expandedMistakes
+        ? execution.commonMistakes
+        : execution.commonMistakes.take(2).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const ExerciseSectionTitle('Come eseguirlo'),
+        const SizedBox(height: 12),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          alignment: Alignment.topCenter,
+          child: Column(
+            children: [
+              for (var index = 0; index < steps.length; index++)
+                _ExecutionRow(index: index + 1, text: steps[index]),
+            ],
+          ),
+        ),
+        if (execution.steps.length > 3)
+          ExerciseLinkButton(
+            label: expandedExecution
+                ? 'Riduci passaggi'
+                : 'Vedi tutti i passaggi',
+            onTap: onToggleExecution,
+          ),
+        if (execution.commonMistakes.isNotEmpty) ...[
+          const SizedBox(height: 26),
+          Text(
+            'Errori comuni',
+            style: TextStyle(
+              color: colors.textPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 11),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            child: Column(
+              children: [
+                for (final mistake in mistakes) _MistakeRow(text: mistake),
+              ],
+            ),
+          ),
+          if (execution.commonMistakes.length > 2)
+            ExerciseLinkButton(
+              label: expandedMistakes
+                  ? 'Mostra meno'
+                  : 'Mostra altri ${execution.commonMistakes.length - 2}',
+              onTap: onToggleMistakes,
+            ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ExecutionRow extends StatelessWidget {
+  final int index;
+  final String text;
+
+  const _ExecutionRow({required this.index, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: colors.surfaceElevated,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '$index',
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.55),
-                fontSize: 12,
+                color: colors.primary,
                 fontWeight: FontWeight.w600,
-                letterSpacing: 0.8,
+              ),
+            ),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 3),
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 15,
+                  height: 1.45,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MistakeRow extends StatelessWidget {
+  final String text;
+
+  const _MistakeRow({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.close_rounded, size: 19, color: colors.warning),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(color: colors.textSecondary, height: 1.4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MusclesPreview extends StatelessWidget {
+  final ExerciseDetailViewData data;
+  final VoidCallback onOpen;
+
+  const _MusclesPreview({required this.data, required this.onOpen});
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = data.muscles
+        .where((muscle) => muscle.role == MuscleRole.primary)
+        .toList();
+    final secondary = data.muscles
+        .where((muscle) => muscle.role == MuscleRole.secondary)
+        .toList();
+    final colors = context.exerciseTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const ExerciseSectionTitle('Muscoli coinvolti'),
+        const SizedBox(height: 14),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: colors.border),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 118,
+                height: 176,
+                child: _OptionalMuscleHero(
+                  tag: 'exercise-muscles-${data.id}',
+                  child: MuscleAnatomyView(muscles: data.muscles),
+                ),
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _MuscleGroup(label: 'Primari', muscles: primary),
+                    const SizedBox(height: 16),
+                    _MuscleGroup(
+                      label: 'Secondari',
+                      muscles: secondary.take(3).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        ExerciseLinkButton(label: 'Esplora muscoli', onTap: onOpen),
+      ],
+    );
+  }
+}
+
+class _MuscleGroup extends StatelessWidget {
+  final String label;
+  final List<MuscleViewData> muscles;
+
+  const _MuscleGroup({required this.label, required this.muscles});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: TextStyle(
+            color: colors.primary,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.8,
+          ),
+        ),
+        const SizedBox(height: 6),
+        for (final muscle in muscles)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(
+              muscle.name,
+              style: TextStyle(color: colors.textPrimary, fontSize: 14),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _BiomechanicsPreview extends StatelessWidget {
+  final ExerciseDetailViewData data;
+  final VoidCallback onOpen;
+
+  const _BiomechanicsPreview({required this.data, required this.onOpen});
+
+  @override
+  Widget build(BuildContext context) {
+    final training = data.biomechanics.training;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ExerciseSectionTitle(
+          'Biomeccanica',
+          onInfo: () => showCoachlyInfoSheet(
+            context,
+            title: 'Stabilità richiesta',
+            description:
+                'Indica quanto controllo esterno offre l’esercizio e quanta stabilizzazione devi produrre tu.',
+            whyItMatters:
+                'Un esercizio stabile può aiutare a concentrarsi sul target, senza essere automaticamente migliore.',
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _Metric(
+                value: data.movementProfile.pattern,
+                label: 'Pattern',
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _Metric(value: training.stability, label: 'Stabilità'),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _Metric(
+                value: training.spinalLoad,
+                label: 'Carico spinale',
               ),
             ),
           ],
         ),
-        const SizedBox(height: 10),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A2E),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.07),
-              width: 1,
-            ),
+        ExerciseLinkButton(label: 'Esplora biomeccanica', onTap: onOpen),
+      ],
+    );
+  }
+}
+
+class _Metric extends StatelessWidget {
+  final String value;
+  final String label;
+
+  const _Metric({required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          maxLines: 2,
+          style: TextStyle(
+            color: colors.textPrimary,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
           ),
-          child: child,
+        ),
+        const SizedBox(height: 5),
+        Text(
+          label,
+          style: TextStyle(color: colors.textSecondary, fontSize: 11),
         ),
       ],
     );
   }
 }
 
-class _EmptyDetail extends StatelessWidget {
-  final String message;
+class _EquipmentSection extends StatelessWidget {
+  final List<EquipmentViewData> equipment;
 
-  const _EmptyDetail(this.message);
-
-  @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      const Icon(Icons.info_outline_rounded, size: 18, color: Colors.white38),
-      const SizedBox(width: 10),
-      Expanded(
-        child: Text(
-          message,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.48),
-            fontSize: 13,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-class _MediaList extends StatelessWidget {
-  final List<ExerciseMediaModel> media;
-
-  const _MediaList({required this.media});
-
-  @override
-  Widget build(BuildContext context) => Column(
-    children: media.map((item) {
-      final label = [
-        item.mediaType,
-        item.mediaPurpose,
-        item.viewAngle,
-      ].where((value) => value.isNotEmpty).join(' · ');
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Row(
-          children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: const Color(0xFF38BDF8).withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                item.mediaType.toLowerCase() == 'video'
-                    ? Icons.play_circle_outline_rounded
-                    : Icons.image_outlined,
-                color: const Color(0xFF38BDF8),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label.isEmpty ? item.mediaUrl : label,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white70, fontSize: 13),
-              ),
-            ),
-          ],
-        ),
-      );
-    }).toList(),
-  );
-}
-
-// ─────────────────────────── muscles list ────────────────────────────────────
-
-class _MusclesList extends StatelessWidget {
-  final List<ExerciseMuscleModel> muscles;
-  final Locale locale;
-
-  const _MusclesList({required this.muscles, required this.locale});
+  const _EquipmentSection({required this.equipment});
 
   @override
   Widget build(BuildContext context) {
-    final sorted = [...muscles]
-      ..sort(
-        (a, b) => (b.activationPercentage ?? 0).compareTo(
-          a.activationPercentage ?? 0,
-        ),
-      );
-
+    final colors = context.exerciseTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: sorted.asMap().entries.map((entry) {
-        final m = entry.value;
-        final name =
-            m.muscle?.nameI18n.fromI18n(locale) ?? context.tr('common.na');
-        final activation = m.activationPercentage ?? 0;
-        final isLast = entry.key == sorted.length - 1;
-        return Padding(
-          padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  if (activation > 0)
-                    Text(
-                      '$activation%',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.55),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                ],
-              ),
-              if (activation > 0) ...[
-                const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: activation / 100,
-                    minHeight: 5,
-                    backgroundColor: Colors.white.withValues(alpha: 0.08),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Color(0xFF9C27B0),
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-// ─────────────────────────── safety list ─────────────────────────────────────
-
-class _SafetyList extends StatelessWidget {
-  final List<ExerciseSafetyModel> safety;
-  final Locale locale;
-
-  const _SafetyList({required this.safety, required this.locale});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: safety.asMap().entries.map((entry) {
-        final isLast = entry.key == safety.length - 1;
-        final note = entry.value.safetyNotesI18n.fromI18n(locale).trim();
-        return Padding(
-          padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Wrap(
-                spacing: 8,
-                runSpacing: 6,
-                children: [
-                  _SafetyPill(
-                    label:
-                        '${locale.languageCode == 'it' ? 'Rischio' : 'Risk'}: ${entry.value.overallRiskLevel}',
-                  ),
-                  if (entry.value.spotterRequired)
-                    _SafetyPill(
-                      label: locale.languageCode == 'it'
-                          ? 'Spotter consigliato'
-                          : 'Spotter recommended',
-                    ),
-                ],
-              ),
-              if (note.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                _TipsList(
-                  tips: note,
-                  accentColor: const Color(0xFFFF7043),
-                  numberColor: const Color(0xFFFFAB91),
-                ),
-              ],
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _SafetyPill extends StatelessWidget {
-  final String label;
-
-  const _SafetyPill({required this.label});
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(999),
-      color: const Color(0xFFFF9800).withValues(alpha: 0.12),
-      border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.3)),
-    ),
-    child: Text(
-      label,
-      style: const TextStyle(
-        color: Color(0xFFFFB74D),
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-  );
-}
-
-class _TextChips extends StatelessWidget {
-  final List<String> labels;
-  final Color color;
-
-  const _TextChips({required this.labels, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: labels
-          .toSet()
-          .map(
-            (label) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: color.withValues(alpha: 0.3)),
-              ),
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          )
-          .toList(),
-    );
-  }
-}
-
-// ─────────────────────────── equipment list ──────────────────────────────────
-
-class _EquipmentList extends StatelessWidget {
-  final List<ExerciseEquipmentModel> equipments;
-  final Locale locale;
-
-  const _EquipmentList({required this.equipments, required this.locale});
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: equipments.map((e) {
-        final label = e.equipment.nameI18n.fromI18n(locale);
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color(0xFF00BCD4).withValues(alpha: 0.18),
-                const Color(0xFF00BCD4).withValues(alpha: 0.08),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: const Color(0xFF00BCD4).withValues(alpha: 0.35),
-              width: 1,
-            ),
-          ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF00BCD4),
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-// ─────────────────────────── variants list ───────────────────────────────────
-
-class _VariantsList extends StatelessWidget {
-  final List<ExerciseVariantModel> variants;
-  final Locale locale;
-  final ValueChanged<String> onOpenVariant;
-
-  const _VariantsList({
-    required this.variants,
-    required this.locale,
-    required this.onOpenVariant,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: variants.asMap().entries.map((entry) {
-        final v = entry.value;
-        final name =
-            v.nameI18n?.fromI18n(locale) ?? v.id ?? context.tr('common.na');
-        return InkWell(
-          onTap: v.id == null || v.id!.isEmpty
-              ? null
-              : () => onOpenVariant(v.id!),
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            margin: EdgeInsets.only(
-              bottom: entry.key == variants.length - 1 ? 0 : 10,
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.035),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: const Color(0xFF4CAF50).withValues(alpha: 0.18),
-              ),
-            ),
+      children: [
+        const ExerciseSectionTitle('Attrezzatura'),
+        const SizedBox(height: 10),
+        for (final item in equipment)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF4CAF50).withValues(alpha: 0.25),
-                        const Color(0xFF4CAF50).withValues(alpha: 0.10),
-                      ],
-                    ),
-                    border: Border.all(
-                      color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: const Icon(
-                    Icons.swap_horiz_rounded,
-                    color: Color(0xFF4CAF50),
-                    size: 18,
-                  ),
-                ),
+                Icon(Icons.cable_rounded, color: colors.primary, size: 21),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        locale.languageCode == 'it'
-                            ? 'Apri dettagli variante'
-                            : 'Open variant details',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.48),
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    item.name,
+                    style: TextStyle(color: colors.textPrimary),
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color: Colors.white.withValues(alpha: 0.45),
-                ),
+                if (item.required)
+                  Text(
+                    'Richiesta',
+                    style: TextStyle(color: colors.textSecondary, fontSize: 12),
+                  ),
               ],
             ),
           ),
-        );
-      }).toList(),
+      ],
     );
   }
 }
 
-class _ExerciseAddAffordance extends StatelessWidget {
-  final VoidCallback onTap;
+class _VariantsPreview extends StatelessWidget {
+  final ExerciseDetailViewData data;
+  final VoidCallback onOpen;
 
-  const _ExerciseAddAffordance({required this.onTap});
+  const _VariantsPreview({required this.data, required this.onOpen});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Container(
-        height: 52,
-        padding: const EdgeInsets.symmetric(horizontal: 18),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF4CAF50), Color(0xFF22C55E)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF22C55E).withValues(alpha: 0.3),
-              blurRadius: 14,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.add_rounded, color: Colors.white, size: 24),
-            const SizedBox(width: 8),
-            Text(
-              context.tr('workout.edit.add_exercise').toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.4,
+    final colors = context.exerciseTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const ExerciseSectionTitle('Varianti'),
+        const SizedBox(height: 10),
+        for (final variant in data.variants.take(3))
+          InkWell(
+            onTap: onOpen,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          variant.name,
+                          style: TextStyle(
+                            color: colors.textPrimary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          variant.relationAxis,
+                          style: TextStyle(
+                            color: colors.textSecondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: colors.textSecondary,
+                    size: 20,
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
+        ExerciseLinkButton(
+          label: 'Vedi ${data.variants.length} varianti',
+          onTap: onOpen,
         ),
+      ],
+    );
+  }
+}
+
+class _SafetySection extends StatelessWidget {
+  final String note;
+
+  const _SafetySection({required this.note});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    return Container(
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: colors.warning.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: colors.warning.withValues(alpha: 0.17)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.lightbulb_outline_rounded,
+            color: colors.warning,
+            size: 21,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Da ricordare',
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Text(
+                  note,
+                  style: TextStyle(color: colors.textSecondary, height: 1.45),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _TipsList extends StatelessWidget {
-  final String tips;
-  final Color accentColor;
-  final Color numberColor;
+class _OptionalMuscleHero extends StatelessWidget {
+  final String tag;
+  final Widget child;
 
-  const _TipsList({
-    required this.tips,
-    this.accentColor = const Color(0xFFF59E0B),
-    this.numberColor = const Color(0xFFFBBF24),
-  });
+  const _OptionalMuscleHero({required this.tag, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    final items = tips
-        .split('\n')
-        .map((tip) => tip.replaceFirst(RegExp(r'^\\s*[•-]\\s*'), '').trim())
-        .map(_stripLeadingMarker)
-        .where((tip) => tip.isNotEmpty)
-        .toList();
+    final material = Material(color: Colors.transparent, child: child);
+    if (MediaQuery.disableAnimationsOf(context)) return material;
+    return Hero(tag: tag, child: material);
+  }
+}
 
-    return Column(
-      children: items.asMap().entries.map((entry) {
-        final isLast = entry.key == items.length - 1;
-        return Padding(
-          padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 25,
-                height: 25,
-                alignment: Alignment.center,
-                margin: const EdgeInsets.only(top: 1),
-                decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${entry.key + 1}',
-                  style: TextStyle(
-                    color: numberColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Text(
-                  entry.value,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.84),
-                    fontSize: 14,
-                    height: 1.45,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+class _Entrance extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+
+  const _Entrance({required this.child, this.delay = Duration.zero});
+
+  @override
+  State<_Entrance> createState() => _EntranceState();
+}
+
+class _EntranceState extends State<_Entrance>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    final totalMilliseconds = 250 + widget.delay.inMilliseconds;
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: totalMilliseconds),
     );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Interval(
+        widget.delay.inMilliseconds / totalMilliseconds,
+        1,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+    _controller.forward();
   }
-}
 
-// ─────────────────────────── back button ─────────────────────────────────────
-
-String _stripLeadingMarker(String value) {
-  final trimmed = value.trimLeft();
-  final bullet = String.fromCharCode(0x2022);
-  if (trimmed.startsWith(bullet) || trimmed.startsWith('-')) {
-    return trimmed.substring(1).trimLeft();
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
-  return trimmed;
-}
-
-class _BackButton extends StatelessWidget {
-  final VoidCallback onBack;
-
-  const _BackButton({required this.onBack});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onBack,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.25),
-            width: 1,
-          ),
-        ),
-        child: const Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: Colors.white,
-          size: 18,
+    if (MediaQuery.disableAnimationsOf(context)) return widget.child;
+    return AnimatedBuilder(
+      animation: _animation,
+      child: widget.child,
+      builder: (_, child) => Opacity(
+        opacity: _animation.value,
+        child: Transform.translate(
+          offset: Offset(0, 8 * (1 - _animation.value)),
+          child: child,
         ),
       ),
     );

@@ -1,16 +1,20 @@
-import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/auth/pages/loading_page/loading_page.dart';
+import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../features/auth/pages/login_page/login_page.dart';
 import '../features/common/navigation/widgets/navigation_bar.dart';
-import '../features/exercise/personal_exercises_page/personal_exercises_page.dart';
-import '../features/exercise/exercise_info_page/exercise_info_page.dart';
 import '../features/exercise/exercise_create_page/exercise_create_page.dart';
+import '../features/exercise/exercise_info_page/exercise_info_page.dart';
+import '../features/exercise/exercise_info_page/presentation/pages/exercise_biomechanics_page.dart';
+import '../features/exercise/exercise_info_page/presentation/pages/exercise_muscles_page.dart';
+import '../features/exercise/exercise_info_page/presentation/pages/exercise_variants_page.dart';
+import '../features/exercise/personal_exercises_page/personal_exercises_page.dart';
 import '../features/home/home.dart';
 import '../features/profile/profile_page.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
@@ -65,6 +69,38 @@ GoRouter router(Ref ref) {
           state,
           ExercisePage(id: state.pathParameters['exerciseId']!),
         ),
+        routes: [
+          GoRoute(
+            path: 'biomechanics',
+            pageBuilder: (context, state) => _exerciseDetailTransition(
+              context,
+              state,
+              ExerciseBiomechanicsPage(
+                exerciseId: state.pathParameters['exerciseId']!,
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'muscles',
+            pageBuilder: (context, state) => _exerciseDetailTransition(
+              context,
+              state,
+              ExerciseMusclesPage(
+                exerciseId: state.pathParameters['exerciseId']!,
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'variants',
+            pageBuilder: (context, state) => _exerciseDetailTransition(
+              context,
+              state,
+              ExerciseVariantsPage(
+                exerciseId: state.pathParameters['exerciseId']!,
+              ),
+            ),
+          ),
+        ],
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -170,6 +206,39 @@ CustomTransitionPage<void> _fadeTransition(GoRouterState state, Widget child) {
       );
     },
     transitionDuration: const Duration(milliseconds: 200),
+  );
+}
+
+Page<void> _exerciseDetailTransition(
+  BuildContext context,
+  GoRouterState state,
+  Widget child,
+) {
+  if (Theme.of(context).platform == TargetPlatform.iOS) {
+    return CupertinoPage<void>(key: state.pageKey, child: child);
+  }
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 280),
+    reverseTransitionDuration: const Duration(milliseconds: 260),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+      return FadeTransition(
+        opacity: Tween<double>(begin: 0.92, end: 1).animate(curved),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.08, 0),
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        ),
+      );
+    },
   );
 }
 
