@@ -14,6 +14,8 @@ import 'package:go_router/go_router.dart';
 
 enum ExerciseQuickNavItem { biomechanics, muscles, variants }
 
+const _quickNavRailGutter = 54.0;
+
 extension on ExerciseQuickNavItem {
   String get label => switch (this) {
     ExerciseQuickNavItem.biomechanics => 'Biomeccanica',
@@ -200,35 +202,49 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
                       ),
                     ),
                     const SizedBox(height: 34),
-                    _Description(text: widget.data.description),
+                    _RailSafeSection(
+                      child: _Description(text: widget.data.description),
+                    ),
                     const SizedBox(height: 34),
-                    _ExecutionSection(
-                      execution: widget.data.execution,
-                      expandedExecution: _expandedExecution,
-                      expandedMistakes: _expandedMistakes,
-                      onToggleExecution: () => setState(
-                        () => _expandedExecution = !_expandedExecution,
+                    _RailSafeSection(
+                      child: _ExecutionSection(
+                        execution: widget.data.execution,
+                        expandedExecution: _expandedExecution,
+                        expandedMistakes: _expandedMistakes,
+                        onToggleExecution: () => setState(
+                          () => _expandedExecution = !_expandedExecution,
+                        ),
+                        onToggleMistakes: () => setState(
+                          () => _expandedMistakes = !_expandedMistakes,
+                        ),
                       ),
-                      onToggleMistakes: () => setState(
-                        () => _expandedMistakes = !_expandedMistakes,
+                    ),
+                    const SizedBox(height: 36),
+                    _RailSafeSection(
+                      child: _MusclesPreview(
+                        data: widget.data,
+                        onOpen: () => _openDetail(ExerciseQuickNavItem.muscles),
                       ),
                     ),
                     const SizedBox(height: 36),
-                    _MusclesPreview(
-                      data: widget.data,
-                      onOpen: () => _openDetail(ExerciseQuickNavItem.muscles),
+                    _RailSafeSection(
+                      child: _BiomechanicsPreview(
+                        data: widget.data,
+                        onOpen: () =>
+                            _openDetail(ExerciseQuickNavItem.biomechanics),
+                      ),
                     ),
                     const SizedBox(height: 36),
-                    _BiomechanicsPreview(
-                      data: widget.data,
-                      onOpen: () =>
-                          _openDetail(ExerciseQuickNavItem.biomechanics),
+                    _RailSafeSection(
+                      child: _EquipmentSection(
+                        equipment: widget.data.equipment,
+                      ),
                     ),
-                    const SizedBox(height: 36),
-                    _EquipmentSection(equipment: widget.data.equipment),
                     if (widget.data.safetyNote.isNotEmpty) ...[
                       const SizedBox(height: 36),
-                      _SafetySection(note: widget.data.safetyNote),
+                      _RailSafeSection(
+                        child: _SafetySection(note: widget.data.safetyNote),
+                      ),
                     ],
                     const SizedBox(height: 40),
                     Divider(color: colors.border),
@@ -662,46 +678,82 @@ class _MorphButton extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Row(
-                mainAxisAlignment: deployProgress < 0.1
-                    ? MainAxisAlignment.center
-                    : MainAxisAlignment.start,
-                children: [
-                  SizedBox(width: lerpDouble(0, 16, deployProgress)),
-                  Icon(item.icon, size: 20, color: colors.primary),
-                  if (deployProgress > 0.3) ...[
-                    SizedBox(width: lerpDouble(0, 12, deployProgress)),
-                    Expanded(
-                      child: Opacity(
-                        opacity: labelOpacity,
-                        child: Text(
-                          item.actionLabel,
-                          maxLines: 1,
-                          overflow: TextOverflow.fade,
-                          style: TextStyle(
-                            color: colors.textPrimary,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final iconProgress = Curves.easeInOutCubic.transform(
+                    deployProgress,
+                  );
+                  final centeredIconLeft = (constraints.maxWidth - 20) / 2;
+                  final iconLeft = lerpDouble(
+                    centeredIconLeft,
+                    16,
+                    iconProgress,
+                  )!;
+                  return Stack(
+                    children: [
+                      Positioned(
+                        left: iconLeft,
+                        top: (constraints.maxHeight - 20) / 2,
+                        child: Icon(item.icon, size: 20, color: colors.primary),
+                      ),
+                      if (deployProgress > 0.3) ...[
+                        Positioned(
+                          left: 48,
+                          right: 44,
+                          top: 0,
+                          bottom: 0,
+                          child: Opacity(
+                            opacity: labelOpacity,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                item.actionLabel,
+                                maxLines: 1,
+                                overflow: TextOverflow.fade,
+                                style: TextStyle(
+                                  color: colors.textPrimary,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    Opacity(
-                      opacity: labelOpacity,
-                      child: Icon(
-                        Icons.chevron_right_rounded,
-                        color: colors.textSecondary,
-                        size: 21,
-                      ),
-                    ),
-                    SizedBox(width: lerpDouble(0, 12, deployProgress)),
-                  ],
-                ],
+                        Positioned(
+                          right: 12,
+                          top: (constraints.maxHeight - 21) / 2,
+                          child: Opacity(
+                            opacity: labelOpacity,
+                            child: Icon(
+                              Icons.chevron_right_rounded,
+                              color: colors.textSecondary,
+                              size: 21,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  );
+                },
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _RailSafeSection extends StatelessWidget {
+  final Widget child;
+
+  const _RailSafeSection({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: _quickNavRailGutter),
+      child: child,
     );
   }
 }
