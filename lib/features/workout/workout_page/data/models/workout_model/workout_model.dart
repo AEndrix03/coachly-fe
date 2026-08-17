@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
 import 'package:coachly/shared/json_converters/map_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -26,6 +27,12 @@ abstract class WorkoutModel with _$WorkoutModel {
     @Default(0) int lastSessionDays,
     required String type,
     @Default([]) List<WorkoutExerciseModel> workoutExercises,
+    @JsonKey(
+      fromJson: workoutProgrammingBlocksFromJson,
+      toJson: workoutProgrammingBlocksToJson,
+    )
+    @Default([])
+    List<WorkoutProgrammingBlockModel> programmingBlocks,
     @Default(true) bool active,
     @Default(false) bool dirty,
     @Default(false) bool delete,

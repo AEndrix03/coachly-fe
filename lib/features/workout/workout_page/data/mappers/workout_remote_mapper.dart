@@ -4,6 +4,7 @@ import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exe
 import 'package:coachly/features/workout/workout_page/data/models/tag_dto/tag_dto.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
 
 class WorkoutRemoteMapper {
   const WorkoutRemoteMapper._();
@@ -59,6 +60,7 @@ class WorkoutRemoteMapper {
       lastSessionDays: _asInt(json['lastSessionDays']) ?? 0,
       type: type,
       workoutExercises: workoutExercises,
+      programmingBlocks: workoutProgrammingBlocksFromJson(json['blocks']),
       active: isActive && !isArchived,
       dirty: false,
       delete: isArchived,
