@@ -143,6 +143,147 @@ class AppStrings {
     'workout.active_short': {'en': 'Active', 'it': 'Attive'},
     'workout.completed': {'en': 'Completed', 'it': 'Completate'},
 
+    'workout.detail.exercises': {'en': 'Exercises', 'it': 'Esercizi'},
+    'workout.detail.working_sets': {
+      'en': 'Working sets',
+      'it': 'Serie allenanti',
+    },
+    'workout.detail.goal': {'en': 'Goal', 'it': 'Obiettivo'},
+    'workout.detail.show_more': {'en': 'Show more', 'it': 'Mostra altro'},
+    'workout.detail.show_less': {'en': 'Show less', 'it': 'Mostra meno'},
+    'workout.detail.structure': {'en': 'Structure', 'it': 'Struttura'},
+    'workout.detail.rest': {'en': 'Rest', 'it': 'Recupero'},
+    'workout.detail.target': {'en': 'Target', 'it': 'Target'},
+    'workout.detail.intensity': {'en': 'Intensity', 'it': 'Intensità'},
+    'workout.detail.recovery': {'en': 'Recovery', 'it': 'Recupero'},
+    'workout.detail.target_load': {'en': 'Target load', 'it': 'Carico target'},
+    'workout.detail.notes': {'en': 'Notes', 'it': 'Note'},
+    'workout.detail.exercise_detail': {
+      'en': 'Exercise details',
+      'it': 'Dettaglio esercizio',
+    },
+    'workout.detail.exercise_unavailable': {
+      'en': 'Exercise unavailable',
+      'it': 'Esercizio non disponibile',
+    },
+    'workout.detail.superset': {'en': 'SUPERSET', 'it': 'SUPERSET'},
+    'workout.detail.circuit': {'en': 'CIRCUIT', 'it': 'CIRCUITO'},
+    'workout.detail.rounds': {'en': 'rounds', 'it': 'round'},
+    'workout.detail.rest_after_round': {
+      'en': 'Rest after round',
+      'it': 'Recupero dopo il round',
+    },
+    'workout.detail.explain_concept': {
+      'en': 'Explain this concept',
+      'it': 'Spiega questo concetto',
+    },
+    'workout.detail.what_is_it': {'en': 'What it is', 'it': 'Cos’è'},
+    'workout.detail.how_to_read': {
+      'en': 'How to read it',
+      'it': 'Come si legge',
+    },
+    'workout.detail.superset_definition': {
+      'en': 'Two or more exercises performed in sequence before resting.',
+      'it': 'Due o più esercizi eseguiti in sequenza prima del recupero.',
+    },
+    'workout.detail.circuit_definition': {
+      'en': 'A sequence of exercises repeated for the prescribed rounds.',
+      'it': 'Una sequenza di esercizi ripetuta per i round prescritti.',
+    },
+    'workout.detail.no_exercises': {
+      'en': 'No exercises',
+      'it': 'Nessun esercizio',
+    },
+    'workout.detail.empty_hint': {
+      'en': 'Build this session from the Coachly catalog or your exercises.',
+      'it': 'Costruisci la sessione dal catalogo Coachly o dai tuoi esercizi.',
+    },
+    'workout.detail.add_exercise': {
+      'en': 'Add exercise',
+      'it': 'Aggiungi esercizio',
+    },
+    'workout.detail.programming_details': {
+      'en': 'Programming details',
+      'it': 'Dettagli programmazione',
+    },
+    'workout.detail.rep_range': {'en': 'Rep range', 'it': 'Range rep'},
+    'workout.detail.concepts_used': {
+      'en': 'Concepts used in this workout',
+      'it': 'Concetti usati in questa scheda',
+    },
+    'workout.detail.sync_pending': {
+      'en': 'Sync pending',
+      'it': 'Sync in attesa',
+    },
+    'workout.detail.concept_rir_definition': {
+      'en':
+          'Reps in reserve estimates how many repetitions remained before failure.',
+      'it':
+          'Le ripetizioni in riserva stimano quante ripetizioni restavano prima del cedimento.',
+    },
+    'workout.detail.concept_rir_example': {
+      'en': 'RIR 2 means you could have completed about two more repetitions.',
+      'it':
+          'RIR 2 significa che avresti potuto eseguire circa altre due ripetizioni.',
+    },
+    'workout.detail.concept_rpe_definition': {
+      'en': 'RPE describes perceived effort on a scale up to 10.',
+      'it': 'RPE descrive lo sforzo percepito su una scala fino a 10.',
+    },
+    'workout.detail.concept_rpe_example': {
+      'en': 'RPE 8 is a challenging set with roughly two reps in reserve.',
+      'it':
+          'RPE 8 è una serie impegnativa con circa due ripetizioni in riserva.',
+    },
+    'workout.detail.concept_percentage1RM_definition': {
+      'en': 'The load is prescribed as a percentage of your one-rep maximum.',
+      'it': 'Il carico è prescritto come percentuale del tuo massimale.',
+    },
+    'workout.detail.concept_percentage1RM_example': {
+      'en': '75% 1RM means using three quarters of your estimated maximum.',
+      'it': '75% 1RM indica tre quarti del massimale stimato.',
+    },
+    'workout.detail.concept_superset_definition': {
+      'en': 'Exercises performed in sequence before resting.',
+      'it': 'Esercizi eseguiti in sequenza prima del recupero.',
+    },
+    'workout.detail.concept_superset_example': {
+      'en': 'A1 is followed by A2, then by the prescribed recovery.',
+      'it': 'A1 è seguito da A2 e poi dal recupero prescritto.',
+    },
+    'workout.detail.concept_circuit_definition': {
+      'en': 'A sequence of exercises repeated for multiple rounds.',
+      'it': 'Una sequenza di esercizi ripetuta per più round.',
+    },
+    'workout.detail.concept_circuit_example': {
+      'en': 'Complete B1, B2 and B3, rest, then repeat.',
+      'it': 'Completa B1, B2 e B3, recupera e ripeti.',
+    },
+    'workout.detail.concept_topSet_definition': {
+      'en': 'The heaviest primary work set for the exercise.',
+      'it': 'La serie allenante principale più pesante dell’esercizio.',
+    },
+    'workout.detail.concept_topSet_example': {
+      'en': '1 × 4–6 at RPE 8.',
+      'it': '1 × 4–6 a RPE 8.',
+    },
+    'workout.detail.concept_backoff_definition': {
+      'en': 'Follow-up sets performed with less load than the top set.',
+      'it': 'Serie successive eseguite con meno carico rispetto al top set.',
+    },
+    'workout.detail.concept_backoff_example': {
+      'en': '3 × 6–8 at 7.5% less than the top set.',
+      'it': '3 × 6–8 con il 7,5% in meno del top set.',
+    },
+    'workout.detail.concept_amrap_definition': {
+      'en': 'Perform as many technically sound repetitions as possible.',
+      'it': 'Esegui più ripetizioni tecnicamente valide possibili.',
+    },
+    'workout.detail.concept_amrap_example': {
+      'en': 'Stop when another clean repetition is no longer available.',
+      'it': 'Fermati quando non è più disponibile un’altra ripetizione pulita.',
+    },
+
     'workout.organize.title': {
       'en': 'Organize Workouts',
       'it': 'Organizza gli Allenamenti',
