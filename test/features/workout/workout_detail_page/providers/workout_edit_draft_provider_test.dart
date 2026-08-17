@@ -1,0 +1,118 @@
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  late ProviderContainer container;
+  late WorkoutEditDraft notifier;
+
+  setUp(() {
+    container = ProviderContainer();
+    addTearDown(container.dispose);
+    notifier = container.read(workoutEditDraftProvider('workout').notifier);
+    notifier.initialize(_workout());
+  });
+
+  test('normalizes legacy exercises into stable independent blocks', () {
+    final state = container.read(workoutEditDraftProvider('workout'));
+
+    expect(state.blocks, hasLength(3));
+    expect(state.blocks.map((block) => block.position), [0, 1, 2]);
+    expect(
+      state.blocks.every((block) => block.groupType == 'exercise'),
+      isTrue,
+    );
+    expect(state.isDirty, isFalse);
+  });
+
+  test(
+    'duplicates, moves and removes by instance id rather than index identity',
+    () {
+      notifier.duplicateExercise('entry-1');
+      var state = container.read(workoutEditDraftProvider('workout'));
+      expect(state.blocks, hasLength(4));
+      expect(state.blocks[1].entries.single.id, isNot('entry-1'));
+
+      notifier.moveBlock(0, 3);
+      state = container.read(workoutEditDraftProvider('workout'));
+      expect(state.blocks.last.entries.single.id, 'entry-1');
+
+      notifier.removeExercise('entry-2');
+      state = container.read(workoutEditDraftProvider('workout'));
+      expect(
+        state.blocks.expand((block) => block.entries).map((entry) => entry.id),
+        isNot(contains('entry-2')),
+      );
+      expect(state.isDirty, isTrue);
+    },
+  );
+
+  test('creates and ungroups valid supersets', () {
+    notifier.createGroup(
+      type: 'superset',
+      instanceIds: const ['entry-1', 'entry-2'],
+      rounds: 3,
+    );
+    var state = container.read(workoutEditDraftProvider('workout'));
+    final group = state.blocks.firstWhere(
+      (block) => block.groupType == 'superset',
+    );
+    expect(group.entries, hasLength(2));
+    expect(group.rounds, 3);
+
+    notifier.ungroup(group.id);
+    state = container.read(workoutEditDraftProvider('workout'));
+    expect(state.blocks.every((block) => block.entries.length == 1), isTrue);
+  });
+
+  test('updates a prescription once in the draft', () {
+    notifier.updatePrescription(
+      instanceId: 'entry-1',
+      sets: 4,
+      repsMin: 6,
+      repsMax: 10,
+      restSeconds: 180,
+      intensityType: 'rir',
+      intensityMin: 1,
+      intensityMax: 2,
+    );
+    final entry = container
+        .read(workoutEditDraftProvider('workout'))
+        .blocks
+        .first
+        .entries
+        .single;
+
+    expect(entry.sets, hasLength(4));
+    expect(entry.sets.first.repsMin, 6);
+    expect(entry.sets.first.repsMax, 10);
+    expect(entry.sets.first.intensityType, 'rir');
+    expect(entry.sets.first.intensityMax, 2);
+  });
+}
+
+WorkoutModel _workout() => WorkoutModel(
+  id: 'workout',
+  titleI18n: const {'en': 'Upper', 'it': 'Upper'},
+  descriptionI18n: null,
+  goal: 'Hypertrophy',
+  lastUsed: DateTime(2026),
+  type: 'Hypertrophy',
+  workoutExercises: List.generate(3, (index) {
+    final number = index + 1;
+    return WorkoutExerciseModel(
+      id: 'entry-$number',
+      exercise: ExerciseDetailModel(
+        id: '00000000-0000-4000-8000-00000000000$number',
+        nameI18n: {'en': 'Exercise $number', 'it': 'Esercizio $number'},
+      ),
+      sets: '3x10',
+      rest: '120s',
+      weight: '-',
+      progress: 0,
+    );
+  }),
+);

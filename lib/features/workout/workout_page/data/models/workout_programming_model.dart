@@ -70,6 +70,50 @@ class WorkoutProgrammingBlockModel {
     if (notes != null) 'notes': notes,
     'entries': entries.map((entry) => entry.toJson()).toList(),
   };
+
+  WorkoutProgrammingBlockModel copyWith({
+    String? id,
+    int? position,
+    Object? label = _unset,
+    Object? sectionId = _unset,
+    Object? sectionPosition = _unset,
+    Object? sectionTitle = _unset,
+    Object? sectionKind = _unset,
+    Object? groupType = _unset,
+    Object? rounds = _unset,
+    Object? restBetweenExercisesSeconds = _unset,
+    Object? restSeconds = _unset,
+    Object? notes = _unset,
+    List<WorkoutProgrammingEntryModel>? entries,
+  }) => WorkoutProgrammingBlockModel(
+    id: id ?? this.id,
+    position: position ?? this.position,
+    label: identical(label, _unset) ? this.label : label as String?,
+    sectionId: identical(sectionId, _unset)
+        ? this.sectionId
+        : sectionId as String?,
+    sectionPosition: identical(sectionPosition, _unset)
+        ? this.sectionPosition
+        : sectionPosition as int?,
+    sectionTitle: identical(sectionTitle, _unset)
+        ? this.sectionTitle
+        : sectionTitle as String?,
+    sectionKind: identical(sectionKind, _unset)
+        ? this.sectionKind
+        : sectionKind as String?,
+    groupType: identical(groupType, _unset)
+        ? this.groupType
+        : groupType as String?,
+    rounds: identical(rounds, _unset) ? this.rounds : rounds as int?,
+    restBetweenExercisesSeconds: identical(restBetweenExercisesSeconds, _unset)
+        ? this.restBetweenExercisesSeconds
+        : restBetweenExercisesSeconds as int?,
+    restSeconds: identical(restSeconds, _unset)
+        ? this.restSeconds
+        : restSeconds as int?,
+    notes: identical(notes, _unset) ? this.notes : notes as String?,
+    entries: entries ?? this.entries,
+  );
 }
 
 class WorkoutProgrammingEntryModel {
@@ -103,6 +147,18 @@ class WorkoutProgrammingEntryModel {
     'position': position,
     'sets': sets.map((set) => set.toJson()).toList(),
   };
+
+  WorkoutProgrammingEntryModel copyWith({
+    String? id,
+    String? exerciseId,
+    int? position,
+    List<WorkoutProgrammingSetModel>? sets,
+  }) => WorkoutProgrammingEntryModel(
+    id: id ?? this.id,
+    exerciseId: exerciseId ?? this.exerciseId,
+    position: position ?? this.position,
+    sets: sets ?? this.sets,
+  );
 }
 
 class WorkoutProgrammingSetModel {
@@ -185,6 +241,54 @@ class WorkoutProgrammingSetModel {
     if (unilateral) 'unilateral': true,
     if (notes != null) 'notes': notes,
   };
+
+  WorkoutProgrammingSetModel copyWith({
+    Object? id = _unset,
+    int? position,
+    String? setType,
+    Object? reps = _unset,
+    Object? repsMin = _unset,
+    Object? repsMax = _unset,
+    String? intensityType,
+    Object? intensityMin = _unset,
+    Object? intensityMax = _unset,
+    Object? relativeLoadPercent = _unset,
+    Object? load = _unset,
+    Object? loadUnit = _unset,
+    Object? restSeconds = _unset,
+    Object? tempo = _unset,
+    Object? pauseSeconds = _unset,
+    bool? unilateral,
+    Object? notes = _unset,
+  }) => WorkoutProgrammingSetModel(
+    id: identical(id, _unset) ? this.id : id as String?,
+    position: position ?? this.position,
+    setType: setType ?? this.setType,
+    reps: identical(reps, _unset) ? this.reps : reps as int?,
+    repsMin: identical(repsMin, _unset) ? this.repsMin : repsMin as int?,
+    repsMax: identical(repsMax, _unset) ? this.repsMax : repsMax as int?,
+    intensityType: intensityType ?? this.intensityType,
+    intensityMin: identical(intensityMin, _unset)
+        ? this.intensityMin
+        : intensityMin as double?,
+    intensityMax: identical(intensityMax, _unset)
+        ? this.intensityMax
+        : intensityMax as double?,
+    relativeLoadPercent: identical(relativeLoadPercent, _unset)
+        ? this.relativeLoadPercent
+        : relativeLoadPercent as double?,
+    load: identical(load, _unset) ? this.load : load as double?,
+    loadUnit: identical(loadUnit, _unset) ? this.loadUnit : loadUnit as String?,
+    restSeconds: identical(restSeconds, _unset)
+        ? this.restSeconds
+        : restSeconds as int?,
+    tempo: identical(tempo, _unset) ? this.tempo : tempo as String?,
+    pauseSeconds: identical(pauseSeconds, _unset)
+        ? this.pauseSeconds
+        : pauseSeconds as int?,
+    unilateral: unilateral ?? this.unilateral,
+    notes: identical(notes, _unset) ? this.notes : notes as String?,
+  );
 }
 
 List<WorkoutProgrammingBlockModel> workoutProgrammingBlocksFromJson(
@@ -220,3 +324,5 @@ int? _integer(Object? value) =>
 double? _number(Object? value) => value is num
     ? value.toDouble()
     : double.tryParse(value?.toString().replaceAll(',', '.') ?? '');
+
+const Object _unset = Object();

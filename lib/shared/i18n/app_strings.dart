@@ -22,6 +22,7 @@ class AppStrings {
     'common.back_to_top': {'en': 'Back to top', 'it': 'Torna in alto'},
     'common.confirm': {'en': 'Confirm', 'it': 'Conferma'},
     'common.cancel': {'en': 'Cancel', 'it': 'Annulla'},
+    'common.undo': {'en': 'UNDO', 'it': 'ANNULLA'},
     'common.edit': {'en': 'Edit', 'it': 'Modifica'},
     'common.duplicate': {'en': 'Duplicate', 'it': 'Duplica'},
     'common.delete': {'en': 'Delete', 'it': 'Elimina'},
@@ -215,6 +216,69 @@ class AppStrings {
       'en': 'Sync pending',
       'it': 'Sync in attesa',
     },
+    'workout.detail.edit_session': {
+      'en': 'Edit session',
+      'it': 'Modifica sessione',
+    },
+    'workout.detail.done': {'en': 'Done', 'it': 'Fine'},
+    'workout.detail.exercise_removed': {
+      'en': 'Exercise removed',
+      'it': 'Esercizio rimosso',
+    },
+    'workout.detail.add_section': {
+      'en': 'Add section',
+      'it': 'Aggiungi sezione',
+    },
+    'workout.detail.create_group': {
+      'en': 'Create superset / circuit',
+      'it': 'Crea superset / circuito',
+    },
+    'workout.detail.section_preparation': {
+      'en': 'Preparation',
+      'it': 'Preparazione',
+    },
+    'workout.detail.section_main': {
+      'en': 'Main work',
+      'it': 'Lavoro principale',
+    },
+    'workout.detail.section_accessory': {
+      'en': 'Accessories',
+      'it': 'Accessori',
+    },
+    'workout.detail.section_custom': {'en': 'Custom', 'it': 'Personalizzata'},
+    'workout.detail.section_name': {'en': 'Section name', 'it': 'Nome sezione'},
+    'workout.detail.ungroup': {'en': 'Ungroup', 'it': 'Separa gruppo'},
+    'workout.detail.edit_exercise': {
+      'en': 'Edit exercise',
+      'it': 'Modifica esercizio',
+    },
+    'workout.detail.base': {'en': 'Base', 'it': 'Base'},
+    'workout.detail.advanced': {'en': 'Advanced', 'it': 'Avanzate'},
+    'workout.detail.advanced_progressive': {
+      'en':
+          'Tempo, pauses, unilateral work, target load and notes remain hidden until needed.',
+      'it':
+          'Tempo, pause, unilateralità, carico target e note restano nascosti finché non servono.',
+    },
+    'workout.detail.none': {'en': 'None', 'it': 'Nessuna'},
+    'workout.detail.saved_offline': {
+      'en': 'Saved offline',
+      'it': 'Salvato offline',
+    },
+    'workout.detail.unsaved_title': {
+      'en': 'Unsaved changes',
+      'it': 'Modifiche non salvate',
+    },
+    'workout.detail.unsaved_body': {
+      'en': 'Save or discard the changes before leaving edit mode.',
+      'it': 'Salva o scarta le modifiche prima di uscire dalla modifica.',
+    },
+    'workout.detail.continue_editing': {
+      'en': 'Continue editing',
+      'it': 'Continua a modificare',
+    },
+    'workout.detail.discard': {'en': 'Discard', 'it': 'Scarta'},
+    'workout.detail.save_exit': {'en': 'Save and exit', 'it': 'Salva ed esci'},
     'workout.detail.concept_rir_definition': {
       'en':
           'Reps in reserve estimates how many repetitions remained before failure.',
