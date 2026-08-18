@@ -2,6 +2,7 @@ import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exe
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -92,6 +93,40 @@ void main() {
     expect(entry.sets.first.intensityType, 'rir');
     expect(entry.sets.first.intensityMax, 2);
   });
+
+  test(
+    'quick adds an exercise with explicit prescription and stable identity',
+    () {
+      notifier.addExercise(
+        exercise: const ExerciseDetailModel(
+          id: '00000000-0000-4000-8000-000000000009',
+          nameI18n: {'en': 'Cable Fly', 'it': 'Croci ai cavi'},
+        ),
+        sets: List.generate(
+          3,
+          (index) => WorkoutProgrammingSetModel(
+            position: index,
+            repsMin: 10,
+            repsMax: 15,
+            intensityType: 'rir',
+            intensityMin: 1,
+            restSeconds: 90,
+          ),
+        ),
+      );
+      final state = container.read(workoutEditDraftProvider('workout'));
+      final added = state.blocks.last.entries.single;
+
+      expect(added.exerciseId, '00000000-0000-4000-8000-000000000009');
+      expect(added.sets, hasLength(3));
+      expect(added.sets.first.repsMax, 15);
+      expect(
+        state.source!.workoutExercises.last.exercise.nameI18n!['en'],
+        'Cable Fly',
+      );
+      expect(state.isDirty, isTrue);
+    },
+  );
 }
 
 WorkoutModel _workout() => WorkoutModel(

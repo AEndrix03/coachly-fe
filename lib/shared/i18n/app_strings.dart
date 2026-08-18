@@ -279,6 +279,50 @@ class AppStrings {
     },
     'workout.detail.discard': {'en': 'Discard', 'it': 'Scarta'},
     'workout.detail.save_exit': {'en': 'Save and exit', 'it': 'Salva ed esci'},
+    'workout.add_exercise.title': {
+      'en': 'Add exercise',
+      'it': 'Aggiungi esercizio',
+    },
+    'workout.add_exercise.search_hint': {
+      'en': 'Search exercise, muscle or equipment…',
+      'it': 'Cerca esercizio, muscolo o attrezzatura…',
+    },
+    'workout.add_exercise.all': {'en': 'All', 'it': 'Tutti'},
+    'workout.add_exercise.verified': {'en': 'Verified', 'it': 'Verified'},
+    'workout.add_exercise.mine': {'en': 'Mine', 'it': 'I miei'},
+    'workout.add_exercise.muscle': {'en': 'Muscle', 'it': 'Muscolo'},
+    'workout.add_exercise.movement': {'en': 'Movement', 'it': 'Movimento'},
+    'workout.add_exercise.equipment': {'en': 'Equipment', 'it': 'Attrezzatura'},
+    'workout.add_exercise.tracking': {'en': 'Tracking', 'it': 'Tracking'},
+    'workout.add_exercise.recent': {'en': 'Recent', 'it': 'Recenti'},
+    'workout.add_exercise.results': {'en': 'Results', 'it': 'Risultati'},
+    'workout.add_exercise.no_results': {
+      'en': 'No exercises match these filters.',
+      'it': 'Nessun esercizio corrisponde ai filtri.',
+    },
+    'workout.add_exercise.clear_filter': {
+      'en': 'Clear filter',
+      'it': 'Rimuovi filtro',
+    },
+    'workout.add_exercise.create_personal': {
+      'en': 'Create personal exercise',
+      'it': 'Crea esercizio personalizzato',
+    },
+    'workout.add_exercise.last_configuration': {
+      'en': 'Using your last compatible prescription',
+      'it': 'Uso dell’ultima prescrizione compatibile',
+    },
+    'workout.add_exercise.reps_min': {'en': 'Min reps', 'it': 'Rep minime'},
+    'workout.add_exercise.reps_max': {'en': 'Max reps', 'it': 'Rep massime'},
+    'workout.add_exercise.add_to': {'en': 'Add to', 'it': 'Aggiungi a'},
+    'workout.add_exercise.no_section': {
+      'en': 'No section',
+      'it': 'Nessuna sezione',
+    },
+    'workout.add_exercise.load_error': {
+      'en': 'Unable to load the exercise catalog.',
+      'it': 'Impossibile caricare il catalogo esercizi.',
+    },
     'workout.detail.concept_rir_definition': {
       'en':
           'Reps in reserve estimates how many repetitions remained before failure.',

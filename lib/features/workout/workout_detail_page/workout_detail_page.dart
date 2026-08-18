@@ -82,7 +82,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
                   child: WorkoutStructuralEdit(
                     workoutId: resolved.id,
                     viewData: viewData,
-                    onAddExercise: () => _openLegacyExercisePicker(resolved),
+                    onAddExercise: () => _openExerciseCatalog(resolved),
                   ),
                 ),
               ] else ...[
@@ -196,8 +196,8 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     }
   }
 
-  void _openLegacyExercisePicker(WorkoutModel resolved) {
-    context.push('/workouts/workout/${resolved.id}/edit', extra: resolved);
+  void _openExerciseCatalog(WorkoutModel resolved) {
+    context.push('/workouts/workout/${resolved.id}/add-exercise');
   }
 }
 

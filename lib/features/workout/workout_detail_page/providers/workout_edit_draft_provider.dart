@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
@@ -143,6 +144,62 @@ class WorkoutEditDraft extends _$WorkoutEditDraft {
       );
       return;
     }
+  }
+
+  void addExercise({
+    required ExerciseDetailModel exercise,
+    required List<WorkoutProgrammingSetModel> sets,
+    String? sectionId,
+  }) {
+    final exerciseId = exercise.id;
+    if (exerciseId == null || exerciseId.isEmpty || sets.isEmpty) return;
+    final instanceId = _uuid();
+    final sectionAnchor = state.blocks.firstWhere(
+      (block) => block.sectionId == sectionId,
+      orElse: () => state.blocks.isEmpty
+          ? WorkoutProgrammingBlockModel(id: _uuid(), position: 0)
+          : state.blocks.last,
+    );
+    final block = WorkoutProgrammingBlockModel(
+      id: _uuid(),
+      position: state.blocks.length,
+      sectionId: sectionId,
+      sectionPosition: sectionId == null ? null : sectionAnchor.sectionPosition,
+      sectionTitle: sectionId == null ? null : sectionAnchor.sectionTitle,
+      sectionKind: sectionId == null ? null : sectionAnchor.sectionKind,
+      groupType: 'exercise',
+      entries: [
+        WorkoutProgrammingEntryModel(
+          id: instanceId,
+          exerciseId: exerciseId,
+          position: 0,
+          sets: sets.indexed
+              .map((item) => item.$2.copyWith(id: null, position: item.$1))
+              .toList(),
+        ),
+      ],
+    );
+    final source = state.source;
+    final details = source == null
+        ? const <WorkoutExerciseModel>[]
+        : [
+            ...source.workoutExercises,
+            WorkoutExerciseModel(
+              id: instanceId,
+              exercise: exercise,
+              sets:
+                  '${sets.length}x${sets.first.repsMin ?? sets.first.reps ?? ''}',
+              rest: '${sets.first.restSeconds ?? 0}s',
+              weight: '-',
+              progress: 0,
+            ),
+          ];
+    state = state.copyWith(
+      source: source?.copyWith(workoutExercises: details),
+      blocks: [...state.blocks, block],
+      isDirty: true,
+      clearError: true,
+    );
   }
 
   void moveExerciseToSection(String instanceId, String? sectionId) {
@@ -438,4 +495,25 @@ String _uuid() {
       .join();
   return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-'
       '${hex.substring(16, 20)}-${hex.substring(20)}';
+}
+
+@riverpod
+WorkoutProgrammingEntryModel? lastExercisePrescription(
+  Ref ref,
+  String exerciseId,
+) {
+  final workouts = ref.watch(workoutListProvider).value;
+  if (workouts == null) return null;
+  final ordered = [...workouts]
+    ..sort((a, b) => b.lastUsed.compareTo(a.lastUsed));
+  for (final workout in ordered) {
+    for (final block in workout.programmingBlocks) {
+      for (final entry in block.entries) {
+        if (entry.exerciseId == exerciseId && entry.sets.isNotEmpty) {
+          return entry;
+        }
+      }
+    }
+  }
+  return null;
 }

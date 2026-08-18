@@ -14,6 +14,7 @@ import '../features/exercise/exercise_create_page/exercise_create_page.dart';
 import '../features/home/home.dart';
 import '../features/profile/profile_page.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
+import '../features/workout/add_exercise_page/add_exercise_page.dart';
 import '../features/workout/workout_detail_page/workout_detail_page.dart';
 import '../features/workout/workout_edit_page/workout_edit_page.dart';
 import '../features/workout/workout_organize_page/workout_organize_page.dart';
@@ -61,7 +62,7 @@ GoRouter router(Ref ref) {
       ),
       GoRoute(
         path: '/exercises/:exerciseId',
-        pageBuilder: (context, state) => _fadeTransition(
+        pageBuilder: (context, state) => _athleteTransition(
           state,
           ExercisePage(id: state.pathParameters['exerciseId']!),
         ),
@@ -104,6 +105,15 @@ GoRouter router(Ref ref) {
                     },
                     routes: [
                       GoRoute(
+                        path: 'add-exercise',
+                        pageBuilder: (context, state) => _athleteTransition(
+                          state,
+                          AddExercisePage(
+                            workoutId: state.pathParameters['id']!,
+                          ),
+                        ),
+                      ),
+                      GoRoute(
                         path: 'edit',
                         pageBuilder: (context, state) {
                           final workout = state.extra as WorkoutModel?;
@@ -118,7 +128,7 @@ GoRouter router(Ref ref) {
                       ),
                       GoRoute(
                         path: 'active',
-                        pageBuilder: (context, state) => _fadeTransition(
+                        pageBuilder: (context, state) => _athleteTransition(
                           state,
                           WorkoutActivePage(
                             workoutId: state.pathParameters['id']!,
@@ -127,7 +137,7 @@ GoRouter router(Ref ref) {
                       ),
                       GoRoute(
                         path: 'workout_exercise_page/:exerciseId',
-                        pageBuilder: (context, state) => _fadeTransition(
+                        pageBuilder: (context, state) => _athleteTransition(
                           state,
                           ExercisePage(id: state.pathParameters['exerciseId']!),
                         ),
@@ -156,6 +166,35 @@ GoRouter router(Ref ref) {
         ],
       ),
     ],
+  );
+}
+
+CustomTransitionPage<void> _athleteTransition(
+  GoRouterState state,
+  Widget child,
+) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 280),
+    reverseTransitionDuration: const Duration(milliseconds: 250),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(.08, 0),
+          end: Offset.zero,
+        ).animate(curved),
+        child: FadeTransition(
+          opacity: Tween<double>(begin: .92, end: 1).animate(curved),
+          child: child,
+        ),
+      );
+    },
   );
 }
 
