@@ -9,6 +9,7 @@ import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
 
 class WorkoutStructuralEdit extends ConsumerWidget {
   final String workoutId;
@@ -389,6 +390,12 @@ class _EditableBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isNameLoading = block.entries.any(
+      (entry) => exercises[entry.id]?.isNameLoading ?? false,
+    );
+    if (isNameLoading) {
+      return _EditableBlockSkeleton(index: index, dragHandle: dragHandle);
+    }
     final names = block.entries
         .map((entry) => exercises[entry.id]?.name ?? entry.exerciseId)
         .join(' · ');
@@ -487,6 +494,51 @@ class _EditableBlock extends StatelessWidget {
       ),
     );
   }
+}
+
+class _EditableBlockSkeleton extends StatelessWidget {
+  final int index;
+  final Widget dragHandle;
+
+  const _EditableBlockSkeleton({required this.index, required this.dragHandle});
+
+  @override
+  Widget build(BuildContext context) => CoachlySurface(
+    padding: const EdgeInsets.fromLTRB(8, 10, 6, 10),
+    child: Shimmer.fromColors(
+      baseColor: CoachlyAthleteTheme.surfaceElevated,
+      highlightColor: CoachlyAthleteTheme.border,
+      child: Row(
+        children: [
+          IgnorePointer(child: dragHandle),
+          Container(
+            width: 30,
+            height: 30,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: CoachlyAthleteTheme.surface,
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: Text(
+              '${index + 1}',
+              style: const TextStyle(color: CoachlyAthleteTheme.primary),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Container(
+              height: 16,
+              decoration: BoxDecoration(
+                color: CoachlyAthleteTheme.surface,
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+          ),
+          const SizedBox(width: 44),
+        ],
+      ),
+    ),
+  );
 }
 
 typedef PrescriptionSave =

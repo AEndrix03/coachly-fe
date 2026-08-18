@@ -4,6 +4,7 @@ import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shimmer/shimmer.dart';
 
 class WorkoutExerciseCard extends StatefulWidget {
   final WorkoutExerciseViewData exercise;
@@ -73,6 +74,9 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
   @override
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
+    if (exercise.isNameLoading) {
+      return _ExerciseCardSkeleton(indexLabel: widget.indexLabel);
+    }
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final rest = exercise.prescription.primaryRestSeconds;
     final intensity = exercise.prescription.compactIntensity;
@@ -196,6 +200,73 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
       ),
     );
   }
+}
+
+class _ExerciseCardSkeleton extends StatelessWidget {
+  final String indexLabel;
+
+  const _ExerciseCardSkeleton({required this.indexLabel});
+
+  @override
+  Widget build(BuildContext context) {
+    final base = CoachlyAthleteTheme.surfaceElevated;
+    return CoachlySurface(
+      padding: const EdgeInsets.all(16),
+      child: Shimmer.fromColors(
+        baseColor: base,
+        highlightColor: CoachlyAthleteTheme.border,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 34,
+              child: Text(
+                indexLabel,
+                style: const TextStyle(
+                  color: CoachlyAthleteTheme.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: .6,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SkeletonLine(width: 190, height: 18),
+                  const SizedBox(height: 8),
+                  _SkeletonLine(width: 126, height: 12),
+                  const SizedBox(height: 16),
+                  _SkeletonLine(width: 92, height: 15),
+                  const SizedBox(height: 8),
+                  _SkeletonLine(width: 142, height: 12),
+                ],
+              ),
+            ),
+            const SizedBox(width: 44, height: 44),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SkeletonLine extends StatelessWidget {
+  final double width;
+  final double height;
+
+  const _SkeletonLine({required this.width, required this.height});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: width,
+    height: height,
+    decoration: BoxDecoration(
+      color: CoachlyAthleteTheme.surface,
+      borderRadius: BorderRadius.circular(6),
+    ),
+  );
 }
 
 class _ExpandedExercise extends StatelessWidget {

@@ -182,6 +182,7 @@ class WorkoutExerciseViewData {
   final String? metadata;
   final ExercisePrescriptionViewData prescription;
   final bool isMissing;
+  final bool isNameLoading;
 
   const WorkoutExerciseViewData({
     required this.instanceId,
@@ -190,6 +191,7 @@ class WorkoutExerciseViewData {
     this.metadata,
     required this.prescription,
     this.isMissing = false,
+    this.isNameLoading = false,
   });
 }
 
@@ -246,16 +248,18 @@ class WorkoutDetailAdapter {
     WorkoutModel workout,
     Locale locale, [
     Map<String, String>? resolvedExerciseNames,
+    Set<String> resolvingExerciseIds = const {},
   ]) {
     final exerciseNames = resolvedExerciseNames ?? const <String, String>{};
     final lookup = _ExerciseLookup(workout.workoutExercises);
     final sections = workout.programmingBlocks.isEmpty
-        ? _legacySections(workout, locale, exerciseNames)
+        ? _legacySections(workout, locale, exerciseNames, resolvingExerciseIds)
         : _structuredSections(
             workout.programmingBlocks,
             lookup,
             locale,
             exerciseNames,
+            resolvingExerciseIds,
           );
     final withoutDuration = WorkoutDetailViewData(
       id: workout.id,
@@ -311,10 +315,16 @@ class WorkoutDetailAdapter {
     WorkoutModel workout,
     Locale locale,
     Map<String, String> resolvedExerciseNames,
+    Set<String> resolvingExerciseIds,
   ) {
     final blocks = workout.workoutExercises.map((exercise) {
       return WorkoutExerciseBlockViewData(
-        _legacyExercise(exercise, locale, resolvedExerciseNames),
+        _legacyExercise(
+          exercise,
+          locale,
+          resolvedExerciseNames,
+          resolvingExerciseIds,
+        ),
       );
     }).toList();
     return [
@@ -332,6 +342,7 @@ class WorkoutDetailAdapter {
     _ExerciseLookup lookup,
     Locale locale,
     Map<String, String> resolvedExerciseNames,
+    Set<String> resolvingExerciseIds,
   ) {
     final sections = <String, _MutableSection>{};
     for (final model in models) {
@@ -353,6 +364,7 @@ class WorkoutDetailAdapter {
               lookup,
               locale,
               resolvedExerciseNames,
+              resolvingExerciseIds,
             ),
           )
           .toList();
@@ -383,6 +395,7 @@ class WorkoutDetailAdapter {
     WorkoutExerciseModel model,
     Locale locale,
     Map<String, String> resolvedExerciseNames,
+    Set<String> resolvingExerciseIds,
   ) {
     final values = RegExp(
       r'\d+',
@@ -404,6 +417,9 @@ class WorkoutDetailAdapter {
       ),
       metadata: _exerciseMetadata(model.exercise, locale),
       isMissing: model.exercise.id == null,
+      isNameLoading:
+          model.exercise.id != null &&
+          resolvingExerciseIds.contains(model.exercise.id),
       prescription: ExercisePrescriptionViewData(
         blocks: [
           PrescriptionBlockViewData(
@@ -426,6 +442,7 @@ class WorkoutDetailAdapter {
     _ExerciseLookup lookup,
     Locale locale,
     Map<String, String> resolvedExerciseNames,
+    Set<String> resolvingExerciseIds,
   ) {
     final exercise =
         lookup.byEntryId[entry.id] ?? lookup.byExerciseId[entry.exerciseId];
@@ -441,6 +458,7 @@ class WorkoutDetailAdapter {
       ),
       metadata: exercise == null ? null : _exerciseMetadata(exercise, locale),
       isMissing: entry.exerciseId.isEmpty,
+      isNameLoading: resolvingExerciseIds.contains(entry.exerciseId),
       prescription: _prescription(entry.sets, block),
     );
   }
@@ -681,6 +699,7 @@ String _displayExerciseName(
       _isUnresolvedExerciseName(localName, exerciseId)) {
     return resolvedName;
   }
+  if (_isUnresolvedExerciseName(localName, exerciseId)) return 'Exercise';
   return localName;
 }
 

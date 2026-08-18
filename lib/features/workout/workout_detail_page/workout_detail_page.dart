@@ -69,23 +69,27 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
       presented,
       locale,
     ).toList()..sort();
-    final resolvedExerciseNames = unresolvedIds.isEmpty
-        ? const <String, String>{}
-        : ref
-              .watch(
-                _exerciseNamesProvider(
-                  '${locale.languageCode}|${unresolvedIds.join('|')}',
-                ),
-              )
-              .when(
-                data: (names) => names,
-                loading: () => const <String, String>{},
-                error: (_, _) => const <String, String>{},
-              );
+    final resolvedExerciseNames = <String, String>{};
+    final resolvingExerciseIds = <String>{};
+    for (final id in unresolvedIds) {
+      final name = ref.watch(
+        _exerciseNameProvider('${locale.languageCode}|$id'),
+      );
+      name.when(
+        data: (value) {
+          if (value != null && value.isNotEmpty) {
+            resolvedExerciseNames[id] = value;
+          }
+        },
+        loading: () => resolvingExerciseIds.add(id),
+        error: (_, _) {},
+      );
+    }
     final viewData = WorkoutDetailAdapter.fromWorkout(
       presented,
       locale,
       resolvedExerciseNames,
+      resolvingExerciseIds,
     );
 
     return PopScope(
@@ -240,28 +244,18 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
   }
 }
 
-final _exerciseNamesProvider = FutureProvider.autoDispose
-    .family<Map<String, String>, String>((ref, ids) async {
+final _exerciseNameProvider = FutureProvider.autoDispose
+    .family<String?, String>((ref, argument) async {
       final repository = ref.watch(exerciseInfoPageRepositoryProvider);
-      final parts = ids.split('|');
+      final parts = argument.split('|');
       final locale = parts.first;
-      final names = await Future.wait(
-        parts.skip(1).where((id) => id.isNotEmpty).map((id) async {
-          final response = await repository.getExerciseDetail(id);
-          final translations = response.data?.nameI18n;
-          final name =
-              translations?[locale] ??
-              translations?.values.firstWhere(
-                (value) => value.trim().isNotEmpty,
-                orElse: () => '',
-              );
-          return MapEntry(id, name ?? '');
-        }),
-      );
-      return {
-        for (final entry in names)
-          if (entry.value.isNotEmpty) entry.key: entry.value,
-      };
+      final response = await repository.getExerciseDetail(parts.last);
+      final translations = response.data?.nameI18n;
+      return translations?[locale] ??
+          translations?.values.firstWhere(
+            (value) => value.trim().isNotEmpty,
+            orElse: () => '',
+          );
     });
 
 class _StartButton extends StatelessWidget {

@@ -87,4 +87,30 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Incline Dumbbell Press'), findsOneWidget);
   });
+
+  testWidgets('shows a skeleton instead of an unresolved exercise ID', (
+    tester,
+  ) async {
+    const unresolved = WorkoutExerciseViewData(
+      instanceId: 'entry-loading',
+      exerciseId: '11111111-1111-4111-8111-111111111111',
+      name: 'Exercise',
+      isNameLoading: true,
+      prescription: ExercisePrescriptionViewData(),
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: WorkoutExerciseCard(
+            exercise: unresolved,
+            indexLabel: '01',
+            onOpenDetail: () {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text(unresolved.exerciseId), findsNothing);
+    expect(find.text('01'), findsOneWidget);
+  });
 }

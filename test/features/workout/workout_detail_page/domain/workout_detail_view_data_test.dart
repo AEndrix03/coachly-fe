@@ -71,6 +71,22 @@ void main() {
       ]);
     });
 
+    test('marks only unresolved exercise cards as loading', () {
+      final viewData = WorkoutDetailAdapter.fromWorkout(
+        _structuredWorkout().copyWith(workoutExercises: const []),
+        const Locale('it'),
+        null,
+        const {'11111111-1111-4111-8111-111111111111'},
+      );
+
+      final exercises =
+          (viewData.sections.single.blocks.single as WorkoutGroupBlockViewData)
+              .exercises;
+      expect(exercises.first.isNameLoading, isTrue);
+      expect(exercises.last.isNameLoading, isFalse);
+      expect(exercises.first.name, 'Exercise');
+    });
+
     test('excludes warm-up sets and detects concepts actually in use', () {
       final workout = _structuredWorkout();
       final firstBlock = workout.programmingBlocks.single;
