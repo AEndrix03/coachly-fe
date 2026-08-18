@@ -49,4 +49,22 @@ void main() {
     expect(exercise.media!.single.isPrimary, isTrue);
     expect(exercise.media!.single.isPublic, isTrue);
   });
+
+  test(
+    'normalizes a single relation object returned by legacy API responses',
+    () {
+      final exercise = ExerciseDetailModel.fromJson({
+        'id': '02e7c672-80c7-4614-b524-2ef69d0e5f72',
+        'safety': {
+          'id': 'safety-1',
+          'overallRiskLevel': 'low',
+          'spotterRequired': false,
+          'safetyNotesI18n': {'it': 'Mantieni il controllo del movimento.'},
+        },
+      });
+
+      expect(exercise.safety, hasLength(1));
+      expect(exercise.safety!.single.overallRiskLevel, 'low');
+    },
+  );
 }
