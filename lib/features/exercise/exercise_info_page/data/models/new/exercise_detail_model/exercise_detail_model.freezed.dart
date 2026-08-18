@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExerciseDetailModel {
 
- String? get id; String? get createdBy; bool get isPersonal;@MapConverter() Map<String, String>? get nameI18n;@MapConverter() Map<String, String>? get descriptionI18n;@MapConverter() Map<String, String>? get tipsI18n; String? get difficultyLevel; String? get mechanicsType; String? get forceType; bool? get isUnilateral; bool? get isBodyweight; List<ExerciseVariantModel>? get variants; List<ExerciseMediaModel>? get media; List<ExerciseCategoryModel>? get categories; List<ExerciseSafetyModel>? get safety; List<ExerciseMuscleModel>? get muscles; List<ExerciseEquipmentModel>? get equipments; List<TagModel>? get tags;
+ String? get id; String? get createdBy;@JsonKey(name: 'personal') bool get isPersonal;@MapConverter() Map<String, String>? get nameI18n;@MapConverter() Map<String, String>? get descriptionI18n;@MapConverter() Map<String, String>? get tipsI18n; String? get difficultyLevel; String? get mechanicsType; String? get forceType;@JsonKey(name: 'unilateral') bool? get isUnilateral;@JsonKey(name: 'bodyweight') bool? get isBodyweight; List<ExerciseVariantModel>? get variants; List<ExerciseMediaModel>? get media; List<ExerciseCategoryModel>? get categories; List<ExerciseSafetyModel>? get safety; List<ExerciseMuscleModel>? get muscles; List<ExerciseEquipmentModel>? get equipments; List<TagModel>? get tags;
 /// Create a copy of ExerciseDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $ExerciseDetailModelCopyWith<$Res>  {
   factory $ExerciseDetailModelCopyWith(ExerciseDetailModel value, $Res Function(ExerciseDetailModel) _then) = _$ExerciseDetailModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? createdBy, bool isPersonal,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight, List<ExerciseVariantModel>? variants, List<ExerciseMediaModel>? media, List<ExerciseCategoryModel>? categories, List<ExerciseSafetyModel>? safety, List<ExerciseMuscleModel>? muscles, List<ExerciseEquipmentModel>? equipments, List<TagModel>? tags
+ String? id, String? createdBy,@JsonKey(name: 'personal') bool isPersonal,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType,@JsonKey(name: 'unilateral') bool? isUnilateral,@JsonKey(name: 'bodyweight') bool? isBodyweight, List<ExerciseVariantModel>? variants, List<ExerciseMediaModel>? media, List<ExerciseCategoryModel>? categories, List<ExerciseSafetyModel>? safety, List<ExerciseMuscleModel>? muscles, List<ExerciseEquipmentModel>? equipments, List<TagModel>? tags
 });
 
 
@@ -170,7 +170,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? createdBy,  bool isPersonal, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  List<ExerciseVariantModel>? variants,  List<ExerciseMediaModel>? media,  List<ExerciseCategoryModel>? categories,  List<ExerciseSafetyModel>? safety,  List<ExerciseMuscleModel>? muscles,  List<ExerciseEquipmentModel>? equipments,  List<TagModel>? tags)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? createdBy, @JsonKey(name: 'personal')  bool isPersonal, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType, @JsonKey(name: 'unilateral')  bool? isUnilateral, @JsonKey(name: 'bodyweight')  bool? isBodyweight,  List<ExerciseVariantModel>? variants,  List<ExerciseMediaModel>? media,  List<ExerciseCategoryModel>? categories,  List<ExerciseSafetyModel>? safety,  List<ExerciseMuscleModel>? muscles,  List<ExerciseEquipmentModel>? equipments,  List<TagModel>? tags)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExerciseDetailModel() when $default != null:
 return $default(_that.id,_that.createdBy,_that.isPersonal,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.variants,_that.media,_that.categories,_that.safety,_that.muscles,_that.equipments,_that.tags);case _:
@@ -191,7 +191,7 @@ return $default(_that.id,_that.createdBy,_that.isPersonal,_that.nameI18n,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? createdBy,  bool isPersonal, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  List<ExerciseVariantModel>? variants,  List<ExerciseMediaModel>? media,  List<ExerciseCategoryModel>? categories,  List<ExerciseSafetyModel>? safety,  List<ExerciseMuscleModel>? muscles,  List<ExerciseEquipmentModel>? equipments,  List<TagModel>? tags)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? createdBy, @JsonKey(name: 'personal')  bool isPersonal, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType, @JsonKey(name: 'unilateral')  bool? isUnilateral, @JsonKey(name: 'bodyweight')  bool? isBodyweight,  List<ExerciseVariantModel>? variants,  List<ExerciseMediaModel>? media,  List<ExerciseCategoryModel>? categories,  List<ExerciseSafetyModel>? safety,  List<ExerciseMuscleModel>? muscles,  List<ExerciseEquipmentModel>? equipments,  List<TagModel>? tags)  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseDetailModel():
 return $default(_that.id,_that.createdBy,_that.isPersonal,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.variants,_that.media,_that.categories,_that.safety,_that.muscles,_that.equipments,_that.tags);case _:
@@ -211,7 +211,7 @@ return $default(_that.id,_that.createdBy,_that.isPersonal,_that.nameI18n,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? createdBy,  bool isPersonal, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  List<ExerciseVariantModel>? variants,  List<ExerciseMediaModel>? media,  List<ExerciseCategoryModel>? categories,  List<ExerciseSafetyModel>? safety,  List<ExerciseMuscleModel>? muscles,  List<ExerciseEquipmentModel>? equipments,  List<TagModel>? tags)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? createdBy, @JsonKey(name: 'personal')  bool isPersonal, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType, @JsonKey(name: 'unilateral')  bool? isUnilateral, @JsonKey(name: 'bodyweight')  bool? isBodyweight,  List<ExerciseVariantModel>? variants,  List<ExerciseMediaModel>? media,  List<ExerciseCategoryModel>? categories,  List<ExerciseSafetyModel>? safety,  List<ExerciseMuscleModel>? muscles,  List<ExerciseEquipmentModel>? equipments,  List<TagModel>? tags)?  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseDetailModel() when $default != null:
 return $default(_that.id,_that.createdBy,_that.isPersonal,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.variants,_that.media,_that.categories,_that.safety,_that.muscles,_that.equipments,_that.tags);case _:
@@ -226,12 +226,12 @@ return $default(_that.id,_that.createdBy,_that.isPersonal,_that.nameI18n,_that.d
 @JsonSerializable()
 
 class _ExerciseDetailModel implements ExerciseDetailModel {
-  const _ExerciseDetailModel({this.id = null, this.createdBy = null, this.isPersonal = false, @MapConverter() final  Map<String, String>? nameI18n = null, @MapConverter() final  Map<String, String>? descriptionI18n = null, @MapConverter() final  Map<String, String>? tipsI18n = null, this.difficultyLevel = null, this.mechanicsType = null, this.forceType = null, this.isUnilateral = null, this.isBodyweight = null, final  List<ExerciseVariantModel>? variants = null, final  List<ExerciseMediaModel>? media = null, final  List<ExerciseCategoryModel>? categories = null, final  List<ExerciseSafetyModel>? safety = null, final  List<ExerciseMuscleModel>? muscles = null, final  List<ExerciseEquipmentModel>? equipments = null, final  List<TagModel>? tags = null}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_tipsI18n = tipsI18n,_variants = variants,_media = media,_categories = categories,_safety = safety,_muscles = muscles,_equipments = equipments,_tags = tags;
+  const _ExerciseDetailModel({this.id = null, this.createdBy = null, @JsonKey(name: 'personal') this.isPersonal = false, @MapConverter() final  Map<String, String>? nameI18n = null, @MapConverter() final  Map<String, String>? descriptionI18n = null, @MapConverter() final  Map<String, String>? tipsI18n = null, this.difficultyLevel = null, this.mechanicsType = null, this.forceType = null, @JsonKey(name: 'unilateral') this.isUnilateral = null, @JsonKey(name: 'bodyweight') this.isBodyweight = null, final  List<ExerciseVariantModel>? variants = null, final  List<ExerciseMediaModel>? media = null, final  List<ExerciseCategoryModel>? categories = null, final  List<ExerciseSafetyModel>? safety = null, final  List<ExerciseMuscleModel>? muscles = null, final  List<ExerciseEquipmentModel>? equipments = null, final  List<TagModel>? tags = null}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_tipsI18n = tipsI18n,_variants = variants,_media = media,_categories = categories,_safety = safety,_muscles = muscles,_equipments = equipments,_tags = tags;
   factory _ExerciseDetailModel.fromJson(Map<String, dynamic> json) => _$ExerciseDetailModelFromJson(json);
 
 @override@JsonKey() final  String? id;
 @override@JsonKey() final  String? createdBy;
-@override@JsonKey() final  bool isPersonal;
+@override@JsonKey(name: 'personal') final  bool isPersonal;
  final  Map<String, String>? _nameI18n;
 @override@JsonKey()@MapConverter() Map<String, String>? get nameI18n {
   final value = _nameI18n;
@@ -262,8 +262,8 @@ class _ExerciseDetailModel implements ExerciseDetailModel {
 @override@JsonKey() final  String? difficultyLevel;
 @override@JsonKey() final  String? mechanicsType;
 @override@JsonKey() final  String? forceType;
-@override@JsonKey() final  bool? isUnilateral;
-@override@JsonKey() final  bool? isBodyweight;
+@override@JsonKey(name: 'unilateral') final  bool? isUnilateral;
+@override@JsonKey(name: 'bodyweight') final  bool? isBodyweight;
  final  List<ExerciseVariantModel>? _variants;
 @override@JsonKey() List<ExerciseVariantModel>? get variants {
   final value = _variants;
@@ -361,7 +361,7 @@ abstract mixin class _$ExerciseDetailModelCopyWith<$Res> implements $ExerciseDet
   factory _$ExerciseDetailModelCopyWith(_ExerciseDetailModel value, $Res Function(_ExerciseDetailModel) _then) = __$ExerciseDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? createdBy, bool isPersonal,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight, List<ExerciseVariantModel>? variants, List<ExerciseMediaModel>? media, List<ExerciseCategoryModel>? categories, List<ExerciseSafetyModel>? safety, List<ExerciseMuscleModel>? muscles, List<ExerciseEquipmentModel>? equipments, List<TagModel>? tags
+ String? id, String? createdBy,@JsonKey(name: 'personal') bool isPersonal,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType,@JsonKey(name: 'unilateral') bool? isUnilateral,@JsonKey(name: 'bodyweight') bool? isBodyweight, List<ExerciseVariantModel>? variants, List<ExerciseMediaModel>? media, List<ExerciseCategoryModel>? categories, List<ExerciseSafetyModel>? safety, List<ExerciseMuscleModel>? muscles, List<ExerciseEquipmentModel>? equipments, List<TagModel>? tags
 });
 
 

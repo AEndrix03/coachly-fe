@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutModel {
 
- String get id;@MapConverter() Map<String, String>? get titleI18n;@MapConverter() Map<String, String>? get descriptionI18n; String? get coachId; String? get coachName; double get progress; int get durationMinutes; String get goal; DateTime get lastUsed; List<TagDto> get muscleTags; int get exercises; int get sessionsCount; int get lastSessionDays; String get type; List<WorkoutExerciseModel> get workoutExercises; bool get active; bool get dirty; bool get delete;
+ String get id;@MapConverter() Map<String, String>? get titleI18n;@MapConverter() Map<String, String>? get descriptionI18n; String? get coachId; String? get coachName; double get progress; int get durationMinutes; String get goal; DateTime get lastUsed; List<TagDto> get muscleTags; int get exercises; int get sessionsCount; int get lastSessionDays; String get type; List<WorkoutExerciseModel> get workoutExercises;@JsonKey(fromJson: workoutProgrammingBlocksFromJson, toJson: workoutProgrammingBlocksToJson) List<WorkoutProgrammingBlockModel> get programmingBlocks; bool get active; bool get dirty; bool get delete;
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $WorkoutModelCopyWith<WorkoutModel> get copyWith => _$WorkoutModelCopyWithImpl<W
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other.titleI18n, titleI18n)&&const DeepCollectionEquality().equals(other.descriptionI18n, descriptionI18n)&&(identical(other.coachId, coachId) || other.coachId == coachId)&&(identical(other.coachName, coachName) || other.coachName == coachName)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&const DeepCollectionEquality().equals(other.muscleTags, muscleTags)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.sessionsCount, sessionsCount) || other.sessionsCount == sessionsCount)&&(identical(other.lastSessionDays, lastSessionDays) || other.lastSessionDays == lastSessionDays)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other.workoutExercises, workoutExercises)&&(identical(other.active, active) || other.active == active)&&(identical(other.dirty, dirty) || other.dirty == dirty)&&(identical(other.delete, delete) || other.delete == delete));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other.titleI18n, titleI18n)&&const DeepCollectionEquality().equals(other.descriptionI18n, descriptionI18n)&&(identical(other.coachId, coachId) || other.coachId == coachId)&&(identical(other.coachName, coachName) || other.coachName == coachName)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&const DeepCollectionEquality().equals(other.muscleTags, muscleTags)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.sessionsCount, sessionsCount) || other.sessionsCount == sessionsCount)&&(identical(other.lastSessionDays, lastSessionDays) || other.lastSessionDays == lastSessionDays)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other.workoutExercises, workoutExercises)&&const DeepCollectionEquality().equals(other.programmingBlocks, programmingBlocks)&&(identical(other.active, active) || other.active == active)&&(identical(other.dirty, dirty) || other.dirty == dirty)&&(identical(other.delete, delete) || other.delete == delete));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(titleI18n),const DeepCollectionEquality().hash(descriptionI18n),coachId,coachName,progress,durationMinutes,goal,lastUsed,const DeepCollectionEquality().hash(muscleTags),exercises,sessionsCount,lastSessionDays,type,const DeepCollectionEquality().hash(workoutExercises),active,dirty,delete);
+int get hashCode => Object.hashAll([runtimeType,id,const DeepCollectionEquality().hash(titleI18n),const DeepCollectionEquality().hash(descriptionI18n),coachId,coachName,progress,durationMinutes,goal,lastUsed,const DeepCollectionEquality().hash(muscleTags),exercises,sessionsCount,lastSessionDays,type,const DeepCollectionEquality().hash(workoutExercises),const DeepCollectionEquality().hash(programmingBlocks),active,dirty,delete]);
 
 @override
 String toString() {
-  return 'WorkoutModel(id: $id, titleI18n: $titleI18n, descriptionI18n: $descriptionI18n, coachId: $coachId, coachName: $coachName, progress: $progress, durationMinutes: $durationMinutes, goal: $goal, lastUsed: $lastUsed, muscleTags: $muscleTags, exercises: $exercises, sessionsCount: $sessionsCount, lastSessionDays: $lastSessionDays, type: $type, workoutExercises: $workoutExercises, active: $active, dirty: $dirty, delete: $delete)';
+  return 'WorkoutModel(id: $id, titleI18n: $titleI18n, descriptionI18n: $descriptionI18n, coachId: $coachId, coachName: $coachName, progress: $progress, durationMinutes: $durationMinutes, goal: $goal, lastUsed: $lastUsed, muscleTags: $muscleTags, exercises: $exercises, sessionsCount: $sessionsCount, lastSessionDays: $lastSessionDays, type: $type, workoutExercises: $workoutExercises, programmingBlocks: $programmingBlocks, active: $active, dirty: $dirty, delete: $delete)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $WorkoutModelCopyWith<$Res>  {
   factory $WorkoutModelCopyWith(WorkoutModel value, $Res Function(WorkoutModel) _then) = _$WorkoutModelCopyWithImpl;
 @useResult
 $Res call({
- String id,@MapConverter() Map<String, String>? titleI18n,@MapConverter() Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
+ String id,@MapConverter() Map<String, String>? titleI18n,@MapConverter() Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises,@JsonKey(fromJson: workoutProgrammingBlocksFromJson, toJson: workoutProgrammingBlocksToJson) List<WorkoutProgrammingBlockModel> programmingBlocks, bool active, bool dirty, bool delete
 });
 
 
@@ -65,7 +65,7 @@ class _$WorkoutModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? titleI18n = freezed,Object? descriptionI18n = freezed,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? muscleTags = null,Object? exercises = null,Object? sessionsCount = null,Object? lastSessionDays = null,Object? type = null,Object? workoutExercises = null,Object? active = null,Object? dirty = null,Object? delete = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? titleI18n = freezed,Object? descriptionI18n = freezed,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? muscleTags = null,Object? exercises = null,Object? sessionsCount = null,Object? lastSessionDays = null,Object? type = null,Object? workoutExercises = null,Object? programmingBlocks = null,Object? active = null,Object? dirty = null,Object? delete = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,titleI18n: freezed == titleI18n ? _self.titleI18n : titleI18n // ignore: cast_nullable_to_non_nullable
@@ -82,7 +82,8 @@ as int,sessionsCount: null == sessionsCount ? _self.sessionsCount : sessionsCoun
 as int,lastSessionDays: null == lastSessionDays ? _self.lastSessionDays : lastSessionDays // ignore: cast_nullable_to_non_nullable
 as int,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,workoutExercises: null == workoutExercises ? _self.workoutExercises : workoutExercises // ignore: cast_nullable_to_non_nullable
-as List<WorkoutExerciseModel>,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
+as List<WorkoutExerciseModel>,programmingBlocks: null == programmingBlocks ? _self.programmingBlocks : programmingBlocks // ignore: cast_nullable_to_non_nullable
+as List<WorkoutProgrammingBlockModel>,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
 as bool,dirty: null == dirty ? _self.dirty : dirty // ignore: cast_nullable_to_non_nullable
 as bool,delete: null == delete ? _self.delete : delete // ignore: cast_nullable_to_non_nullable
 as bool,
@@ -170,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @MapConverter()  Map<String, String>? titleI18n, @MapConverter()  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @MapConverter()  Map<String, String>? titleI18n, @MapConverter()  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises, @JsonKey(fromJson: workoutProgrammingBlocksFromJson, toJson: workoutProgrammingBlocksToJson)  List<WorkoutProgrammingBlockModel> programmingBlocks,  bool active,  bool dirty,  bool delete)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WorkoutModel() when $default != null:
-return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.active,_that.dirty,_that.delete);case _:
+return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.programmingBlocks,_that.active,_that.dirty,_that.delete);case _:
   return orElse();
 
 }
@@ -191,10 +192,10 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @MapConverter()  Map<String, String>? titleI18n, @MapConverter()  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @MapConverter()  Map<String, String>? titleI18n, @MapConverter()  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises, @JsonKey(fromJson: workoutProgrammingBlocksFromJson, toJson: workoutProgrammingBlocksToJson)  List<WorkoutProgrammingBlockModel> programmingBlocks,  bool active,  bool dirty,  bool delete)  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutModel():
-return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.active,_that.dirty,_that.delete);case _:
+return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.programmingBlocks,_that.active,_that.dirty,_that.delete);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -211,10 +212,10 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @MapConverter()  Map<String, String>? titleI18n, @MapConverter()  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises,  bool active,  bool dirty,  bool delete)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @MapConverter()  Map<String, String>? titleI18n, @MapConverter()  Map<String, String>? descriptionI18n,  String? coachId,  String? coachName,  double progress,  int durationMinutes,  String goal,  DateTime lastUsed,  List<TagDto> muscleTags,  int exercises,  int sessionsCount,  int lastSessionDays,  String type,  List<WorkoutExerciseModel> workoutExercises, @JsonKey(fromJson: workoutProgrammingBlocksFromJson, toJson: workoutProgrammingBlocksToJson)  List<WorkoutProgrammingBlockModel> programmingBlocks,  bool active,  bool dirty,  bool delete)?  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutModel() when $default != null:
-return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.active,_that.dirty,_that.delete);case _:
+return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_that.coachName,_that.progress,_that.durationMinutes,_that.goal,_that.lastUsed,_that.muscleTags,_that.exercises,_that.sessionsCount,_that.lastSessionDays,_that.type,_that.workoutExercises,_that.programmingBlocks,_that.active,_that.dirty,_that.delete);case _:
   return null;
 
 }
@@ -226,7 +227,7 @@ return $default(_that.id,_that.titleI18n,_that.descriptionI18n,_that.coachId,_th
 @JsonSerializable()
 
 class _WorkoutModel implements WorkoutModel {
-  const _WorkoutModel({required this.id, @MapConverter() required final  Map<String, String>? titleI18n, @MapConverter() required final  Map<String, String>? descriptionI18n, this.coachId, this.coachName, this.progress = 0.0, this.durationMinutes = 0, required this.goal, required this.lastUsed, final  List<TagDto> muscleTags = const [], this.exercises = 0, this.sessionsCount = 0, this.lastSessionDays = 0, required this.type, final  List<WorkoutExerciseModel> workoutExercises = const [], this.active = true, this.dirty = false, this.delete = false}): _titleI18n = titleI18n,_descriptionI18n = descriptionI18n,_muscleTags = muscleTags,_workoutExercises = workoutExercises;
+  const _WorkoutModel({required this.id, @MapConverter() required final  Map<String, String>? titleI18n, @MapConverter() required final  Map<String, String>? descriptionI18n, this.coachId, this.coachName, this.progress = 0.0, this.durationMinutes = 0, required this.goal, required this.lastUsed, final  List<TagDto> muscleTags = const [], this.exercises = 0, this.sessionsCount = 0, this.lastSessionDays = 0, required this.type, final  List<WorkoutExerciseModel> workoutExercises = const [], @JsonKey(fromJson: workoutProgrammingBlocksFromJson, toJson: workoutProgrammingBlocksToJson) final  List<WorkoutProgrammingBlockModel> programmingBlocks = const [], this.active = true, this.dirty = false, this.delete = false}): _titleI18n = titleI18n,_descriptionI18n = descriptionI18n,_muscleTags = muscleTags,_workoutExercises = workoutExercises,_programmingBlocks = programmingBlocks;
   factory _WorkoutModel.fromJson(Map<String, dynamic> json) => _$WorkoutModelFromJson(json);
 
 @override final  String id;
@@ -272,6 +273,13 @@ class _WorkoutModel implements WorkoutModel {
   return EqualUnmodifiableListView(_workoutExercises);
 }
 
+ final  List<WorkoutProgrammingBlockModel> _programmingBlocks;
+@override@JsonKey(fromJson: workoutProgrammingBlocksFromJson, toJson: workoutProgrammingBlocksToJson) List<WorkoutProgrammingBlockModel> get programmingBlocks {
+  if (_programmingBlocks is EqualUnmodifiableListView) return _programmingBlocks;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_programmingBlocks);
+}
+
 @override@JsonKey() final  bool active;
 @override@JsonKey() final  bool dirty;
 @override@JsonKey() final  bool delete;
@@ -289,16 +297,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other._titleI18n, _titleI18n)&&const DeepCollectionEquality().equals(other._descriptionI18n, _descriptionI18n)&&(identical(other.coachId, coachId) || other.coachId == coachId)&&(identical(other.coachName, coachName) || other.coachName == coachName)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&const DeepCollectionEquality().equals(other._muscleTags, _muscleTags)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.sessionsCount, sessionsCount) || other.sessionsCount == sessionsCount)&&(identical(other.lastSessionDays, lastSessionDays) || other.lastSessionDays == lastSessionDays)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other._workoutExercises, _workoutExercises)&&(identical(other.active, active) || other.active == active)&&(identical(other.dirty, dirty) || other.dirty == dirty)&&(identical(other.delete, delete) || other.delete == delete));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutModel&&(identical(other.id, id) || other.id == id)&&const DeepCollectionEquality().equals(other._titleI18n, _titleI18n)&&const DeepCollectionEquality().equals(other._descriptionI18n, _descriptionI18n)&&(identical(other.coachId, coachId) || other.coachId == coachId)&&(identical(other.coachName, coachName) || other.coachName == coachName)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.durationMinutes, durationMinutes) || other.durationMinutes == durationMinutes)&&(identical(other.goal, goal) || other.goal == goal)&&(identical(other.lastUsed, lastUsed) || other.lastUsed == lastUsed)&&const DeepCollectionEquality().equals(other._muscleTags, _muscleTags)&&(identical(other.exercises, exercises) || other.exercises == exercises)&&(identical(other.sessionsCount, sessionsCount) || other.sessionsCount == sessionsCount)&&(identical(other.lastSessionDays, lastSessionDays) || other.lastSessionDays == lastSessionDays)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other._workoutExercises, _workoutExercises)&&const DeepCollectionEquality().equals(other._programmingBlocks, _programmingBlocks)&&(identical(other.active, active) || other.active == active)&&(identical(other.dirty, dirty) || other.dirty == dirty)&&(identical(other.delete, delete) || other.delete == delete));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,const DeepCollectionEquality().hash(_titleI18n),const DeepCollectionEquality().hash(_descriptionI18n),coachId,coachName,progress,durationMinutes,goal,lastUsed,const DeepCollectionEquality().hash(_muscleTags),exercises,sessionsCount,lastSessionDays,type,const DeepCollectionEquality().hash(_workoutExercises),active,dirty,delete);
+int get hashCode => Object.hashAll([runtimeType,id,const DeepCollectionEquality().hash(_titleI18n),const DeepCollectionEquality().hash(_descriptionI18n),coachId,coachName,progress,durationMinutes,goal,lastUsed,const DeepCollectionEquality().hash(_muscleTags),exercises,sessionsCount,lastSessionDays,type,const DeepCollectionEquality().hash(_workoutExercises),const DeepCollectionEquality().hash(_programmingBlocks),active,dirty,delete]);
 
 @override
 String toString() {
-  return 'WorkoutModel(id: $id, titleI18n: $titleI18n, descriptionI18n: $descriptionI18n, coachId: $coachId, coachName: $coachName, progress: $progress, durationMinutes: $durationMinutes, goal: $goal, lastUsed: $lastUsed, muscleTags: $muscleTags, exercises: $exercises, sessionsCount: $sessionsCount, lastSessionDays: $lastSessionDays, type: $type, workoutExercises: $workoutExercises, active: $active, dirty: $dirty, delete: $delete)';
+  return 'WorkoutModel(id: $id, titleI18n: $titleI18n, descriptionI18n: $descriptionI18n, coachId: $coachId, coachName: $coachName, progress: $progress, durationMinutes: $durationMinutes, goal: $goal, lastUsed: $lastUsed, muscleTags: $muscleTags, exercises: $exercises, sessionsCount: $sessionsCount, lastSessionDays: $lastSessionDays, type: $type, workoutExercises: $workoutExercises, programmingBlocks: $programmingBlocks, active: $active, dirty: $dirty, delete: $delete)';
 }
 
 
@@ -309,7 +317,7 @@ abstract mixin class _$WorkoutModelCopyWith<$Res> implements $WorkoutModelCopyWi
   factory _$WorkoutModelCopyWith(_WorkoutModel value, $Res Function(_WorkoutModel) _then) = __$WorkoutModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@MapConverter() Map<String, String>? titleI18n,@MapConverter() Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises, bool active, bool dirty, bool delete
+ String id,@MapConverter() Map<String, String>? titleI18n,@MapConverter() Map<String, String>? descriptionI18n, String? coachId, String? coachName, double progress, int durationMinutes, String goal, DateTime lastUsed, List<TagDto> muscleTags, int exercises, int sessionsCount, int lastSessionDays, String type, List<WorkoutExerciseModel> workoutExercises,@JsonKey(fromJson: workoutProgrammingBlocksFromJson, toJson: workoutProgrammingBlocksToJson) List<WorkoutProgrammingBlockModel> programmingBlocks, bool active, bool dirty, bool delete
 });
 
 
@@ -326,7 +334,7 @@ class __$WorkoutModelCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? titleI18n = freezed,Object? descriptionI18n = freezed,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? muscleTags = null,Object? exercises = null,Object? sessionsCount = null,Object? lastSessionDays = null,Object? type = null,Object? workoutExercises = null,Object? active = null,Object? dirty = null,Object? delete = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? titleI18n = freezed,Object? descriptionI18n = freezed,Object? coachId = freezed,Object? coachName = freezed,Object? progress = null,Object? durationMinutes = null,Object? goal = null,Object? lastUsed = null,Object? muscleTags = null,Object? exercises = null,Object? sessionsCount = null,Object? lastSessionDays = null,Object? type = null,Object? workoutExercises = null,Object? programmingBlocks = null,Object? active = null,Object? dirty = null,Object? delete = null,}) {
   return _then(_WorkoutModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,titleI18n: freezed == titleI18n ? _self._titleI18n : titleI18n // ignore: cast_nullable_to_non_nullable
@@ -343,7 +351,8 @@ as int,sessionsCount: null == sessionsCount ? _self.sessionsCount : sessionsCoun
 as int,lastSessionDays: null == lastSessionDays ? _self.lastSessionDays : lastSessionDays // ignore: cast_nullable_to_non_nullable
 as int,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as String,workoutExercises: null == workoutExercises ? _self._workoutExercises : workoutExercises // ignore: cast_nullable_to_non_nullable
-as List<WorkoutExerciseModel>,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
+as List<WorkoutExerciseModel>,programmingBlocks: null == programmingBlocks ? _self._programmingBlocks : programmingBlocks // ignore: cast_nullable_to_non_nullable
+as List<WorkoutProgrammingBlockModel>,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
 as bool,dirty: null == dirty ? _self.dirty : dirty // ignore: cast_nullable_to_non_nullable
 as bool,delete: null == delete ? _self.delete : delete // ignore: cast_nullable_to_non_nullable
 as bool,

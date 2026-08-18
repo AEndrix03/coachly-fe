@@ -68,7 +68,6 @@ class ExerciseInfoPageService {
     if (filter.muscleIds != null && filter.muscleIds!.isNotEmpty) {
       queryParameters['muscleIds'] = filter.muscleIds!.join(',');
     }
-
     return await _apiClient.get<List<ExerciseDetailModel>>(
       '/exercises/filtered',
       queryParameters: queryParameters,

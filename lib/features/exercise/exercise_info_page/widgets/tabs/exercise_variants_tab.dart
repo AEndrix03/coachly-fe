@@ -4,6 +4,7 @@ import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ExerciseVariantsTab extends ConsumerWidget {
   final List<ExerciseVariantModel> variants;
@@ -49,9 +50,9 @@ class ExerciseVariantsTab extends ConsumerWidget {
     required Locale locale,
   }) {
     return InkWell(
-      onTap: () {
-        // TODO: Navigate to variant detail page
-      },
+      onTap: variant.id == null || variant.id!.isEmpty
+          ? null
+          : () => context.push('/exercises/${variant.id}'),
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(16),

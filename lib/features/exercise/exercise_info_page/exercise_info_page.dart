@@ -10,13 +10,17 @@ import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ExercisePage extends ConsumerStatefulWidget {
   final String id;
+  final bool isVariantDetail;
 
-  const ExercisePage({super.key, required this.id});
+  const ExercisePage({
+    super.key,
+    required this.id,
+    this.isVariantDetail = false,
+  });
 
   @override
   ConsumerState<ExercisePage> createState() => _ExercisePageState();
@@ -38,6 +42,11 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F1E),
+      floatingActionButton: state.hasSelectedExercise
+          ? _ExerciseAddAffordance(
+              onTap: () => Navigator.of(context).pop(state.selectedExercise),
+            )
+          : null,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         child: state.hasError
@@ -48,16 +57,27 @@ class _ExercisePageState extends ConsumerState<ExercisePage> {
                 onRetry: () => ref
                     .read(exerciseInfoProvider.notifier)
                     .loadExerciseDetail(widget.id),
-                onBack: () => context.pop(),
+                onBack: () => Navigator.of(context).maybePop(),
               )
             : state.isLoadingDetail || !state.hasSelectedExercise
             ? const _SkeletonState(key: ValueKey('loading'))
             : _ContentState(
                 key: ValueKey(state.selectedExercise!.id),
                 exercise: state.selectedExercise!,
+                onOpenVariant: _openVariant,
               ),
       ),
     );
+  }
+
+  Future<void> _openVariant(String exerciseId) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ExercisePage(id: exerciseId, isVariantDetail: true),
+      ),
+    );
+    if (!mounted) return;
+    await ref.read(exerciseInfoProvider.notifier).loadExerciseDetail(widget.id);
   }
 }
 
@@ -225,8 +245,13 @@ class _ErrorState extends StatelessWidget {
 
 class _ContentState extends ConsumerWidget {
   final ExerciseDetailModel exercise;
+  final ValueChanged<String> onOpenVariant;
 
-  const _ContentState({super.key, required this.exercise});
+  const _ContentState({
+    super.key,
+    required this.exercise,
+    required this.onOpenVariant,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -315,14 +340,7 @@ class _ContentState extends ConsumerWidget {
                     title: locale.languageCode == 'it'
                         ? 'CONSIGLI DI ESECUZIONE'
                         : 'EXECUTION TIPS',
-                    child: Text(
-                      tips,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.82),
-                        fontSize: 14,
-                        height: 1.6,
-                      ),
-                    ),
+                    child: _TipsList(tips: tips),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -390,7 +408,11 @@ class _ContentState extends ConsumerWidget {
                     icon: Icons.swap_horiz_rounded,
                     color: const Color(0xFF4CAF50),
                     title: context.tr('exercise.variants'),
-                    child: _VariantsList(variants: variants, locale: locale),
+                    child: _VariantsList(
+                      variants: variants,
+                      locale: locale,
+                      onOpenVariant: onOpenVariant,
+                    ),
                   ),
                 ],
                 if (tips.isEmpty)
@@ -872,13 +894,10 @@ class _SafetyList extends StatelessWidget {
               ),
               if (note.isNotEmpty) ...[
                 const SizedBox(height: 10),
-                Text(
-                  note,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.82),
-                    fontSize: 13,
-                    height: 1.5,
-                  ),
+                _TipsList(
+                  tips: note,
+                  accentColor: const Color(0xFFFF7043),
+                  numberColor: const Color(0xFFFFAB91),
                 ),
               ],
             ],
@@ -998,8 +1017,13 @@ class _EquipmentList extends StatelessWidget {
 class _VariantsList extends StatelessWidget {
   final List<ExerciseVariantModel> variants;
   final Locale locale;
+  final ValueChanged<String> onOpenVariant;
 
-  const _VariantsList({required this.variants, required this.locale});
+  const _VariantsList({
+    required this.variants,
+    required this.locale,
+    required this.onOpenVariant,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1007,13 +1031,26 @@ class _VariantsList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: variants.asMap().entries.map((entry) {
         final v = entry.value;
-        final isLast = entry.key == variants.length - 1;
         final name =
             v.nameI18n?.fromI18n(locale) ?? v.id ?? context.tr('common.na');
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        return InkWell(
+          onTap: v.id == null || v.id!.isEmpty
+              ? null
+              : () => onOpenVariant(v.id!),
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            margin: EdgeInsets.only(
+              bottom: entry.key == variants.length - 1 ? 0 : 10,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.035),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.18),
+              ),
+            ),
+            child: Row(
               children: [
                 Container(
                   width: 36,
@@ -1044,23 +1081,148 @@ class _VariantsList extends StatelessWidget {
                     children: [
                       Text(
                         name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        locale.languageCode == 'it'
+                            ? 'Apri dettagli variante'
+                            : 'Open variant details',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.48),
+                          fontSize: 11,
                         ),
                       ),
                     ],
                   ),
                 ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: Colors.white.withValues(alpha: 0.45),
+                ),
               ],
             ),
-            if (!isLast) ...[
-              const SizedBox(height: 12),
-              Divider(color: Colors.white.withValues(alpha: 0.06), height: 1),
-              const SizedBox(height: 12),
-            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _ExerciseAddAffordance extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ExerciseAddAffordance({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        height: 52,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4CAF50), Color(0xFF22C55E)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF22C55E).withValues(alpha: 0.3),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
           ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.add_rounded, color: Colors.white, size: 24),
+            const SizedBox(width: 8),
+            Text(
+              context.tr('workout.edit.add_exercise').toUpperCase(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TipsList extends StatelessWidget {
+  final String tips;
+  final Color accentColor;
+  final Color numberColor;
+
+  const _TipsList({
+    required this.tips,
+    this.accentColor = const Color(0xFFF59E0B),
+    this.numberColor = const Color(0xFFFBBF24),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final items = tips
+        .split('\n')
+        .map((tip) => tip.replaceFirst(RegExp(r'^\\s*[•-]\\s*'), '').trim())
+        .map(_stripLeadingMarker)
+        .where((tip) => tip.isNotEmpty)
+        .toList();
+
+    return Column(
+      children: items.asMap().entries.map((entry) {
+        final isLast = entry.key == items.length - 1;
+        return Padding(
+          padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 25,
+                height: 25,
+                alignment: Alignment.center,
+                margin: const EdgeInsets.only(top: 1),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '${entry.key + 1}',
+                  style: TextStyle(
+                    color: numberColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(
+                  entry.value,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.84),
+                    fontSize: 14,
+                    height: 1.45,
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       }).toList(),
     );
@@ -1068,6 +1230,15 @@ class _VariantsList extends StatelessWidget {
 }
 
 // ─────────────────────────── back button ─────────────────────────────────────
+
+String _stripLeadingMarker(String value) {
+  final trimmed = value.trimLeft();
+  final bullet = String.fromCharCode(0x2022);
+  if (trimmed.startsWith(bullet) || trimmed.startsWith('-')) {
+    return trimmed.substring(1).trimLeft();
+  }
+  return trimmed;
+}
 
 class _BackButton extends StatelessWidget {
   final VoidCallback onBack;

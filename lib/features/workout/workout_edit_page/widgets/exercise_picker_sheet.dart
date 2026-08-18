@@ -34,9 +34,11 @@ class ExercisePickerSheet extends ConsumerStatefulWidget {
 
 class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   final _searchCtrl = TextEditingController();
-  final _debouncer = Debouncer(delay: const Duration(milliseconds: 400));
+  final _debouncer = Debouncer(delay: const Duration(milliseconds: 350));
+  final _listScrollController = ScrollController();
 
   bool _showAdvanced = false;
+  bool _showScrollToTop = false;
   String _scope = 'community';
 
   // active filters
@@ -55,6 +57,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   void initState() {
     super.initState();
     _searchCtrl.addListener(_onSearch);
+    _listScrollController.addListener(_onListScroll);
   }
 
   @override
@@ -62,6 +65,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     _searchCtrl.removeListener(_onSearch);
     _searchCtrl.dispose();
     _debouncer.dispose();
+    _listScrollController.removeListener(_onListScroll);
+    _listScrollController.dispose();
     super.dispose();
   }
 
@@ -71,9 +76,26 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     _debouncer.run(_applyFilters);
   }
 
+  void _onListScroll() {
+    final shouldShow = _listScrollController.offset > 320;
+    if (shouldShow != _showScrollToTop) {
+      setState(() => _showScrollToTop = shouldShow);
+    }
+  }
+
+  void _scrollToTop() {
+    _listScrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   void _applyFilters() {
     final locale = ref.read(languageProvider);
-    final lang = '${locale.languageCode}_${locale.countryCode}';
+    final lang = locale.countryCode == null || locale.countryCode!.isEmpty
+        ? locale.languageCode
+        : '${locale.languageCode}_${locale.countryCode}';
     final text = _searchCtrl.text;
     setState(() {
       _filter = ExerciseFilterModel(
@@ -472,17 +494,23 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   /// so options don't disappear when categorical filters are applied.
   Widget _buildOptionsSource() {
     final locale = ref.read(languageProvider);
-    final lang = '${locale.languageCode}_${locale.countryCode}';
-    final text = _searchCtrl.text;
+    final lang = locale.countryCode == null || locale.countryCode!.isEmpty
+        ? locale.languageCode
+        : '${locale.languageCode}_${locale.countryCode}';
     final baseFilter = ExerciseFilterModel(
       scope: _scope,
       langFilter: lang,
-      textFilter: text.length >= 2 || text.isEmpty ? text : null,
+      // Use the applied filter, never the live TextEditingController value:
+      // this keeps keystrokes behind the debounce boundary.
+      textFilter: _filter.textFilter,
     );
 
     return Consumer(
       builder: (context, ref, _) {
-        final all = ref.watch(exerciseListProvider(filter: baseFilter));
+        // With no advanced filter, this is the same provider watched by the
+        // list below. Riverpod then shares one request instead of issuing two.
+        final filterForOptions = _hasAdvancedFilters ? baseFilter : _filter;
+        final all = ref.watch(exerciseListProvider(filter: filterForOptions));
         return all.maybeWhen(
           data: (exercises) => _buildFilterPanel(exercises),
           orElse: () => const SizedBox.shrink(),
@@ -490,6 +518,14 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       },
     );
   }
+
+  bool get _hasAdvancedFilters =>
+      _categoryId != null ||
+      _muscleId != null ||
+      _mechanics != null ||
+      _forceType != null ||
+      _bodyweight != null ||
+      _unilateral != null;
 
   Widget _buildFilterPanel(List<ExerciseDetailModel> exercises) {
     final locale = ref.read(languageProvider);
@@ -504,7 +540,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           id,
           () => _Option(
             id: id,
-            label: cat.nameI18n?.fromI18n(locale) ?? id,
+            label:
+                (cat.nameI18n as Map<String, String>?)?.fromI18n(locale) ?? id,
             isPrimary: cat.isPrimary ?? false,
           ),
         );
@@ -526,7 +563,11 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           id,
           () => _Option(
             id: id,
-            label: em.muscle?.nameI18n.fromI18n(locale) ?? id,
+            label:
+                (em.muscle?.nameI18n as Map<String, String>?)?.fromI18n(
+                  locale,
+                ) ??
+                id,
           ),
         );
       }
@@ -844,10 +885,64 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           data: (exercises) {
             final visible = _excludeSelected(exercises);
             if (visible.isEmpty) return _buildEmptyList();
-            return ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              itemCount: visible.length,
-              itemBuilder: (_, i) => _buildCard(visible[i]),
+            return Stack(
+              children: [
+                ListView.builder(
+                  controller: _listScrollController,
+                  // Keep just a small viewport ahead of the user. The list
+                  // remains lazy while avoiding rebuilds during a fast drag.
+                  cacheExtent: 250,
+                  addAutomaticKeepAlives: false,
+                  padding: const EdgeInsets.fromLTRB(16, 8, 24, 24),
+                  itemCount: visible.length,
+                  itemBuilder: (_, i) => _buildCard(visible[i]),
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: 30,
+                  child: _ExerciseListScrollRail(
+                    controller: _listScrollController,
+                  ),
+                ),
+                Positioned(
+                  right: 20,
+                  bottom: 20,
+                  child: IgnorePointer(
+                    ignoring: !_showScrollToTop,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 180),
+                      opacity: _showScrollToTop ? 1 : 0,
+                      child: Tooltip(
+                        message: context.tr('common.back_to_top'),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _scrollToTop,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Ink(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF2196F3,
+                                ).withValues(alpha: 0.85),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.vertical_align_top_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         );
@@ -907,29 +1002,17 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     final isBodyweight = exercise.isBodyweight ?? false;
 
     return GestureDetector(
-      onTap: () {
-        final defaults = _lastSessionDefaults(exercise.id ?? '');
-        widget.onExerciseSelected(
-          EditableExerciseModel(
-            id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
-            exerciseId: exercise.id ?? '',
-            number: 0,
-            name: name,
-            muscles: (exercise.muscles ?? const [])
-                .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? na)
-                .toList(),
-            // Kept only for the existing workout payload; it is not exposed in the UI.
-            difficulty: '',
-            sets: defaults.sets,
-            rest: '60s',
-            weight: defaults.weight,
-            progress: '0',
-            notes: '',
-            accentColorHex: '#2196F3',
-            variants: exercise.variants ?? const [],
-          ),
+      onTap: () async {
+        final selectedExercise = await context.push<ExerciseDetailModel>(
+          '/exercises/${exercise.id}',
         );
-        Navigator.pop(context);
+        if (!mounted || selectedExercise == null) return;
+
+        final selectedName =
+            selectedExercise.nameI18n?.fromI18n(locale) ??
+            selectedExercise.id ??
+            na;
+        _addExercise(selectedExercise, selectedName, locale, na);
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
@@ -1026,28 +1109,37 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                 ),
               ),
               const SizedBox(width: 10),
-              // Add button
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF2196F3).withValues(alpha: 0.40),
-                      blurRadius: 10,
-                      spreadRadius: -3,
-                      offset: const Offset(0, 3),
+              Semantics(
+                button: true,
+                label: context.tr('workout.edit.add_exercise'),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _addExercise(exercise, name, locale, na),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(
+                            0xFF2196F3,
+                          ).withValues(alpha: 0.40),
+                          blurRadius: 10,
+                          spreadRadius: -3,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.add_rounded,
-                  color: Colors.white,
-                  size: 20,
+                    child: const Icon(
+                      Icons.add_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -1055,6 +1147,36 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         ),
       ),
     );
+  }
+
+  void _addExercise(
+    ExerciseDetailModel exercise,
+    String name,
+    Locale locale,
+    String notAvailable,
+  ) {
+    final defaults = _lastSessionDefaults(exercise.id ?? '');
+    widget.onExerciseSelected(
+      EditableExerciseModel(
+        id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
+        exerciseId: exercise.id ?? '',
+        number: 0,
+        name: name,
+        muscles: (exercise.muscles ?? const [])
+            .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? notAvailable)
+            .toList(),
+        // Kept only for the existing workout payload; it is not exposed in the UI.
+        difficulty: '',
+        sets: defaults.sets,
+        rest: '60s',
+        weight: defaults.weight,
+        progress: '0',
+        notes: '',
+        accentColorHex: '#2196F3',
+        variants: exercise.variants ?? const [],
+      ),
+    );
+    Navigator.pop(context);
   }
 
   Widget _cardTag(String label, Color color) {
@@ -1148,6 +1270,115 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 }
 
 // ─────────────────────────── data class ──────────────────────────────────────
+
+/// A wide touch target with a lightweight, app-styled scroll thumb.
+///
+/// [RawScrollbar]'s hit area is only as wide as its thumb, which is difficult
+/// to grab in a long exercise catalogue. This rail maps a drag directly to the
+/// list offset and rebuilds only itself while the list scrolls.
+class _ExerciseListScrollRail extends StatelessWidget {
+  static const _minThumbLength = 52.0;
+
+  final ScrollController controller;
+
+  const _ExerciseListScrollRail({required this.controller});
+
+  void _moveTo(double localY, double trackHeight) {
+    if (!controller.hasClients) return;
+    final position = controller.position;
+    final maxScroll = position.maxScrollExtent;
+    if (maxScroll <= 0 || trackHeight <= 0) return;
+
+    final contentHeight = maxScroll + position.viewportDimension;
+    final thumbHeight = (trackHeight * trackHeight / contentHeight)
+        .clamp(_minThumbLength, trackHeight)
+        .toDouble();
+    final travel = trackHeight - thumbHeight;
+    if (travel <= 0) return;
+
+    final thumbTop = (localY - thumbHeight / 2).clamp(0.0, travel).toDouble();
+    controller.jumpTo(thumbTop / travel * maxScroll);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final trackHeight = constraints.maxHeight;
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: (details) =>
+              _moveTo(details.localPosition.dy, trackHeight),
+          onPanStart: (details) =>
+              _moveTo(details.localPosition.dy, trackHeight),
+          onPanUpdate: (details) =>
+              _moveTo(details.localPosition.dy, trackHeight),
+          child: AnimatedBuilder(
+            animation: controller,
+            builder: (context, _) {
+              if (!controller.hasClients) return const SizedBox.expand();
+              final position = controller.position;
+              final maxScroll = position.maxScrollExtent;
+              if (maxScroll <= 0 || trackHeight <= 0) {
+                return const SizedBox.expand();
+              }
+
+              final contentHeight = maxScroll + position.viewportDimension;
+              final thumbHeight = (trackHeight * trackHeight / contentHeight)
+                  .clamp(_minThumbLength, trackHeight)
+                  .toDouble();
+              final travel = trackHeight - thumbHeight;
+              final thumbTop = travel <= 0
+                  ? 0.0
+                  : (position.pixels / maxScroll * travel)
+                        .clamp(0.0, travel)
+                        .toDouble();
+
+              return Stack(
+                children: [
+                  Center(
+                    child: Container(
+                      width: 3,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2A2A3E).withValues(alpha: 0.75),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: thumbTop,
+                    left: 8,
+                    right: 8,
+                    height: thumbHeight,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(
+                              0xFF2196F3,
+                            ).withValues(alpha: 0.3),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
 
 class _Option {
   final String id;

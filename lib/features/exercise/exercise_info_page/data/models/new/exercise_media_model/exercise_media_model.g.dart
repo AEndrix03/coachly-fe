@@ -8,14 +8,14 @@ part of 'exercise_media_model.dart';
 
 _ExerciseMediaModel _$ExerciseMediaModelFromJson(Map<String, dynamic> json) =>
     _ExerciseMediaModel(
-      id: json['id'] as String,
-      mediaType: json['mediaType'] as String,
-      mediaUrl: json['mediaUrl'] as String,
-      thumbnailUrl: json['thumbnailUrl'] as String,
-      mediaPurpose: json['mediaPurpose'] as String,
-      viewAngle: json['viewAngle'] as String,
-      isPrimary: json['isPrimary'] as bool,
-      isPublic: json['isPublic'] as bool,
+      id: json['id'] as String? ?? '',
+      mediaType: json['mediaType'] as String? ?? '',
+      mediaUrl: json['mediaUrl'] as String? ?? '',
+      thumbnailUrl: json['thumbnailUrl'] as String? ?? '',
+      mediaPurpose: json['mediaPurpose'] as String? ?? '',
+      viewAngle: json['viewAngle'] as String? ?? '',
+      isPrimary: json['primary'] as bool? ?? false,
+      isPublic: json['public'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ExerciseMediaModelToJson(_ExerciseMediaModel instance) =>
@@ -26,6 +26,6 @@ Map<String, dynamic> _$ExerciseMediaModelToJson(_ExerciseMediaModel instance) =>
       'thumbnailUrl': instance.thumbnailUrl,
       'mediaPurpose': instance.mediaPurpose,
       'viewAngle': instance.viewAngle,
-      'isPrimary': instance.isPrimary,
-      'isPublic': instance.isPublic,
+      'primary': instance.isPrimary,
+      'public': instance.isPublic,
     };

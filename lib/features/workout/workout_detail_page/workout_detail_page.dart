@@ -1,155 +1,351 @@
-import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
-import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_exercise_list_section.dart';
-import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_header.dart';
-import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_stats_cards.dart';
+import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
+import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
+import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_content.dart';
+import 'package:coachly/features/workout/workout_detail_page/widgets/workout_structural_edit.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
-import 'package:coachly/shared/widgets/cards/border_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class WorkoutDetailPage extends ConsumerWidget {
+class WorkoutDetailPage extends ConsumerStatefulWidget {
   final WorkoutModel workout;
 
   const WorkoutDetailPage({super.key, required this.workout});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final resolvedWorkout = ref.watch(workoutListProvider).maybeWhen(
-      data: (workouts) {
-        for (final item in workouts) {
-          if (item.id == workout.id) {
-            return item;
-          }
-        }
-        return workout;
-      },
-      orElse: () => workout,
-    );
+  ConsumerState<WorkoutDetailPage> createState() => _WorkoutDetailPageState();
+}
 
-    return Scaffold(
-      body: Container(
-        color: const Color(0xFF0F0F1E),
-        child: _buildBody(context, ref, resolvedWorkout),
-      ),
-    );
+class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
+  final ScrollController _scrollController = ScrollController();
+  bool _editing = false;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
-  Widget _buildBody(BuildContext context, WidgetRef ref, WorkoutModel workout) {
-    final locale = ref.watch(languageProvider);
-    final isPersonalWorkout = (workout.coachId?.trim().isEmpty ?? true);
-
-    return RefreshIndicator(
-      onRefresh: () async {
-        ref.invalidate(workoutListProvider);
-      },
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            WorkoutDetailHeader(
-              title: workout.titleI18n?.fromI18n(locale) ?? '',
-              coachName: workout.coachName ?? '',
-              showCoach: !isPersonalWorkout,
-              muscleTags: workout.muscleTags,
-              onBack: () => context.pop(),
-              onShare: () => _showShareToast(context, ref),
-              onEdit: () => context.push(
-                '/workouts/workout/${workout.id}/edit',
-                extra: workout,
-              ),
-            ),
-            const SizedBox(height: 20),
-            WorkoutDetailStatsCards(
-              exercisesCount: workout.workoutExercises.length,
-              duration: workout.durationMinutes.toString(),
-              focus: workout.type,
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: BorderCard(
-                title: context.tr('workout.description'),
-                text: workout.descriptionI18n?.fromI18n(locale) ?? '',
-                borderColor: const Color(0xFF2196F3),
-              ),
-            ),
-            const SizedBox(height: 20),
-            _buildStartButton(context, workout),
-            const SizedBox(height: 20),
-            WorkoutDetailExerciseListSection(
-              exercises: workout.workoutExercises,
-              workoutId: workout.id,
-            ),
-            const SizedBox(height: 32),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStartButton(BuildContext context, WorkoutModel workout) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF2196F3).withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: ElevatedButton.icon(
-          onPressed: () => context.go(
-            '/workouts/workout/${workout.id}/active',
-            extra: workout,
-          ),
-          icon: const Icon(Icons.play_arrow, size: 22),
-          label: Text(
-            context.tr('workout.start'),
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.3,
-            ),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.white,
-            shadowColor: Colors.transparent,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            elevation: 0,
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showShareToast(BuildContext context, WidgetRef ref) {
-    ref
-        .read(appToastServiceProvider)
-        .showInfo(
-          context,
-          context.tr('workout.share_soon'),
-          title: context.tr('workout.share'),
-          duration: const Duration(seconds: 2),
+  @override
+  Widget build(BuildContext context) {
+    final resolved = ref
+        .watch(workoutListProvider)
+        .maybeWhen(
+          data: (workouts) =>
+              workouts
+                  .where((item) => item.id == widget.workout.id)
+                  .firstOrNull ??
+              widget.workout,
+          orElse: () => widget.workout,
         );
+    final locale = ref.watch(languageProvider);
+    final draft = ref.watch(workoutEditDraftProvider(resolved.id));
+    final presented = _editing && draft.isInitialized
+        ? resolved.copyWith(programmingBlocks: draft.blocks)
+        : resolved;
+    final viewData = WorkoutDetailAdapter.fromWorkout(presented, locale);
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _handleBack();
+      },
+      child: Scaffold(
+        backgroundColor: CoachlyAthleteTheme.background,
+        body: RefreshIndicator(
+          color: CoachlyAthleteTheme.primary,
+          onRefresh: _editing
+              ? () async {}
+              : () async => ref.invalidate(workoutListProvider),
+          child: CustomScrollView(
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              _WorkoutSliverHeader(
+                title: _editing
+                    ? context.tr('workout.detail.edit_session')
+                    : viewData.title,
+                editing: _editing,
+                saving: draft.isSaving,
+                onBack: _handleBack,
+                onEdit: () => _enterEdit(resolved),
+                onDone: _saveAndFinish,
+              ),
+              if (_editing) ...[
+                const SliverToBoxAdapter(child: SizedBox(height: 18)),
+                SliverToBoxAdapter(
+                  child: WorkoutStructuralEdit(
+                    workoutId: resolved.id,
+                    viewData: viewData,
+                    onAddExercise: () => _openExerciseCatalog(resolved),
+                  ),
+                ),
+              ] else ...[
+                SliverToBoxAdapter(child: WorkoutIdentity(workout: viewData)),
+                const SliverToBoxAdapter(child: SizedBox(height: 22)),
+                SliverToBoxAdapter(
+                  child: WorkoutSummaryStrip(workout: viewData),
+                ),
+                if (viewData.goal != null) ...[
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                  SliverToBoxAdapter(
+                    child: WorkoutGoalSection(goal: viewData.goal!),
+                  ),
+                ],
+                const SliverToBoxAdapter(child: SizedBox(height: 22)),
+                SliverToBoxAdapter(
+                  child: _StartButton(workout: resolved, viewData: viewData),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 30)),
+                SliverToBoxAdapter(
+                  child: WorkoutStructure(
+                    workout: viewData,
+                    onEdit: () => _enterEdit(resolved),
+                    onOpenExercise: (exercise) =>
+                        context.push('/exercises/${exercise.exerciseId}'),
+                    onAddExercise: () => _enterEdit(resolved),
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                SliverToBoxAdapter(
+                  child: WorkoutProgrammingDetails(workout: viewData),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                SliverToBoxAdapter(
+                  child: WorkoutConceptsSection(workout: viewData),
+                ),
+              ],
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 36 + MediaQuery.paddingOf(context).bottom,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _enterEdit(WorkoutModel workout) {
+    ref.read(workoutEditDraftProvider(workout.id).notifier).initialize(workout);
+    HapticFeedback.selectionClick();
+    setState(() => _editing = true);
+  }
+
+  Future<void> _saveAndFinish() async {
+    final result = await ref
+        .read(workoutEditDraftProvider(widget.workout.id).notifier)
+        .save();
+    if (!mounted || result == null) return;
+    HapticFeedback.mediumImpact();
+    setState(() => _editing = false);
+    final state = ref.read(workoutEditDraftProvider(widget.workout.id));
+    if (state.savedOffline) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('workout.detail.saved_offline'))),
+      );
+    }
+  }
+
+  Future<void> _handleBack() async {
+    if (!_editing) {
+      context.pop();
+      return;
+    }
+    final state = ref.read(workoutEditDraftProvider(widget.workout.id));
+    if (!state.isDirty) {
+      setState(() => _editing = false);
+      return;
+    }
+    final action = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: CoachlyAthleteTheme.surfaceElevated,
+        title: Text(context.tr('workout.detail.unsaved_title')),
+        content: Text(context.tr('workout.detail.unsaved_body')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'continue'),
+            child: Text(context.tr('workout.detail.continue_editing')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'discard'),
+            child: Text(
+              context.tr('workout.detail.discard'),
+              style: const TextStyle(color: CoachlyAthleteTheme.danger),
+            ),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, 'save'),
+            child: Text(context.tr('workout.detail.save_exit')),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    if (action == 'discard') {
+      ref.read(workoutEditDraftProvider(widget.workout.id).notifier).discard();
+      setState(() => _editing = false);
+    } else if (action == 'save') {
+      await _saveAndFinish();
+    }
+  }
+
+  void _openExerciseCatalog(WorkoutModel resolved) {
+    context.push('/workouts/workout/${resolved.id}/add-exercise');
+  }
+}
+
+class _StartButton extends StatelessWidget {
+  final WorkoutModel workout;
+  final WorkoutDetailViewData viewData;
+
+  const _StartButton({required this.workout, required this.viewData});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: CoachlyAthleteTheme.pagePadding,
+      child: FilledButton.icon(
+        onPressed: viewData.exerciseCount == 0
+            ? null
+            : () {
+                HapticFeedback.mediumImpact();
+                context.go(
+                  '/workouts/workout/${workout.id}/active',
+                  extra: workout,
+                );
+              },
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(54),
+          backgroundColor: CoachlyAthleteTheme.primary,
+          disabledBackgroundColor: CoachlyAthleteTheme.surfaceElevated,
+          foregroundColor: CoachlyAthleteTheme.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        icon: const Icon(Icons.play_arrow_rounded),
+        label: Text(
+          context.tr('workout.start'),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+        ),
+      ),
+    );
+  }
+}
+
+class _WorkoutSliverHeader extends StatelessWidget {
+  final String title;
+  final bool editing;
+  final bool saving;
+  final VoidCallback onBack;
+  final VoidCallback onEdit;
+  final VoidCallback onDone;
+
+  const _WorkoutSliverHeader({
+    required this.title,
+    required this.editing,
+    required this.saving,
+    required this.onBack,
+    required this.onEdit,
+    required this.onDone,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar(
+      pinned: true,
+      backgroundColor: CoachlyAthleteTheme.background,
+      surfaceTintColor: Colors.transparent,
+      leading: IconButton(
+        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+        onPressed: onBack,
+        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+      ),
+      title: editing
+          ? Text(
+              title,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+            )
+          : null,
+      actions: [
+        TextButton(
+          onPressed: saving ? null : (editing ? onDone : onEdit),
+          style: TextButton.styleFrom(
+            minimumSize: const Size(48, 44),
+            foregroundColor: CoachlyAthleteTheme.primary,
+          ),
+          child: saving
+              ? const SizedBox.square(
+                  dimension: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(
+                  context.tr(editing ? 'workout.detail.done' : 'common.edit'),
+                ),
+        ),
+        if (!editing) ...[
+          PopupMenuButton<String>(
+            tooltip: context.tr('workout.actions'),
+            icon: const Icon(Icons.more_horiz_rounded),
+            color: CoachlyAthleteTheme.surfaceElevated,
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: 'duplicate',
+                child: Text(context.tr('common.duplicate')),
+              ),
+              PopupMenuItem(
+                value: 'delete',
+                child: Text(
+                  context.tr('common.delete'),
+                  style: const TextStyle(color: CoachlyAthleteTheme.danger),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 6),
+        ],
+      ],
+      flexibleSpace: editing
+          ? null
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final top = MediaQuery.paddingOf(context).top;
+                final opacity = ((88 - constraints.maxHeight + top) / 20).clamp(
+                  0.0,
+                  1.0,
+                );
+                return Align(
+                  alignment: Alignment.bottomCenter,
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: opacity,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(72, 0, 120, 17),
+                        child: Text(
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: CoachlyAthleteTheme.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
   }
 }

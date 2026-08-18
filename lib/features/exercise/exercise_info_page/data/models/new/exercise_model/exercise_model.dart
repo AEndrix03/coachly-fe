@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:coachly/shared/json_converters/map_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -9,15 +11,15 @@ abstract class ExerciseModel with _$ExerciseModel {
   const factory ExerciseModel({
     @Default(null) String? id,
     @Default(null) String? createdBy,
-    @Default(false) bool isPersonal,
+    @JsonKey(name: 'personal') @Default(false) bool isPersonal,
     @MapConverter() @Default(null) Map<String, String>? nameI18n,
     @MapConverter() @Default(null) Map<String, String>? descriptionI18n,
     @MapConverter() @Default(null) Map<String, String>? tipsI18n,
     @Default(null) String? difficultyLevel,
     @Default(null) String? mechanicsType,
     @Default(null) String? forceType,
-    @Default(null) bool? isUnilateral,
-    @Default(null) bool? isBodyweight,
+    @JsonKey(name: 'unilateral') @Default(null) bool? isUnilateral,
+    @JsonKey(name: 'bodyweight') @Default(null) bool? isBodyweight,
   }) = _ExerciseModel;
 
   factory ExerciseModel.fromJson(Map<String, dynamic> json) =>

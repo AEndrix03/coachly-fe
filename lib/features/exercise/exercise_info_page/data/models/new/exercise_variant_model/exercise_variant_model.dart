@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:coachly/shared/json_converters/map_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -14,8 +16,8 @@ abstract class ExerciseVariantModel with _$ExerciseVariantModel {
     @Default(null) String? difficultyLevel,
     @Default(null) String? mechanicsType,
     @Default(null) String? forceType,
-    @Default(null) bool? isUnilateral,
-    @Default(null) bool? isBodyweight,
+    @JsonKey(name: 'unilateral') @Default(null) bool? isUnilateral,
+    @JsonKey(name: 'bodyweight') @Default(null) bool? isBodyweight,
     @Default(null) int? difficultyDelta,
   }) = _ExerciseVariantModel;
 

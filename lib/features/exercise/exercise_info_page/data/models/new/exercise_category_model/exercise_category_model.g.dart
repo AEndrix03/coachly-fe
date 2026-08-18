@@ -18,7 +18,7 @@ _ExerciseCategoryModel _$ExerciseCategoryModelFromJson(
       ? null
       : const MapConverter().fromJson(json['descriptionI18n']),
   categoryLevel: (json['categoryLevel'] as num?)?.toInt() ?? null,
-  isPrimary: json['isPrimary'] as bool? ?? null,
+  isPrimary: json['primary'] as bool? ?? null,
   children:
       (json['children'] as List<dynamic>?)
           ?.map(
@@ -36,6 +36,6 @@ Map<String, dynamic> _$ExerciseCategoryModelToJson(
   'nameI18n': const MapConverter().toJson(instance.nameI18n),
   'descriptionI18n': const MapConverter().toJson(instance.descriptionI18n),
   'categoryLevel': instance.categoryLevel,
-  'isPrimary': instance.isPrimary,
+  'primary': instance.isPrimary,
   'children': instance.children,
 };

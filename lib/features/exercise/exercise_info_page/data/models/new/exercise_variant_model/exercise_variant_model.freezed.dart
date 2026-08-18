@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExerciseVariantModel {
 
- String? get id;@MapConverter() Map<String, String>? get nameI18n;@MapConverter() Map<String, String>? get descriptionI18n;@MapConverter() Map<String, String>? get tipsI18n; String? get difficultyLevel; String? get mechanicsType; String? get forceType; bool? get isUnilateral; bool? get isBodyweight; int? get difficultyDelta;
+ String? get id;@MapConverter() Map<String, String>? get nameI18n;@MapConverter() Map<String, String>? get descriptionI18n;@MapConverter() Map<String, String>? get tipsI18n; String? get difficultyLevel; String? get mechanicsType; String? get forceType;@JsonKey(name: 'unilateral') bool? get isUnilateral;@JsonKey(name: 'bodyweight') bool? get isBodyweight; int? get difficultyDelta;
 /// Create a copy of ExerciseVariantModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $ExerciseVariantModelCopyWith<$Res>  {
   factory $ExerciseVariantModelCopyWith(ExerciseVariantModel value, $Res Function(ExerciseVariantModel) _then) = _$ExerciseVariantModelCopyWithImpl;
 @useResult
 $Res call({
- String? id,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight, int? difficultyDelta
+ String? id,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType,@JsonKey(name: 'unilateral') bool? isUnilateral,@JsonKey(name: 'bodyweight') bool? isBodyweight, int? difficultyDelta
 });
 
 
@@ -162,7 +162,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  int? difficultyDelta)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType, @JsonKey(name: 'unilateral')  bool? isUnilateral, @JsonKey(name: 'bodyweight')  bool? isBodyweight,  int? difficultyDelta)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExerciseVariantModel() when $default != null:
 return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.difficultyDelta);case _:
@@ -183,7 +183,7 @@ return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  int? difficultyDelta)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType, @JsonKey(name: 'unilateral')  bool? isUnilateral, @JsonKey(name: 'bodyweight')  bool? isBodyweight,  int? difficultyDelta)  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseVariantModel():
 return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.difficultyDelta);case _:
@@ -203,7 +203,7 @@ return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType,  bool? isUnilateral,  bool? isBodyweight,  int? difficultyDelta)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n, @MapConverter()  Map<String, String>? tipsI18n,  String? difficultyLevel,  String? mechanicsType,  String? forceType, @JsonKey(name: 'unilateral')  bool? isUnilateral, @JsonKey(name: 'bodyweight')  bool? isBodyweight,  int? difficultyDelta)?  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseVariantModel() when $default != null:
 return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_that.difficultyLevel,_that.mechanicsType,_that.forceType,_that.isUnilateral,_that.isBodyweight,_that.difficultyDelta);case _:
@@ -218,7 +218,7 @@ return $default(_that.id,_that.nameI18n,_that.descriptionI18n,_that.tipsI18n,_th
 @JsonSerializable()
 
 class _ExerciseVariantModel implements ExerciseVariantModel {
-  const _ExerciseVariantModel({this.id = null, @MapConverter() final  Map<String, String>? nameI18n = null, @MapConverter() final  Map<String, String>? descriptionI18n = null, @MapConverter() final  Map<String, String>? tipsI18n = null, this.difficultyLevel = null, this.mechanicsType = null, this.forceType = null, this.isUnilateral = null, this.isBodyweight = null, this.difficultyDelta = null}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_tipsI18n = tipsI18n;
+  const _ExerciseVariantModel({this.id = null, @MapConverter() final  Map<String, String>? nameI18n = null, @MapConverter() final  Map<String, String>? descriptionI18n = null, @MapConverter() final  Map<String, String>? tipsI18n = null, this.difficultyLevel = null, this.mechanicsType = null, this.forceType = null, @JsonKey(name: 'unilateral') this.isUnilateral = null, @JsonKey(name: 'bodyweight') this.isBodyweight = null, this.difficultyDelta = null}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_tipsI18n = tipsI18n;
   factory _ExerciseVariantModel.fromJson(Map<String, dynamic> json) => _$ExerciseVariantModelFromJson(json);
 
 @override@JsonKey() final  String? id;
@@ -252,8 +252,8 @@ class _ExerciseVariantModel implements ExerciseVariantModel {
 @override@JsonKey() final  String? difficultyLevel;
 @override@JsonKey() final  String? mechanicsType;
 @override@JsonKey() final  String? forceType;
-@override@JsonKey() final  bool? isUnilateral;
-@override@JsonKey() final  bool? isBodyweight;
+@override@JsonKey(name: 'unilateral') final  bool? isUnilateral;
+@override@JsonKey(name: 'bodyweight') final  bool? isBodyweight;
 @override@JsonKey() final  int? difficultyDelta;
 
 /// Create a copy of ExerciseVariantModel
@@ -289,7 +289,7 @@ abstract mixin class _$ExerciseVariantModelCopyWith<$Res> implements $ExerciseVa
   factory _$ExerciseVariantModelCopyWith(_ExerciseVariantModel value, $Res Function(_ExerciseVariantModel) _then) = __$ExerciseVariantModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType, bool? isUnilateral, bool? isBodyweight, int? difficultyDelta
+ String? id,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n,@MapConverter() Map<String, String>? tipsI18n, String? difficultyLevel, String? mechanicsType, String? forceType,@JsonKey(name: 'unilateral') bool? isUnilateral,@JsonKey(name: 'bodyweight') bool? isBodyweight, int? difficultyDelta
 });
 
 

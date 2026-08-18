@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:coachly/shared/json_converters/map_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -12,7 +14,7 @@ abstract class ExerciseCategoryModel with _$ExerciseCategoryModel {
     @MapConverter() @Default(null) Map<String, String>? nameI18n,
     @MapConverter() @Default(null) Map<String, String>? descriptionI18n,
     @Default(null) int? categoryLevel,
-    @Default(null) bool? isPrimary,
+    @JsonKey(name: 'primary') @Default(null) bool? isPrimary,
     @Default(null) List<ExerciseCategoryModel>? children,
   }) = _ExerciseCategoryModel;
 

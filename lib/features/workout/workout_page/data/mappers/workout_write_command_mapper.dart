@@ -4,6 +4,7 @@ import 'package:coachly/features/workout/workout_edit_page/providers/workout_edi
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutWriteCommandMapper {
@@ -32,21 +33,19 @@ class WorkoutWriteCommandMapper {
       description: description,
       translations: translations,
       status: 'active',
-      blocks: [
-        WorkoutBlockWritePayload(
+      blocks: state.exercises.asMap().entries.map((entry) {
+        return WorkoutBlockWritePayload(
           id: null,
-          position: 0,
-          label: _nullIfBlank(state.type),
+          position: entry.key,
+          label: null,
+          groupType: 'exercise',
           restSeconds: null,
           notes: null,
-          entries: state.exercises.asMap().entries.map((entry) {
-            return _entryFromEditableExercise(
-              exercise: entry.value,
-              position: entry.key,
-            );
-          }).toList(),
-        ),
-      ],
+          entries: [
+            _entryFromEditableExercise(exercise: entry.value, position: 0),
+          ],
+        );
+      }).toList(),
     );
   }
 
@@ -89,21 +88,73 @@ class WorkoutWriteCommandMapper {
           : workout.active
           ? 'active'
           : 'draft',
-      blocks: [
-        WorkoutBlockWritePayload(
-          id: _optionalUuid(workout.id),
-          position: 0,
-          label: _nullIfBlank(workout.type),
-          restSeconds: null,
-          notes: null,
-          entries: workout.workoutExercises.asMap().entries.map((entry) {
-            return _entryFromWorkoutExercise(
-              exercise: entry.value,
-              position: entry.key,
-            );
-          }).toList(),
-        ),
-      ],
+      blocks: workout.programmingBlocks.isNotEmpty
+          ? workout.programmingBlocks.map(_blockFromProgrammingModel).toList()
+          : workout.workoutExercises.asMap().entries.map((entry) {
+              return WorkoutBlockWritePayload(
+                id: null,
+                position: entry.key,
+                label: null,
+                groupType: 'exercise',
+                restSeconds: null,
+                notes: null,
+                entries: [
+                  _entryFromWorkoutExercise(exercise: entry.value, position: 0),
+                ],
+              );
+            }).toList(),
+    );
+  }
+
+  static WorkoutBlockWritePayload _blockFromProgrammingModel(
+    WorkoutProgrammingBlockModel block,
+  ) {
+    return WorkoutBlockWritePayload(
+      id: _optionalUuid(block.id),
+      position: block.position,
+      label: _nullIfBlank(block.label),
+      sectionId: _optionalUuid(block.sectionId),
+      sectionPosition: block.sectionPosition,
+      sectionTitle: _nullIfBlank(block.sectionTitle),
+      sectionKind: block.sectionKind,
+      groupType: block.groupType,
+      rounds: block.rounds,
+      restBetweenExercisesSeconds: block.restBetweenExercisesSeconds,
+      restSeconds: block.restSeconds,
+      notes: _nullIfBlank(block.notes),
+      entries: block.entries.map((entry) {
+        _validateExerciseId(entry.exerciseId);
+        return WorkoutEntryWritePayload(
+          id: _optionalUuid(entry.id),
+          exerciseId: entry.exerciseId,
+          position: entry.position,
+          sets: entry.sets.map(_setFromProgrammingModel).toList(),
+        );
+      }).toList(),
+    );
+  }
+
+  static WorkoutSetWritePayload _setFromProgrammingModel(
+    WorkoutProgrammingSetModel set,
+  ) {
+    return WorkoutSetWritePayload(
+      id: _optionalUuid(set.id),
+      position: set.position,
+      setType: set.setType,
+      reps: set.reps,
+      repsMin: set.repsMin,
+      repsMax: set.repsMax,
+      intensityType: set.intensityType,
+      intensityMin: set.intensityMin,
+      intensityMax: set.intensityMax,
+      relativeLoadPercent: set.relativeLoadPercent,
+      load: set.load,
+      loadUnit: set.loadUnit,
+      restSeconds: set.restSeconds,
+      tempo: set.tempo,
+      pauseSeconds: set.pauseSeconds,
+      unilateral: set.unilateral,
+      notes: _nullIfBlank(set.notes),
     );
   }
 

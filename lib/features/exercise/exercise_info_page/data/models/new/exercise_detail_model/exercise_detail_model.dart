@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_variant_model/exercise_variant_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_category_model/exercise_category_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_equipment_model/exercise_equipment_model.dart';
@@ -16,15 +18,15 @@ abstract class ExerciseDetailModel with _$ExerciseDetailModel {
   const factory ExerciseDetailModel({
     @Default(null) String? id,
     @Default(null) String? createdBy,
-    @Default(false) bool isPersonal,
+    @JsonKey(name: 'personal') @Default(false) bool isPersonal,
     @MapConverter() @Default(null) Map<String, String>? nameI18n,
     @MapConverter() @Default(null) Map<String, String>? descriptionI18n,
     @MapConverter() @Default(null) Map<String, String>? tipsI18n,
     @Default(null) String? difficultyLevel,
     @Default(null) String? mechanicsType,
     @Default(null) String? forceType,
-    @Default(null) bool? isUnilateral,
-    @Default(null) bool? isBodyweight,
+    @JsonKey(name: 'unilateral') @Default(null) bool? isUnilateral,
+    @JsonKey(name: 'bodyweight') @Default(null) bool? isBodyweight,
     @Default(null) List<ExerciseVariantModel>? variants,
     @Default(null) List<ExerciseMediaModel>? media,
     @Default(null) List<ExerciseCategoryModel>? categories,

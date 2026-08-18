@@ -1,3 +1,4 @@
+import 'package:coachly/core/config/app_cache_policy.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
@@ -17,11 +18,15 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     String exerciseId,
   ) async {
     try {
-      final cachedExercise = await _hiveService.getExercise(exerciseId);
+      final cachedExercise = AppCachePolicy.isEnabled
+          ? await _hiveService.getExercise(exerciseId)
+          : null;
       final remoteResponse = await _service.fetchExerciseDetails(exerciseId);
 
       if (remoteResponse.success && remoteResponse.data != null) {
-        await _hiveService.saveExerciseDetail(remoteResponse.data!);
+        if (AppCachePolicy.isEnabled) {
+          await _hiveService.saveExerciseDetail(remoteResponse.data!);
+        }
         return ApiResponse.success(data: remoteResponse.data!);
       }
 
@@ -45,6 +50,10 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   @override
   Future<ApiResponse<List<ExerciseModel>>> getAllExercises() async {
     try {
+      if (!AppCachePolicy.isEnabled) {
+        return _service.fetchAllExercises();
+      }
+
       await _ensureLocalCache();
       final exercises = await _hiveService.getExerciseSummaries();
       return ApiResponse.success(data: exercises);
@@ -59,6 +68,18 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     Set<String> excludedExerciseIds = const {},
   }) async {
     try {
+      if (!AppCachePolicy.isEnabled) {
+        final response = await _service.fetchFilteredExercises(filter);
+        if (!response.success || response.data == null) {
+          return response;
+        }
+        return ApiResponse.success(
+          data: response.data!
+              .where((exercise) => !excludedExerciseIds.contains(exercise.id))
+              .toList(),
+        );
+      }
+
       await _ensureLocalCache();
       final exercises = await _hiveService.getFilteredExercises(
         filter,
@@ -151,7 +172,6 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     final response = await _service.fetchFilteredExercises(
       const ExerciseFilterModel(scope: 'community'),
     );
-
     if (!response.success || response.data == null) {
       return ApiResponse.error(
         message: response.message ?? 'Failed to refresh exercises from remote',
@@ -160,12 +180,20 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
       );
     }
 
+    if (!AppCachePolicy.isEnabled) {
+      return ApiResponse.success(data: response.data!);
+    }
+
     await _hiveService.saveExercises(response.data!);
     final localExercises = await _hiveService.getExercises();
     return ApiResponse.success(data: localExercises);
   }
 
   Future<void> _ensureLocalCache() async {
+    if (!AppCachePolicy.isEnabled) {
+      return;
+    }
+
     final isEmpty = await _hiveService.isEmpty();
     if (!isEmpty) {
       return;

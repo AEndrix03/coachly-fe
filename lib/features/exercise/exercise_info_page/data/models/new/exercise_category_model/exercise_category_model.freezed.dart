@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ExerciseCategoryModel {
 
- String? get id; String? get code;@MapConverter() Map<String, String>? get nameI18n;@MapConverter() Map<String, String>? get descriptionI18n; int? get categoryLevel; bool? get isPrimary; List<ExerciseCategoryModel>? get children;
+ String? get id; String? get code;@MapConverter() Map<String, String>? get nameI18n;@MapConverter() Map<String, String>? get descriptionI18n; int? get categoryLevel;@JsonKey(name: 'primary') bool? get isPrimary; List<ExerciseCategoryModel>? get children;
 /// Create a copy of ExerciseCategoryModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $ExerciseCategoryModelCopyWith<$Res>  {
   factory $ExerciseCategoryModelCopyWith(ExerciseCategoryModel value, $Res Function(ExerciseCategoryModel) _then) = _$ExerciseCategoryModelCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? code,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n, int? categoryLevel, bool? isPrimary, List<ExerciseCategoryModel>? children
+ String? id, String? code,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n, int? categoryLevel,@JsonKey(name: 'primary') bool? isPrimary, List<ExerciseCategoryModel>? children
 });
 
 
@@ -159,7 +159,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? code, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n,  int? categoryLevel,  bool? isPrimary,  List<ExerciseCategoryModel>? children)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? code, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n,  int? categoryLevel, @JsonKey(name: 'primary')  bool? isPrimary,  List<ExerciseCategoryModel>? children)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ExerciseCategoryModel() when $default != null:
 return $default(_that.id,_that.code,_that.nameI18n,_that.descriptionI18n,_that.categoryLevel,_that.isPrimary,_that.children);case _:
@@ -180,7 +180,7 @@ return $default(_that.id,_that.code,_that.nameI18n,_that.descriptionI18n,_that.c
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? code, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n,  int? categoryLevel,  bool? isPrimary,  List<ExerciseCategoryModel>? children)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? code, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n,  int? categoryLevel, @JsonKey(name: 'primary')  bool? isPrimary,  List<ExerciseCategoryModel>? children)  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseCategoryModel():
 return $default(_that.id,_that.code,_that.nameI18n,_that.descriptionI18n,_that.categoryLevel,_that.isPrimary,_that.children);case _:
@@ -200,7 +200,7 @@ return $default(_that.id,_that.code,_that.nameI18n,_that.descriptionI18n,_that.c
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? code, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n,  int? categoryLevel,  bool? isPrimary,  List<ExerciseCategoryModel>? children)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? code, @MapConverter()  Map<String, String>? nameI18n, @MapConverter()  Map<String, String>? descriptionI18n,  int? categoryLevel, @JsonKey(name: 'primary')  bool? isPrimary,  List<ExerciseCategoryModel>? children)?  $default,) {final _that = this;
 switch (_that) {
 case _ExerciseCategoryModel() when $default != null:
 return $default(_that.id,_that.code,_that.nameI18n,_that.descriptionI18n,_that.categoryLevel,_that.isPrimary,_that.children);case _:
@@ -215,7 +215,7 @@ return $default(_that.id,_that.code,_that.nameI18n,_that.descriptionI18n,_that.c
 @JsonSerializable()
 
 class _ExerciseCategoryModel implements ExerciseCategoryModel {
-  const _ExerciseCategoryModel({this.id = null, this.code = null, @MapConverter() final  Map<String, String>? nameI18n = null, @MapConverter() final  Map<String, String>? descriptionI18n = null, this.categoryLevel = null, this.isPrimary = null, final  List<ExerciseCategoryModel>? children = null}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_children = children;
+  const _ExerciseCategoryModel({this.id = null, this.code = null, @MapConverter() final  Map<String, String>? nameI18n = null, @MapConverter() final  Map<String, String>? descriptionI18n = null, this.categoryLevel = null, @JsonKey(name: 'primary') this.isPrimary = null, final  List<ExerciseCategoryModel>? children = null}): _nameI18n = nameI18n,_descriptionI18n = descriptionI18n,_children = children;
   factory _ExerciseCategoryModel.fromJson(Map<String, dynamic> json) => _$ExerciseCategoryModelFromJson(json);
 
 @override@JsonKey() final  String? id;
@@ -239,7 +239,7 @@ class _ExerciseCategoryModel implements ExerciseCategoryModel {
 }
 
 @override@JsonKey() final  int? categoryLevel;
-@override@JsonKey() final  bool? isPrimary;
+@override@JsonKey(name: 'primary') final  bool? isPrimary;
  final  List<ExerciseCategoryModel>? _children;
 @override@JsonKey() List<ExerciseCategoryModel>? get children {
   final value = _children;
@@ -283,7 +283,7 @@ abstract mixin class _$ExerciseCategoryModelCopyWith<$Res> implements $ExerciseC
   factory _$ExerciseCategoryModelCopyWith(_ExerciseCategoryModel value, $Res Function(_ExerciseCategoryModel) _then) = __$ExerciseCategoryModelCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? code,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n, int? categoryLevel, bool? isPrimary, List<ExerciseCategoryModel>? children
+ String? id, String? code,@MapConverter() Map<String, String>? nameI18n,@MapConverter() Map<String, String>? descriptionI18n, int? categoryLevel,@JsonKey(name: 'primary') bool? isPrimary, List<ExerciseCategoryModel>? children
 });
 
 
