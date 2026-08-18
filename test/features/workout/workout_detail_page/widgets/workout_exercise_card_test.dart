@@ -52,6 +52,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Exercise details'), findsOneWidget);
     expect(find.text('Control the eccentric.'), findsOneWidget);
+    expect(
+      tester.widget<SizeTransition>(find.byType(SizeTransition)).axis,
+      Axis.vertical,
+    );
 
     await tester.tap(find.text('Exercise details'));
     expect(detailOpened, isTrue);

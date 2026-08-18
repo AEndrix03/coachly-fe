@@ -116,6 +116,15 @@ GoRouter router(Ref ref) {
                       GoRoute(
                         path: 'edit',
                         pageBuilder: (context, state) {
+                          if (state.pathParameters['id'] == 'new') {
+                            return _fadeTransition(
+                              state,
+                              WorkoutDetailPage(
+                                workout: _newWorkout(),
+                                initiallyEditing: true,
+                              ),
+                            );
+                          }
                           final workout = state.extra as WorkoutModel?;
                           return _fadeTransition(
                             state,
@@ -168,6 +177,15 @@ GoRouter router(Ref ref) {
     ],
   );
 }
+
+WorkoutModel _newWorkout() => WorkoutModel(
+  id: 'new',
+  titleI18n: const {'it': 'Nuova scheda', 'en': 'New workout'},
+  descriptionI18n: null,
+  goal: 'Generale',
+  lastUsed: DateTime.now(),
+  type: 'Generale',
+);
 
 CustomTransitionPage<void> _athleteTransition(
   GoRouterState state,

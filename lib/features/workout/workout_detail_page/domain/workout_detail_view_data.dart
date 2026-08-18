@@ -244,12 +244,19 @@ class WorkoutDetailAdapter {
 
   static WorkoutDetailViewData fromWorkout(
     WorkoutModel workout,
-    Locale locale,
-  ) {
+    Locale locale, [
+    Map<String, String>? resolvedExerciseNames,
+  ]) {
+    final exerciseNames = resolvedExerciseNames ?? const <String, String>{};
     final lookup = _ExerciseLookup(workout.workoutExercises);
     final sections = workout.programmingBlocks.isEmpty
-        ? _legacySections(workout, locale)
-        : _structuredSections(workout.programmingBlocks, lookup, locale);
+        ? _legacySections(workout, locale, exerciseNames)
+        : _structuredSections(
+            workout.programmingBlocks,
+            lookup,
+            locale,
+            exerciseNames,
+          );
     final withoutDuration = WorkoutDetailViewData(
       id: workout.id,
       title: workout.titleI18n?.fromI18n(locale) ?? workout.id,
@@ -269,12 +276,46 @@ class WorkoutDetailAdapter {
     );
   }
 
-  static List<WorkoutSectionViewData> _legacySections(
+  /// IDs whose locally available label is absent or just the opaque UUID.
+  /// Their display names are resolved by the detail page from the exercise
+  /// catalogue before rendering the workout.
+  static Set<String> unresolvedExerciseIds(
     WorkoutModel workout,
     Locale locale,
   ) {
+    final ids = <String>{};
+    for (final exercise in workout.workoutExercises) {
+      final id = exercise.exercise.id?.trim();
+      if (id == null || id.isEmpty) continue;
+      if (_isUnresolvedExerciseName(
+        _exerciseName(exercise.exercise, locale),
+        id,
+      )) {
+        ids.add(id);
+      }
+    }
+    for (final block in workout.programmingBlocks) {
+      for (final entry in block.entries) {
+        if (entry.exerciseId.isNotEmpty &&
+            !workout.workoutExercises.any(
+              (exercise) => exercise.exercise.id == entry.exerciseId,
+            )) {
+          ids.add(entry.exerciseId);
+        }
+      }
+    }
+    return ids;
+  }
+
+  static List<WorkoutSectionViewData> _legacySections(
+    WorkoutModel workout,
+    Locale locale,
+    Map<String, String> resolvedExerciseNames,
+  ) {
     final blocks = workout.workoutExercises.map((exercise) {
-      return WorkoutExerciseBlockViewData(_legacyExercise(exercise, locale));
+      return WorkoutExerciseBlockViewData(
+        _legacyExercise(exercise, locale, resolvedExerciseNames),
+      );
     }).toList();
     return [
       WorkoutSectionViewData(
@@ -290,6 +331,7 @@ class WorkoutDetailAdapter {
     List<WorkoutProgrammingBlockModel> models,
     _ExerciseLookup lookup,
     Locale locale,
+    Map<String, String> resolvedExerciseNames,
   ) {
     final sections = <String, _MutableSection>{};
     for (final model in models) {
@@ -304,7 +346,15 @@ class WorkoutDetailAdapter {
         ),
       );
       final exercises = model.entries
-          .map((entry) => _structuredExercise(entry, model, lookup, locale))
+          .map(
+            (entry) => _structuredExercise(
+              entry,
+              model,
+              lookup,
+              locale,
+              resolvedExerciseNames,
+            ),
+          )
           .toList();
       final groupType = _groupType(model.groupType);
       if (groupType != null && exercises.length >= 2) {
@@ -332,6 +382,7 @@ class WorkoutDetailAdapter {
   static WorkoutExerciseViewData _legacyExercise(
     WorkoutExerciseModel model,
     Locale locale,
+    Map<String, String> resolvedExerciseNames,
   ) {
     final values = RegExp(
       r'\d+',
@@ -346,7 +397,11 @@ class WorkoutDetailAdapter {
     return WorkoutExerciseViewData(
       instanceId: model.id,
       exerciseId: model.exercise.id ?? model.id,
-      name: _exerciseName(model.exercise, locale),
+      name: _displayExerciseName(
+        _exerciseName(model.exercise, locale),
+        model.exercise.id,
+        resolvedExerciseNames,
+      ),
       metadata: _exerciseMetadata(model.exercise, locale),
       isMissing: model.exercise.id == null,
       prescription: ExercisePrescriptionViewData(
@@ -370,15 +425,20 @@ class WorkoutDetailAdapter {
     WorkoutProgrammingBlockModel block,
     _ExerciseLookup lookup,
     Locale locale,
+    Map<String, String> resolvedExerciseNames,
   ) {
     final exercise =
         lookup.byEntryId[entry.id] ?? lookup.byExerciseId[entry.exerciseId];
     return WorkoutExerciseViewData(
       instanceId: entry.id,
       exerciseId: entry.exerciseId,
-      name: exercise == null
-          ? (entry.exerciseId.isEmpty ? 'Exercise' : entry.exerciseId)
-          : _exerciseName(exercise, locale),
+      name: _displayExerciseName(
+        exercise == null
+            ? (entry.exerciseId.isEmpty ? 'Exercise' : entry.exerciseId)
+            : _exerciseName(exercise, locale),
+        entry.exerciseId,
+        resolvedExerciseNames,
+      ),
       metadata: exercise == null ? null : _exerciseMetadata(exercise, locale),
       isMissing: entry.exerciseId.isEmpty,
       prescription: _prescription(entry.sets, block),
@@ -607,6 +667,29 @@ int _inferRounds(List<WorkoutExerciseViewData> exercises) => exercises
 
 String _exerciseName(ExerciseDetailModel exercise, Locale locale) =>
     exercise.nameI18n?.fromI18n(locale) ?? 'Exercise';
+
+String _displayExerciseName(
+  String localName,
+  String? exerciseId,
+  Map<String, String> resolvedExerciseNames,
+) {
+  final resolvedName = exerciseId == null
+      ? null
+      : resolvedExerciseNames[exerciseId];
+  if (resolvedName != null &&
+      resolvedName.trim().isNotEmpty &&
+      _isUnresolvedExerciseName(localName, exerciseId)) {
+    return resolvedName;
+  }
+  return localName;
+}
+
+bool _isUnresolvedExerciseName(String name, String? exerciseId) {
+  final normalizedName = name.trim();
+  return normalizedName.isEmpty ||
+      normalizedName == 'Exercise' ||
+      (exerciseId != null && normalizedName == exerciseId);
+}
 
 String? _exerciseMetadata(ExerciseDetailModel exercise, Locale locale) {
   final equipment = exercise.equipments?.firstOrNull?.equipment.nameI18n

@@ -26,6 +26,49 @@ class WorkoutExerciseCard extends StatefulWidget {
 class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
     with SingleTickerProviderStateMixin {
   bool _expanded = false;
+  bool _showExpandedDetails = false;
+  late final AnimationController _expandController;
+  late final Animation<double> _expandAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _expandController =
+        AnimationController(
+          vsync: this,
+          duration: CoachlyAthleteTheme.expandDuration,
+        )..addStatusListener((status) {
+          if (status == AnimationStatus.dismissed && _showExpandedDetails) {
+            setState(() => _showExpandedDetails = false);
+          }
+        });
+    _expandAnimation = CurvedAnimation(
+      parent: _expandController,
+      curve: CoachlyAthleteTheme.standardCurve,
+    );
+  }
+
+  @override
+  void dispose() {
+    _expandController.dispose();
+    super.dispose();
+  }
+
+  void _toggleExpanded(bool reduceMotion) {
+    HapticFeedback.selectionClick();
+    final expand = !_expanded;
+    setState(() {
+      _expanded = expand;
+      if (expand) _showExpandedDetails = true;
+    });
+    if (reduceMotion) {
+      _expandController.value = expand ? 1 : 0;
+    } else if (expand) {
+      _expandController.forward();
+    } else {
+      _expandController.reverse();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +86,7 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
 
     return CoachlyPressable(
       semanticLabel: semantics,
-      onTap: () {
-        HapticFeedback.selectionClick();
-        setState(() => _expanded = !_expanded);
-      },
+      onTap: () => _toggleExpanded(reduceMotion),
       child: CoachlySurface(
         padding: EdgeInsets.zero,
         child: Padding(
@@ -138,19 +178,17 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
                   ),
                 ],
               ),
-              AnimatedSize(
-                alignment: Alignment.topCenter,
-                duration: reduceMotion
-                    ? Duration.zero
-                    : CoachlyAthleteTheme.expandDuration,
-                curve: CoachlyAthleteTheme.standardCurve,
-                child: !_expanded
-                    ? const SizedBox.shrink()
-                    : _ExpandedExercise(
+              SizeTransition(
+                axis: Axis.vertical,
+                axisAlignment: -1,
+                sizeFactor: _expandAnimation,
+                child: _showExpandedDetails
+                    ? _ExpandedExercise(
                         exercise: exercise,
                         onEdit: widget.onEdit,
                         onOpenDetail: widget.onOpenDetail,
-                      ),
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),

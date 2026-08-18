@@ -1,3 +1,4 @@
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
@@ -14,8 +15,13 @@ import 'package:go_router/go_router.dart';
 
 class WorkoutDetailPage extends ConsumerStatefulWidget {
   final WorkoutModel workout;
+  final bool initiallyEditing;
 
-  const WorkoutDetailPage({super.key, required this.workout});
+  const WorkoutDetailPage({
+    super.key,
+    required this.workout,
+    this.initiallyEditing = false,
+  });
 
   @override
   ConsumerState<WorkoutDetailPage> createState() => _WorkoutDetailPageState();
@@ -24,6 +30,17 @@ class WorkoutDetailPage extends ConsumerStatefulWidget {
 class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
   final ScrollController _scrollController = ScrollController();
   bool _editing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _editing = widget.initiallyEditing;
+    if (_editing) {
+      ref
+          .read(workoutEditDraftProvider(widget.workout.id).notifier)
+          .initialize(widget.workout);
+    }
+  }
 
   @override
   void dispose() {
@@ -48,7 +65,28 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     final presented = _editing && draft.isInitialized
         ? resolved.copyWith(programmingBlocks: draft.blocks)
         : resolved;
-    final viewData = WorkoutDetailAdapter.fromWorkout(presented, locale);
+    final unresolvedIds = WorkoutDetailAdapter.unresolvedExerciseIds(
+      presented,
+      locale,
+    ).toList()..sort();
+    final resolvedExerciseNames = unresolvedIds.isEmpty
+        ? const <String, String>{}
+        : ref
+              .watch(
+                _exerciseNamesProvider(
+                  '${locale.languageCode}|${unresolvedIds.join('|')}',
+                ),
+              )
+              .when(
+                data: (names) => names,
+                loading: () => const <String, String>{},
+                error: (_, _) => const <String, String>{},
+              );
+    final viewData = WorkoutDetailAdapter.fromWorkout(
+      presented,
+      locale,
+      resolvedExerciseNames,
+    );
 
     return PopScope(
       canPop: false,
@@ -201,6 +239,30 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     context.push('/workouts/workout/${resolved.id}/add-exercise');
   }
 }
+
+final _exerciseNamesProvider = FutureProvider.autoDispose
+    .family<Map<String, String>, String>((ref, ids) async {
+      final repository = ref.watch(exerciseInfoPageRepositoryProvider);
+      final parts = ids.split('|');
+      final locale = parts.first;
+      final names = await Future.wait(
+        parts.skip(1).where((id) => id.isNotEmpty).map((id) async {
+          final response = await repository.getExerciseDetail(id);
+          final translations = response.data?.nameI18n;
+          final name =
+              translations?[locale] ??
+              translations?.values.firstWhere(
+                (value) => value.trim().isNotEmpty,
+                orElse: () => '',
+              );
+          return MapEntry(id, name ?? '');
+        }),
+      );
+      return {
+        for (final entry in names)
+          if (entry.value.isNotEmpty) entry.key: entry.value,
+      };
+    });
 
 class _StartButton extends StatelessWidget {
   final WorkoutModel workout;

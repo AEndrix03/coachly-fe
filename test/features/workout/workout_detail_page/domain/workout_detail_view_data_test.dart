@@ -51,6 +51,26 @@ void main() {
       );
     });
 
+    test('uses resolved exercise names instead of opaque exercise IDs', () {
+      final workout = _structuredWorkout().copyWith(workoutExercises: const []);
+      final viewData = WorkoutDetailAdapter.fromWorkout(
+        workout,
+        const Locale('it'),
+        const {
+          '11111111-1111-4111-8111-111111111111': 'Panca inclinata con manubri',
+          '22222222-2222-4222-8222-222222222222': 'Lat machine presa larga',
+        },
+      );
+
+      final exercises =
+          (viewData.sections.single.blocks.single as WorkoutGroupBlockViewData)
+              .exercises;
+      expect(exercises.map((exercise) => exercise.name), [
+        'Panca inclinata con manubri',
+        'Lat machine presa larga',
+      ]);
+    });
+
     test('excludes warm-up sets and detects concepts actually in use', () {
       final workout = _structuredWorkout();
       final firstBlock = workout.programmingBlocks.single;
