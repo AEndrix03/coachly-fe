@@ -32,7 +32,7 @@ class ExerciseInfoPageService {
     );
   }
 
-  /// Fetch filtered exercises
+  /// Fetch the complete filtered catalogue in one response.
   Future<ApiResponse<List<ExerciseDetailModel>>> fetchFilteredExercises(
     ExerciseFilterModel filter,
   ) async {
