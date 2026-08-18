@@ -9,7 +9,7 @@ class WorkoutWriteCommand {
   const WorkoutWriteCommand({
     required this.id,
     required this.name,
-    required this.description,
+    this.description,
     required this.translations,
     required this.status,
     required this.blocks,

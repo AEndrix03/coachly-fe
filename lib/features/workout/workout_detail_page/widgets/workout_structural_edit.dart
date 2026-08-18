@@ -88,6 +88,12 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                                 required intensityType,
                                 intensityMin,
                                 intensityMax,
+                                setType,
+                                unilateral,
+                                tempo,
+                                pauseSeconds,
+                                notes,
+                                relativeLoadPercent,
                               }) => notifier.updatePrescription(
                                 instanceId: block.entries.single.id,
                                 sets: sets,
@@ -97,6 +103,12 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                                 intensityType: intensityType,
                                 intensityMin: intensityMin,
                                 intensityMax: intensityMax,
+                                setType: setType,
+                                unilateral: unilateral,
+                                tempo: tempo,
+                                pauseSeconds: pauseSeconds,
+                                notes: notes,
+                                relativeLoadPercent: relativeLoadPercent,
                               ),
                         )
                       : null,
@@ -113,7 +125,8 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                         ),
                         action: SnackBarAction(
                           label: context.tr('common.undo'),
-                          onPressed: () => notifier.restoreBlocks(beforeRemoval),
+                          onPressed: () =>
+                              notifier.restoreBlocks(beforeRemoval),
                         ),
                       ),
                     );
@@ -465,6 +478,12 @@ typedef PrescriptionSave =
       required String intensityType,
       double? intensityMin,
       double? intensityMax,
+      String? setType,
+      bool? unilateral,
+      String? tempo,
+      int? pauseSeconds,
+      String? notes,
+      double? relativeLoadPercent,
     });
 
 class WorkoutExerciseQuickEditSheet extends StatefulWidget {
@@ -510,7 +529,13 @@ class _WorkoutExerciseQuickEditSheetState
   late final TextEditingController repsMax;
   late final TextEditingController rest;
   late final TextEditingController intensity;
+  late final TextEditingController tempo;
+  late final TextEditingController pause;
+  late final TextEditingController notes;
+  late final TextEditingController relativeLoad;
   String intensityType = 'none';
+  String setType = 'normal';
+  bool unilateral = false;
 
   @override
   void initState() {
@@ -527,6 +552,14 @@ class _WorkoutExerciseQuickEditSheetState
     rest = TextEditingController(text: '${first?.restSeconds ?? 120}');
     intensityType = first?.intensityType ?? 'none';
     intensity = TextEditingController(text: '${first?.intensityMin ?? ''}');
+    setType = first?.setType ?? 'normal';
+    unilateral = first?.unilateral ?? false;
+    tempo = TextEditingController(text: first?.tempo ?? '');
+    pause = TextEditingController(text: '${first?.pauseSeconds ?? ''}');
+    notes = TextEditingController(text: first?.notes ?? '');
+    relativeLoad = TextEditingController(
+      text: '${first?.relativeLoadPercent?.abs() ?? ''}',
+    );
   }
 
   @override
@@ -536,6 +569,10 @@ class _WorkoutExerciseQuickEditSheetState
     repsMax.dispose();
     rest.dispose();
     intensity.dispose();
+    tempo.dispose();
+    pause.dispose();
+    notes.dispose();
+    relativeLoad.dispose();
     super.dispose();
   }
 
@@ -584,12 +621,7 @@ class _WorkoutExerciseQuickEditSheetState
                 children: [
                   _baseTab(context),
                   _intensityTab(context),
-                  Center(
-                    child: Text(
-                      context.tr('workout.detail.advanced_progressive'),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+                  _advancedTab(context),
                 ],
               ),
             ),
@@ -619,6 +651,21 @@ class _WorkoutExerciseQuickEditSheetState
                           intensityMax: double.tryParse(
                             intensity.text.replaceAll(',', '.'),
                           ),
+                          setType: setType,
+                          unilateral: unilateral,
+                          tempo: tempo.text.trim().isEmpty
+                              ? null
+                              : tempo.text.trim(),
+                          pauseSeconds: int.tryParse(pause.text),
+                          notes: notes.text.trim().isEmpty
+                              ? null
+                              : notes.text.trim(),
+                          relativeLoadPercent: setType == 'backoff'
+                              ? -(double.tryParse(
+                                      relativeLoad.text.replaceAll(',', '.'),
+                                    ) ??
+                                    0)
+                              : null,
                         );
                         HapticFeedback.mediumImpact();
                         Navigator.pop(context);
@@ -705,6 +752,71 @@ class _WorkoutExerciseQuickEditSheetState
         _EditorLabel(intensityType.replaceAll('_', '').toUpperCase()),
         _numberField(intensity, decimal: true),
       ],
+    ],
+  );
+
+  Widget _advancedTab(BuildContext context) => ListView(
+    padding: const EdgeInsets.all(20),
+    children: [
+      _EditorLabel(context.tr('workout.detail.set_type')),
+      DropdownButtonFormField<String>(
+        initialValue: setType,
+        items:
+            const [
+                  'normal',
+                  'warmup',
+                  'top_set',
+                  'backoff',
+                  'amrap',
+                  'dropset',
+                  'failure',
+                ]
+                .map(
+                  (value) => DropdownMenuItem(
+                    value: value,
+                    child: Text(value.replaceAll('_', ' ').toUpperCase()),
+                  ),
+                )
+                .toList(),
+        onChanged: (value) {
+          if (value == null) return;
+          HapticFeedback.selectionClick();
+          setState(() => setType = value);
+        },
+      ),
+      if (setType == 'backoff') ...[
+        const SizedBox(height: 18),
+        _EditorLabel(context.tr('workout.detail.relative_load')),
+        _numberField(relativeLoad, decimal: true),
+      ],
+      const SizedBox(height: 12),
+      SwitchListTile.adaptive(
+        contentPadding: EdgeInsets.zero,
+        title: Text(context.tr('workout.detail.unilateral')),
+        value: unilateral,
+        onChanged: (value) {
+          HapticFeedback.selectionClick();
+          setState(() => unilateral = value);
+        },
+      ),
+      const SizedBox(height: 6),
+      _EditorLabel(context.tr('workout.detail.tempo')),
+      TextField(
+        controller: tempo,
+        textInputAction: TextInputAction.next,
+        decoration: const InputDecoration(hintText: '3-1-1-0'),
+      ),
+      const SizedBox(height: 18),
+      _EditorLabel(context.tr('workout.detail.pause_seconds')),
+      _numberField(pause),
+      const SizedBox(height: 18),
+      _EditorLabel(context.tr('workout.detail.exercise_note')),
+      TextField(
+        controller: notes,
+        minLines: 2,
+        maxLines: 4,
+        textCapitalization: TextCapitalization.sentences,
+      ),
     ],
   );
 

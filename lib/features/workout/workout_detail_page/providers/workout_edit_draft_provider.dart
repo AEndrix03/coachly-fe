@@ -63,6 +63,15 @@ class WorkoutEditDraft extends _$WorkoutEditDraft {
     );
   }
 
+  void discard() {
+    final source = state.source;
+    if (source == null) return;
+    state = WorkoutEditDraftState(
+      source: source,
+      blocks: _normalizeBlocks(source),
+    );
+  }
+
   void moveBlock(int oldIndex, int newIndex) {
     if (!_validIndex(oldIndex) || oldIndex == newIndex) return;
     final blocks = [...state.blocks];
@@ -332,6 +341,12 @@ class WorkoutEditDraft extends _$WorkoutEditDraft {
     required String intensityType,
     double? intensityMin,
     double? intensityMax,
+    String? setType,
+    bool? unilateral,
+    String? tempo,
+    int? pauseSeconds,
+    String? notes,
+    double? relativeLoadPercent,
   }) {
     if (sets < 1 || (repsMin != null && repsMax != null && repsMin > repsMax)) {
       return;
@@ -346,19 +361,22 @@ class WorkoutEditDraft extends _$WorkoutEditDraft {
               sets,
               (index) => WorkoutProgrammingSetModel(
                 position: index,
-                setType: previous?.setType ?? 'normal',
+                setType: setType ?? previous?.setType ?? 'normal',
                 repsMin: repsMin,
                 repsMax: repsMax,
                 intensityType: intensityType,
                 intensityMin: intensityType == 'none' ? null : intensityMin,
                 intensityMax: intensityType == 'none' ? null : intensityMax,
+                relativeLoadPercent: setType == 'backoff'
+                    ? relativeLoadPercent
+                    : null,
                 load: previous?.load,
                 loadUnit: previous?.loadUnit,
                 restSeconds: restSeconds,
-                tempo: previous?.tempo,
-                pauseSeconds: previous?.pauseSeconds,
-                unilateral: previous?.unilateral ?? false,
-                notes: previous?.notes,
+                tempo: tempo,
+                pauseSeconds: pauseSeconds,
+                unilateral: unilateral ?? false,
+                notes: notes,
               ),
             ),
           );

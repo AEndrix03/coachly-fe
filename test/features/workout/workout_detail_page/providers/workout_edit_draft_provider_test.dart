@@ -94,6 +94,41 @@ void main() {
     expect(entry.sets.first.intensityMax, 2);
   });
 
+  test('persists advanced prescription fields and can discard the draft', () {
+    notifier.updatePrescription(
+      instanceId: 'entry-1',
+      sets: 3,
+      repsMin: 6,
+      repsMax: 8,
+      restSeconds: 180,
+      intensityType: 'rpe',
+      intensityMin: 8,
+      intensityMax: 8,
+      setType: 'backoff',
+      unilateral: true,
+      tempo: '3-1-1-0',
+      pauseSeconds: 1,
+      notes: 'Control the eccentric',
+      relativeLoadPercent: -7.5,
+    );
+
+    var state = container.read(workoutEditDraftProvider('workout'));
+    final set = state.blocks.first.entries.single.sets.first;
+    expect(set.setType, 'backoff');
+    expect(set.relativeLoadPercent, -7.5);
+    expect(set.unilateral, isTrue);
+    expect(set.tempo, '3-1-1-0');
+    expect(set.pauseSeconds, 1);
+    expect(set.notes, 'Control the eccentric');
+    expect(state.isDirty, isTrue);
+
+    notifier.discard();
+    state = container.read(workoutEditDraftProvider('workout'));
+    expect(state.blocks, hasLength(3));
+    expect(state.blocks.first.entries.single.sets.first.setType, 'normal');
+    expect(state.isDirty, isFalse);
+  });
+
   test(
     'quick adds an exercise with explicit prescription and stable identity',
     () {

@@ -254,6 +254,21 @@ class AppStrings {
     },
     'workout.detail.base': {'en': 'Base', 'it': 'Base'},
     'workout.detail.advanced': {'en': 'Advanced', 'it': 'Avanzate'},
+    'workout.detail.set_type': {'en': 'Set type', 'it': 'Tipo serie'},
+    'workout.detail.relative_load': {
+      'en': 'Reduction from top set (%)',
+      'it': 'Riduzione dal top set (%)',
+    },
+    'workout.detail.unilateral': {'en': 'Unilateral', 'it': 'Unilaterale'},
+    'workout.detail.tempo': {'en': 'Tempo', 'it': 'Tempo'},
+    'workout.detail.pause_seconds': {
+      'en': 'Pause (seconds)',
+      'it': 'Pausa (secondi)',
+    },
+    'workout.detail.exercise_note': {
+      'en': 'Exercise note',
+      'it': 'Nota esercizio',
+    },
     'workout.detail.advanced_progressive': {
       'en':
           'Tempo, pauses, unilateral work, target load and notes remain hidden until needed.',

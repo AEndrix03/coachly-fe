@@ -190,6 +190,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     );
     if (!mounted) return;
     if (action == 'discard') {
+      ref.read(workoutEditDraftProvider(widget.workout.id).notifier).discard();
       setState(() => _editing = false);
     } else if (action == 'save') {
       await _saveAndFinish();
