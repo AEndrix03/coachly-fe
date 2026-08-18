@@ -182,71 +182,79 @@ class WorkoutStructuralEdit extends ConsumerWidget {
     BuildContext context,
     WorkoutEditDraft notifier,
   ) async {
-    final controller = TextEditingController();
     var kind = 'main';
+    var title = '';
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: CoachlyAthleteTheme.surfaceElevated,
       builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => Padding(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            20,
-            20,
-            20 + MediaQuery.viewInsetsOf(context).bottom,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                context.tr('workout.detail.add_section'),
-                style: const TextStyle(
-                  color: CoachlyAthleteTheme.textPrimary,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
+        builder: (context, setSheetState) => SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              20,
+              20,
+              20 + MediaQuery.viewInsetsOf(context).bottom,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  context.tr('workout.detail.add_section'),
+                  style: const TextStyle(
+                    color: CoachlyAthleteTheme.textPrimary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                children: ['preparation', 'main', 'accessory', 'custom'].map((
-                  value,
-                ) {
-                  return ChoiceChip(
-                    selected: kind == value,
-                    onSelected: (_) {
-                      HapticFeedback.selectionClick();
-                      setSheetState(() => kind = value);
-                    },
-                    label: Text(context.tr('workout.detail.section_$value')),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: controller,
-                autofocus: true,
-                style: const TextStyle(color: CoachlyAthleteTheme.textPrimary),
-                decoration: InputDecoration(
-                  hintText: context.tr('workout.detail.section_name'),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  children: ['preparation', 'main', 'accessory', 'custom'].map((
+                    value,
+                  ) {
+                    return ChoiceChip(
+                      selected: kind == value,
+                      onSelected: (_) {
+                        HapticFeedback.selectionClick();
+                        setSheetState(() => kind = value);
+                      },
+                      label: Text(context.tr('workout.detail.section_$value')),
+                    );
+                  }).toList(),
                 ),
-              ),
-              const SizedBox(height: 18),
-              FilledButton(
-                onPressed: () {
-                  notifier.addSection(title: controller.text, kind: kind);
-                  Navigator.pop(sheetContext);
-                },
-                child: Text(context.tr('common.confirm')),
-              ),
-            ],
+                const SizedBox(height: 14),
+                TextField(
+                  autofocus: true,
+                  onChanged: (value) => title = value,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) {
+                    notifier.addSection(title: title.trim(), kind: kind);
+                    Navigator.pop(sheetContext);
+                  },
+                  style: const TextStyle(
+                    color: CoachlyAthleteTheme.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: context.tr('workout.detail.section_name'),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                FilledButton(
+                  onPressed: () {
+                    notifier.addSection(title: title.trim(), kind: kind);
+                    Navigator.pop(sheetContext);
+                  },
+                  child: Text(context.tr('common.confirm')),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
-    controller.dispose();
   }
 
   Future<void> _createGroup(
@@ -266,88 +274,90 @@ class WorkoutStructuralEdit extends ConsumerWidget {
         builder: (context, setSheetState) => SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  context.tr('workout.detail.create_group'),
-                  style: const TextStyle(
-                    color: CoachlyAthleteTheme.textPrimary,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
+            child: SizedBox(
+              height: min(MediaQuery.sizeOf(context).height * .72, 520),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    context.tr('workout.detail.create_group'),
+                    style: const TextStyle(
+                      color: CoachlyAthleteTheme.textPrimary,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                ),
-                SegmentedButton<String>(
-                  segments: [
-                    ButtonSegment(
-                      value: 'superset',
-                      label: Text(context.tr('workout.detail.superset')),
-                    ),
-                    ButtonSegment(
-                      value: 'circuit',
-                      label: Text(context.tr('workout.detail.circuit')),
-                    ),
-                  ],
-                  selected: {type},
-                  onSelectionChanged: (value) =>
-                      setSheetState(() => type = value.single),
-                ),
-                const SizedBox(height: 12),
-                Flexible(
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: state.blocks.expand((block) => block.entries).map(
-                      (entry) {
-                        return CheckboxListTile(
-                          value: selected.contains(entry.id),
-                          title: Text(
-                            exercises[entry.id]?.name ?? entry.exerciseId,
-                            style: const TextStyle(
-                              color: CoachlyAthleteTheme.textPrimary,
-                            ),
-                          ),
-                          onChanged: (value) => setSheetState(() {
-                            value == true
-                                ? selected.add(entry.id)
-                                : selected.remove(entry.id);
-                          }),
-                        );
-                      },
-                    ).toList(),
+                  SegmentedButton<String>(
+                    segments: [
+                      ButtonSegment(
+                        value: 'superset',
+                        label: Text(context.tr('workout.detail.superset')),
+                      ),
+                      ButtonSegment(
+                        value: 'circuit',
+                        label: Text(context.tr('workout.detail.circuit')),
+                      ),
+                    ],
+                    selected: {type},
+                    onSelectionChanged: (value) =>
+                        setSheetState(() => type = value.single),
                   ),
-                ),
-                Row(
-                  children: [
-                    Text(context.tr('workout.detail.rounds')),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: rounds > 1
-                          ? () => setSheetState(() => rounds--)
-                          : null,
-                      icon: const Icon(Icons.remove),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView(
+                      children: state.blocks
+                          .expand((block) => block.entries)
+                          .map((entry) {
+                            return CheckboxListTile(
+                              value: selected.contains(entry.id),
+                              title: Text(
+                                exercises[entry.id]?.name ?? entry.exerciseId,
+                                style: const TextStyle(
+                                  color: CoachlyAthleteTheme.textPrimary,
+                                ),
+                              ),
+                              onChanged: (value) => setSheetState(() {
+                                value == true
+                                    ? selected.add(entry.id)
+                                    : selected.remove(entry.id);
+                              }),
+                            );
+                          })
+                          .toList(),
                     ),
-                    Text('$rounds'),
-                    IconButton(
-                      onPressed: () => setSheetState(() => rounds++),
-                      icon: const Icon(Icons.add),
-                    ),
-                  ],
-                ),
-                FilledButton(
-                  onPressed: selected.length < 2
-                      ? null
-                      : () {
-                          notifier.createGroup(
-                            type: type,
-                            instanceIds: selected.toList(),
-                            rounds: rounds,
-                          );
-                          Navigator.pop(sheetContext);
-                        },
-                  child: Text(context.tr('common.confirm')),
-                ),
-              ],
+                  ),
+                  Row(
+                    children: [
+                      Text(context.tr('workout.detail.rounds')),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: rounds > 1
+                            ? () => setSheetState(() => rounds--)
+                            : null,
+                        icon: const Icon(Icons.remove),
+                      ),
+                      Text('$rounds'),
+                      IconButton(
+                        onPressed: () => setSheetState(() => rounds++),
+                        icon: const Icon(Icons.add),
+                      ),
+                    ],
+                  ),
+                  FilledButton(
+                    onPressed: selected.length < 2
+                        ? null
+                        : () {
+                            notifier.createGroup(
+                              type: type,
+                              instanceIds: selected.toList(),
+                              rounds: rounds,
+                            );
+                            Navigator.pop(sheetContext);
+                          },
+                    child: Text(context.tr('common.confirm')),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -384,12 +394,18 @@ class _EditableBlock extends StatelessWidget {
         .join(' · ');
     final group = block.groupType == 'superset' || block.groupType == 'circuit';
     return CoachlySurface(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 7),
+      padding: const EdgeInsets.fromLTRB(8, 10, 6, 10),
       child: Row(
         children: [
           dragHandle,
-          SizedBox(
+          Container(
             width: 30,
+            height: 30,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: CoachlyAthleteTheme.primary.withValues(alpha: .12),
+              borderRadius: BorderRadius.circular(9),
+            ),
             child: Text(
               group
                   ? String.fromCharCode(65 + index.clamp(0, 25))
@@ -425,6 +441,10 @@ class _EditableBlock extends StatelessWidget {
             ),
           ),
           PopupMenuButton<String>(
+            icon: const Icon(
+              Icons.more_horiz_rounded,
+              color: CoachlyAthleteTheme.textSecondary,
+            ),
             constraints: const BoxConstraints(minWidth: 180),
             color: CoachlyAthleteTheme.surfaceElevated,
             onSelected: (value) {
