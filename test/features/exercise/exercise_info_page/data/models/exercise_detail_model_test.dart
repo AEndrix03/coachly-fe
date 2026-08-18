@@ -67,4 +67,21 @@ void main() {
       expect(exercise.safety!.single.overallRiskLevel, 'low');
     },
   );
+
+  test('parses the V2 safety object returned by the details endpoint', () {
+    final exercise = ExerciseDetailModel.fromJson({
+      'id': '02e7c672-80c7-4614-b524-2ef69d0e5f72',
+      'safety': {
+        'spotterPolicy': 'not_required',
+        'notesI18n': {'it': 'Mantieni il controllo del movimento.'},
+      },
+    });
+
+    expect(exercise.safety, hasLength(1));
+    expect(exercise.safety!.single.overallRiskLevel, 'not_required');
+    expect(
+      exercise.safety!.single.safetyNotesI18n['it'],
+      'Mantieni il controllo del movimento.',
+    );
+  });
 }
