@@ -21,6 +21,9 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
       final cachedExercise = AppCachePolicy.isEnabled
           ? await _hiveService.getExercise(exerciseId)
           : null;
+      if (cachedExercise != null) {
+        return ApiResponse.success(data: cachedExercise);
+      }
       final remoteResponse = await _service.fetchExerciseDetails(exerciseId);
 
       if (remoteResponse.success && remoteResponse.data != null) {
@@ -28,13 +31,6 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
           await _hiveService.saveExerciseDetail(remoteResponse.data!);
         }
         return ApiResponse.success(data: remoteResponse.data!);
-      }
-
-      // The catalogue cache contains summaries, while this entry can be a full
-      // detail previously fetched from the API. It is used only as an offline
-      // fallback; online access must always use the detail endpoint.
-      if (cachedExercise != null) {
-        return ApiResponse.success(data: cachedExercise);
       }
 
       return ApiResponse.error(
@@ -59,6 +55,25 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
       return ApiResponse.success(data: exercises);
     } catch (e) {
       return ApiResponse.error(message: 'Failed to load exercises: $e');
+    }
+  }
+
+  @override
+  Future<ApiResponse<List<ExerciseModel>>> getExerciseSummaries() async {
+    try {
+      if (!AppCachePolicy.isEnabled) {
+        // Debug/network-only mode deliberately does not write Hive, but the
+        // provider still fetches this unfiltered catalogue only once.
+        return _service.fetchAllExercises();
+      }
+      await _ensureLocalCache();
+      return ApiResponse.success(
+        data: await _hiveService.getExerciseSummaries(),
+      );
+    } catch (e) {
+      return ApiResponse.error(
+        message: 'Failed to load exercise summaries: $e',
+      );
     }
   }
 
@@ -88,6 +103,54 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
       return ApiResponse.success(data: exercises);
     } catch (e) {
       return ApiResponse.error(message: 'Failed to filter exercises: $e');
+    }
+  }
+
+  @override
+  Future<ApiResponse<List<ExerciseModel>>> getFilteredExerciseSummaries(
+    ExerciseFilterModel filter, {
+    Set<String> excludedExerciseIds = const {},
+  }) async {
+    try {
+      if (!AppCachePolicy.isEnabled) {
+        final response = await _service.fetchFilteredExercises(filter);
+        if (!response.success || response.data == null) {
+          return ApiResponse.error(
+            message: response.message ?? 'Failed to load exercise summaries',
+            statusCode: response.statusCode,
+            errors: response.errors,
+          );
+        }
+        return ApiResponse.success(
+          data: response.data!
+              .where((exercise) => !excludedExerciseIds.contains(exercise.id))
+              .map(
+                (exercise) => ExerciseModel(
+                  id: exercise.id,
+                  createdBy: exercise.createdBy,
+                  isPersonal: exercise.isPersonal,
+                  nameI18n: exercise.nameI18n,
+                  difficultyLevel: exercise.difficultyLevel,
+                  mechanicsType: exercise.mechanicsType,
+                  forceType: exercise.forceType,
+                  isUnilateral: exercise.isUnilateral,
+                  isBodyweight: exercise.isBodyweight,
+                ),
+              )
+              .toList(),
+        );
+      }
+      await _ensureLocalCache();
+      return ApiResponse.success(
+        data: await _hiveService.getFilteredExerciseSummaries(
+          filter,
+          excludedExerciseIds: excludedExerciseIds,
+        ),
+      );
+    } catch (e) {
+      return ApiResponse.error(
+        message: 'Failed to load exercise summaries: $e',
+      );
     }
   }
 
@@ -169,9 +232,7 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
 
   @override
   Future<ApiResponse<List<ExerciseDetailModel>>> refreshFromRemote() async {
-    final response = await _service.fetchFilteredExercises(
-      const ExerciseFilterModel(scope: 'community'),
-    );
+    final response = await _service.fetchAllExercises();
     if (!response.success || response.data == null) {
       return ApiResponse.error(
         message: response.message ?? 'Failed to refresh exercises from remote',
@@ -180,12 +241,12 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
       );
     }
     if (!AppCachePolicy.isEnabled) {
-      return ApiResponse.success(data: response.data!);
+      return ApiResponse.success(data: const []);
     }
 
-    await _hiveService.saveExercises(response.data!);
-    final localExercises = await _hiveService.getExercises();
-    return ApiResponse.success(data: localExercises);
+    await _hiveService.saveExerciseSummaries(response.data!);
+    // Details are deliberately fetched lazily, one exercise at a time.
+    return ApiResponse.success(data: const []);
   }
 
   Future<void> _ensureLocalCache() async {

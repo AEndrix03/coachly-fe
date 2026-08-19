@@ -31,8 +31,8 @@ class ExerciseHiveService {
     return ExerciseDetailModel.fromJson(Map<String, dynamic>.from(raw));
   }
 
-  Future<void> saveExercises(List<ExerciseDetailModel> exercises) async {
-    final box = _localDbService.exercises;
+  Future<void> saveExerciseSummaries(List<ExerciseModel> exercises) async {
+    final box = _localDbService.exerciseCatalog;
     await box.clear();
 
     for (final exercise in exercises) {
@@ -40,7 +40,11 @@ class ExerciseHiveService {
       if (id == null || id.isEmpty) {
         continue;
       }
-      await box.put(id, exercise.toJson());
+      await box.put(id, {
+        'id': id,
+        'personal': exercise.isPersonal,
+        'nameI18n': exercise.nameI18n,
+      });
     }
   }
 
@@ -55,7 +59,7 @@ class ExerciseHiveService {
   }
 
   Future<bool> isEmpty() async {
-    return _localDbService.exercises.isEmpty;
+    return _localDbService.exerciseCatalog.isEmpty;
   }
 
   Future<List<ExerciseDetailModel>> getFilteredExercises(
@@ -126,24 +130,110 @@ class ExerciseHiveService {
   }
 
   Future<List<ExerciseModel>> getExerciseSummaries() async {
-    final exercises = await getExercises();
-    return exercises
-        .map(
-          (exercise) => ExerciseModel(
-            id: exercise.id,
-            createdBy: exercise.createdBy,
-            isPersonal: exercise.isPersonal,
-            nameI18n: exercise.nameI18n,
-            descriptionI18n: exercise.descriptionI18n,
-            tipsI18n: exercise.tipsI18n,
-            difficultyLevel: exercise.difficultyLevel,
-            mechanicsType: exercise.mechanicsType,
-            forceType: exercise.forceType,
-            isUnilateral: exercise.isUnilateral,
-            isBodyweight: exercise.isBodyweight,
-          ),
-        )
-        .toList();
+    return getFilteredExerciseSummaries(const ExerciseFilterModel());
+  }
+
+  /// Reads only fields needed by catalogue cards. Avoid deserializing every
+  /// detail object: the cache can contain thousands of nested exercise records.
+  Future<List<ExerciseModel>> getFilteredExerciseSummaries(
+    ExerciseFilterModel filter, {
+    Set<String> excludedExerciseIds = const {},
+  }) async {
+    final summaries = <ExerciseModel>[];
+    for (final raw in _localDbService.exerciseCatalog.values) {
+      final exercise = Map<String, dynamic>.from(raw);
+      final id = exercise['id'] as String?;
+      if (id == null || id.isEmpty || excludedExerciseIds.contains(id)) {
+        continue;
+      }
+      if (!_matchesRawExercise(exercise, filter)) continue;
+      summaries.add(
+        ExerciseModel(
+          id: id,
+          createdBy: exercise['createdBy'] as String?,
+          isPersonal: exercise['personal'] as bool? ?? false,
+          nameI18n: _stringMap(exercise['nameI18n']),
+          difficultyLevel: exercise['difficultyLevel'] as String?,
+          mechanicsType: exercise['mechanicsType'] as String?,
+          forceType: exercise['forceType'] as String?,
+          isUnilateral: exercise['unilateral'] as bool?,
+          isBodyweight: exercise['bodyweight'] as bool?,
+        ),
+      );
+    }
+    return summaries;
+  }
+
+  bool _matchesRawExercise(
+    Map<String, dynamic> exercise,
+    ExerciseFilterModel filter,
+  ) {
+    final names = _stringMap(exercise['nameI18n']);
+    final text = filter.textFilter?.trim().toLowerCase();
+    if (text != null &&
+        text.isNotEmpty &&
+        !(names?.values.any((name) => name.toLowerCase().contains(text)) ??
+            false)) {
+      return false;
+    }
+    final isPersonal = exercise['personal'] as bool? ?? false;
+    if (filter.scope == 'default' && isPersonal) return false;
+    if (filter.scope == 'mine' && !isPersonal) return false;
+    if (!_matchesRawString(
+          exercise['difficultyLevel'] as String?,
+          filter.difficultyLevel,
+        ) ||
+        !_matchesRawString(
+          exercise['mechanicsType'] as String?,
+          filter.mechanicsType,
+        ) ||
+        !_matchesRawString(
+          exercise['forceType'] as String?,
+          filter.forceType,
+        ) ||
+        !_matchesRawBool(
+          exercise['unilateral'] as bool?,
+          filter.isUnilateral,
+        ) ||
+        !_matchesRawBool(
+          exercise['bodyweight'] as bool?,
+          filter.isBodyweight,
+        )) {
+      return false;
+    }
+    return _matchesRawIds(exercise['categories'], filter.categoryIds) &&
+        _matchesRawIds(
+          exercise['muscles'],
+          filter.muscleIds,
+          nestedKey: 'muscle',
+        );
+  }
+
+  Map<String, String>? _stringMap(dynamic value) => value is Map
+      ? value.map((key, value) => MapEntry('$key', '$value'))
+      : null;
+
+  bool _matchesRawString(String? value, String? expected) =>
+      expected == null || expected.isEmpty || value == expected;
+
+  bool _matchesRawBool(bool? value, bool? expected) =>
+      expected == null || value == expected;
+
+  bool _matchesRawIds(
+    dynamic rawValues,
+    List<String>? filterIds, {
+    String? nestedKey,
+  }) {
+    if (filterIds == null || filterIds.isEmpty) return true;
+    if (rawValues is! List) return false;
+    final ids = rawValues
+        .whereType<Map>()
+        .map((raw) => nestedKey == null ? raw : raw[nestedKey])
+        .whereType<Map>()
+        .map((raw) => raw['id'] as String?)
+        .whereType<String>()
+        .toSet();
+    return filterIds.any(ids.contains);
   }
 
   bool _matchesTextFilter(ExerciseDetailModel exercise, String? textFilter) {

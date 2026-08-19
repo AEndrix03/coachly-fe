@@ -3,6 +3,8 @@ import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
@@ -10,6 +12,7 @@ import 'package:coachly/features/workout/workout_page/data/models/local_workout_
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -490,35 +493,11 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   // ── filter options source ─────────────────────────────────────────────────
 
-  /// Uses a base filter (text + lang only) to build available filter options
-  /// so options don't disappear when categorical filters are applied.
-  Widget _buildOptionsSource() {
-    final locale = ref.read(languageProvider);
-    final lang = locale.countryCode == null || locale.countryCode!.isEmpty
-        ? locale.languageCode
-        : '${locale.languageCode}_${locale.countryCode}';
-    final baseFilter = ExerciseFilterModel(
-      scope: _scope,
-      langFilter: lang,
-      // Use the applied filter, never the live TextEditingController value:
-      // this keeps keystrokes behind the debounce boundary.
-      textFilter: _filter.textFilter,
-    );
+  /// The picker intentionally indexes just names. Advanced catalogue filters
+  /// would require loading every exercise detail and are therefore omitted.
+  Widget _buildOptionsSource() => const SizedBox.shrink();
 
-    return Consumer(
-      builder: (context, ref, _) {
-        // With no advanced filter, this is the same provider watched by the
-        // list below. Riverpod then shares one request instead of issuing two.
-        final filterForOptions = _hasAdvancedFilters ? baseFilter : _filter;
-        final all = ref.watch(exerciseListProvider(filter: filterForOptions));
-        return all.maybeWhen(
-          data: (exercises) => _buildFilterPanel(exercises),
-          orElse: () => const SizedBox.shrink(),
-        );
-      },
-    );
-  }
-
+  // ignore: unused_element
   bool get _hasAdvancedFilters =>
       _categoryId != null ||
       _muscleId != null ||
@@ -527,6 +506,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       _bodyweight != null ||
       _unilateral != null;
 
+  // ignore: unused_element
   Widget _buildFilterPanel(List<ExerciseDetailModel> exercises) {
     final locale = ref.read(languageProvider);
 
@@ -868,7 +848,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   Widget _buildList() {
     return Consumer(
       builder: (context, ref, _) {
-        final value = ref.watch(exerciseListProvider(filter: _filter));
+        final value = ref.watch(exerciseListProvider);
         return value.when(
           loading: () => const Center(
             child: CircularProgressIndicator(
@@ -883,17 +863,24 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             ),
           ),
           data: (exercises) {
-            final visible = _excludeSelected(exercises);
+            final visible = _filterAndExclude(exercises);
             if (visible.isEmpty) return _buildEmptyList();
             return Stack(
               children: [
                 ListView.builder(
                   controller: _listScrollController,
-                  // Keep just a small viewport ahead of the user. The list
-                  // remains lazy while avoiding rebuilds during a fast drag.
-                  cacheExtent: 250,
+                  // Keep only a short viewport ahead of the user. Together
+                  // with ListView.builder this keeps the catalogue virtualized
+                  // without mounting the full exercise list.
+                  cacheExtent: 300,
                   addAutomaticKeepAlives: false,
-                  padding: const EdgeInsets.fromLTRB(16, 8, 24, 24),
+                  addRepaintBoundaries: true,
+                  // 78px card + 14px gap keeps the catalogue compact while
+                  // preserving a clearly separated tap target per exercise.
+                  itemExtent: 92,
+                  // Reserve space for the rail, so its thumb never sits on
+                  // top of the exercise cards.
+                  padding: const EdgeInsets.fromLTRB(16, 8, 52, 24),
                   itemCount: visible.length,
                   itemBuilder: (_, i) => _buildCard(visible[i]),
                 ),
@@ -901,7 +888,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                   top: 0,
                   right: 0,
                   bottom: 0,
-                  width: 30,
+                  width: 36,
                   child: _ExerciseListScrollRail(
                     controller: _listScrollController,
                   ),
@@ -925,14 +912,28 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                               width: 32,
                               height: 32,
                               decoration: BoxDecoration(
-                                color: const Color(
-                                  0xFF2196F3,
-                                ).withValues(alpha: 0.85),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHighest,
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainer,
+                                  ],
+                                ),
                                 shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outlineVariant,
+                                ),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.vertical_align_top_rounded,
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 size: 18,
                               ),
                             ),
@@ -989,164 +990,195 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   // ── exercise card ─────────────────────────────────────────────────────────
 
-  Widget _buildCard(ExerciseDetailModel exercise) {
+  Widget _buildCard(ExerciseModel exercise) {
     final locale = ref.watch(languageProvider);
     final na = context.tr('common.na');
     final name = exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? na;
-    final muscles = (exercise.muscles ?? const [])
-        .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? '')
-        .where((s) => s.isNotEmpty)
-        .take(2)
-        .join(', ');
-    final mechanics = exercise.mechanicsType;
     final isBodyweight = exercise.isBodyweight ?? false;
 
-    return GestureDetector(
-      onTap: () async {
-        final selectedExercise = await context.push<ExerciseDetailModel>(
-          '/exercises/${exercise.id}',
-        );
-        if (!mounted || selectedExercise == null) return;
+    Future<void> openDetail() async {
+      final selectedExercise = await context.push<ExerciseDetailModel>(
+        '/exercises/${exercise.id}',
+      );
+      if (!mounted) return;
+      if (selectedExercise == null) return;
+      final selectedName =
+          selectedExercise.nameI18n?.fromI18n(locale) ??
+          selectedExercise.id ??
+          na;
+      _addExercise(selectedExercise, selectedName, locale, na);
+    }
 
-        final selectedName =
-            selectedExercise.nameI18n?.fromI18n(locale) ??
-            selectedExercise.id ??
-            na;
-        _addExercise(selectedExercise, selectedName, locale, na);
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF2A2A3E).withValues(alpha: 0.75),
-              const Color(0xFF1A1A2E).withValues(alpha: 0.90),
-            ],
-          ),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.09),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.25),
-              blurRadius: 14,
-              offset: const Offset(0, 5),
-              spreadRadius: -4,
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        height: 78,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                const Color(0xFF2A2A3E).withValues(alpha: 0.75),
+                const Color(0xFF1A1A2E).withValues(alpha: 0.90),
+              ],
             ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              // Icon badge
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(13),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF2196F3).withValues(alpha: 0.30),
-                      blurRadius: 12,
-                      spreadRadius: -3,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  isBodyweight
-                      ? Icons.self_improvement_rounded
-                      : Icons.fitness_center_rounded,
-                  color: Colors.white,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 14),
-              // Name + tags
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        height: 1.3,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    if (muscles.isNotEmpty || mechanics != null) ...[
-                      const SizedBox(height: 7),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 4,
-                        children: [
-                          if (muscles.isNotEmpty)
-                            _cardTag(muscles, const Color(0xFF2196F3)),
-                          if (mechanics != null)
-                            _cardTag(
-                              _mechanicsLabel(mechanics),
-                              const Color(0xFF00BCD4),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Semantics(
-                button: true,
-                label: context.tr('workout.edit.add_exercise'),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => _addExercise(exercise, name, locale, na),
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(
-                            0xFF2196F3,
-                          ).withValues(alpha: 0.40),
-                          blurRadius: 10,
-                          spreadRadius: -3,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.add_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.09),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.25),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+                spreadRadius: -4,
               ),
             ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: openDetail,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xFF2196F3),
+                                    Color(0xFF7B4BC1),
+                                  ],
+                                ),
+                              ),
+                              child: Icon(
+                                isBodyweight
+                                    ? Icons.self_improvement_rounded
+                                    : Icons.fitness_center_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.04),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                    child: Text(
+                                      name,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        height: 1.3,
+                                        letterSpacing: -0.2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Semantics(
+                  button: true,
+                  label: context.tr('workout.edit.add_exercise'),
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Material(
+                      color: Colors.transparent,
+                      shape: const CircleBorder(),
+                      child: IconButton(
+                        tooltip: context.tr('workout.edit.add_exercise'),
+                        onPressed: () =>
+                            _addExerciseFromSummary(exercise, name, locale, na),
+                        padding: EdgeInsets.zero,
+                        icon: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFF2196F3,
+                                ).withValues(alpha: 0.40),
+                                blurRadius: 10,
+                                spreadRadius: -3,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.add_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _addExerciseFromSummary(
+    ExerciseModel exercise,
+    String name,
+    Locale locale,
+    String notAvailable,
+  ) async {
+    final id = exercise.id;
+    if (id == null || id.isEmpty) return;
+    final repository = ref.read(exerciseInfoPageRepositoryProvider);
+    final response = await repository.getExerciseDetail(id);
+    if (!mounted) return;
+    if (!response.success || response.data == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.message ?? context.tr('common.error'))),
+      );
+      return;
+    }
+    _addExercise(response.data!, name, locale, notAvailable);
   }
 
   void _addExercise(
@@ -1177,31 +1209,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       ),
     );
     Navigator.pop(context);
-  }
-
-  Widget _cardTag(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        gradient: LinearGradient(
-          colors: [
-            color.withValues(alpha: 0.18),
-            color.withValues(alpha: 0.08),
-          ],
-        ),
-        border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.2,
-        ),
-      ),
-    );
   }
 
   // ── helpers ───────────────────────────────────────────────────────────────
@@ -1246,11 +1253,20 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     }
   }
 
-  List<ExerciseDetailModel> _excludeSelected(List<ExerciseDetailModel> list) {
-    if (widget.excludedExerciseIds.isEmpty) return list;
+  List<ExerciseModel> _filterAndExclude(List<ExerciseModel> list) {
+    final text = _filter.textFilter?.trim().toLowerCase();
     return list
-        .where((e) => !widget.excludedExerciseIds.contains(e.id))
-        .toList();
+        .where((exercise) {
+          if (widget.excludedExerciseIds.contains(exercise.id)) return false;
+          if (_scope == 'mine' && !exercise.isPersonal) return false;
+          if (_scope == 'default' && exercise.isPersonal) return false;
+          if (text == null || text.isEmpty) return true;
+          return exercise.nameI18n?.values.any(
+                (name) => name.toLowerCase().contains(text),
+              ) ??
+              false;
+        })
+        .toList(growable: false);
   }
 
   String _mechanicsLabel(String raw) => switch (raw.toLowerCase()) {
@@ -1276,28 +1292,105 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 /// [RawScrollbar]'s hit area is only as wide as its thumb, which is difficult
 /// to grab in a long exercise catalogue. This rail maps a drag directly to the
 /// list offset and rebuilds only itself while the list scrolls.
-class _ExerciseListScrollRail extends StatelessWidget {
+class _ExerciseListScrollRail extends StatefulWidget {
   static const _minThumbLength = 52.0;
 
   final ScrollController controller;
 
   const _ExerciseListScrollRail({required this.controller});
 
-  void _moveTo(double localY, double trackHeight) {
-    if (!controller.hasClients) return;
-    final position = controller.position;
+  @override
+  State<_ExerciseListScrollRail> createState() =>
+      _ExerciseListScrollRailState();
+}
+
+class _ExerciseListScrollRailState extends State<_ExerciseListScrollRail> {
+  double? _pendingOffset;
+  bool _scrollScheduled = false;
+  ScrollPosition? _scrollPosition;
+  bool _isScrolling = false;
+  bool _isDragging = false;
+
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) => _attachScrollState());
+  }
+
+  @override
+  void didUpdateWidget(covariant _ExerciseListScrollRail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      _detachScrollState();
+      SchedulerBinding.instance.addPostFrameCallback(
+        (_) => _attachScrollState(),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _detachScrollState();
+    super.dispose();
+  }
+
+  void _attachScrollState() {
+    if (!mounted || !widget.controller.hasClients) return;
+    _scrollPosition = widget.controller.position;
+    _scrollPosition!.isScrollingNotifier.addListener(_onScrollStateChanged);
+    _onScrollStateChanged();
+  }
+
+  void _detachScrollState() {
+    _scrollPosition?.isScrollingNotifier.removeListener(_onScrollStateChanged);
+    _scrollPosition = null;
+  }
+
+  void _onScrollStateChanged() {
+    final isScrolling = _scrollPosition?.isScrollingNotifier.value ?? false;
+    if (mounted && isScrolling != _isScrolling) {
+      setState(() => _isScrolling = isScrolling);
+    }
+  }
+
+  void _setDragging(bool value) {
+    if (_isDragging != value) setState(() => _isDragging = value);
+  }
+
+  void _moveTo(double localY, double trackHeight, {required bool immediately}) {
+    if (!widget.controller.hasClients) return;
+    final position = widget.controller.position;
     final maxScroll = position.maxScrollExtent;
     if (maxScroll <= 0 || trackHeight <= 0) return;
 
     final contentHeight = maxScroll + position.viewportDimension;
     final thumbHeight = (trackHeight * trackHeight / contentHeight)
-        .clamp(_minThumbLength, trackHeight)
+        .clamp(_ExerciseListScrollRail._minThumbLength, trackHeight)
         .toDouble();
     final travel = trackHeight - thumbHeight;
     if (travel <= 0) return;
 
     final thumbTop = (localY - thumbHeight / 2).clamp(0.0, travel).toDouble();
-    controller.jumpTo(thumbTop / travel * maxScroll);
+    final targetOffset = thumbTop / travel * maxScroll;
+    if (immediately) {
+      widget.controller.jumpTo(targetOffset);
+      return;
+    }
+
+    // Pointer events can arrive faster than Flutter can paint. Coalescing
+    // drag updates to a frame prevents the rail from flooding the scrollable
+    // with jumpTo calls while preserving direct thumb tracking.
+    _pendingOffset = targetOffset;
+    if (_scrollScheduled) return;
+    _scrollScheduled = true;
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _scrollScheduled = false;
+      final offset = _pendingOffset;
+      _pendingOffset = null;
+      if (!mounted || offset == null || !widget.controller.hasClients) return;
+      final position = widget.controller.position;
+      widget.controller.jumpTo(offset.clamp(0.0, position.maxScrollExtent));
+    });
   }
 
   @override
@@ -1308,16 +1401,23 @@ class _ExerciseListScrollRail extends StatelessWidget {
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTapDown: (details) =>
-              _moveTo(details.localPosition.dy, trackHeight),
-          onPanStart: (details) =>
-              _moveTo(details.localPosition.dy, trackHeight),
-          onPanUpdate: (details) =>
-              _moveTo(details.localPosition.dy, trackHeight),
+              _moveTo(details.localPosition.dy, trackHeight, immediately: true),
+          onPanStart: (details) {
+            _setDragging(true);
+            _moveTo(details.localPosition.dy, trackHeight, immediately: true);
+          },
+          onPanUpdate: (details) => _moveTo(
+            details.localPosition.dy,
+            trackHeight,
+            immediately: false,
+          ),
+          onPanEnd: (_) => _setDragging(false),
+          onPanCancel: () => _setDragging(false),
           child: AnimatedBuilder(
-            animation: controller,
+            animation: widget.controller,
             builder: (context, _) {
-              if (!controller.hasClients) return const SizedBox.expand();
-              final position = controller.position;
+              if (!widget.controller.hasClients) return const SizedBox.expand();
+              final position = widget.controller.position;
               final maxScroll = position.maxScrollExtent;
               if (maxScroll <= 0 || trackHeight <= 0) {
                 return const SizedBox.expand();
@@ -1325,7 +1425,7 @@ class _ExerciseListScrollRail extends StatelessWidget {
 
               final contentHeight = maxScroll + position.viewportDimension;
               final thumbHeight = (trackHeight * trackHeight / contentHeight)
-                  .clamp(_minThumbLength, trackHeight)
+                  .clamp(_ExerciseListScrollRail._minThumbLength, trackHeight)
                   .toDouble();
               final travel = trackHeight - thumbHeight;
               final thumbTop = travel <= 0
@@ -1341,32 +1441,49 @@ class _ExerciseListScrollRail extends StatelessWidget {
                       width: 3,
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A3E).withValues(alpha: 0.75),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  Positioned(
+                  AnimatedPositioned(
+                    duration: MediaQuery.of(context).disableAnimations
+                        ? Duration.zero
+                        : const Duration(milliseconds: 90),
+                    curve: Curves.easeOutCubic,
                     top: thumbTop,
-                    left: 8,
-                    right: 8,
+                    left: 10,
+                    right: 10,
                     height: thumbHeight,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF2196F3,
-                            ).withValues(alpha: 0.3),
-                            blurRadius: 6,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 180),
+                      opacity: _isScrolling ? 1 : 0.62,
+                      child: AnimatedScale(
+                        duration: const Duration(milliseconds: 120),
+                        scale: _isDragging ? 1.12 : 1,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerHighest,
+                                Theme.of(context).colorScheme.surfaceContainer,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.22),
+                                blurRadius: _isDragging ? 8 : 4,
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

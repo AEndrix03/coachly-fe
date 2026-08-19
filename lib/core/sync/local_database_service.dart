@@ -16,9 +16,11 @@ class LocalDatabaseService {
   static String get sessionSyncJobsBox => 'session_sync_jobs_v$_dbVersion';
   static String get workoutStructuredBox => 'workout_structured_v$_dbVersion';
   static String get voiceAliasesBox => 'voice_aliases_v$_dbVersion';
-  static String get voiceResolutionLogsBox => 'voice_resolution_logs_v$_dbVersion';
+  static String get voiceResolutionLogsBox =>
+      'voice_resolution_logs_v$_dbVersion';
 
   static const String _exercisesBox = 'exercises';
+  static const String _exerciseCatalogBox = 'exercise_catalog';
   static const String _settingsBox = 'settings';
 
   static final LocalDatabaseService _instance =
@@ -50,6 +52,7 @@ class LocalDatabaseService {
     await Hive.openBox<Map>(voiceAliasesBox);
     await Hive.openBox<Map>(voiceResolutionLogsBox);
     await Hive.openBox<Map>(_exercisesBox);
+    await Hive.openBox<Map>(_exerciseCatalogBox);
     await Hive.openBox<dynamic>(_settingsBox);
 
     _initialized = true;
@@ -79,6 +82,8 @@ class LocalDatabaseService {
   Box<WorkoutModel> get workouts => Hive.box<WorkoutModel>(workoutsBox);
 
   Box<Map> get exercises => Hive.box<Map>(_exercisesBox);
+
+  Box<Map> get exerciseCatalog => Hive.box<Map>(_exerciseCatalogBox);
 
   Box<Map> get workoutSessions => Hive.box<Map>(workoutSessionsBox);
 
@@ -161,6 +166,7 @@ class LocalDatabaseService {
     await Hive.box<Map>(voiceAliasesBox).clear();
     await Hive.box<Map>(voiceResolutionLogsBox).clear();
     await Hive.box<Map>(_exercisesBox).clear();
+    await Hive.box<Map>(_exerciseCatalogBox).clear();
     await Hive.box<dynamic>(_settingsBox).clear();
     debugPrint('Cleared all local data');
   }

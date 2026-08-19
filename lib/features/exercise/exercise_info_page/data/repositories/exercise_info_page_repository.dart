@@ -8,7 +8,14 @@ abstract class IExerciseInfoPageRepository {
 
   Future<ApiResponse<List<ExerciseModel>>> getAllExercises();
 
+  Future<ApiResponse<List<ExerciseModel>>> getExerciseSummaries();
+
   Future<ApiResponse<List<ExerciseDetailModel>>> getFilteredExercises(
+    ExerciseFilterModel filter, {
+    Set<String> excludedExerciseIds = const {},
+  });
+
+  Future<ApiResponse<List<ExerciseModel>>> getFilteredExerciseSummaries(
     ExerciseFilterModel filter, {
     Set<String> excludedExerciseIds = const {},
   });

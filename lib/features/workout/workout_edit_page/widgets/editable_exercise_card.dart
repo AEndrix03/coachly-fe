@@ -9,7 +9,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class EditableExerciseCard extends ConsumerStatefulWidget {
   final EditableExerciseModel exercise;
@@ -227,99 +226,106 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
   }
 
   Widget _buildMainContent() {
-    return Padding(
-      padding: const EdgeInsets.all(14),
-      child: Row(
-        children: [
-          _buildDragHandle(),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _displayName(),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.2,
-                          height: 1.3,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _toggleExpanded,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            _buildDragHandle(),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: widget.onPreview,
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.06),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              _displayName(),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.2,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    if (_isResolvingName) ...[
-                      const SizedBox(width: 8),
-                      const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
+                      if (_isResolvingName) ...[
+                        const SizedBox(width: 8),
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ],
                     ],
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _buildTag(
-                      widget.exercise.muscles.isNotEmpty
-                          ? widget.exercise.muscles.first
-                          : context.tr('common.na'),
-                      widget.exercise.accentColor,
-                      Icons.fitness_center,
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          _buildActionButtons(),
-        ],
+            const SizedBox(width: 8),
+            _buildActionButtons(),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildDragHandle() {
-    return ReorderableDragStartListener(
+    return ReorderableDelayedDragStartListener(
       index: widget.exercise.number - 1,
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF4A4A5E), Color(0xFF2A2A3E)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            width: 2,
-            color: Colors.white.withValues(alpha: 0.15),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+      child: GestureDetector(
+        onTap: _toggleExpanded,
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF4A4A5E), Color(0xFF2A2A3E)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            widget.exercise.number.toString(),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.5,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              width: 2,
+              color: Colors.white.withValues(alpha: 0.15),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              widget.exercise.number.toString(),
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.9),
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
+              ),
             ),
           ),
         ),
@@ -328,7 +334,7 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
   }
 
   Widget _buildActionButtons() {
-    return Column(
+    return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildIconButton(
@@ -336,21 +342,15 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
           Colors.white,
           _toggleExpanded,
         ),
-        const SizedBox(height: 8),
-        _buildIconButton(
-          LucideIcons.eye,
-          const Color(0xFF2196F3),
-          widget.onPreview,
-        ),
-        const SizedBox(height: 8),
         if (widget.exercise.variants.isNotEmpty) ...[
+          const SizedBox(width: 8),
           _buildIconButton(
             Icons.swap_horiz,
             widget.exercise.accentColor,
             widget.onFindVariant,
           ),
-          const SizedBox(height: 8),
         ],
+        const SizedBox(width: 8),
         _buildIconButton(
           Icons.delete_outline,
           const Color(0xFFFF5252),
@@ -381,23 +381,27 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
   }
 
   Widget _buildSummaryBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.only(
-          bottomLeft: const Radius.circular(19),
-          bottomRight: _isExpanded ? Radius.zero : const Radius.circular(19),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _toggleExpanded,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.only(
+            bottomLeft: const Radius.circular(19),
+            bottomRight: _isExpanded ? Radius.zero : const Radius.circular(19),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          _buildSummaryChip(Icons.repeat, widget.exercise.sets),
-          const SizedBox(width: 10),
-          _buildSummaryChip(Icons.timer_outlined, widget.exercise.rest),
-          const Spacer(),
-          _buildSummaryChip(Icons.fitness_center, widget.exercise.weight),
-        ],
+        child: Row(
+          children: [
+            _buildSummaryChip(Icons.repeat, widget.exercise.sets),
+            const SizedBox(width: 10),
+            _buildSummaryChip(Icons.timer_outlined, widget.exercise.rest),
+            const Spacer(),
+            _buildSummaryChip(Icons.fitness_center, widget.exercise.weight),
+          ],
+        ),
       ),
     );
   }
@@ -603,35 +607,6 @@ class _EditableExerciseCardState extends ConsumerState<EditableExerciseCard> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildTag(String label, Color color, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
-        ),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.35), width: 1.5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: color),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
-      ),
     );
   }
 

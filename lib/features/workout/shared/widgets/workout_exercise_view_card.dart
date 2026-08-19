@@ -6,7 +6,6 @@ import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Read-only exercise card — same visual style as EditableExerciseCard but
 /// without drag handle, edit fields, delete and variant buttons.
@@ -131,100 +130,104 @@ class _WorkoutExerciseViewCardState
 
   Widget _buildMainContent() {
     final locale = ref.watch(languageProvider);
-    final exercise = widget.workoutExercise.exercise;
-
-    return Padding(
-      padding: const EdgeInsets.all(14),
-      child: Row(
-        children: [
-          _buildNumberBadge(),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _displayName(locale),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.2,
-                          height: 1.3,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _toggleExpanded,
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            _buildNumberBadge(),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _hasExerciseId ? _openExerciseDetail : null,
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.06),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              _displayName(locale),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.2,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    if (_isResolvingName) ...[
-                      const SizedBox(width: 8),
-                      const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
+                      if (_isResolvingName) ...[
+                        const SizedBox(width: 8),
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ],
                     ],
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _buildTag(
-                      exercise.muscles?.firstOrNull?.muscle?.nameI18n.fromI18n(
-                            locale,
-                          ) ??
-                          context.tr('common.na'),
-                      const Color(0xFF2196F3),
-                      Icons.fitness_center,
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          _buildActionButtons(),
-        ],
+            const SizedBox(width: 8),
+            _buildActionButtons(),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildNumberBadge() {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4A4A5E), Color(0xFF2A2A3E)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          width: 2,
-          color: Colors.white.withValues(alpha: 0.15),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+    return GestureDetector(
+      onTap: _toggleExpanded,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4A4A5E), Color(0xFF2A2A3E)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          widget.exerciseNumber.toString(),
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.9),
-            fontSize: 18,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.5,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            width: 2,
+            color: Colors.white.withValues(alpha: 0.15),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            widget.exerciseNumber.toString(),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.5,
+            ),
           ),
         ),
       ),
@@ -232,7 +235,7 @@ class _WorkoutExerciseViewCardState
   }
 
   Widget _buildActionButtons() {
-    return Column(
+    return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildIconButton(
@@ -240,14 +243,6 @@ class _WorkoutExerciseViewCardState
           Colors.white,
           _toggleExpanded,
         ),
-        if (_hasExerciseId) ...[
-          const SizedBox(height: 8),
-          _buildIconButton(
-            LucideIcons.eye,
-            const Color(0xFF2196F3),
-            _openExerciseDetail,
-          ),
-        ],
       ],
     );
   }
@@ -275,26 +270,33 @@ class _WorkoutExerciseViewCardState
   // ─── Summary bar (collapsed) ───────────────────────────────────────────────
 
   Widget _buildSummaryBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.only(
-          bottomLeft: const Radius.circular(19),
-          bottomRight: _isExpanded ? Radius.zero : const Radius.circular(19),
-        ),
-      ),
-      child: Row(
-        children: [
-          _buildSummaryChip(Icons.repeat, widget.workoutExercise.sets),
-          const SizedBox(width: 10),
-          _buildSummaryChip(Icons.timer_outlined, widget.workoutExercise.rest),
-          const Spacer(),
-          _buildSummaryChip(
-            Icons.fitness_center,
-            widget.workoutExercise.weight,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _toggleExpanded,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.only(
+            bottomLeft: const Radius.circular(19),
+            bottomRight: _isExpanded ? Radius.zero : const Radius.circular(19),
           ),
-        ],
+        ),
+        child: Row(
+          children: [
+            _buildSummaryChip(Icons.repeat, widget.workoutExercise.sets),
+            const SizedBox(width: 10),
+            _buildSummaryChip(
+              Icons.timer_outlined,
+              widget.workoutExercise.rest,
+            ),
+            const Spacer(),
+            _buildSummaryChip(
+              Icons.fitness_center,
+              widget.workoutExercise.weight,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -455,35 +457,6 @@ class _WorkoutExerciseViewCardState
     if (matches.length >= 2) return (matches[0], matches[1]);
     if (matches.length == 1) return (matches[0], '');
     return ('', '');
-  }
-
-  Widget _buildTag(String label, Color color, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
-        ),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.35), width: 1.5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: color),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   void _toggleExpanded() {
