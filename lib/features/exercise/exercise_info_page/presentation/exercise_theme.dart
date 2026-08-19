@@ -95,6 +95,14 @@ extension ExerciseThemeContext on BuildContext {
 
 ThemeData exerciseDetailTheme(ThemeData base) {
   return base.copyWith(
+    colorScheme: base.colorScheme.copyWith(
+      primary: CoachlyExerciseTheme.dark.primary,
+      onPrimary: CoachlyExerciseTheme.dark.background,
+      surface: CoachlyExerciseTheme.dark.surface,
+      onSurface: CoachlyExerciseTheme.dark.textPrimary,
+      outline: CoachlyExerciseTheme.dark.border,
+      error: CoachlyExerciseTheme.dark.warning,
+    ),
     scaffoldBackgroundColor: CoachlyExerciseTheme.dark.background,
     // Keep this list concretely typed. Some Flutter/Dart combinations infer
     // the recursively bounded ThemeExtension<dynamic> spread incorrectly.

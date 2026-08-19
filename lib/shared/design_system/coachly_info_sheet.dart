@@ -1,4 +1,5 @@
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
 import 'package:flutter/material.dart';
 
 class CoachlyInfoSection {
@@ -36,7 +37,7 @@ class CoachlyInfoSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: CoachlyAthleteTheme.surfaceElevated,
+      backgroundColor: context.exerciseTheme.surfaceElevated,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -68,7 +69,9 @@ class CoachlyInfoSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: CoachlyAthleteTheme.textSecondary.withValues(alpha: .45),
+                color: context.exerciseTheme.textSecondary.withValues(
+                  alpha: .45,
+                ),
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
@@ -76,8 +79,8 @@ class CoachlyInfoSheet extends StatelessWidget {
           const SizedBox(height: 22),
           Text(
             title,
-            style: const TextStyle(
-              color: CoachlyAthleteTheme.textPrimary,
+            style: TextStyle(
+              color: context.exerciseTheme.textPrimary,
               fontSize: 26,
               fontWeight: FontWeight.w800,
             ),
@@ -91,8 +94,8 @@ class CoachlyInfoSheet extends StatelessWidget {
                 children: [
                   Text(
                     section.title,
-                    style: const TextStyle(
-                      color: CoachlyAthleteTheme.primary,
+                    style: TextStyle(
+                      color: context.exerciseTheme.primary,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                     ),
@@ -100,8 +103,8 @@ class CoachlyInfoSheet extends StatelessWidget {
                   const SizedBox(height: 7),
                   Text(
                     section.body,
-                    style: const TextStyle(
-                      color: CoachlyAthleteTheme.textPrimary,
+                    style: TextStyle(
+                      color: context.exerciseTheme.textPrimary,
                       fontSize: 15,
                       height: 1.5,
                     ),
@@ -117,8 +120,8 @@ class CoachlyInfoSheet extends StatelessWidget {
               child: FilledButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: FilledButton.styleFrom(
-                  backgroundColor: CoachlyAthleteTheme.primary,
-                  foregroundColor: CoachlyAthleteTheme.background,
+                  backgroundColor: context.exerciseTheme.primary,
+                  foregroundColor: context.exerciseTheme.background,
                 ),
                 child: Text(primaryActionLabel!),
               ),
@@ -136,7 +139,7 @@ class CoachlyInfoSheet extends StatelessWidget {
                       CoachlyAthleteTheme.touchTarget,
                       CoachlyAthleteTheme.touchTarget,
                     ),
-                    foregroundColor: CoachlyAthleteTheme.primary,
+                    foregroundColor: context.exerciseTheme.primary,
                   ),
                   child: Text(secondaryActionLabel!),
                 ),

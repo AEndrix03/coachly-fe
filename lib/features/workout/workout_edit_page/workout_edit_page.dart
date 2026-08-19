@@ -1,6 +1,7 @@
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_builder/providers/workout_builder_providers.dart';
 import 'package:coachly/features/workout/workout_builder/widgets/workout_builder_widgets.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
 import 'package:coachly/features/workout/workout_edit_page/widgets/exercise_picker_sheet.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
@@ -48,92 +49,95 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(editWorkoutControllerProvider(widget.workoutId));
-    return PopScope(
-      canPop: !state.isDirty,
-      onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) _close();
-      },
-      child: Scaffold(
-        backgroundColor: CoachlyAthleteTheme.background,
-        appBar: AppBar(
-          backgroundColor: CoachlyAthleteTheme.background,
-          surfaceTintColor: Colors.transparent,
-          leading: IconButton(
-            onPressed: _close,
-            tooltip: context.tr('common.cancel'),
-            icon: const Icon(Icons.close),
-          ),
-          title: Text(context.tr('workout.builder.edit_title')),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              onPressed: state.isSaving || _source == null ? null : _commit,
-              tooltip: context.tr('common.confirm'),
-              icon: state.isSaving
-                  ? const SizedBox.square(
-                      dimension: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.check),
+    return Theme(
+      data: exerciseDetailTheme(Theme.of(context)),
+      child: PopScope(
+        canPop: !state.isDirty,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _close();
+        },
+        child: Scaffold(
+          backgroundColor: context.exerciseTheme.background,
+          appBar: AppBar(
+            backgroundColor: context.exerciseTheme.background,
+            surfaceTintColor: Colors.transparent,
+            leading: IconButton(
+              onPressed: _close,
+              tooltip: context.tr('common.cancel'),
+              icon: const Icon(Icons.close),
             ),
-          ],
-        ),
-        body: _source == null
-            ? const Center(child: CircularProgressIndicator())
-            : SafeArea(
-                top: false,
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
-                  children: [
-                    InkWell(
-                      onTap: _editMetadata,
-                      borderRadius: BorderRadius.circular(
-                        CoachlyAthleteTheme.compactRadius,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: WorkoutBuilderSummary(
-                                draft: state.draft,
-                                compact: true,
+            title: Text(context.tr('workout.builder.edit_title')),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                onPressed: state.isSaving || _source == null ? null : _commit,
+                tooltip: context.tr('common.confirm'),
+                icon: state.isSaving
+                    ? const SizedBox.square(
+                        dimension: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.check),
+              ),
+            ],
+          ),
+          body: _source == null
+              ? const Center(child: CircularProgressIndicator())
+              : SafeArea(
+                  top: false,
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
+                    children: [
+                      InkWell(
+                        onTap: _editMetadata,
+                        borderRadius: BorderRadius.circular(
+                          CoachlyAthleteTheme.compactRadius,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: WorkoutBuilderSummary(
+                                  draft: state.draft,
+                                  compact: true,
+                                ),
                               ),
-                            ),
-                            const Icon(
-                              Icons.edit_outlined,
-                              color: CoachlyAthleteTheme.textSecondary,
-                            ),
-                          ],
+                              Icon(
+                                Icons.edit_outlined,
+                                color: context.exerciseTheme.textSecondary,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 26),
-                    WorkoutDraftStructure(
-                      draft: state.draft,
-                      onEditExercise: _editExercise,
-                      onReorder: (section, oldIndex, newIndex) => ref
-                          .read(
-                            editWorkoutControllerProvider(
-                              widget.workoutId,
-                            ).notifier,
-                          )
-                          .reorderInSection(section, oldIndex, newIndex),
-                      onRemove: _removeItem,
-                      onAddExercise: _addExercise,
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: CoachlyAthleteTheme.touchTarget,
-                      child: FilledButton.icon(
-                        onPressed: _showAddActions,
-                        icon: const Icon(Icons.add),
-                        label: Text(context.tr('workout.builder.add')),
+                      const SizedBox(height: 26),
+                      WorkoutDraftStructure(
+                        draft: state.draft,
+                        onEditExercise: _editExercise,
+                        onReorder: (section, oldIndex, newIndex) => ref
+                            .read(
+                              editWorkoutControllerProvider(
+                                widget.workoutId,
+                              ).notifier,
+                            )
+                            .reorderInSection(section, oldIndex, newIndex),
+                        onRemove: _removeItem,
+                        onAddExercise: _addExercise,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: CoachlyAthleteTheme.touchTarget,
+                        child: FilledButton.icon(
+                          onPressed: _showAddActions,
+                          icon: const Icon(Icons.add),
+                          label: Text(context.tr('workout.builder.add')),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
@@ -142,14 +146,14 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     final draft = ref
         .read(editWorkoutControllerProvider(widget.workoutId))
         .draft;
-    final title = TextEditingController(text: draft.title);
-    final focus = TextEditingController(text: draft.focus);
+    var title = draft.title;
+    var focus = draft.focus ?? '';
     var goal = draft.trainingGoal;
     final apply = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: CoachlyAthleteTheme.surfaceElevated,
+      backgroundColor: context.exerciseTheme.surfaceElevated,
       builder: (context) => StatefulBuilder(
         builder: (context, setSheetState) => Padding(
           padding: EdgeInsets.fromLTRB(
@@ -165,16 +169,17 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               children: [
                 Text(
                   context.tr('workout.builder.info_title'),
-                  style: const TextStyle(
-                    color: CoachlyAthleteTheme.textPrimary,
+                  style: TextStyle(
+                    color: context.exerciseTheme.textPrimary,
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextField(
-                  controller: title,
+                TextFormField(
+                  initialValue: title,
                   maxLength: 60,
+                  onChanged: (value) => setSheetState(() => title = value),
                   decoration: InputDecoration(
                     labelText: context.tr('workout.builder.title_label'),
                   ),
@@ -198,18 +203,19 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                   onChanged: (value) => setSheetState(() => goal = value),
                 ),
                 const SizedBox(height: 10),
-                TextField(
-                  controller: focus,
+                TextFormField(
+                  initialValue: focus,
                   minLines: 2,
                   maxLines: 4,
                   maxLength: 180,
+                  onChanged: (value) => focus = value,
                   decoration: InputDecoration(
                     labelText: context.tr('workout.builder.focus_label'),
                   ),
                 ),
                 const SizedBox(height: 18),
                 FilledButton(
-                  onPressed: title.text.trim().isEmpty
+                  onPressed: title.trim().isEmpty
                       ? null
                       : () => Navigator.pop(context, true),
                   child: Text(context.tr('workout.builder.apply')),
@@ -224,12 +230,10 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
           .updateMetadata(
-            title: title.text.trim(),
+            title: title.trim(),
             goal: goal,
-            focus: focus.text.trim().isEmpty ? null : focus.text.trim(),
+            focus: focus.trim().isEmpty ? null : focus.trim(),
           );
-    title.dispose();
-    focus.dispose();
   }
 
   Future<void> _addExercise(String? sectionId) async {
@@ -308,7 +312,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     final action = await showModalBottomSheet<String>(
       context: context,
       useSafeArea: true,
-      backgroundColor: CoachlyAthleteTheme.surfaceElevated,
+      backgroundColor: context.exerciseTheme.surfaceElevated,
       builder: (context) => Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -340,32 +344,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Future<void> _addSection() async {
-    final controller = TextEditingController();
-    final name = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: CoachlyAthleteTheme.surfaceElevated,
-        title: Text(context.tr('workout.builder.new_section')),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(
-            labelText: context.tr('workout.builder.custom_name'),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.tr('common.cancel')),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: Text(context.tr('workout.builder.add_section')),
-          ),
-        ],
-      ),
-    );
-    controller.dispose();
+    final name = await showWorkoutSectionNameSheet(context);
     if (name?.isNotEmpty == true)
       ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
@@ -385,7 +364,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     final ok = await showModalBottomSheet<bool>(
       context: context,
       useSafeArea: true,
-      backgroundColor: CoachlyAthleteTheme.surfaceElevated,
+      backgroundColor: context.exerciseTheme.surfaceElevated,
       builder: (context) => StatefulBuilder(
         builder: (context, update) => Padding(
           padding: const EdgeInsets.all(20),
@@ -395,8 +374,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             children: [
               Text(
                 context.tr('workout.builder.create_superset'),
-                style: const TextStyle(
-                  color: CoachlyAthleteTheme.textPrimary,
+                style: TextStyle(
+                  color: context.exerciseTheme.textPrimary,
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
                 ),
@@ -452,7 +431,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     final discard = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: CoachlyAthleteTheme.surfaceElevated,
+        backgroundColor: context.exerciseTheme.surfaceElevated,
         title: Text(context.tr('workout.detail.unsaved_title')),
         content: Text(context.tr('workout.detail.unsaved_body')),
         actions: [
@@ -464,7 +443,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               context.tr('workout.detail.discard'),
-              style: const TextStyle(color: CoachlyAthleteTheme.danger),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
         ],

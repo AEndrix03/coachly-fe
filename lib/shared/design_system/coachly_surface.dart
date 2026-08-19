@@ -1,4 +1,5 @@
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
 import 'package:flutter/material.dart';
 
 class CoachlySurface extends StatelessWidget {
@@ -19,11 +20,11 @@ class CoachlySurface extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: color ?? CoachlyAthleteTheme.surface,
+        color: color ?? context.exerciseTheme.surface,
         borderRadius:
             borderRadius ??
             BorderRadius.circular(CoachlyAthleteTheme.cardRadius),
-        border: Border.all(color: CoachlyAthleteTheme.border),
+        border: Border.all(color: context.exerciseTheme.border),
       ),
       child: Padding(padding: padding, child: child),
     );

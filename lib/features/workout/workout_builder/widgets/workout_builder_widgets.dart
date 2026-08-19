@@ -1,4 +1,5 @@
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
@@ -448,12 +449,103 @@ Future<WorkoutExerciseDraft?> showPrescriptionEditor(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: CoachlyAthleteTheme.surfaceElevated,
+    backgroundColor: context.exerciseTheme.surfaceElevated,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
     builder: (_) => _PrescriptionEditor(initial: initial, adding: adding),
   );
+}
+
+Future<String?> showWorkoutSectionNameSheet(BuildContext context) =>
+    showModalBottomSheet<String>(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: true,
+      backgroundColor: context.exerciseTheme.surfaceElevated,
+      builder: (_) => const _WorkoutSectionNameSheet(),
+    );
+
+class _WorkoutSectionNameSheet extends StatefulWidget {
+  const _WorkoutSectionNameSheet();
+
+  @override
+  State<_WorkoutSectionNameSheet> createState() =>
+      _WorkoutSectionNameSheetState();
+}
+
+class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
+  final controller = TextEditingController();
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedPadding(
+    duration: CoachlyAthleteTheme.expandDuration,
+    curve: CoachlyAthleteTheme.standardCurve,
+    padding: EdgeInsets.fromLTRB(
+      20,
+      20,
+      20,
+      20 + MediaQuery.viewInsetsOf(context).bottom,
+    ),
+    child: SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            context.tr('workout.builder.new_section'),
+            style: TextStyle(
+              color: context.exerciseTheme.textPrimary,
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: ['preparation', 'main', 'accessories', 'finisher']
+                .map(
+                  (key) => ActionChip(
+                    label: Text(context.tr('workout.builder.section_$key')),
+                    onPressed: () => Navigator.pop(
+                      context,
+                      context.tr('workout.builder.section_$key'),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: 14),
+          TextField(
+            controller: controller,
+            autofocus: true,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _submit(),
+            decoration: InputDecoration(
+              labelText: context.tr('workout.builder.custom_name'),
+            ),
+          ),
+          const SizedBox(height: 18),
+          FilledButton(
+            onPressed: _submit,
+            child: Text(context.tr('workout.builder.add_section')),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  void _submit() {
+    final value = controller.text.trim();
+    if (value.isNotEmpty) Navigator.pop(context, value);
+  }
 }
 
 class _PrescriptionEditor extends StatefulWidget {
