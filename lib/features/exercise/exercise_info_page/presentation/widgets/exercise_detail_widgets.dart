@@ -4,6 +4,8 @@ import 'dart:ui' show lerpDouble;
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -600,128 +602,33 @@ Future<void> showCoachlyInfoSheet(
   required CoachlyGuideTopic guideTopic,
   String? disclaimer,
 }) {
-  final colors = context.exerciseTheme;
-  return showModalBottomSheet<void>(
-    context: context,
-    backgroundColor: colors.surfaceElevated,
-    isScrollControlled: true,
-    useSafeArea: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-    ),
-    builder: (sheetContext) => Padding(
-      padding: EdgeInsets.fromLTRB(
-        20,
-        10,
-        20,
-        20 + MediaQuery.viewInsetsOf(sheetContext).bottom,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Container(
-                width: 42,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colors.textSecondary.withValues(alpha: 0.35),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              title,
-              style: TextStyle(
-                color: colors.textPrimary,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              description,
-              style: TextStyle(
-                color: colors.textSecondary,
-                fontSize: 15,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 22),
-            Text(
-              'Perché conta?',
-              style: TextStyle(
-                color: colors.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              whyItMatters,
-              style: TextStyle(
-                color: colors.textSecondary,
-                fontSize: 15,
-                height: 1.5,
-              ),
-            ),
-            if (disclaimer != null) ...[
-              const SizedBox(height: 18),
-              Text(
-                disclaimer,
-                style: TextStyle(
-                  color: colors.info,
-                  fontSize: 13,
-                  height: 1.45,
-                ),
-              ),
-            ],
-            const SizedBox(height: 26),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: FilledButton(
-                onPressed: () => Navigator.of(sheetContext).pop(),
-                style: FilledButton.styleFrom(
-                  backgroundColor: colors.primary,
-                  foregroundColor: colors.background,
-                ),
-                child: const Text('Ho capito'),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Center(
-              child: TextButton(
-                onPressed: () {
-                  final navigator = Navigator.of(context);
-                  final reduceMotion = MediaQuery.disableAnimationsOf(context);
-                  HapticFeedback.lightImpact();
-                  Navigator.of(sheetContext).pop();
-                  final route = reduceMotion
-                      ? PageRouteBuilder<void>(
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
-                          pageBuilder: (_, _, _) =>
-                              CoachlyConceptGuidePage(topic: guideTopic),
-                        )
-                      : CupertinoPageRoute<void>(
-                          builder: (_) =>
-                              CoachlyConceptGuidePage(topic: guideTopic),
-                        );
-                  navigator.push<void>(route);
-                },
-                child: Text(
-                  'Approfondisci  →',
-                  style: TextStyle(color: colors.primary),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
+  return CoachlyInfoSheet.show(
+    context,
+    title: title,
+    sections: [
+      CoachlyInfoSection(context.tr('workout.detail.what_is_it'), description),
+      CoachlyInfoSection(context.tr('common.why_it_matters'), whyItMatters),
+      if (disclaimer != null)
+        CoachlyInfoSection(context.tr('common.app_name'), disclaimer),
+    ],
+    primaryActionLabel: context.tr('common.got_it'),
+    secondaryActionLabel: context.tr('common.learn_more'),
+    onSecondaryAction: () {
+      final navigator = Navigator.of(context);
+      final reduceMotion = MediaQuery.disableAnimationsOf(context);
+      HapticFeedback.lightImpact();
+      final route = reduceMotion
+          ? PageRouteBuilder<void>(
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+              pageBuilder: (_, _, _) =>
+                  CoachlyConceptGuidePage(topic: guideTopic),
+            )
+          : CupertinoPageRoute<void>(
+              builder: (_) => CoachlyConceptGuidePage(topic: guideTopic),
+            );
+      navigator.push<void>(route);
+    },
   );
 }
 

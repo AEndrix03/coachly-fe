@@ -13,6 +13,10 @@ abstract final class CoachlyAthleteTheme {
   static const pagePadding = EdgeInsets.symmetric(horizontal: 20);
   static const sectionGap = 28.0;
   static const cardRadius = 18.0;
+  static const compactRadius = 10.0;
+  static const actionRadius = 16.0;
+  static const touchTarget = 48.0;
+  static const cardPadding = 16.0;
 
   static const expandDuration = Duration(milliseconds: 200);
   static const pageDuration = Duration(milliseconds: 280);

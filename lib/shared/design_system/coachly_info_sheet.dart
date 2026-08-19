@@ -11,17 +11,26 @@ class CoachlyInfoSection {
 class CoachlyInfoSheet extends StatelessWidget {
   final String title;
   final List<CoachlyInfoSection> sections;
+  final String? primaryActionLabel;
+  final String? secondaryActionLabel;
+  final VoidCallback? onSecondaryAction;
 
   const CoachlyInfoSheet({
     super.key,
     required this.title,
     required this.sections,
+    this.primaryActionLabel,
+    this.secondaryActionLabel,
+    this.onSecondaryAction,
   });
 
   static Future<void> show(
     BuildContext context, {
     required String title,
     required List<CoachlyInfoSection> sections,
+    String? primaryActionLabel,
+    String? secondaryActionLabel,
+    VoidCallback? onSecondaryAction,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -31,7 +40,13 @@ class CoachlyInfoSheet extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => CoachlyInfoSheet(title: title, sections: sections),
+      builder: (_) => CoachlyInfoSheet(
+        title: title,
+        sections: sections,
+        primaryActionLabel: primaryActionLabel,
+        secondaryActionLabel: secondaryActionLabel,
+        onSecondaryAction: onSecondaryAction,
+      ),
     );
   }
 
@@ -95,6 +110,39 @@ class CoachlyInfoSheet extends StatelessWidget {
               ),
             ),
           ),
+          if (primaryActionLabel != null) ...[
+            SizedBox(
+              width: double.infinity,
+              height: CoachlyAthleteTheme.touchTarget,
+              child: FilledButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: FilledButton.styleFrom(
+                  backgroundColor: CoachlyAthleteTheme.primary,
+                  foregroundColor: CoachlyAthleteTheme.background,
+                ),
+                child: Text(primaryActionLabel!),
+              ),
+            ),
+            if (secondaryActionLabel != null) ...[
+              const SizedBox(height: 4),
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    onSecondaryAction?.call();
+                  },
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(
+                      CoachlyAthleteTheme.touchTarget,
+                      CoachlyAthleteTheme.touchTarget,
+                    ),
+                    foregroundColor: CoachlyAthleteTheme.primary,
+                  ),
+                  child: Text(secondaryActionLabel!),
+                ),
+              ),
+            ],
+          ],
         ],
       ),
     );

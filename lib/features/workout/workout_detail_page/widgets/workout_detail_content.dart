@@ -14,6 +14,13 @@ class WorkoutIdentity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final metadata = <String>[
+      if (workout.focus case final focus?) focus,
+      _exerciseCountLabel(context, workout.exerciseCount),
+      _setCountLabel(context, workout.workingSets),
+      if (workout.estimatedDuration case final duration?)
+        _durationLabel(context, duration),
+    ];
     return Padding(
       padding: CoachlyAthleteTheme.pagePadding,
       child: Column(
@@ -29,17 +36,28 @@ class WorkoutIdentity extends StatelessWidget {
               letterSpacing: -.7,
             ),
           ),
-          if (workout.focus != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              workout.focus!,
-              style: const TextStyle(
-                color: CoachlyAthleteTheme.textSecondary,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+          const SizedBox(height: 9),
+          Wrap(
+            spacing: 6,
+            runSpacing: 4,
+            children: [
+              for (var index = 0; index < metadata.length; index++) ...[
+                if (index > 0)
+                  const Text(
+                    '·',
+                    style: TextStyle(color: CoachlyAthleteTheme.textSecondary),
+                  ),
+                Text(
+                  metadata[index],
+                  style: const TextStyle(
+                    color: CoachlyAthleteTheme.textSecondary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ],
+          ),
           if (workout.syncPending) ...[
             const SizedBox(height: 10),
             Row(
@@ -65,92 +83,6 @@ class WorkoutIdentity extends StatelessWidget {
       ),
     );
   }
-}
-
-class WorkoutSummaryStrip extends StatelessWidget {
-  final WorkoutDetailViewData workout;
-
-  const WorkoutSummaryStrip({super.key, required this.workout});
-
-  @override
-  Widget build(BuildContext context) {
-    final duration = workout.estimatedDuration;
-    final minutes = duration == null
-        ? '—'
-        : '~${(duration.inSeconds / 60).ceil()} min';
-    return Padding(
-      padding: CoachlyAthleteTheme.pagePadding,
-      child: CoachlySurface(
-        child: Row(
-          children: [
-            _SummaryMetric(
-              value: '${workout.exerciseCount}',
-              label: context.tr('workout.detail.exercises'),
-            ),
-            const _SummaryDivider(),
-            _SummaryMetric(
-              value: '${workout.workingSets}',
-              label: context.tr('workout.detail.working_sets'),
-            ),
-            const _SummaryDivider(),
-            _SummaryMetric(
-              value: minutes,
-              label: context.tr('workout.duration'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SummaryMetric extends StatelessWidget {
-  final String value;
-  final String label;
-
-  const _SummaryMetric({required this.value, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            value,
-            maxLines: 1,
-            style: const TextStyle(
-              color: CoachlyAthleteTheme.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            style: const TextStyle(
-              color: CoachlyAthleteTheme.textSecondary,
-              fontSize: 11,
-              height: 1.15,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryDivider extends StatelessWidget {
-  const _SummaryDivider();
-
-  @override
-  Widget build(BuildContext context) => Container(
-    width: 1,
-    height: 42,
-    margin: const EdgeInsets.symmetric(horizontal: 8),
-    color: CoachlyAthleteTheme.border,
-  );
 }
 
 class WorkoutGoalSection extends StatefulWidget {
@@ -259,14 +191,29 @@ class WorkoutStructure extends StatelessWidget {
         yield Padding(
           key: ValueKey(section.id),
           padding: const EdgeInsets.only(top: 18, bottom: 4),
-          child: Text(
-            '${section.title!.toUpperCase()} · ${section.exerciseCount} ${context.tr('workout.detail.exercises').toLowerCase()}',
-            style: const TextStyle(
-              color: CoachlyAthleteTheme.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: .75,
-            ),
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            spacing: 12,
+            runSpacing: 4,
+            children: [
+              Text(
+                section.title!.toUpperCase(),
+                style: const TextStyle(
+                  color: CoachlyAthleteTheme.textSecondary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: .75,
+                ),
+              ),
+              Text(
+                _exerciseCountLabel(context, section.exerciseCount),
+                style: const TextStyle(
+                  color: CoachlyAthleteTheme.textSecondary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         );
       }
@@ -348,96 +295,90 @@ class _EmptyWorkout extends StatelessWidget {
   }
 }
 
-class WorkoutProgrammingDetails extends StatelessWidget {
+/// Derived summaries are deliberately computed from the resolved exercises;
+/// they are not persisted on the workout or included in sync payloads.
+class WorkoutOverview extends StatelessWidget {
   final WorkoutDetailViewData workout;
 
-  const WorkoutProgrammingDetails({super.key, required this.workout});
+  const WorkoutOverview({super.key, required this.workout});
 
   @override
   Widget build(BuildContext context) {
-    if (workout.workingSets == 0) return const SizedBox.shrink();
-    final ranges = <String, int>{};
-    for (final exercise in _exercises(workout)) {
-      for (final block in exercise.prescription.blocks.where(
-        (block) => block.isWorking,
-      )) {
-        final label = block.repsMin == null
-            ? 'AMRAP'
-            : block.repsMax != null && block.repsMax != block.repsMin
-            ? '${block.repsMin}–${block.repsMax}'
-            : '${block.repsMin}';
-        ranges.update(
-          label,
-          (value) => value + block.sets,
-          ifAbsent: () => block.sets,
-        );
-      }
-    }
+    final muscles = workout.muscleSummary;
+    final equipment = workout.equipmentSummary;
+    if (muscles.isEmpty && equipment.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: CoachlyAthleteTheme.pagePadding,
-      child: CoachlySurface(
-        padding: EdgeInsets.zero,
-        child: Theme(
-          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            iconColor: CoachlyAthleteTheme.primary,
-            collapsedIconColor: CoachlyAthleteTheme.textSecondary,
-            tilePadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CoachlySectionHeader(title: context.tr('workout.detail.overview')),
+          if (muscles.isNotEmpty)
+            _OverviewItem(
+              icon: Icons.accessibility_new_rounded,
+              title: context.tr('workout.detail.muscle_focus'),
+              values: muscles,
             ),
-            childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            title: Text(
-              context.tr('workout.detail.programming_details'),
-              style: const TextStyle(
-                color: CoachlyAthleteTheme.textPrimary,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
+          if (muscles.isNotEmpty && equipment.isNotEmpty)
+            const SizedBox(height: 10),
+          if (equipment.isNotEmpty)
+            _OverviewItem(
+              icon: Icons.fitness_center_rounded,
+              title: context.tr('workout.detail.equipment'),
+              values: equipment,
             ),
-            children: [
-              _DetailRow(
-                label: context.tr('workout.detail.working_sets'),
-                value: '${workout.workingSets}',
-              ),
-              ...ranges.entries.map(
-                (entry) => _DetailRow(
-                  label:
-                      '${context.tr('workout.detail.rep_range')} ${entry.key}',
-                  value:
-                      '${entry.value} ${context.tr('workout.sets').toLowerCase()}',
-                ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }
 }
 
-class _DetailRow extends StatelessWidget {
-  final String label;
-  final String value;
+class _OverviewItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final List<String> values;
 
-  const _DetailRow({required this.label, required this.value});
+  const _OverviewItem({
+    required this.icon,
+    required this.title,
+    required this.values,
+  });
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 10),
+  Widget build(BuildContext context) => CoachlySurface(
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Icon(icon, color: CoachlyAthleteTheme.primary, size: 20),
+        const SizedBox(width: 12),
         Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(color: CoachlyAthleteTheme.textSecondary),
-          ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            color: CoachlyAthleteTheme.textPrimary,
-            fontWeight: FontWeight.w700,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: CoachlyAthleteTheme.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 7),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: values
+                    .map(
+                      (value) => Text(
+                        value,
+                        style: const TextStyle(
+                          color: CoachlyAthleteTheme.textSecondary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
           ),
         ),
       ],
@@ -492,6 +433,7 @@ class WorkoutConceptsSection extends StatelessWidget {
     CoachlyInfoSheet.show(
       context,
       title: label,
+      primaryActionLabel: context.tr('common.got_it'),
       sections: [
         CoachlyInfoSection(
           context.tr('workout.detail.what_is_it'),
@@ -506,19 +448,6 @@ class WorkoutConceptsSection extends StatelessWidget {
   }
 }
 
-Iterable<WorkoutExerciseViewData> _exercises(
-  WorkoutDetailViewData workout,
-) sync* {
-  for (final block in workout.sections.expand((section) => section.blocks)) {
-    switch (block) {
-      case WorkoutExerciseBlockViewData():
-        yield block.exercise;
-      case WorkoutGroupBlockViewData():
-        yield* block.exercises;
-    }
-  }
-}
-
 String _conceptLabel(WorkoutConcept concept) => switch (concept) {
   WorkoutConcept.rir => 'RIR',
   WorkoutConcept.rpe => 'RPE',
@@ -529,3 +458,22 @@ String _conceptLabel(WorkoutConcept concept) => switch (concept) {
   WorkoutConcept.backoff => 'Back-off',
   WorkoutConcept.amrap => 'AMRAP',
 };
+
+String _exerciseCountLabel(BuildContext context, int count) => context.tr(
+  count == 1
+      ? 'workout.detail.exercise_count_one'
+      : 'workout.detail.exercise_count_other',
+  params: {'count': '$count'},
+);
+
+String _setCountLabel(BuildContext context, int count) => context.tr(
+  count == 1
+      ? 'workout.detail.set_count_one'
+      : 'workout.detail.set_count_other',
+  params: {'count': '$count'},
+);
+
+String _durationLabel(BuildContext context, Duration duration) => context.tr(
+  'workout.detail.estimated_minutes',
+  params: {'count': '${(duration.inSeconds / 60).ceil()}'},
+);

@@ -18,6 +18,7 @@ import '../features/exercise/personal_exercises_page/personal_exercises_page.dar
 import '../features/home/home.dart';
 import '../features/profile/profile_page.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
+import '../features/workout/workout_builder/create_workout_flow.dart';
 import '../features/workout/add_exercise_page/add_exercise_page.dart';
 import '../features/workout/workout_detail_page/workout_detail_page.dart';
 import '../features/workout/workout_edit_page/workout_edit_page.dart';
@@ -155,10 +156,7 @@ GoRouter router(Ref ref) {
                           if (state.pathParameters['id'] == 'new') {
                             return _fadeTransition(
                               state,
-                              WorkoutDetailPage(
-                                workout: _newWorkout(),
-                                initiallyEditing: true,
-                              ),
+                              const CreateWorkoutFlow(),
                             );
                           }
                           final workout = state.extra as WorkoutModel?;
@@ -184,7 +182,10 @@ GoRouter router(Ref ref) {
                         path: 'workout_exercise_page/:exerciseId',
                         pageBuilder: (context, state) => _athleteTransition(
                           state,
-                          ExercisePage(id: state.pathParameters['exerciseId']!),
+                          ExercisePage(
+                            id: state.pathParameters['exerciseId']!,
+                            showAddButton: false,
+                          ),
                         ),
                       ),
                     ],
@@ -213,15 +214,6 @@ GoRouter router(Ref ref) {
     ],
   );
 }
-
-WorkoutModel _newWorkout() => WorkoutModel(
-  id: 'new',
-  titleI18n: const {'it': 'Nuova scheda', 'en': 'New workout'},
-  descriptionI18n: null,
-  goal: 'Generale',
-  lastUsed: DateTime.now(),
-  type: 'Generale',
-);
 
 CustomTransitionPage<void> _fadeTransition(GoRouterState state, Widget child) {
   return CustomTransitionPage<void>(

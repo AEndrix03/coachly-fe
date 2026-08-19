@@ -48,4 +48,4 @@ final class ExerciseListProvider
   }
 }
 
-String _$exerciseListHash() => r'69ca6edff4bc45d9bec3fe0d90bc83ec961c9bb6';
+String _$exerciseListHash() => r'69f4266cabe569e2c9240d877de6d41b02b8f224';

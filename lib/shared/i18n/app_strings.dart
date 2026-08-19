@@ -34,6 +34,9 @@ class AppStrings {
     'common.days': {'en': 'days', 'it': 'giorni'},
     'common.na': {'en': 'N/A', 'it': 'N/D'},
     'common.seconds': {'en': 'seconds', 'it': 'secondi'},
+    'common.got_it': {'en': 'Got it', 'it': 'Ho capito'},
+    'common.why_it_matters': {'en': 'Why it matters', 'it': 'Perché conta?'},
+    'common.learn_more': {'en': 'Learn more →', 'it': 'Approfondisci →'},
 
     'nav.community': {'en': 'Community', 'it': 'Community'},
     'nav.workouts': {'en': 'Workouts', 'it': 'Allenamenti'},
@@ -119,6 +122,179 @@ class AppStrings {
     'workout.focus': {'en': 'Focus', 'it': 'Focus'},
     'workout.type': {'en': 'Type', 'it': 'Tipo'},
     'workout.hypertrophy': {'en': 'Hypertrophy', 'it': 'Ipertrofia'},
+    'workout.builder.create_title': {
+      'en': 'Create workout',
+      'it': 'Crea una scheda',
+    },
+    'workout.builder.edit_title': {
+      'en': 'Edit workout',
+      'it': 'Modifica scheda',
+    },
+    'workout.builder.structure_title': {
+      'en': 'Build the structure',
+      'it': 'Costruisci la struttura',
+    },
+    'workout.builder.review_title': {
+      'en': 'Review workout',
+      'it': 'Rivedi la scheda',
+    },
+    'workout.builder.identity_heading': {
+      'en': 'Let’s build\nyour workout.',
+      'it': 'Iniziamo a creare\nla tua scheda.',
+    },
+    'workout.builder.title_label': {
+      'en': 'Workout title',
+      'it': 'Titolo della scheda',
+    },
+    'workout.builder.title_hint': {
+      'en': 'Back & Chest',
+      'it': 'Schiena & Petto',
+    },
+    'workout.builder.goal_label': {
+      'en': 'Session goal',
+      'it': 'Obiettivo della sessione',
+    },
+    'workout.builder.focus_label': {
+      'en': 'Focus (optional)',
+      'it': 'Focus (opzionale)',
+    },
+    'workout.builder.focus_hint': {
+      'en': 'What should this session emphasize?',
+      'it': 'Dorso e petto con enfasi…',
+    },
+    'workout.builder.goal_hypertrophy': {
+      'en': 'Hypertrophy',
+      'it': 'Ipertrofia',
+    },
+    'workout.builder.goal_strength': {'en': 'Strength', 'it': 'Forza'},
+    'workout.builder.goal_general': {'en': 'General', 'it': 'Generale'},
+    'workout.builder.goal_info_title': {
+      'en': 'Session context',
+      'it': 'Contesto della sessione',
+    },
+    'workout.builder.goal_info_body': {
+      'en':
+          'The goal describes the session’s main type of work and helps Coachly present the workout in context.',
+      'it':
+          'L’obiettivo descrive il tipo principale di lavoro previsto nella sessione e aiuta Coachly a presentare il contesto della scheda.',
+    },
+    'workout.builder.continue_action': {'en': 'Continue →', 'it': 'Continua →'},
+    'workout.builder.review_action': {
+      'en': 'Review workout',
+      'it': 'Rivedi la scheda',
+    },
+    'workout.builder.create_action': {
+      'en': 'Create workout',
+      'it': 'Crea scheda',
+    },
+    'workout.builder.untitled': {
+      'en': 'Untitled workout',
+      'it': 'Scheda senza titolo',
+    },
+    'workout.builder.empty': {
+      'en': 'Add your first exercise to start building the workout.',
+      'it': 'Aggiungi il primo esercizio per iniziare a costruire la scheda.',
+    },
+    'workout.builder.add_first_exercise': {
+      'en': 'Add first exercise',
+      'it': 'Aggiungi il primo esercizio',
+    },
+    'workout.builder.add': {'en': 'Add', 'it': 'Aggiungi'},
+    'workout.builder.exercise': {'en': 'Exercise', 'it': 'Esercizio'},
+    'workout.builder.section': {'en': 'Section', 'it': 'Sezione'},
+    'workout.builder.block': {'en': 'Block', 'it': 'Blocco'},
+    'workout.builder.section_empty': {
+      'en': 'Add an exercise or block',
+      'it': 'Aggiungi un esercizio o un blocco',
+    },
+    'workout.builder.position': {
+      'en': 'position {position}',
+      'it': 'posizione {position}',
+    },
+    'workout.builder.programming': {
+      'en': 'Programming',
+      'it': 'Programmazione',
+    },
+    'workout.builder.reps_min': {
+      'en': 'Minimum reps',
+      'it': 'Ripetizioni minime',
+    },
+    'workout.builder.reps_max': {
+      'en': 'Maximum reps',
+      'it': 'Ripetizioni massime',
+    },
+    'workout.builder.decrease': {
+      'en': 'Decrease {label}',
+      'it': 'Diminuisci {label}',
+    },
+    'workout.builder.increase': {
+      'en': 'Increase {label}',
+      'it': 'Aumenta {label}',
+    },
+    'workout.builder.add_exercise': {
+      'en': 'Add exercise',
+      'it': 'Aggiungi esercizio',
+    },
+    'workout.builder.save_changes': {
+      'en': 'Save changes',
+      'it': 'Salva modifiche',
+    },
+    'workout.builder.new_section': {'en': 'New section', 'it': 'Nuova sezione'},
+    'workout.builder.section_preparation': {
+      'en': 'Preparation',
+      'it': 'Preparazione',
+    },
+    'workout.builder.section_main': {'en': 'Main', 'it': 'Principali'},
+    'workout.builder.section_accessories': {
+      'en': 'Accessories',
+      'it': 'Accessori',
+    },
+    'workout.builder.section_finisher': {'en': 'Finisher', 'it': 'Finisher'},
+    'workout.builder.custom_name': {
+      'en': 'Custom name',
+      'it': 'Nome personalizzato',
+    },
+    'workout.builder.add_section': {
+      'en': 'Add section',
+      'it': 'Aggiungi sezione',
+    },
+    'workout.builder.create_superset': {
+      'en': 'Create a superset',
+      'it': 'Crea un superset',
+    },
+    'workout.builder.add_superset': {
+      'en': 'Add superset',
+      'it': 'Aggiungi superset',
+    },
+    'workout.builder.learn_structure': {
+      'en': 'Learn about structure',
+      'it': 'Impara la struttura',
+    },
+    'workout.builder.organize_title': {
+      'en': 'Organize the workout',
+      'it': 'Organizzare la scheda',
+    },
+    'workout.builder.section_info': {
+      'en':
+          'A section groups exercises to improve readability and does not change how they are performed.',
+      'it':
+          'Una sezione raggruppa gli esercizi per rendere la scheda più leggibile e non cambia il modo in cui vengono eseguiti.',
+    },
+    'workout.builder.block_info': {
+      'en':
+          'A block, such as a superset or circuit, connects exercises and changes their order and recovery.',
+      'it':
+          'Un blocco, come un superset o un circuito, collega più esercizi e influenza l’ordine e i recuperi durante l’allenamento.',
+    },
+    'workout.builder.info_title': {
+      'en': 'Workout information',
+      'it': 'Informazioni scheda',
+    },
+    'workout.builder.apply': {'en': 'Apply', 'it': 'Applica'},
+    'workout.builder.item_removed': {
+      'en': 'Item removed',
+      'it': 'Elemento rimosso',
+    },
     'workout.share': {'en': 'Share', 'it': 'Condividi'},
     'workout.share_soon': {
       'en': 'Workout sharing coming soon',
@@ -145,9 +321,49 @@ class AppStrings {
     'workout.completed': {'en': 'Completed', 'it': 'Completate'},
 
     'workout.detail.exercises': {'en': 'Exercises', 'it': 'Esercizi'},
+    'workout.detail.exercise_count_one': {
+      'en': '{count} exercise',
+      'it': '{count} esercizio',
+    },
+    'workout.detail.exercise_count_other': {
+      'en': '{count} exercises',
+      'it': '{count} esercizi',
+    },
+    'workout.detail.set_count_one': {
+      'en': '{count} working set',
+      'it': '{count} serie allenante',
+    },
+    'workout.detail.set_count_other': {
+      'en': '{count} working sets',
+      'it': '{count} serie allenanti',
+    },
+    'workout.detail.estimated_minutes': {
+      'en': '~{count} min',
+      'it': '~{count} min',
+    },
+    'workout.detail.overview': {'en': 'Overview', 'it': 'Panoramica'},
+    'workout.detail.muscle_focus': {
+      'en': 'Muscle focus',
+      'it': 'Focus muscolare',
+    },
+    'workout.detail.equipment': {'en': 'Equipment', 'it': 'Attrezzatura'},
     'workout.detail.working_sets': {
       'en': 'Working sets',
       'it': 'Serie allenanti',
+    },
+    'workout.detail.working_sets_definition': {
+      'en':
+          'The prescribed sets that count as the main training work for this exercise.',
+      'it':
+          'Le serie prescritte che costituiscono il lavoro allenante principale dell’esercizio.',
+    },
+    'workout.detail.rep_range_definition': {
+      'en': 'The target number of repetitions for each working set.',
+      'it': 'Il numero di ripetizioni da raggiungere in ogni serie allenante.',
+    },
+    'workout.detail.recovery_definition': {
+      'en': 'The suggested rest before the next working set.',
+      'it': 'Il recupero suggerito prima della serie allenante successiva.',
     },
     'workout.detail.goal': {'en': 'Goal', 'it': 'Obiettivo'},
     'workout.detail.show_more': {'en': 'Show more', 'it': 'Mostra altro'},
@@ -167,12 +383,55 @@ class AppStrings {
       'en': 'Exercise unavailable',
       'it': 'Esercizio non disponibile',
     },
+    'workout.detail.exercise_fallback': {'en': 'Exercise', 'it': 'Esercizio'},
+    'workout.detail.exercise_loading': {
+      'en': 'Loading exercise',
+      'it': 'Caricamento esercizio',
+    },
+    'workout.detail.open_exercise_semantics': {
+      'en': 'Open details for {name}',
+      'it': 'Apri il dettaglio di {name}',
+    },
+    'workout.detail.exercise_semantics_position': {
+      'en': 'Exercise {position}',
+      'it': 'Esercizio {position}',
+    },
+    'workout.detail.expand_details': {
+      'en': 'Expand details',
+      'it': 'Espandi dettagli',
+    },
+    'workout.detail.collapse_details': {
+      'en': 'Collapse details',
+      'it': 'Comprimi dettagli',
+    },
     'workout.detail.superset': {'en': 'SUPERSET', 'it': 'SUPERSET'},
+    'workout.detail.triset': {'en': 'TRISET', 'it': 'TRISET'},
+    'workout.detail.giant_set': {'en': 'GIANT SET', 'it': 'GIANT SET'},
     'workout.detail.circuit': {'en': 'CIRCUIT', 'it': 'CIRCUITO'},
     'workout.detail.rounds': {'en': 'rounds', 'it': 'round'},
+    'workout.detail.round_count_one': {
+      'en': '{count} round',
+      'it': '{count} giro',
+    },
+    'workout.detail.round_count_other': {
+      'en': '{count} rounds',
+      'it': '{count} giri',
+    },
     'workout.detail.rest_after_round': {
       'en': 'Rest after round',
       'it': 'Recupero dopo il round',
+    },
+    'workout.detail.rest_between_exercises': {
+      'en': 'Rest between exercises',
+      'it': 'Recupero tra esercizi',
+    },
+    'workout.detail.expand_group': {
+      'en': 'Expand group',
+      'it': 'Espandi blocco',
+    },
+    'workout.detail.collapse_group': {
+      'en': 'Collapse group',
+      'it': 'Comprimi blocco',
     },
     'workout.detail.explain_concept': {
       'en': 'Explain this concept',
@@ -186,6 +445,14 @@ class AppStrings {
     'workout.detail.superset_definition': {
       'en': 'Two or more exercises performed in sequence before resting.',
       'it': 'Due o più esercizi eseguiti in sequenza prima del recupero.',
+    },
+    'workout.detail.triset_definition': {
+      'en': 'Three exercises performed in sequence before resting.',
+      'it': 'Tre esercizi eseguiti in sequenza prima del recupero.',
+    },
+    'workout.detail.giant_set_definition': {
+      'en': 'A longer sequence of exercises performed before resting.',
+      'it': 'Una sequenza più lunga di esercizi eseguiti prima del recupero.',
     },
     'workout.detail.circuit_definition': {
       'en': 'A sequence of exercises repeated for the prescribed rounds.',

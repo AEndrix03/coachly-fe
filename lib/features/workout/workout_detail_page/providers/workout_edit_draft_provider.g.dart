@@ -58,7 +58,7 @@ final class WorkoutEditDraftProvider
   }
 }
 
-String _$workoutEditDraftHash() => r'ee90e067a4d22f2616e842dc677c1a9386d68080';
+String _$workoutEditDraftHash() => r'ef8f7c07541d8ed1e4325fbbe36d08a5eb458b5d';
 
 final class WorkoutEditDraftFamily extends $Family
     with
@@ -174,7 +174,7 @@ final class LastExercisePrescriptionProvider
 }
 
 String _$lastExercisePrescriptionHash() =>
-    r'1dda35b105bd404543151280b53cc201e3ec520e';
+    r'9f92d4076b30ccee7ef93ca6e3f396048b451997';
 
 final class LastExercisePrescriptionFamily extends $Family
     with $FunctionalFamilyOverride<WorkoutProgrammingEntryModel?, String> {

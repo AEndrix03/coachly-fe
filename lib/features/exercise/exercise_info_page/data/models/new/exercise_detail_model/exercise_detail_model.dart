@@ -52,7 +52,6 @@ abstract class ExerciseDetailModel with _$ExerciseDetailModel {
       'variants',
       'media',
       'categories',
-      'safety',
       'muscles',
       'equipments',
       'tags',

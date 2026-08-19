@@ -66,11 +66,13 @@ extension on ExerciseQuickNavItem {
 class ExercisePage extends ConsumerWidget {
   final String id;
   final bool isVariantDetail;
+  final bool showAddButton;
 
   const ExercisePage({
     super.key,
     required this.id,
     this.isVariantDetail = false,
+    this.showAddButton = true,
   });
 
   @override
@@ -79,12 +81,15 @@ class ExercisePage extends ConsumerWidget {
     return Theme(
       data: exerciseDetailTheme(Theme.of(context)),
       child: asyncData.when(
+        skipLoadingOnReload: false,
+        skipLoadingOnRefresh: false,
         loading: () => const ExerciseLoadingView(),
         error: (_, _) => ExerciseErrorView(
           onRetry: () => ref.invalidate(exerciseDetailViewProvider(id)),
         ),
         data: (data) => ExerciseOverviewContent(
           data: data,
+          showAddButton: showAddButton,
           onAdd: () => Navigator.of(context).pop(
             ExerciseDetailModel(
               id: data.id,
@@ -101,11 +106,13 @@ class ExercisePage extends ConsumerWidget {
 class ExerciseOverviewContent extends StatefulWidget {
   final ExerciseDetailViewData data;
   final VoidCallback onAdd;
+  final bool showAddButton;
 
   const ExerciseOverviewContent({
     super.key,
     required this.data,
     required this.onAdd,
+    this.showAddButton = true,
   });
 
   @override
@@ -262,7 +269,9 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
     final colors = context.exerciseTheme;
     return Scaffold(
       backgroundColor: colors.background,
-      bottomNavigationBar: ExerciseAddAction(onTap: widget.onAdd),
+      bottomNavigationBar: widget.showAddButton
+          ? ExerciseAddAction(onTap: widget.onAdd)
+          : null,
       body: Stack(
         key: _stackKey,
         children: [

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
@@ -47,7 +48,7 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
   @override
   Widget build(BuildContext context) {
     final locale = ref.watch(languageProvider);
-    final catalog = ref.watch(exerciseListProvider());
+    final catalog = ref.watch(exerciseListProvider);
     return Scaffold(
       backgroundColor: CoachlyAthleteTheme.background,
       appBar: AppBar(
@@ -67,13 +68,16 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
         error: (_, _) =>
             _CatalogError(onRetry: () => ref.invalidate(exerciseListProvider)),
         data: (allExercises) {
-          final results = _filter(allExercises, locale);
+          final exercises = allExercises.map(_toDetailModel).toList(
+            growable: false,
+          );
+          final results = _filter(exercises, locale);
           final initial = _query.isEmpty && !_hasFilters;
-          final displayed = initial ? _recent(allExercises) : results;
+          final displayed = initial ? _recent(exercises) : results;
           return CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
-                child: _searchAndFilters(context, allExercises, locale),
+                child: _searchAndFilters(context, exercises, locale),
               ),
               SliverToBoxAdapter(
                 child: Padding(
@@ -282,6 +286,22 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
       _equipmentId != null ||
       _movement != null ||
       _bodyweight != null;
+
+  ExerciseDetailModel _toDetailModel(ExerciseModel exercise) {
+    return ExerciseDetailModel(
+      id: exercise.id,
+      createdBy: exercise.createdBy,
+      isPersonal: exercise.isPersonal,
+      nameI18n: exercise.nameI18n,
+      descriptionI18n: exercise.descriptionI18n,
+      tipsI18n: exercise.tipsI18n,
+      difficultyLevel: exercise.difficultyLevel,
+      mechanicsType: exercise.mechanicsType,
+      forceType: exercise.forceType,
+      isUnilateral: exercise.isUnilateral,
+      isBodyweight: exercise.isBodyweight,
+    );
+  }
 
   List<ExerciseDetailModel> _filter(
     List<ExerciseDetailModel> all,

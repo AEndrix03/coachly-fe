@@ -2,8 +2,11 @@ import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
+import 'package:coachly/features/workout/workout_detail_page/providers/workout_detail_view_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_content.dart';
+import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_app_bar.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_structural_edit.dart';
+import 'package:coachly/features/workout/workout_detail_page/widgets/workout_start_button.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
@@ -29,11 +32,13 @@ class WorkoutDetailPage extends ConsumerStatefulWidget {
 
 class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
   final ScrollController _scrollController = ScrollController();
+  final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
   bool _editing = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_handleScroll);
     _editing = widget.initiallyEditing;
     if (_editing) {
       ref
@@ -44,8 +49,17 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _scrollController
+      ..removeListener(_handleScroll)
+      ..dispose();
+    _scrollOffset.dispose();
     super.dispose();
+  }
+
+  void _handleScroll() {
+    _scrollOffset.value = _scrollController.hasClients
+        ? _scrollController.offset
+        : 0;
   }
 
   @override
@@ -85,11 +99,15 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
         error: (_, _) {},
       );
     }
-    final viewData = WorkoutDetailAdapter.fromWorkout(
-      presented,
-      locale,
-      resolvedExerciseNames,
-      resolvingExerciseIds,
+    final viewData = ref.watch(
+      workoutDetailViewDataProvider(
+        WorkoutDetailViewRequest(
+          workout: presented,
+          locale: locale,
+          resolvedExerciseNames: resolvedExerciseNames,
+          resolvingExerciseIds: resolvingExerciseIds,
+        ),
+      ),
     );
 
     return PopScope(
@@ -108,12 +126,13 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
-              _WorkoutSliverHeader(
+              WorkoutDetailAppBar(
                 title: _editing
                     ? context.tr('workout.detail.edit_session')
                     : viewData.title,
                 editing: _editing,
                 saving: draft.isSaving,
+                scrollOffset: _scrollOffset,
                 onBack: _handleBack,
                 onEdit: () => _enterEdit(resolved),
                 onDone: _saveAndFinish,
@@ -129,10 +148,6 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
                 ),
               ] else ...[
                 SliverToBoxAdapter(child: WorkoutIdentity(workout: viewData)),
-                const SliverToBoxAdapter(child: SizedBox(height: 22)),
-                SliverToBoxAdapter(
-                  child: WorkoutSummaryStrip(workout: viewData),
-                ),
                 if (viewData.goal != null) ...[
                   const SliverToBoxAdapter(child: SizedBox(height: 24)),
                   SliverToBoxAdapter(
@@ -141,22 +156,27 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
                 ],
                 const SliverToBoxAdapter(child: SizedBox(height: 22)),
                 SliverToBoxAdapter(
-                  child: _StartButton(workout: resolved, viewData: viewData),
+                  child: WorkoutStartButton(
+                    enabled: viewData.exerciseCount > 0,
+                    onPressed: () => context.go(
+                      '/workouts/workout/${resolved.id}/active',
+                      extra: resolved,
+                    ),
+                  ),
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: 30)),
                 SliverToBoxAdapter(
                   child: WorkoutStructure(
                     workout: viewData,
                     onEdit: () => _enterEdit(resolved),
-                    onOpenExercise: (exercise) =>
-                        context.push('/exercises/${exercise.exerciseId}'),
+                    onOpenExercise: (exercise) => context.push(
+                      '/workouts/workout/${resolved.id}/workout_exercise_page/${exercise.exerciseId}',
+                    ),
                     onAddExercise: () => _enterEdit(resolved),
                   ),
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: 28)),
-                SliverToBoxAdapter(
-                  child: WorkoutProgrammingDetails(workout: viewData),
-                ),
+                SliverToBoxAdapter(child: WorkoutOverview(workout: viewData)),
                 const SliverToBoxAdapter(child: SizedBox(height: 28)),
                 SliverToBoxAdapter(
                   child: WorkoutConceptsSection(workout: viewData),
@@ -257,151 +277,3 @@ final _exerciseNameProvider = FutureProvider.autoDispose
             orElse: () => '',
           );
     });
-
-class _StartButton extends StatelessWidget {
-  final WorkoutModel workout;
-  final WorkoutDetailViewData viewData;
-
-  const _StartButton({required this.workout, required this.viewData});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: CoachlyAthleteTheme.pagePadding,
-      child: FilledButton.icon(
-        onPressed: viewData.exerciseCount == 0
-            ? null
-            : () {
-                HapticFeedback.mediumImpact();
-                context.go(
-                  '/workouts/workout/${workout.id}/active',
-                  extra: workout,
-                );
-              },
-        style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(54),
-          backgroundColor: CoachlyAthleteTheme.primary,
-          disabledBackgroundColor: CoachlyAthleteTheme.surfaceElevated,
-          foregroundColor: CoachlyAthleteTheme.background,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        icon: const Icon(Icons.play_arrow_rounded),
-        label: Text(
-          context.tr('workout.start'),
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
-        ),
-      ),
-    );
-  }
-}
-
-class _WorkoutSliverHeader extends StatelessWidget {
-  final String title;
-  final bool editing;
-  final bool saving;
-  final VoidCallback onBack;
-  final VoidCallback onEdit;
-  final VoidCallback onDone;
-
-  const _WorkoutSliverHeader({
-    required this.title,
-    required this.editing,
-    required this.saving,
-    required this.onBack,
-    required this.onEdit,
-    required this.onDone,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverAppBar(
-      pinned: true,
-      backgroundColor: CoachlyAthleteTheme.background,
-      surfaceTintColor: Colors.transparent,
-      leading: IconButton(
-        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-        onPressed: onBack,
-        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-      ),
-      title: editing
-          ? Text(
-              title,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-            )
-          : null,
-      actions: [
-        TextButton(
-          onPressed: saving ? null : (editing ? onDone : onEdit),
-          style: TextButton.styleFrom(
-            minimumSize: const Size(48, 44),
-            foregroundColor: CoachlyAthleteTheme.primary,
-          ),
-          child: saving
-              ? const SizedBox.square(
-                  dimension: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(
-                  context.tr(editing ? 'workout.detail.done' : 'common.edit'),
-                ),
-        ),
-        if (!editing) ...[
-          PopupMenuButton<String>(
-            tooltip: context.tr('workout.actions'),
-            icon: const Icon(Icons.more_horiz_rounded),
-            color: CoachlyAthleteTheme.surfaceElevated,
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: 'duplicate',
-                child: Text(context.tr('common.duplicate')),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: Text(
-                  context.tr('common.delete'),
-                  style: const TextStyle(color: CoachlyAthleteTheme.danger),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 6),
-        ],
-      ],
-      flexibleSpace: editing
-          ? null
-          : LayoutBuilder(
-              builder: (context, constraints) {
-                final top = MediaQuery.paddingOf(context).top;
-                final opacity = ((88 - constraints.maxHeight + top) / 20).clamp(
-                  0.0,
-                  1.0,
-                );
-                return Align(
-                  alignment: Alignment.bottomCenter,
-                  child: IgnorePointer(
-                    child: Opacity(
-                      opacity: opacity,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(72, 0, 120, 17),
-                        child: Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: CoachlyAthleteTheme.textPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-    );
-  }
-}

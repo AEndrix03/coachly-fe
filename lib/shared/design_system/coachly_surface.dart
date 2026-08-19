@@ -34,6 +34,8 @@ class CoachlyPressable extends StatefulWidget {
   final Widget child;
   final VoidCallback? onTap;
   final String? semanticLabel;
+  final bool? semanticExpanded;
+  final bool excludeChildSemantics;
   final BorderRadius borderRadius;
 
   const CoachlyPressable({
@@ -41,6 +43,8 @@ class CoachlyPressable extends StatefulWidget {
     required this.child,
     required this.onTap,
     this.semanticLabel,
+    this.semanticExpanded,
+    this.excludeChildSemantics = true,
     this.borderRadius = const BorderRadius.all(
       Radius.circular(CoachlyAthleteTheme.cardRadius),
     ),
@@ -59,6 +63,9 @@ class _CoachlyPressableState extends State<CoachlyPressable> {
     return Semantics(
       button: widget.onTap != null,
       label: widget.semanticLabel,
+      expanded: widget.semanticExpanded,
+      excludeSemantics:
+          widget.semanticLabel != null && widget.excludeChildSemantics,
       child: AnimatedScale(
         scale: !reduceMotion && _pressed ? 0.985 : 1,
         duration: Duration(milliseconds: _pressed ? 80 : 130),

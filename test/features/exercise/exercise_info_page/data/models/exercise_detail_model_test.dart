@@ -80,8 +80,8 @@ void main() {
         },
       });
 
-      expect(exercise.safety, hasLength(1));
-      expect(exercise.safety!.single.overallRiskLevel, 'low');
+      expect(exercise.safety, isNotNull);
+      expect(exercise.safety!.spotterPolicy, 'low');
     },
   );
 
@@ -94,10 +94,10 @@ void main() {
       },
     });
 
-    expect(exercise.safety, hasLength(1));
-    expect(exercise.safety!.single.overallRiskLevel, 'not_required');
+    expect(exercise.safety, isNotNull);
+    expect(exercise.safety!.spotterPolicy, 'not_required');
     expect(
-      exercise.safety!.single.safetyNotesI18n['it'],
+      exercise.safety!.notesI18n!['it'],
       'Mantieni il controllo del movimento.',
     );
   });

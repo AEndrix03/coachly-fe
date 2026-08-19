@@ -1,5 +1,6 @@
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
+import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
 import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -75,26 +76,38 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
   Widget build(BuildContext context) {
     final exercise = widget.exercise;
     if (exercise.isNameLoading) {
-      return _ExerciseCardSkeleton(indexLabel: widget.indexLabel);
+      return WorkoutExerciseLoadingCard(indexLabel: widget.indexLabel);
     }
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final rest = exercise.prescription.primaryRestSeconds;
     final intensity = exercise.prescription.compactIntensity;
+    final displayName = _displayName(context, exercise);
     final semantics = [
-      exercise.name,
+      context.tr(
+        'workout.detail.exercise_semantics_position',
+        params: {'position': widget.indexLabel},
+      ),
+      displayName,
       exercise.prescription.compactTarget,
       if (intensity != null) intensity,
       if (rest != null)
         '${context.tr('workout.detail.rest')} ${_duration(rest)}',
+      context.tr(
+        _expanded
+            ? 'workout.detail.collapse_details'
+            : 'workout.detail.expand_details',
+      ),
     ].join('. ');
 
     return CoachlyPressable(
       semanticLabel: semantics,
+      semanticExpanded: _expanded,
+      excludeChildSemantics: false,
       onTap: () => _toggleExpanded(reduceMotion),
       child: CoachlySurface(
         padding: EdgeInsets.zero,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(CoachlyAthleteTheme.cardPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -113,22 +126,44 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
                       ),
                     ),
                   ),
+                  _ExerciseThumbnail(url: exercise.thumbnailUrl),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          exercise.isMissing
-                              ? context.tr(
-                                  'workout.detail.exercise_unavailable',
-                                )
-                              : exercise.name,
-                          maxLines: 2,
-                          style: const TextStyle(
-                            color: CoachlyAthleteTheme.textPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            height: 1.22,
+                        Semantics(
+                          button: !exercise.isMissing,
+                          label: context.tr(
+                            'workout.detail.open_exercise_semantics',
+                            params: {'name': displayName},
+                          ),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: exercise.isMissing
+                                ? null
+                                : () {
+                                    HapticFeedback.lightImpact();
+                                    widget.onOpenDetail();
+                                  },
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                minHeight: CoachlyAthleteTheme.touchTarget,
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  displayName,
+                                  maxLines: 2,
+                                  style: const TextStyle(
+                                    color: CoachlyAthleteTheme.textPrimary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.22,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                         if (exercise.metadata != null) ...[
@@ -202,71 +237,91 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
   }
 }
 
-class _ExerciseCardSkeleton extends StatelessWidget {
+class WorkoutExerciseLoadingCard extends StatelessWidget {
   final String indexLabel;
 
-  const _ExerciseCardSkeleton({required this.indexLabel});
+  const WorkoutExerciseLoadingCard({super.key, required this.indexLabel});
 
   @override
   Widget build(BuildContext context) {
-    final base = CoachlyAthleteTheme.surfaceElevated;
-    return CoachlySurface(
-      padding: const EdgeInsets.all(16),
-      child: Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: CoachlyAthleteTheme.border,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 34,
-              child: Text(
-                indexLabel,
-                style: const TextStyle(
-                  color: CoachlyAthleteTheme.primary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: .6,
+    return Semantics(
+      label: context.tr('workout.detail.exercise_loading'),
+      child: ExcludeSemantics(
+        child: CoachlySurface(
+          padding: const EdgeInsets.all(CoachlyAthleteTheme.cardPadding),
+          child: Shimmer.fromColors(
+            baseColor: CoachlyAthleteTheme.surfaceElevated,
+            highlightColor: CoachlyAthleteTheme.border,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 34,
+                  child: Text(
+                    indexLabel,
+                    style: const TextStyle(
+                      color: CoachlyAthleteTheme.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
-              ),
+                const _LoadingBlock.square(size: 52),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _LoadingBlock(height: 18, widthFactor: .76),
+                      SizedBox(height: 9),
+                      _LoadingBlock(height: 12, widthFactor: .52),
+                      SizedBox(height: 16),
+                      _LoadingBlock(height: 15, widthFactor: .42),
+                      SizedBox(height: 8),
+                      _LoadingBlock(height: 12, widthFactor: .62),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 44, height: 44),
+              ],
             ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _SkeletonLine(width: 190, height: 18),
-                  const SizedBox(height: 8),
-                  _SkeletonLine(width: 126, height: 12),
-                  const SizedBox(height: 16),
-                  _SkeletonLine(width: 92, height: 15),
-                  const SizedBox(height: 8),
-                  _SkeletonLine(width: 142, height: 12),
-                ],
-              ),
-            ),
-            const SizedBox(width: 44, height: 44),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _SkeletonLine extends StatelessWidget {
-  final double width;
+class _LoadingBlock extends StatelessWidget {
   final double height;
+  final double? widthFactor;
+  final double? fixedWidth;
 
-  const _SkeletonLine({required this.width, required this.height});
+  const _LoadingBlock({required this.height, this.widthFactor})
+    : fixedWidth = null;
+
+  const _LoadingBlock.square({required double size})
+    : height = size,
+      fixedWidth = size,
+      widthFactor = null;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: width,
-    height: height,
-    decoration: BoxDecoration(
-      color: CoachlyAthleteTheme.surface,
-      borderRadius: BorderRadius.circular(6),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final block = Container(
+      width: fixedWidth,
+      height: height,
+      decoration: BoxDecoration(
+        color: CoachlyAthleteTheme.surface,
+        borderRadius: BorderRadius.circular(CoachlyAthleteTheme.compactRadius),
+      ),
+    );
+    if (widthFactor == null) return block;
+    return FractionallySizedBox(
+      widthFactor: widthFactor,
+      alignment: Alignment.centerLeft,
+      child: block,
+    );
+  }
 }
 
 class _ExpandedExercise extends StatelessWidget {
@@ -282,55 +337,49 @@ class _ExpandedExercise extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rows = <(String, String)>[
+    final rows = <_ExerciseDetailRow>[
       (
-        context.tr('workout.detail.target'),
-        exercise.prescription.compactTarget,
+        label: context.tr('workout.detail.working_sets'),
+        value: '${exercise.prescription.workingSets}',
+        infoKey: 'workout.detail.working_sets_definition',
       ),
+      if (_repRange(exercise.prescription) case final value?)
+        (
+          label: context.tr('workout.detail.rep_range'),
+          value: value,
+          infoKey: 'workout.detail.rep_range_definition',
+        ),
       if (exercise.prescription.compactIntensity case final value?)
-        (context.tr('workout.detail.intensity'), value),
+        (
+          label: context.tr('workout.detail.intensity'),
+          value: value,
+          infoKey: null,
+        ),
       if (exercise.prescription.primaryRestSeconds case final value?)
-        (context.tr('workout.detail.recovery'), _duration(value)),
+        (
+          label: context.tr('workout.detail.recovery'),
+          value: _duration(value),
+          infoKey: 'workout.detail.recovery_definition',
+        ),
       if (_targetLoad(exercise.prescription) case final value?)
-        (context.tr('workout.detail.target_load'), value),
+        (
+          label: context.tr('workout.detail.target_load'),
+          value: value,
+          infoKey: null,
+        ),
       if (exercise.prescription.note case final value?)
-        (context.tr('workout.detail.notes'), value),
+        (
+          label: context.tr('workout.detail.notes'),
+          value: value,
+          infoKey: null,
+        ),
     ];
     return Column(
       children: [
         const SizedBox(height: 16),
         const Divider(height: 1, color: CoachlyAthleteTheme.border),
         const SizedBox(height: 14),
-        ...rows.map(
-          (row) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 108,
-                  child: Text(
-                    row.$1,
-                    style: const TextStyle(
-                      color: CoachlyAthleteTheme.textSecondary,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    row.$2,
-                    style: const TextStyle(
-                      color: CoachlyAthleteTheme.textPrimary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        ...rows.map((row) => _ExerciseInfoRow(row: row)),
         Row(
           children: [
             if (onEdit != null)
@@ -366,6 +415,124 @@ class _ExpandedExercise extends StatelessWidget {
   }
 }
 
+typedef _ExerciseDetailRow = ({String label, String value, String? infoKey});
+
+class _ExerciseInfoRow extends StatelessWidget {
+  final _ExerciseDetailRow row;
+
+  const _ExerciseInfoRow({required this.row});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 132,
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  row.label,
+                  style: const TextStyle(
+                    color: CoachlyAthleteTheme.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+              if (row.infoKey != null)
+                IconButton(
+                  constraints: const BoxConstraints.tightFor(
+                    width: CoachlyAthleteTheme.touchTarget,
+                    height: CoachlyAthleteTheme.touchTarget,
+                  ),
+                  padding: EdgeInsets.zero,
+                  tooltip: context.tr('workout.detail.explain_concept'),
+                  onPressed: () => CoachlyInfoSheet.show(
+                    context,
+                    title: row.label,
+                    primaryActionLabel: context.tr('common.got_it'),
+                    sections: [
+                      CoachlyInfoSection(
+                        context.tr('workout.detail.what_is_it'),
+                        context.tr(row.infoKey!),
+                      ),
+                    ],
+                  ),
+                  icon: const Icon(
+                    Icons.info_outline_rounded,
+                    size: 18,
+                    color: CoachlyAthleteTheme.textSecondary,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Text(
+            row.value,
+            textAlign: TextAlign.end,
+            style: const TextStyle(
+              color: CoachlyAthleteTheme.textPrimary,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _ExerciseThumbnail extends StatelessWidget {
+  final String? url;
+
+  const _ExerciseThumbnail({this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    const size = 52.0;
+    final fallback = ColoredBox(
+      color: CoachlyAthleteTheme.surfaceElevated,
+      child: const Center(
+        child: Icon(
+          Icons.fitness_center_rounded,
+          size: 20,
+          color: CoachlyAthleteTheme.textSecondary,
+        ),
+      ),
+    );
+    return ExcludeSemantics(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(CoachlyAthleteTheme.compactRadius),
+        child: SizedBox.square(
+          dimension: size,
+          child: url == null
+              ? fallback
+              : Image.network(
+                  url!,
+                  fit: BoxFit.cover,
+                  cacheWidth: 104,
+                  cacheHeight: 104,
+                  errorBuilder: (_, _, _) => fallback,
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+String _displayName(BuildContext context, WorkoutExerciseViewData exercise) {
+  if (exercise.isMissing) {
+    return context.tr('workout.detail.exercise_unavailable');
+  }
+  if (exercise.name.trim().isEmpty || exercise.name == 'Exercise') {
+    return context.tr('workout.detail.exercise_fallback');
+  }
+  return exercise.name;
+}
+
 String _duration(int seconds) {
   if (seconds < 60) return '${seconds}s';
   final minutes = seconds ~/ 60;
@@ -382,4 +549,16 @@ String? _targetLoad(ExercisePrescriptionViewData prescription) {
       ? block.targetLoad!.toInt().toString()
       : block.targetLoad!.toStringAsFixed(1);
   return '$load ${block.loadUnit ?? 'kg'}';
+}
+
+String? _repRange(ExercisePrescriptionViewData prescription) {
+  final values = prescription.blocks
+      .where((block) => block.repsMin != null)
+      .map(
+        (block) => block.repsMax != null && block.repsMax != block.repsMin
+            ? '${block.repsMin}–${block.repsMax}'
+            : '${block.repsMin}',
+      )
+      .toSet();
+  return values.isEmpty ? null : values.join(' · ');
 }

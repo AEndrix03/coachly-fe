@@ -7,7 +7,10 @@ import 'package:flutter/widgets.dart';
 
 enum WorkoutSectionKind { standard, preparation, main, accessory, custom }
 
-enum WorkoutGroupType { superset, circuit }
+/// Presentation-only group types.  The adapter accepts the backend values when
+/// present, but keeping this type here prevents the detail UI from depending on
+/// the transport model.
+enum WorkoutGroupType { superset, triset, giantSet, circuit }
 
 enum PrescriptionBlockType {
   standard,
@@ -180,18 +183,24 @@ class WorkoutExerciseViewData {
   final String exerciseId;
   final String name;
   final String? metadata;
+  final String? thumbnailUrl;
   final ExercisePrescriptionViewData prescription;
   final bool isMissing;
   final bool isNameLoading;
+  final List<String> muscles;
+  final List<String> equipment;
 
   const WorkoutExerciseViewData({
     required this.instanceId,
     required this.exerciseId,
     required this.name,
     this.metadata,
+    this.thumbnailUrl,
     required this.prescription,
     this.isMissing = false,
     this.isNameLoading = false,
+    this.muscles = const [],
+    this.equipment = const [],
   });
 }
 
@@ -221,6 +230,8 @@ class WorkoutDetailViewData {
   final String? focus;
   final List<WorkoutSectionViewData> sections;
   final Duration? estimatedDuration;
+  final List<String> muscleSummary;
+  final List<String> equipmentSummary;
   final bool syncPending;
 
   const WorkoutDetailViewData({
@@ -230,6 +241,8 @@ class WorkoutDetailViewData {
     this.focus,
     required this.sections,
     this.estimatedDuration,
+    this.muscleSummary = const [],
+    this.equipmentSummary = const [],
     this.syncPending = false,
   });
 
@@ -267,6 +280,8 @@ class WorkoutDetailAdapter {
       goal: _nonBlank(workout.descriptionI18n?.fromI18n(locale)),
       focus: _nonBlank(workout.type),
       sections: sections,
+      muscleSummary: _summaryMuscles(sections),
+      equipmentSummary: _summaryEquipment(sections),
       syncPending: workout.dirty,
     );
     return WorkoutDetailViewData(
@@ -276,6 +291,8 @@ class WorkoutDetailAdapter {
       focus: withoutDuration.focus,
       sections: sections,
       estimatedDuration: WorkoutDurationEstimator.estimate(withoutDuration),
+      muscleSummary: withoutDuration.muscleSummary,
+      equipmentSummary: withoutDuration.equipmentSummary,
       syncPending: withoutDuration.syncPending,
     );
   }
@@ -416,10 +433,13 @@ class WorkoutDetailAdapter {
         resolvedExerciseNames,
       ),
       metadata: _exerciseMetadata(model.exercise, locale),
+      thumbnailUrl: _thumbnailUrl(model.exercise),
       isMissing: model.exercise.id == null,
       isNameLoading:
           model.exercise.id != null &&
           resolvingExerciseIds.contains(model.exercise.id),
+      muscles: _muscles(model.exercise, locale),
+      equipment: _equipment(model.exercise, locale),
       prescription: ExercisePrescriptionViewData(
         blocks: [
           PrescriptionBlockViewData(
@@ -457,8 +477,11 @@ class WorkoutDetailAdapter {
         resolvedExerciseNames,
       ),
       metadata: exercise == null ? null : _exerciseMetadata(exercise, locale),
+      thumbnailUrl: exercise == null ? null : _thumbnailUrl(exercise),
       isMissing: entry.exerciseId.isEmpty,
       isNameLoading: resolvingExerciseIds.contains(entry.exerciseId),
+      muscles: exercise == null ? const [] : _muscles(exercise, locale),
+      equipment: exercise == null ? const [] : _equipment(exercise, locale),
       prescription: _prescription(entry.sets, block),
     );
   }
@@ -561,9 +584,9 @@ class WorkoutConceptDetector {
       };
       if (block is WorkoutGroupBlockViewData) {
         result.add(
-          block.type == WorkoutGroupType.superset
-              ? WorkoutConcept.superset
-              : WorkoutConcept.circuit,
+          block.type == WorkoutGroupType.circuit
+              ? WorkoutConcept.circuit
+              : WorkoutConcept.superset,
         );
       }
       for (final prescription in exercises.expand(
@@ -640,6 +663,8 @@ WorkoutSectionKind _sectionKind(String? value) => switch (value) {
 
 WorkoutGroupType? _groupType(String? value) => switch (value) {
   'superset' => WorkoutGroupType.superset,
+  'triset' => WorkoutGroupType.triset,
+  'giant_set' || 'giantset' => WorkoutGroupType.giantSet,
   'circuit' => WorkoutGroupType.circuit,
   _ => null,
 };
@@ -719,6 +744,61 @@ String? _exerciseMetadata(ExerciseDetailModel exercise, Locale locale) {
       .whereType<String>()
       .join(' · ');
   return _nonBlank([muscles, equipment].whereType<String>().join(' · '));
+}
+
+String? _thumbnailUrl(ExerciseDetailModel exercise) {
+  final media = exercise.media
+      ?.where((item) => item.isPublic)
+      .toList(growable: false);
+  if (media == null || media.isEmpty) return null;
+  final preferred =
+      media.where((item) => item.isPrimary).firstOrNull ?? media.first;
+  return _nonBlank(
+    preferred.thumbnailUrl.isNotEmpty
+        ? preferred.thumbnailUrl
+        : preferred.mediaUrl,
+  );
+}
+
+List<String> _muscles(ExerciseDetailModel exercise, Locale locale) =>
+    exercise.muscles
+        ?.map((item) => item.muscle?.nameI18n.fromI18n(locale))
+        .whereType<String>()
+        .where((value) => value.trim().isNotEmpty)
+        .toSet()
+        .toList(growable: false) ??
+    const [];
+
+List<String> _equipment(ExerciseDetailModel exercise, Locale locale) =>
+    exercise.equipments
+        ?.map((item) => item.equipment.nameI18n.fromI18n(locale))
+        .whereType<String>()
+        .where((value) => value.trim().isNotEmpty)
+        .toSet()
+        .toList(growable: false) ??
+    const [];
+
+List<String> _summaryMuscles(List<WorkoutSectionViewData> sections) =>
+    _sectionExercises(
+      sections,
+    ).expand((exercise) => exercise.muscles).toSet().toList(growable: false);
+
+List<String> _summaryEquipment(List<WorkoutSectionViewData> sections) =>
+    _sectionExercises(
+      sections,
+    ).expand((exercise) => exercise.equipment).toSet().toList(growable: false);
+
+Iterable<WorkoutExerciseViewData> _sectionExercises(
+  List<WorkoutSectionViewData> sections,
+) sync* {
+  for (final block in sections.expand((section) => section.blocks)) {
+    switch (block) {
+      case WorkoutExerciseBlockViewData():
+        yield block.exercise;
+      case WorkoutGroupBlockViewData():
+        yield* block.exercises;
+    }
+  }
 }
 
 int? _seconds(String raw) {
