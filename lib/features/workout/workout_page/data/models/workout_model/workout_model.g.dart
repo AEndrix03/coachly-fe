@@ -33,6 +33,9 @@ _WorkoutModel _$WorkoutModelFromJson(Map<String, dynamic> json) =>
               )
               .toList() ??
           const [],
+      programmingBlocks: json['programmingBlocks'] == null
+          ? const []
+          : workoutProgrammingBlocksFromJson(json['programmingBlocks']),
       active: json['active'] as bool? ?? true,
       dirty: json['dirty'] as bool? ?? false,
       delete: json['delete'] as bool? ?? false,
@@ -55,6 +58,9 @@ Map<String, dynamic> _$WorkoutModelToJson(_WorkoutModel instance) =>
       'lastSessionDays': instance.lastSessionDays,
       'type': instance.type,
       'workoutExercises': instance.workoutExercises,
+      'programmingBlocks': workoutProgrammingBlocksToJson(
+        instance.programmingBlocks,
+      ),
       'active': instance.active,
       'dirty': instance.dirty,
       'delete': instance.delete,

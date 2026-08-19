@@ -1,0 +1,102 @@
+import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
+import 'package:flutter/material.dart';
+
+class CoachlyInfoSection {
+  final String title;
+  final String body;
+
+  const CoachlyInfoSection(this.title, this.body);
+}
+
+class CoachlyInfoSheet extends StatelessWidget {
+  final String title;
+  final List<CoachlyInfoSection> sections;
+
+  const CoachlyInfoSheet({
+    super.key,
+    required this.title,
+    required this.sections,
+  });
+
+  static Future<void> show(
+    BuildContext context, {
+    required String title,
+    required List<CoachlyInfoSection> sections,
+  }) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: CoachlyAthleteTheme.surfaceElevated,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => CoachlyInfoSheet(title: title, sections: sections),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        12,
+        20,
+        20 + MediaQuery.paddingOf(context).bottom,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: CoachlyAthleteTheme.textSecondary.withValues(alpha: .45),
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+          ),
+          const SizedBox(height: 22),
+          Text(
+            title,
+            style: const TextStyle(
+              color: CoachlyAthleteTheme.textPrimary,
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 22),
+          ...sections.map(
+            (section) => Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    section.title,
+                    style: const TextStyle(
+                      color: CoachlyAthleteTheme.primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  Text(
+                    section.body,
+                    style: const TextStyle(
+                      color: CoachlyAthleteTheme.textPrimary,
+                      fontSize: 15,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

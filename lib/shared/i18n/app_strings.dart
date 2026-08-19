@@ -22,6 +22,7 @@ class AppStrings {
     'common.back_to_top': {'en': 'Back to top', 'it': 'Torna in alto'},
     'common.confirm': {'en': 'Confirm', 'it': 'Conferma'},
     'common.cancel': {'en': 'Cancel', 'it': 'Annulla'},
+    'common.undo': {'en': 'UNDO', 'it': 'ANNULLA'},
     'common.edit': {'en': 'Edit', 'it': 'Modifica'},
     'common.duplicate': {'en': 'Duplicate', 'it': 'Duplica'},
     'common.delete': {'en': 'Delete', 'it': 'Elimina'},
@@ -142,6 +143,269 @@ class AppStrings {
     'workout.streak': {'en': 'Streak', 'it': 'Streak'},
     'workout.active_short': {'en': 'Active', 'it': 'Attive'},
     'workout.completed': {'en': 'Completed', 'it': 'Completate'},
+
+    'workout.detail.exercises': {'en': 'Exercises', 'it': 'Esercizi'},
+    'workout.detail.working_sets': {
+      'en': 'Working sets',
+      'it': 'Serie allenanti',
+    },
+    'workout.detail.goal': {'en': 'Goal', 'it': 'Obiettivo'},
+    'workout.detail.show_more': {'en': 'Show more', 'it': 'Mostra altro'},
+    'workout.detail.show_less': {'en': 'Show less', 'it': 'Mostra meno'},
+    'workout.detail.structure': {'en': 'Structure', 'it': 'Struttura'},
+    'workout.detail.rest': {'en': 'Rest', 'it': 'Recupero'},
+    'workout.detail.target': {'en': 'Target', 'it': 'Target'},
+    'workout.detail.intensity': {'en': 'Intensity', 'it': 'Intensità'},
+    'workout.detail.recovery': {'en': 'Recovery', 'it': 'Recupero'},
+    'workout.detail.target_load': {'en': 'Target load', 'it': 'Carico target'},
+    'workout.detail.notes': {'en': 'Notes', 'it': 'Note'},
+    'workout.detail.exercise_detail': {
+      'en': 'Exercise details',
+      'it': 'Dettaglio esercizio',
+    },
+    'workout.detail.exercise_unavailable': {
+      'en': 'Exercise unavailable',
+      'it': 'Esercizio non disponibile',
+    },
+    'workout.detail.superset': {'en': 'SUPERSET', 'it': 'SUPERSET'},
+    'workout.detail.circuit': {'en': 'CIRCUIT', 'it': 'CIRCUITO'},
+    'workout.detail.rounds': {'en': 'rounds', 'it': 'round'},
+    'workout.detail.rest_after_round': {
+      'en': 'Rest after round',
+      'it': 'Recupero dopo il round',
+    },
+    'workout.detail.explain_concept': {
+      'en': 'Explain this concept',
+      'it': 'Spiega questo concetto',
+    },
+    'workout.detail.what_is_it': {'en': 'What it is', 'it': 'Cos’è'},
+    'workout.detail.how_to_read': {
+      'en': 'How to read it',
+      'it': 'Come si legge',
+    },
+    'workout.detail.superset_definition': {
+      'en': 'Two or more exercises performed in sequence before resting.',
+      'it': 'Due o più esercizi eseguiti in sequenza prima del recupero.',
+    },
+    'workout.detail.circuit_definition': {
+      'en': 'A sequence of exercises repeated for the prescribed rounds.',
+      'it': 'Una sequenza di esercizi ripetuta per i round prescritti.',
+    },
+    'workout.detail.no_exercises': {
+      'en': 'No exercises',
+      'it': 'Nessun esercizio',
+    },
+    'workout.detail.empty_hint': {
+      'en': 'Build this session from the Coachly catalog or your exercises.',
+      'it': 'Costruisci la sessione dal catalogo Coachly o dai tuoi esercizi.',
+    },
+    'workout.detail.add_exercise': {
+      'en': 'Add exercise',
+      'it': 'Aggiungi esercizio',
+    },
+    'workout.detail.programming_details': {
+      'en': 'Programming details',
+      'it': 'Dettagli programmazione',
+    },
+    'workout.detail.rep_range': {'en': 'Rep range', 'it': 'Range rep'},
+    'workout.detail.concepts_used': {
+      'en': 'Concepts used in this workout',
+      'it': 'Concetti usati in questa scheda',
+    },
+    'workout.detail.sync_pending': {
+      'en': 'Sync pending',
+      'it': 'Sync in attesa',
+    },
+    'workout.detail.edit_session': {
+      'en': 'Edit session',
+      'it': 'Modifica sessione',
+    },
+    'workout.detail.done': {'en': 'Done', 'it': 'Fine'},
+    'workout.detail.exercise_removed': {
+      'en': 'Exercise removed',
+      'it': 'Esercizio rimosso',
+    },
+    'workout.detail.add_section': {
+      'en': 'Add section',
+      'it': 'Aggiungi sezione',
+    },
+    'workout.detail.create_group': {
+      'en': 'Create superset / circuit',
+      'it': 'Crea superset / circuito',
+    },
+    'workout.detail.section_preparation': {
+      'en': 'Preparation',
+      'it': 'Preparazione',
+    },
+    'workout.detail.section_main': {
+      'en': 'Main work',
+      'it': 'Lavoro principale',
+    },
+    'workout.detail.section_accessory': {
+      'en': 'Accessories',
+      'it': 'Accessori',
+    },
+    'workout.detail.section_custom': {'en': 'Custom', 'it': 'Personalizzata'},
+    'workout.detail.section_name': {'en': 'Section name', 'it': 'Nome sezione'},
+    'workout.detail.ungroup': {'en': 'Ungroup', 'it': 'Separa gruppo'},
+    'workout.detail.edit_exercise': {
+      'en': 'Edit exercise',
+      'it': 'Modifica esercizio',
+    },
+    'workout.detail.base': {'en': 'Base', 'it': 'Base'},
+    'workout.detail.advanced': {'en': 'Advanced', 'it': 'Avanzate'},
+    'workout.detail.set_type': {'en': 'Set type', 'it': 'Tipo serie'},
+    'workout.detail.relative_load': {
+      'en': 'Reduction from top set (%)',
+      'it': 'Riduzione dal top set (%)',
+    },
+    'workout.detail.unilateral': {'en': 'Unilateral', 'it': 'Unilaterale'},
+    'workout.detail.tempo': {'en': 'Tempo', 'it': 'Tempo'},
+    'workout.detail.pause_seconds': {
+      'en': 'Pause (seconds)',
+      'it': 'Pausa (secondi)',
+    },
+    'workout.detail.exercise_note': {
+      'en': 'Exercise note',
+      'it': 'Nota esercizio',
+    },
+    'workout.detail.advanced_progressive': {
+      'en':
+          'Tempo, pauses, unilateral work, target load and notes remain hidden until needed.',
+      'it':
+          'Tempo, pause, unilateralità, carico target e note restano nascosti finché non servono.',
+    },
+    'workout.detail.none': {'en': 'None', 'it': 'Nessuna'},
+    'workout.detail.saved_offline': {
+      'en': 'Saved offline',
+      'it': 'Salvato offline',
+    },
+    'workout.detail.unsaved_title': {
+      'en': 'Unsaved changes',
+      'it': 'Modifiche non salvate',
+    },
+    'workout.detail.unsaved_body': {
+      'en': 'Save or discard the changes before leaving edit mode.',
+      'it': 'Salva o scarta le modifiche prima di uscire dalla modifica.',
+    },
+    'workout.detail.continue_editing': {
+      'en': 'Continue editing',
+      'it': 'Continua a modificare',
+    },
+    'workout.detail.discard': {'en': 'Discard', 'it': 'Scarta'},
+    'workout.detail.save_exit': {'en': 'Save and exit', 'it': 'Salva ed esci'},
+    'workout.add_exercise.title': {
+      'en': 'Add exercise',
+      'it': 'Aggiungi esercizio',
+    },
+    'workout.add_exercise.search_hint': {
+      'en': 'Search exercise, muscle or equipment…',
+      'it': 'Cerca esercizio, muscolo o attrezzatura…',
+    },
+    'workout.add_exercise.all': {'en': 'All', 'it': 'Tutti'},
+    'workout.add_exercise.verified': {'en': 'Verified', 'it': 'Verified'},
+    'workout.add_exercise.mine': {'en': 'Mine', 'it': 'I miei'},
+    'workout.add_exercise.muscle': {'en': 'Muscle', 'it': 'Muscolo'},
+    'workout.add_exercise.movement': {'en': 'Movement', 'it': 'Movimento'},
+    'workout.add_exercise.equipment': {'en': 'Equipment', 'it': 'Attrezzatura'},
+    'workout.add_exercise.tracking': {'en': 'Tracking', 'it': 'Tracking'},
+    'workout.add_exercise.recent': {'en': 'Recent', 'it': 'Recenti'},
+    'workout.add_exercise.results': {'en': 'Results', 'it': 'Risultati'},
+    'workout.add_exercise.no_results': {
+      'en': 'No exercises match these filters.',
+      'it': 'Nessun esercizio corrisponde ai filtri.',
+    },
+    'workout.add_exercise.clear_filter': {
+      'en': 'Clear filter',
+      'it': 'Rimuovi filtro',
+    },
+    'workout.add_exercise.create_personal': {
+      'en': 'Create personal exercise',
+      'it': 'Crea esercizio personalizzato',
+    },
+    'workout.add_exercise.last_configuration': {
+      'en': 'Using your last compatible prescription',
+      'it': 'Uso dell’ultima prescrizione compatibile',
+    },
+    'workout.add_exercise.reps_min': {'en': 'Min reps', 'it': 'Rep minime'},
+    'workout.add_exercise.reps_max': {'en': 'Max reps', 'it': 'Rep massime'},
+    'workout.add_exercise.add_to': {'en': 'Add to', 'it': 'Aggiungi a'},
+    'workout.add_exercise.no_section': {
+      'en': 'No section',
+      'it': 'Nessuna sezione',
+    },
+    'workout.add_exercise.load_error': {
+      'en': 'Unable to load the exercise catalog.',
+      'it': 'Impossibile caricare il catalogo esercizi.',
+    },
+    'workout.detail.concept_rir_definition': {
+      'en':
+          'Reps in reserve estimates how many repetitions remained before failure.',
+      'it':
+          'Le ripetizioni in riserva stimano quante ripetizioni restavano prima del cedimento.',
+    },
+    'workout.detail.concept_rir_example': {
+      'en': 'RIR 2 means you could have completed about two more repetitions.',
+      'it':
+          'RIR 2 significa che avresti potuto eseguire circa altre due ripetizioni.',
+    },
+    'workout.detail.concept_rpe_definition': {
+      'en': 'RPE describes perceived effort on a scale up to 10.',
+      'it': 'RPE descrive lo sforzo percepito su una scala fino a 10.',
+    },
+    'workout.detail.concept_rpe_example': {
+      'en': 'RPE 8 is a challenging set with roughly two reps in reserve.',
+      'it':
+          'RPE 8 è una serie impegnativa con circa due ripetizioni in riserva.',
+    },
+    'workout.detail.concept_percentage1RM_definition': {
+      'en': 'The load is prescribed as a percentage of your one-rep maximum.',
+      'it': 'Il carico è prescritto come percentuale del tuo massimale.',
+    },
+    'workout.detail.concept_percentage1RM_example': {
+      'en': '75% 1RM means using three quarters of your estimated maximum.',
+      'it': '75% 1RM indica tre quarti del massimale stimato.',
+    },
+    'workout.detail.concept_superset_definition': {
+      'en': 'Exercises performed in sequence before resting.',
+      'it': 'Esercizi eseguiti in sequenza prima del recupero.',
+    },
+    'workout.detail.concept_superset_example': {
+      'en': 'A1 is followed by A2, then by the prescribed recovery.',
+      'it': 'A1 è seguito da A2 e poi dal recupero prescritto.',
+    },
+    'workout.detail.concept_circuit_definition': {
+      'en': 'A sequence of exercises repeated for multiple rounds.',
+      'it': 'Una sequenza di esercizi ripetuta per più round.',
+    },
+    'workout.detail.concept_circuit_example': {
+      'en': 'Complete B1, B2 and B3, rest, then repeat.',
+      'it': 'Completa B1, B2 e B3, recupera e ripeti.',
+    },
+    'workout.detail.concept_topSet_definition': {
+      'en': 'The heaviest primary work set for the exercise.',
+      'it': 'La serie allenante principale più pesante dell’esercizio.',
+    },
+    'workout.detail.concept_topSet_example': {
+      'en': '1 × 4–6 at RPE 8.',
+      'it': '1 × 4–6 a RPE 8.',
+    },
+    'workout.detail.concept_backoff_definition': {
+      'en': 'Follow-up sets performed with less load than the top set.',
+      'it': 'Serie successive eseguite con meno carico rispetto al top set.',
+    },
+    'workout.detail.concept_backoff_example': {
+      'en': '3 × 6–8 at 7.5% less than the top set.',
+      'it': '3 × 6–8 con il 7,5% in meno del top set.',
+    },
+    'workout.detail.concept_amrap_definition': {
+      'en': 'Perform as many technically sound repetitions as possible.',
+      'it': 'Esegui più ripetizioni tecnicamente valide possibili.',
+    },
+    'workout.detail.concept_amrap_example': {
+      'en': 'Stop when another clean repetition is no longer available.',
+      'it': 'Fermati quando non è più disponibile un’altra ripetizione pulita.',
+    },
 
     'workout.organize.title': {
       'en': 'Organize Workouts',

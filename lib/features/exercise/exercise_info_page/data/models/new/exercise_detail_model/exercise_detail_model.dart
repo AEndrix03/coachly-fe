@@ -39,5 +39,30 @@ abstract class ExerciseDetailModel with _$ExerciseDetailModel {
   }) = _ExerciseDetailModel;
 
   factory ExerciseDetailModel.fromJson(Map<String, dynamic> json) =>
-      _$ExerciseDetailModelFromJson(json);
+      _$ExerciseDetailModelFromJson(_normalizeCollectionFields(json));
+
+  /// The exercise API has historically returned a single relation as an
+  /// object, while the current contract exposes every relation as a list.
+  /// Normalize the legacy shape at the boundary so the rest of the app can
+  /// always work with collections.
+  static Map<String, dynamic> _normalizeCollectionFields(
+    Map<String, dynamic> json,
+  ) {
+    const collectionFields = {
+      'variants',
+      'media',
+      'categories',
+      'safety',
+      'muscles',
+      'equipments',
+      'tags',
+    };
+
+    return json.map((key, value) {
+      if (collectionFields.contains(key) && value is Map) {
+        return MapEntry(key, [value]);
+      }
+      return MapEntry(key, value);
+    });
+  }
 }
