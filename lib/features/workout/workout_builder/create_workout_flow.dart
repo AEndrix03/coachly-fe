@@ -207,6 +207,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
               _BuilderActions(
                 onAddExercise: () => _addExercise(null),
                 onAddSection: _addSection,
+                onCreateBlock: _createBlock,
               ),
           ],
         ),
@@ -313,6 +314,33 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
       ref.read(createWorkoutControllerProvider.notifier).addSection(name);
   }
 
+  Future<void> _createBlock() async {
+    final draft = ref.read(createWorkoutControllerProvider).draft;
+    final candidates = <_BlockCandidate>[];
+    for (final section in draft.sections) {
+      for (final item in section.items.whereType<WorkoutExerciseItemDraft>()) {
+        candidates.add(_BlockCandidate(sectionId: section.id, item: item));
+      }
+    }
+    if (candidates.length < 2) return;
+    final selection = await showModalBottomSheet<_BlockSelection>(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: true,
+      backgroundColor: context.exerciseTheme.surfaceElevated,
+      builder: (_) => _CreateBlockSheet(candidates: candidates),
+    );
+    if (selection == null || !mounted) return;
+    ref
+        .read(createWorkoutControllerProvider.notifier)
+        .createGroup(
+          type: selection.type,
+          itemIds: selection.itemIds,
+          rounds: selection.rounds,
+        );
+    HapticFeedback.lightImpact();
+  }
+
   Future<void> _commit() async {
     final workout = await ref
         .read(createWorkoutControllerProvider.notifier)
@@ -378,6 +406,10 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
         context.tr('workout.builder.section'),
         context.tr('workout.builder.section_info'),
       ),
+      CoachlyInfoSection(
+        context.tr('workout.builder.block'),
+        context.tr('workout.builder.block_info'),
+      ),
     ],
     primaryActionLabel: context.tr('common.got_it'),
     secondaryActionLabel: context.tr('common.learn_more'),
@@ -385,10 +417,11 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
 }
 
 class _BuilderActions extends StatelessWidget {
-  final VoidCallback onAddExercise, onAddSection;
+  final VoidCallback onAddExercise, onAddSection, onCreateBlock;
   const _BuilderActions({
     required this.onAddExercise,
     required this.onAddSection,
+    required this.onCreateBlock,
   });
   @override
   Widget build(BuildContext context) => Padding(
@@ -407,10 +440,168 @@ class _BuilderActions extends StatelessWidget {
           label: Text(context.tr('workout.builder.section')),
           onPressed: onAddSection,
         ),
+        ActionChip(
+          avatar: const Icon(Icons.link_rounded, size: 18),
+          label: Text(context.tr('workout.builder.block')),
+          onPressed: onCreateBlock,
+        ),
       ],
     ),
   );
 }
+
+class _BlockCandidate {
+  final String sectionId;
+  final WorkoutExerciseItemDraft item;
+  const _BlockCandidate({required this.sectionId, required this.item});
+}
+
+class _BlockSelection {
+  final WorkoutGroupType type;
+  final List<String> itemIds;
+  final int rounds;
+  const _BlockSelection({
+    required this.type,
+    required this.itemIds,
+    required this.rounds,
+  });
+}
+
+class _CreateBlockSheet extends StatefulWidget {
+  final List<_BlockCandidate> candidates;
+  const _CreateBlockSheet({required this.candidates});
+
+  @override
+  State<_CreateBlockSheet> createState() => _CreateBlockSheetState();
+}
+
+class _CreateBlockSheetState extends State<_CreateBlockSheet> {
+  WorkoutGroupType type = WorkoutGroupType.superset;
+  final selected = <String>{};
+  String? selectedSectionId;
+  int rounds = 3;
+
+  @override
+  Widget build(BuildContext context) => DraggableScrollableSheet(
+    initialChildSize: .78,
+    minChildSize: .52,
+    maxChildSize: .94,
+    expand: false,
+    builder: (context, scrollController) => Column(
+      children: [
+        const SizedBox(height: 10),
+        Container(
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: context.exerciseTheme.textSecondary.withValues(alpha: .45),
+            borderRadius: BorderRadius.circular(99),
+          ),
+        ),
+        Expanded(
+          child: ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+            children: [
+              Text(
+                context.tr('workout.builder.connect_exercises'),
+                style: TextStyle(
+                  color: context.exerciseTheme.textPrimary,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: WorkoutGroupType.values.map((value) {
+                  return ChoiceChip(
+                    selected: type == value,
+                    label: Text(_groupTypeLabel(context, value)),
+                    onSelected: (_) => setState(() {
+                      type = value;
+                      selected.clear();
+                      selectedSectionId = null;
+                    }),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
+              ...widget.candidates.map((candidate) {
+                final disabled =
+                    selectedSectionId != null &&
+                    selectedSectionId != candidate.sectionId;
+                return CheckboxListTile(
+                  value: selected.contains(candidate.item.id),
+                  enabled: !disabled,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(candidate.item.exercise.name),
+                  onChanged: disabled
+                      ? null
+                      : (checked) => setState(() {
+                          if (checked == true) {
+                            selectedSectionId = candidate.sectionId;
+                            selected.add(candidate.item.id);
+                          } else {
+                            selected.remove(candidate.item.id);
+                            if (selected.isEmpty) selectedSectionId = null;
+                          }
+                        }),
+                );
+              }),
+              const SizedBox(height: 12),
+              NumericStepper(
+                label: context.tr('workout.detail.rounds'),
+                value: rounds,
+                min: 1,
+                onChanged: (value) => setState(() => rounds = value),
+              ),
+            ],
+          ),
+        ),
+        SafeArea(
+          top: false,
+          minimum: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+          child: SizedBox(
+            width: double.infinity,
+            height: CoachlyAthleteTheme.touchTarget,
+            child: FilledButton(
+              onPressed: _canSubmit
+                  ? () => Navigator.pop(
+                      context,
+                      _BlockSelection(
+                        type: type,
+                        itemIds: selected.toList(),
+                        rounds: rounds,
+                      ),
+                    )
+                  : null,
+              child: Text(context.tr('workout.builder.add_block')),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  bool get _canSubmit =>
+      selected.length >=
+      switch (type) {
+        WorkoutGroupType.superset => 2,
+        WorkoutGroupType.triset => 3,
+        WorkoutGroupType.giantSet => 4,
+        WorkoutGroupType.circuit => 2,
+      };
+}
+
+String _groupTypeLabel(BuildContext context, WorkoutGroupType type) =>
+    context.tr(switch (type) {
+      WorkoutGroupType.superset => 'workout.detail.superset',
+      WorkoutGroupType.triset => 'workout.detail.triset',
+      WorkoutGroupType.giantSet => 'workout.detail.giant_set',
+      WorkoutGroupType.circuit => 'workout.detail.circuit',
+    });
 
 class _BottomAction extends StatelessWidget {
   final String label;

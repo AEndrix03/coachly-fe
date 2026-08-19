@@ -262,6 +262,11 @@ class AppStrings {
       'en': 'Create a superset',
       'it': 'Crea un superset',
     },
+    'workout.builder.connect_exercises': {
+      'en': 'Connect exercises',
+      'it': 'Collega più esercizi',
+    },
+    'workout.builder.add_block': {'en': 'Add block', 'it': 'Aggiungi blocco'},
     'workout.builder.add_superset': {
       'en': 'Add superset',
       'it': 'Aggiungi superset',
