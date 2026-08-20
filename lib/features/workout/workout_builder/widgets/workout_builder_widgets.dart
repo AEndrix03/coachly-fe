@@ -87,6 +87,53 @@ class WorkoutStructureHints extends StatelessWidget {
   );
 }
 
+class WorkoutStructureComposer extends StatelessWidget {
+  final VoidCallback onAddExercise;
+  final VoidCallback onAddSection;
+  final VoidCallback onCreateBlock;
+
+  const WorkoutStructureComposer({
+    super.key,
+    required this.onAddExercise,
+    required this.onAddSection,
+    required this.onCreateBlock,
+  });
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    label: context.tr('workout.builder.structure_actions'),
+    child: Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: FilledButton.tonalIcon(
+              icon: const Icon(Icons.add, size: 20),
+              label: Text(context.tr('workout.builder.exercise')),
+              onPressed: onAddExercise,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextButton(
+              onPressed: onAddSection,
+              child: Text(context.tr('workout.builder.section')),
+            ),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: TextButton(
+              onPressed: onCreateBlock,
+              child: Text(context.tr('workout.builder.block')),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 class _StructureHint extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -165,6 +212,7 @@ class WorkoutDraftStructure extends StatelessWidget {
   final ValueChanged<String?> onAddExercise;
   final VoidCallback onAddSection;
   final VoidCallback onCreateBlock;
+  final ValueChanged<WorkoutSectionDraft>? onEditSection;
   final bool editable;
 
   const WorkoutDraftStructure({
@@ -180,6 +228,7 @@ class WorkoutDraftStructure extends StatelessWidget {
     required this.onAddExercise,
     required this.onAddSection,
     required this.onCreateBlock,
+    this.onEditSection,
     this.editable = true,
   });
 
@@ -206,23 +255,42 @@ class WorkoutDraftStructure extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Semantics(
                         header: true,
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                section.name!.toUpperCase(),
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: CoachlyAthleteTheme.textSecondary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: .8,
+                        button: editable && onEditSection != null,
+                        child: InkWell(
+                          onTap: editable && onEditSection != null
+                              ? () => onEditSection!(section)
+                              : null,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 44),
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    section.name!.toUpperCase(),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: CoachlyAthleteTheme.textSecondary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: .8,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 12),
+                                const Expanded(child: Divider()),
+                                if (editable && onEditSection != null) ...[
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    context.tr('common.edit'),
+                                    style: const TextStyle(
+                                      color: CoachlyAthleteTheme.textSecondary,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
-                            const SizedBox(width: 12),
-                            const Expanded(child: Divider()),
-                          ],
+                          ),
                         ),
                       ),
                     ),

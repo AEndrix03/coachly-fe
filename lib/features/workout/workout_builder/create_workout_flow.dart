@@ -256,10 +256,11 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                 onAddExercise: _addExercise,
                 onAddSection: _addSection,
                 onCreateBlock: _createBlock,
+                onEditSection: _editSection,
               ),
             ),
             if (state.draft.exerciseCount > 0)
-              _BuilderActions(
+              WorkoutStructureComposer(
                 onAddExercise: () => _addExercise(null),
                 onAddSection: _addSection,
                 onCreateBlock: _createBlock,
@@ -442,6 +443,14 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     if (name?.isNotEmpty == true) {
       ref.read(createWorkoutControllerProvider.notifier).addSection(name);
     }
+  }
+
+  Future<void> _editSection(WorkoutSectionDraft section) async {
+    final name = await showWorkoutSectionNameSheet(context);
+    if (name?.isNotEmpty != true || !mounted) return;
+    ref
+        .read(createWorkoutControllerProvider.notifier)
+        .renameSection(section.id, name!);
   }
 
   Future<void> _createBlock() async {
@@ -828,48 +837,6 @@ class _GoalOption extends StatelessWidget {
       ),
     );
   }
-}
-
-class _BuilderActions extends StatelessWidget {
-  final VoidCallback onAddExercise, onAddSection, onCreateBlock;
-  const _BuilderActions({
-    required this.onAddExercise,
-    required this.onAddSection,
-    required this.onCreateBlock,
-  });
-  @override
-  Widget build(BuildContext context) => Semantics(
-    container: true,
-    label: context.tr('workout.builder.structure_actions'),
-    child: Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: FilledButton.tonalIcon(
-              icon: const Icon(Icons.add, size: 20),
-              label: Text(context.tr('workout.builder.exercise')),
-              onPressed: onAddExercise,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: TextButton(
-              onPressed: onAddSection,
-              child: Text(context.tr('workout.builder.section')),
-            ),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: TextButton(
-              onPressed: onCreateBlock,
-              child: Text(context.tr('workout.builder.block')),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }
 
 class _BlockCandidate {

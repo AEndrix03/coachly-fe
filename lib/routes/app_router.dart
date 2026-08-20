@@ -155,6 +155,7 @@ GoRouter router(Ref ref) {
                       ),
                       GoRoute(
                         path: 'edit',
+                        parentNavigatorKey: _rootNavigatorKey,
                         pageBuilder: (context, state) {
                           if (state.pathParameters['id'] == 'new') {
                             return _fadeTransition(

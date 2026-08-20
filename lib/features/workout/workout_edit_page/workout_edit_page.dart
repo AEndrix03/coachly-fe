@@ -136,15 +136,13 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                         onAddExercise: _addExercise,
                         onAddSection: _addSection,
                         onCreateBlock: _createGroup,
+                        onEditSection: _editSection,
                       ),
                       const SizedBox(height: 8),
-                      SizedBox(
-                        height: CoachlyAthleteTheme.touchTarget,
-                        child: FilledButton.icon(
-                          onPressed: _showAddActions,
-                          icon: const Icon(Icons.add),
-                          label: Text(context.tr('workout.builder.add')),
-                        ),
+                      WorkoutStructureComposer(
+                        onAddExercise: () => _addExercise(null),
+                        onAddSection: _addSection,
+                        onCreateBlock: _createGroup,
                       ),
                     ],
                   ),
@@ -377,41 +375,6 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     }
   }
 
-  Future<void> _showAddActions() async {
-    final action = await showModalBottomSheet<String>(
-      context: context,
-      useSafeArea: true,
-      backgroundColor: context.exerciseTheme.surfaceElevated,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.fitness_center),
-              title: Text(context.tr('workout.builder.exercise')),
-              onTap: () => Navigator.pop(context, 'exercise'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.view_agenda_outlined),
-              title: Text(context.tr('workout.builder.section')),
-              onTap: () => Navigator.pop(context, 'section'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.link),
-              title: Text(context.tr('workout.builder.block')),
-              onTap: () => Navigator.pop(context, 'block'),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (!mounted) return;
-    if (action == 'exercise') await _addExercise(null);
-    if (action == 'section') await _addSection();
-    if (action == 'block') await _createGroup();
-  }
-
   Future<void> _addSection() async {
     final name = await showWorkoutSectionNameSheet(context);
     if (name?.isNotEmpty == true) {
@@ -419,6 +382,14 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
           .addSection(name);
     }
+  }
+
+  Future<void> _editSection(WorkoutSectionDraft section) async {
+    final name = await showWorkoutSectionNameSheet(context);
+    if (name?.isNotEmpty != true || !mounted) return;
+    ref
+        .read(editWorkoutControllerProvider(widget.workoutId).notifier)
+        .renameSection(section.id, name!);
   }
 
   Future<void> _createGroup() async {

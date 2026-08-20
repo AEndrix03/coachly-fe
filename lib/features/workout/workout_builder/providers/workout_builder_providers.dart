@@ -80,6 +80,20 @@ abstract mixin class WorkoutDraftMutations {
     );
   }
 
+  void renameSection(String sectionId, String name) {
+    final sections = current.draft.sections
+        .map(
+          (section) => section.id == sectionId
+              ? section.copyWith(name: name.trim())
+              : section,
+        )
+        .toList();
+    current = current.copyWith(
+      draft: current.draft.copyWith(sections: sections),
+      error: null,
+    );
+  }
+
   void addExercise(WorkoutExerciseDraft exercise, {String? sectionId}) {
     var sections = [...current.draft.sections];
     if (sections.isEmpty) {
