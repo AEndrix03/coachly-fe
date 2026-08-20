@@ -879,7 +879,8 @@ class _WorkoutSectionNameSheet extends StatefulWidget {
 
 class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
   final controller = TextEditingController();
-  String? selectedType;
+  String selectedType = 'main';
+  bool customizing = false;
 
   @override
   void dispose() {
@@ -910,42 +911,109 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 6),
           Text(
-            context.tr('workout.builder.choose_section_type'),
+            context.tr('workout.builder.section_explanation'),
             style: const TextStyle(
               color: CoachlyAthleteTheme.textSecondary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: ['preparation', 'main', 'accessories', 'finisher']
-                .map(
-                  (key) => ChoiceChip(
-                    selected: selectedType == key,
-                    label: Text(context.tr('workout.builder.section_$key')),
-                    onSelected: (_) => setState(() => selectedType = key),
-                  ),
-                )
-                .toList(),
-          ),
-          const SizedBox(height: 14),
-          TextField(
-            controller: controller,
-            autofocus: true,
-            textInputAction: TextInputAction.done,
-            onSubmitted: (_) => _submit(),
-            decoration: InputDecoration(
-              labelText: context.tr('workout.builder.custom_name'),
-              helperText: context.tr('workout.builder.optional'),
+              fontSize: 15,
+              height: 1.4,
             ),
           ),
           const SizedBox(height: 18),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children:
+                ['preparation', 'main', 'accessories', 'finisher', 'cooldown']
+                    .map(
+                      (key) => ChoiceChip(
+                        selected: selectedType == key,
+                        label: Text(context.tr('workout.builder.section_$key')),
+                        onSelected: (_) => setState(() {
+                          selectedType = key;
+                          customizing = false;
+                          controller.clear();
+                        }),
+                      ),
+                    )
+                    .toList(),
+          ),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => setState(() => customizing = !customizing),
+              child: Text(context.tr('workout.builder.customize')),
+            ),
+          ),
+          AnimatedSize(
+            duration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : CoachlyAthleteTheme.expandDuration,
+            curve: CoachlyAthleteTheme.standardCurve,
+            alignment: Alignment.topCenter,
+            child: customizing
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: TextField(
+                      controller: controller,
+                      autofocus: true,
+                      maxLength: 30,
+                      textCapitalization: TextCapitalization.sentences,
+                      textInputAction: TextInputAction.done,
+                      onChanged: (_) => setState(() {}),
+                      onSubmitted: (_) => _submit(),
+                      decoration: InputDecoration(
+                        labelText: context.tr('workout.builder.custom_name'),
+                        hintText: context.tr(
+                          'workout.builder.custom_section_hint',
+                        ),
+                        filled: false,
+                        border: const UnderlineInputBorder(),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: context.exerciseTheme.border,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+          Text(
+            context.tr('workout.builder.preview'),
+            style: const TextStyle(
+              color: CoachlyAthleteTheme.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              letterSpacing: .7,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  _sectionName.toUpperCase(),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: CoachlyAthleteTheme.textPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: .8,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(child: Divider()),
+            ],
+          ),
+          const SizedBox(height: 22),
           FilledButton(
-            onPressed: _submit,
+            onPressed: customizing && controller.text.trim().isEmpty
+                ? null
+                : _submit,
             child: Text(context.tr('workout.builder.add_section')),
           ),
         ],
@@ -954,16 +1022,14 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
   );
 
   void _submit() {
-    final value = controller.text.trim();
-    if (value.isNotEmpty) {
-      Navigator.pop(context, value);
-      return;
-    }
-    final type = selectedType;
-    if (type != null) {
-      Navigator.pop(context, context.tr('workout.builder.section_$type'));
-    }
+    if (customizing && controller.text.trim().isEmpty) return;
+    HapticFeedback.lightImpact();
+    Navigator.pop(context, _sectionName);
   }
+
+  String get _sectionName => customizing && controller.text.trim().isNotEmpty
+      ? controller.text.trim()
+      : context.tr('workout.builder.section_$selectedType');
 }
 
 class _PrescriptionEditor extends StatefulWidget {

@@ -336,6 +336,20 @@ class AppStrings {
       'it': 'Accessori',
     },
     'workout.builder.section_finisher': {'en': 'Finisher', 'it': 'Finisher'},
+    'workout.builder.section_cooldown': {
+      'en': 'Cooldown',
+      'it': 'Defaticamento',
+    },
+    'workout.builder.section_explanation': {
+      'en': "Organize exercises without changing how they're performed.",
+      'it': 'Organizza gli esercizi senza cambiarne l’esecuzione.',
+    },
+    'workout.builder.customize': {'en': 'Customize', 'it': 'Personalizza'},
+    'workout.builder.custom_section_hint': {
+      'en': 'Upper body',
+      'it': 'Parte superiore',
+    },
+    'workout.builder.preview': {'en': 'PREVIEW', 'it': 'ANTEPRIMA'},
     'workout.builder.custom_name': {
       'en': 'Custom name',
       'it': 'Nome personalizzato',
