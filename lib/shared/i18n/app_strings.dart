@@ -142,9 +142,13 @@ class AppStrings {
       'en': 'Let’s build\nyour workout.',
       'it': 'Iniziamo a creare\nla tua scheda.',
     },
+    'workout.builder.identity_subtitle': {
+      'en': 'Name your workout and choose its main goal.',
+      'it': 'Dai un nome alla scheda e scegli il suo obiettivo principale.',
+    },
     'workout.builder.title_label': {
-      'en': 'Workout title',
-      'it': 'Titolo della scheda',
+      'en': 'Workout name',
+      'it': 'Nome della scheda',
     },
     'workout.builder.title_hint': {
       'en': 'Back & Chest',
@@ -155,8 +159,8 @@ class AppStrings {
       'it': 'Obiettivo della sessione',
     },
     'workout.builder.focus_label': {
-      'en': 'Focus (optional)',
-      'it': 'Focus (opzionale)',
+      'en': 'Session note',
+      'it': 'Nota della sessione',
     },
     'workout.builder.focus_hint': {
       'en': 'What should this session emphasize?',
@@ -168,6 +172,31 @@ class AppStrings {
     },
     'workout.builder.goal_strength': {'en': 'Strength', 'it': 'Forza'},
     'workout.builder.goal_general': {'en': 'General', 'it': 'Generale'},
+    'workout.builder.goal_hypertrophy_description': {
+      'en': 'Muscle growth',
+      'it': 'Crescita muscolare',
+    },
+    'workout.builder.goal_strength_description': {
+      'en': 'Performance & load',
+      'it': 'Performance e carico',
+    },
+    'workout.builder.goal_general_description': {
+      'en': 'Balanced training',
+      'it': 'Allenamento bilanciato',
+    },
+    'workout.builder.goal_info_tooltip': {
+      'en': 'About session goals',
+      'it': 'Informazioni sugli obiettivi della sessione',
+    },
+    'workout.builder.add_session_note': {
+      'en': 'Add a session note',
+      'it': 'Aggiungi una nota alla sessione',
+    },
+    'workout.builder.session_note': {
+      'en': 'Session note',
+      'it': 'Nota della sessione',
+    },
+    'workout.builder.optional': {'en': 'Optional', 'it': 'Opzionale'},
     'workout.builder.goal_info_title': {
       'en': 'Session context',
       'it': 'Contesto della sessione',
@@ -178,7 +207,7 @@ class AppStrings {
       'it':
           'L’obiettivo descrive il tipo principale di lavoro previsto nella sessione e aiuta Coachly a presentare il contesto della scheda.',
     },
-    'workout.builder.continue_action': {'en': 'Continue →', 'it': 'Continua →'},
+    'workout.builder.continue_action': {'en': 'Continue', 'it': 'Continua'},
     'workout.builder.review_action': {
       'en': 'Review workout',
       'it': 'Rivedi la scheda',
@@ -195,6 +224,16 @@ class AppStrings {
       'en': 'Add your first exercise to start building the workout.',
       'it': 'Aggiungi il primo esercizio per iniziare a costruire la scheda.',
     },
+    'workout.builder.empty_title': {
+      'en': 'Build your session',
+      'it': 'Costruisci la sessione',
+    },
+    'workout.builder.empty_body': {
+      'en':
+          'Start with your first exercise. You can organize it later into sections or blocks.',
+      'it':
+          'Inizia dal primo esercizio. Potrai organizzarlo in sezioni o blocchi in seguito.',
+    },
     'workout.builder.add_first_exercise': {
       'en': 'Add first exercise',
       'it': 'Aggiungi il primo esercizio',
@@ -204,8 +243,8 @@ class AppStrings {
     'workout.builder.section': {'en': 'Section', 'it': 'Sezione'},
     'workout.builder.block': {'en': 'Block', 'it': 'Blocco'},
     'workout.builder.section_empty': {
-      'en': 'Add an exercise or block',
-      'it': 'Aggiungi un esercizio o un blocco',
+      'en': 'Add exercise',
+      'it': 'Aggiungi esercizio',
     },
     'workout.builder.position': {
       'en': 'position {position}',
@@ -214,6 +253,31 @@ class AppStrings {
     'workout.builder.programming': {
       'en': 'Programming',
       'it': 'Programmazione',
+    },
+    'workout.builder.rep_range': {
+      'en': 'Rep range',
+      'it': 'Range di ripetizioni',
+    },
+    'workout.builder.rest': {'en': 'Rest', 'it': 'Recupero'},
+    'workout.builder.target_load_heading': {
+      'en': 'TARGET LOAD',
+      'it': 'CARICO TARGET',
+    },
+    'workout.builder.from_history': {
+      'en': 'From history',
+      'it': 'Dallo storico',
+    },
+    'workout.builder.intensity': {'en': 'Intensity', 'it': 'Intensità'},
+    'workout.builder.progression': {'en': 'Progression', 'it': 'Progressione'},
+    'workout.builder.advanced': {'en': 'Advanced', 'it': 'Avanzate'},
+    'workout.builder.not_configured': {
+      'en': 'Not configured',
+      'it': 'Non configurata',
+    },
+    'workout.builder.manual': {'en': 'Manual', 'it': 'Manuale'},
+    'workout.builder.advanced_summary': {
+      'en': 'Tempo, set types, notes…',
+      'it': 'Tempo, tipi di serie, note…',
     },
     'workout.builder.reps_min': {
       'en': 'Minimum reps',
@@ -257,6 +321,56 @@ class AppStrings {
     'workout.builder.add_section': {
       'en': 'Add section',
       'it': 'Aggiungi sezione',
+    },
+    'workout.builder.choose_section_type': {
+      'en': 'Choose a type',
+      'it': 'Scegli un tipo',
+    },
+    'workout.builder.open_exercise_details': {
+      'en': 'Open {name} details',
+      'it': 'Apri i dettagli di {name}',
+    },
+    'workout.builder.item_actions': {
+      'en': 'Exercise actions',
+      'it': 'Azioni esercizio',
+    },
+    'workout.builder.move': {'en': 'Move', 'it': 'Sposta'},
+    'workout.builder.move_to_section': {
+      'en': 'Move to section',
+      'it': 'Sposta nella sezione',
+    },
+    'workout.builder.main_section': {'en': 'Main', 'it': 'Principale'},
+    'workout.builder.more_actions': {
+      'en': 'More structure actions',
+      'it': 'Altre azioni sulla struttura',
+    },
+    'workout.builder.create_block': {
+      'en': 'Create exercise block',
+      'it': 'Crea un blocco di esercizi',
+    },
+    'workout.builder.configure_block': {
+      'en': 'Configure exercise block',
+      'it': 'Configura il blocco di esercizi',
+    },
+    'workout.builder.rest_after_round': {
+      'en': 'Rest after round · {duration}',
+      'it': 'Recupero dopo il round · {duration}',
+    },
+    'workout.builder.selected_exercises': {
+      'en': 'SELECTED',
+      'it': 'SELEZIONATI',
+    },
+    'workout.builder.between_exercises': {
+      'en': 'Between exercises',
+      'it': 'Tra gli esercizi',
+    },
+    'workout.builder.after_each_round': {
+      'en': 'After each round',
+      'it': 'Dopo ogni round',
+    },
+    'workout.builder.review_summary': {
+      'en': '{exercises} · ~{minutes} min',
+      'it': '{exercises} · ~{minutes} min',
     },
     'workout.builder.create_superset': {
       'en': 'Create a superset',

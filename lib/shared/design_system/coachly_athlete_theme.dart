@@ -16,6 +16,7 @@ abstract final class CoachlyAthleteTheme {
   static const compactRadius = 10.0;
   static const actionRadius = 16.0;
   static const touchTarget = 48.0;
+  static const primaryActionHeight = 56.0;
   static const cardPadding = 16.0;
 
   static const expandDuration = Duration(milliseconds: 200);

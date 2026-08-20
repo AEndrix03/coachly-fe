@@ -115,6 +115,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                       WorkoutDraftStructure(
                         draft: state.draft,
                         onEditExercise: _editExercise,
+                        onEditBlock: _editBlock,
+                        onOpenExercise: _openExerciseDetail,
                         onReorder: (section, oldIndex, newIndex) => ref
                             .read(
                               editWorkoutControllerProvider(
@@ -123,7 +125,17 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                             )
                             .reorderInSection(section, oldIndex, newIndex),
                         onRemove: _removeItem,
+                        onDuplicate: (id) => ref
+                            .read(
+                              editWorkoutControllerProvider(
+                                widget.workoutId,
+                              ).notifier,
+                            )
+                            .duplicateItem(id),
+                        onMove: _moveItem,
                         onAddExercise: _addExercise,
+                        onAddSection: _addSection,
+                        onCreateBlock: _createGroup,
                       ),
                       const SizedBox(height: 8),
                       SizedBox(
@@ -226,7 +238,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         ),
       ),
     );
-    if (apply == true)
+    if (apply == true) {
       ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
           .updateMetadata(
@@ -234,6 +246,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             goal: goal,
             focus: focus.trim().isEmpty ? null : focus.trim(),
           );
+    }
   }
 
   Future<void> _addExercise(String? sectionId) async {
@@ -271,10 +284,66 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       exercise,
       adding: false,
     );
-    if (updated != null)
+    if (updated != null) {
       ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
           .updateExercise(updated);
+    }
+  }
+
+  Future<void> _editBlock(WorkoutExerciseGroupDraft group) async {
+    final updated = await showWorkoutBlockEditor(context, group);
+    if (updated == null || !mounted) return;
+    ref
+        .read(editWorkoutControllerProvider(widget.workoutId).notifier)
+        .updateGroup(updated);
+  }
+
+  Future<void> _openExerciseDetail(WorkoutExerciseDraft exercise) async {
+    await context.push('/exercises/${exercise.exerciseId}?mode=view');
+  }
+
+  Future<void> _moveItem(String itemId) async {
+    final sections = ref
+        .read(editWorkoutControllerProvider(widget.workoutId))
+        .draft
+        .sections;
+    if (sections.length < 2) return;
+    final destination = await showModalBottomSheet<String>(
+      context: context,
+      useSafeArea: true,
+      backgroundColor: context.exerciseTheme.surfaceElevated,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.tr('workout.builder.move_to_section'),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: context.exerciseTheme.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...sections.map(
+              (section) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  section.name ?? context.tr('workout.builder.main_section'),
+                ),
+                onTap: () => Navigator.pop(context, section.id),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (destination == null || !mounted) return;
+    ref
+        .read(editWorkoutControllerProvider(widget.workoutId).notifier)
+        .moveItemToSection(itemId, destination);
   }
 
   void _removeItem(String id) {
@@ -345,10 +414,11 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
 
   Future<void> _addSection() async {
     final name = await showWorkoutSectionNameSheet(context);
-    if (name?.isNotEmpty == true)
+    if (name?.isNotEmpty == true) {
       ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
           .addSection(name);
+    }
   }
 
   Future<void> _createGroup() async {
@@ -402,13 +472,14 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         ),
       ),
     );
-    if (ok == true)
+    if (ok == true) {
       ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
           .createGroup(
             type: WorkoutGroupType.superset,
             itemIds: selected.toList(),
           );
+    }
   }
 
   Future<void> _commit() async {

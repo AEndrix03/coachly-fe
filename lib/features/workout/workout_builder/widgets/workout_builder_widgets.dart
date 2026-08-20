@@ -33,7 +33,8 @@ class WorkoutBuilderSummary extends StatelessWidget {
       const SizedBox(height: 8),
       Text(
         [
-          if (draft.trainingGoal?.isNotEmpty == true) draft.trainingGoal!,
+          if (draft.trainingGoal?.isNotEmpty == true)
+            context.tr('workout.builder.goal_${draft.trainingGoal}'),
           context.tr(
             draft.exerciseCount == 1
                 ? 'workout.detail.exercise_count_one'
@@ -57,49 +58,39 @@ class WorkoutBuilderSummary extends StatelessWidget {
 class WorkoutDraftStructure extends StatelessWidget {
   final WorkoutDraft draft;
   final ValueChanged<WorkoutExerciseDraft> onEditExercise;
+  final ValueChanged<WorkoutExerciseGroupDraft> onEditBlock;
+  final ValueChanged<WorkoutExerciseDraft> onOpenExercise;
   final void Function(String sectionId, int oldIndex, int newIndex) onReorder;
   final ValueChanged<String> onRemove;
+  final ValueChanged<String> onDuplicate;
+  final ValueChanged<String> onMove;
   final ValueChanged<String?> onAddExercise;
+  final VoidCallback onAddSection;
+  final VoidCallback onCreateBlock;
   final bool editable;
 
   const WorkoutDraftStructure({
     super.key,
     required this.draft,
     required this.onEditExercise,
+    required this.onEditBlock,
+    required this.onOpenExercise,
     required this.onReorder,
     required this.onRemove,
+    required this.onDuplicate,
+    required this.onMove,
     required this.onAddExercise,
+    required this.onAddSection,
+    required this.onCreateBlock,
     this.editable = true,
   });
 
   @override
   Widget build(BuildContext context) {
     if (draft.exerciseCount == 0 && draft.sections.isEmpty) {
-      return CoachlySurface(
-        child: Column(
-          children: [
-            const Icon(
-              Icons.fitness_center_rounded,
-              color: CoachlyAthleteTheme.textSecondary,
-              size: 32,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              context.tr('workout.builder.empty'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: CoachlyAthleteTheme.textPrimary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 14),
-            FilledButton.icon(
-              onPressed: () => onAddExercise(null),
-              icon: const Icon(Icons.add),
-              label: Text(context.tr('workout.builder.add_first_exercise')),
-            ),
-          ],
-        ),
+      return _WorkoutEmptyState(
+        onAddExercise: () => onAddExercise(null),
+        onAddSection: onAddSection,
       );
     }
     return Column(
@@ -140,7 +131,7 @@ class WorkoutDraftStructure extends StatelessWidget {
                       proxyDecorator: (child, _, animation) => AnimatedBuilder(
                         animation: animation,
                         builder: (_, child) => Transform.scale(
-                          scale: 1 + animation.value * .025,
+                          scale: 1 + animation.value * .015,
                           child: Material(
                             color: Colors.transparent,
                             elevation: 8,
@@ -155,7 +146,11 @@ class WorkoutDraftStructure extends StatelessWidget {
                         index: index,
                         editable: editable,
                         onEditExercise: onEditExercise,
+                        onEditBlock: onEditBlock,
+                        onOpenExercise: onOpenExercise,
                         onRemove: onRemove,
+                        onDuplicate: onDuplicate,
+                        onMove: onMove,
                       ),
                     )
                   else
@@ -166,7 +161,11 @@ class WorkoutDraftStructure extends StatelessWidget {
                         index: pair.$1,
                         editable: false,
                         onEditExercise: onEditExercise,
+                        onEditBlock: onEditBlock,
+                        onOpenExercise: onOpenExercise,
                         onRemove: onRemove,
+                        onDuplicate: onDuplicate,
+                        onMove: onMove,
                       ),
                     ),
                   if (editable && section.items.isNotEmpty)
@@ -175,7 +174,7 @@ class WorkoutDraftStructure extends StatelessWidget {
                       child: TextButton.icon(
                         onPressed: () => onAddExercise(section.id),
                         icon: const Icon(Icons.add),
-                        label: Text(context.tr('workout.builder.add')),
+                        label: Text(context.tr('workout.builder.add_exercise')),
                       ),
                     ),
                 ],
@@ -198,19 +197,79 @@ class _SectionEmpty extends StatelessWidget {
   );
 }
 
+class _WorkoutEmptyState extends StatelessWidget {
+  final VoidCallback onAddExercise;
+  final VoidCallback onAddSection;
+
+  const _WorkoutEmptyState({
+    required this.onAddExercise,
+    required this.onAddSection,
+  });
+
+  @override
+  Widget build(BuildContext context) => AnimatedSwitcher(
+    duration: MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : CoachlyAthleteTheme.expandDuration,
+    child: Padding(
+      key: const ValueKey('workout-empty'),
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.tr('workout.builder.empty_title'),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: context.exerciseTheme.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            context.tr('workout.builder.empty_body'),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: context.exerciseTheme.textSecondary,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 20),
+          FilledButton.icon(
+            onPressed: onAddExercise,
+            icon: const Icon(Icons.add),
+            label: Text(context.tr('workout.builder.add_first_exercise')),
+          ),
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: onAddSection,
+            child: Text(context.tr('workout.builder.add_section')),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 class _DraftItem extends StatelessWidget {
   final WorkoutStructureItemDraft item;
   final int index;
   final bool editable;
   final ValueChanged<WorkoutExerciseDraft> onEditExercise;
+  final ValueChanged<WorkoutExerciseGroupDraft> onEditBlock;
+  final ValueChanged<WorkoutExerciseDraft> onOpenExercise;
   final ValueChanged<String> onRemove;
+  final ValueChanged<String> onDuplicate;
+  final ValueChanged<String> onMove;
   const _DraftItem({
     super.key,
     required this.item,
     required this.index,
     required this.editable,
     required this.onEditExercise,
+    required this.onEditBlock,
+    required this.onOpenExercise,
     required this.onRemove,
+    required this.onDuplicate,
+    required this.onMove,
   });
 
   @override
@@ -220,6 +279,7 @@ class _DraftItem extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: CoachlySurface(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -241,14 +301,34 @@ class _DraftItem extends StatelessWidget {
                     ),
                   ),
                   if (editable)
-                    _RemoveButton(onRemove: () => onRemove(group.id)),
+                    _ItemMenu(
+                      onEdit: () => onEditBlock(group),
+                      onDuplicate: () => onDuplicate(group.id),
+                      onMove: () => onMove(group.id),
+                      onRemove: () => onRemove(group.id),
+                    ),
                 ],
               ),
               ...group.exercises.indexed.map(
                 (pair) => _ExerciseLine(
                   exercise: pair.$2,
-                  prefix: '${String.fromCharCode(65 + index)}${pair.$1 + 1}',
-                  onTap: () => onEditExercise(pair.$2),
+                  prefix: 'A${pair.$1 + 1}',
+                  onEdit: () => onEditExercise(pair.$2),
+                  onOpen: () => onOpenExercise(pair.$2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 48, top: 6),
+                child: Text(
+                  context.tr(
+                    'workout.builder.rest_after_round',
+                    params: {
+                      'duration': formatDuration(group.roundRestSeconds),
+                    },
+                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: context.exerciseTheme.textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -263,6 +343,7 @@ class _DraftItem extends StatelessWidget {
         label:
             '${exercise.name}, ${context.tr('workout.builder.position', params: {'position': '${index + 1}'})}',
         child: CoachlySurface(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
             children: [
               if (editable)
@@ -274,10 +355,17 @@ class _DraftItem extends StatelessWidget {
                 child: _ExerciseLine(
                   exercise: exercise,
                   prefix: '${index + 1}'.padLeft(2, '0'),
-                  onTap: () => onEditExercise(exercise),
+                  onEdit: () => onEditExercise(exercise),
+                  onOpen: () => onOpenExercise(exercise),
                 ),
               ),
-              if (editable) _RemoveButton(onRemove: () => onRemove(item.id)),
+              if (editable)
+                _ItemMenu(
+                  onEdit: () => onEditExercise(exercise),
+                  onDuplicate: () => onDuplicate(item.id),
+                  onMove: () => onMove(item.id),
+                  onRemove: () => onRemove(item.id),
+                ),
             ],
           ),
         ),
@@ -289,15 +377,17 @@ class _DraftItem extends StatelessWidget {
 class _ExerciseLine extends StatelessWidget {
   final WorkoutExerciseDraft exercise;
   final String prefix;
-  final VoidCallback onTap;
+  final VoidCallback onEdit;
+  final VoidCallback onOpen;
   const _ExerciseLine({
     required this.exercise,
     required this.prefix,
-    required this.onTap,
+    required this.onEdit,
+    required this.onOpen,
   });
   @override
   Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
+    onTap: onEdit,
     borderRadius: BorderRadius.circular(CoachlyAthleteTheme.compactRadius),
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -318,18 +408,45 @@ class _ExerciseLine extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  exercise.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: CoachlyAthleteTheme.textPrimary,
-                    fontWeight: FontWeight.w700,
+                Semantics(
+                  button: true,
+                  label: context.tr(
+                    'workout.builder.open_exercise_details',
+                    params: {'name': exercise.name},
+                  ),
+                  child: InkWell(
+                    onTap: onOpen,
+                    borderRadius: BorderRadius.circular(
+                      CoachlyAthleteTheme.compactRadius,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 32),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              exercise.name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: CoachlyAthleteTheme.textPrimary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.chevron_right,
+                            size: 18,
+                            color: CoachlyAthleteTheme.textSecondary,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
-                  '${exercise.sets} × ${exercise.repTarget.compactLabel} · ${formatDuration(exercise.recoverySeconds)}',
+                  formatPrescription(exercise),
                   style: const TextStyle(
                     color: CoachlyAthleteTheme.textSecondary,
                     fontSize: 13,
@@ -357,14 +474,55 @@ class _DragHandle extends StatelessWidget {
   );
 }
 
-class _RemoveButton extends StatelessWidget {
+enum _ItemAction { edit, duplicate, move, remove }
+
+class _ItemMenu extends StatelessWidget {
+  final VoidCallback onEdit;
+  final VoidCallback onDuplicate;
+  final VoidCallback onMove;
   final VoidCallback onRemove;
-  const _RemoveButton({required this.onRemove});
+
+  const _ItemMenu({
+    required this.onEdit,
+    required this.onDuplicate,
+    required this.onMove,
+    required this.onRemove,
+  });
+
   @override
-  Widget build(BuildContext context) => IconButton(
-    onPressed: onRemove,
-    tooltip: context.tr('common.delete'),
-    icon: const Icon(Icons.close, color: CoachlyAthleteTheme.textSecondary),
+  Widget build(BuildContext context) => PopupMenuButton<_ItemAction>(
+    tooltip: context.tr('workout.builder.item_actions'),
+    icon: const Icon(
+      Icons.more_horiz,
+      color: CoachlyAthleteTheme.textSecondary,
+    ),
+    onSelected: (action) => switch (action) {
+      _ItemAction.edit => onEdit(),
+      _ItemAction.duplicate => onDuplicate(),
+      _ItemAction.move => onMove(),
+      _ItemAction.remove => onRemove(),
+    },
+    itemBuilder: (context) => [
+      PopupMenuItem(
+        value: _ItemAction.edit,
+        child: Text(context.tr('common.edit')),
+      ),
+      PopupMenuItem(
+        value: _ItemAction.duplicate,
+        child: Text(context.tr('common.duplicate')),
+      ),
+      PopupMenuItem(
+        value: _ItemAction.move,
+        child: Text(context.tr('workout.builder.move')),
+      ),
+      PopupMenuItem(
+        value: _ItemAction.remove,
+        child: Text(
+          context.tr('common.delete'),
+          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        ),
+      ),
+    ],
   );
 }
 
@@ -374,6 +532,8 @@ class NumericStepper extends StatelessWidget {
   final ValueChanged<int> onChanged;
   final int min;
   final int max;
+  final int step;
+  final String Function(int value)? formatter;
   const NumericStepper({
     super.key,
     required this.label,
@@ -381,11 +541,13 @@ class NumericStepper extends StatelessWidget {
     required this.onChanged,
     this.min = 0,
     this.max = 99,
+    this.step = 1,
+    this.formatter,
   });
   @override
   Widget build(BuildContext context) => Semantics(
     container: true,
-    label: '$label. $value',
+    label: '$label. ${formatter?.call(value) ?? value}',
     child: Row(
       children: [
         Expanded(
@@ -398,10 +560,10 @@ class NumericStepper extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: value > min
+          onPressed: value - step >= min
               ? () {
                   HapticFeedback.selectionClick();
-                  onChanged(value - 1);
+                  onChanged(value - step);
                 }
               : null,
           tooltip: context.tr(
@@ -413,7 +575,7 @@ class NumericStepper extends StatelessWidget {
         ConstrainedBox(
           constraints: const BoxConstraints(minWidth: 44),
           child: Text(
-            '$value',
+            formatter?.call(value) ?? '$value',
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: CoachlyAthleteTheme.textPrimary,
@@ -423,10 +585,10 @@ class NumericStepper extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: value < max
+          onPressed: value + step <= max
               ? () {
                   HapticFeedback.selectionClick();
-                  onChanged(value + 1);
+                  onChanged(value + step);
                 }
               : null,
           tooltip: context.tr(
@@ -437,6 +599,58 @@ class NumericStepper extends StatelessWidget {
         ),
       ],
     ),
+  );
+}
+
+class RepRangeControl extends StatelessWidget {
+  final String label;
+  final int min;
+  final int max;
+  final void Function(int min, int max) onChanged;
+
+  const RepRangeControl({
+    super.key,
+    required this.label,
+    required this.min,
+    required this.max,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) => NumericStepper(
+    label: label,
+    value: min,
+    min: 1,
+    max: 99,
+    formatter: (_) => min == max ? '$min' : '$min–$max',
+    onChanged: (value) {
+      final delta = value - min;
+      onChanged(value, (max + delta).clamp(value, 99));
+    },
+  );
+}
+
+class DurationStepper extends StatelessWidget {
+  final String label;
+  final int seconds;
+  final ValueChanged<int> onChanged;
+
+  const DurationStepper({
+    super.key,
+    required this.label,
+    required this.seconds,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) => NumericStepper(
+    label: label,
+    value: seconds,
+    min: 0,
+    max: 900,
+    step: 30,
+    formatter: formatDuration,
+    onChanged: onChanged,
   );
 }
 
@@ -453,7 +667,17 @@ Future<WorkoutExerciseDraft?> showPrescriptionEditor(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
-    builder: (_) => _PrescriptionEditor(initial: initial, adding: adding),
+    builder: (_) => DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: .78,
+      minChildSize: .55,
+      maxChildSize: .94,
+      builder: (context, scrollController) => _PrescriptionEditor(
+        initial: initial,
+        adding: adding,
+        scrollController: scrollController,
+      ),
+    ),
   );
 }
 
@@ -476,6 +700,7 @@ class _WorkoutSectionNameSheet extends StatefulWidget {
 
 class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
   final controller = TextEditingController();
+  String? selectedType;
 
   @override
   void dispose() {
@@ -507,17 +732,23 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
             ),
           ),
           const SizedBox(height: 16),
+          Text(
+            context.tr('workout.builder.choose_section_type'),
+            style: const TextStyle(
+              color: CoachlyAthleteTheme.textSecondary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: ['preparation', 'main', 'accessories', 'finisher']
                 .map(
-                  (key) => ActionChip(
+                  (key) => ChoiceChip(
+                    selected: selectedType == key,
                     label: Text(context.tr('workout.builder.section_$key')),
-                    onPressed: () => Navigator.pop(
-                      context,
-                      context.tr('workout.builder.section_$key'),
-                    ),
+                    onSelected: (_) => setState(() => selectedType = key),
                   ),
                 )
                 .toList(),
@@ -530,6 +761,7 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
             onSubmitted: (_) => _submit(),
             decoration: InputDecoration(
               labelText: context.tr('workout.builder.custom_name'),
+              helperText: context.tr('workout.builder.optional'),
             ),
           ),
           const SizedBox(height: 18),
@@ -544,14 +776,26 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
 
   void _submit() {
     final value = controller.text.trim();
-    if (value.isNotEmpty) Navigator.pop(context, value);
+    if (value.isNotEmpty) {
+      Navigator.pop(context, value);
+      return;
+    }
+    final type = selectedType;
+    if (type != null) {
+      Navigator.pop(context, context.tr('workout.builder.section_$type'));
+    }
   }
 }
 
 class _PrescriptionEditor extends StatefulWidget {
   final WorkoutExerciseDraft initial;
   final bool adding;
-  const _PrescriptionEditor({required this.initial, required this.adding});
+  final ScrollController scrollController;
+  const _PrescriptionEditor({
+    required this.initial,
+    required this.adding,
+    required this.scrollController,
+  });
   @override
   State<_PrescriptionEditor> createState() => _PrescriptionEditorState();
 }
@@ -571,134 +815,306 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
   }
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.fromLTRB(
-      20,
-      12,
-      20,
-      20 + MediaQuery.viewInsetsOf(context).bottom,
-    ),
-    child: SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: CoachlyAthleteTheme.textSecondary.withValues(alpha: .45),
-                borderRadius: BorderRadius.circular(99),
+  Widget build(BuildContext context) => Column(
+    children: [
+      Expanded(
+        child: SingleChildScrollView(
+          controller: widget.scrollController,
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: CoachlyAthleteTheme.textSecondary.withValues(
+                      alpha: .45,
+                    ),
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              Text(
+                widget.initial.name,
+                style: const TextStyle(
+                  color: CoachlyAthleteTheme.textPrimary,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                context.tr('workout.builder.programming'),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: CoachlyAthleteTheme.textSecondary,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: .7,
+                ),
+              ),
+              const SizedBox(height: 20),
+              NumericStepper(
+                label: context.tr('workout.sets'),
+                value: sets,
+                min: 1,
+                onChanged: (v) => setState(() => sets = v),
+              ),
+              RepRangeControl(
+                label: context.tr('workout.builder.rep_range'),
+                min: min,
+                max: max,
+                onChanged: (newMin, newMax) => setState(() {
+                  min = newMin;
+                  max = newMax;
+                }),
+              ),
+              DurationStepper(
+                label: context.tr('workout.builder.rest'),
+                seconds: recovery,
+                onChanged: (value) => setState(() => recovery = value),
+              ),
+              const SizedBox(height: 22),
+              Text(
+                context.tr('workout.builder.target_load_heading'),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: CoachlyAthleteTheme.textSecondary,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: .7,
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: load,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                ],
+                decoration: InputDecoration(
+                  labelText: context.tr('workout.detail.target_load'),
+                  hintText: context.tr('workout.builder.from_history'),
+                  suffixText: widget.initial.loadUnit,
+                ),
+              ),
+              const SizedBox(height: 22),
+              _ProgrammingFutureRow(
+                label: context.tr('workout.builder.intensity'),
+                value: context.tr('workout.builder.not_configured'),
+              ),
+              _ProgrammingFutureRow(
+                label: context.tr('workout.builder.progression'),
+                value: context.tr('workout.builder.manual'),
+              ),
+              _ProgrammingFutureRow(
+                label: context.tr('workout.builder.advanced'),
+                value: context.tr('workout.builder.advanced_summary'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      AnimatedPadding(
+        duration: CoachlyAthleteTheme.expandDuration,
+        padding: EdgeInsets.fromLTRB(
+          20,
+          10,
+          20,
+          12 + MediaQuery.viewInsetsOf(context).bottom,
+        ),
+        child: SizedBox(
+          width: double.infinity,
+          height: CoachlyAthleteTheme.primaryActionHeight,
+          child: FilledButton(
+            onPressed: () => Navigator.pop(
+              context,
+              widget.initial.copyWith(
+                sets: sets,
+                repTarget: min == max
+                    ? RepTarget.fixed(min)
+                    : RepTarget.range(min: min, max: max),
+                recoverySeconds: recovery,
+                targetLoad: double.tryParse(load.text.replaceAll(',', '.')),
+              ),
+            ),
+            child: Text(
+              context.tr(
+                widget.adding
+                    ? 'workout.builder.add_exercise'
+                    : 'workout.builder.save_changes',
               ),
             ),
           ),
-          const SizedBox(height: 22),
-          Text(
-            widget.initial.name,
+        ),
+      ),
+    ],
+  );
+}
+
+class _ProgrammingFutureRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _ProgrammingFutureRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 10),
+    child: Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
             style: const TextStyle(
               color: CoachlyAthleteTheme.textPrimary,
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
-          Text(
-            context.tr('workout.builder.programming'),
+        ),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
             style: const TextStyle(color: CoachlyAthleteTheme.textSecondary),
           ),
-          const SizedBox(height: 20),
-          NumericStepper(
-            label: context.tr('workout.sets'),
-            value: sets,
-            min: 1,
-            onChanged: (v) => setState(() => sets = v),
-          ),
-          NumericStepper(
-            label: context.tr('workout.builder.reps_min'),
-            value: min,
-            min: 1,
-            onChanged: (v) => setState(() {
-              min = v;
-              if (max < min) max = min;
-            }),
-          ),
-          NumericStepper(
-            label: context.tr('workout.builder.reps_max'),
-            value: max,
-            min: min,
-            onChanged: (v) => setState(() => max = v),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            context.tr('workout.detail.recovery'),
-            style: const TextStyle(
-              color: CoachlyAthleteTheme.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [30, 60, 90, 120, 180]
-                .map(
-                  (seconds) => ChoiceChip(
-                    selected: recovery == seconds,
-                    label: Text(formatDuration(seconds)),
-                    onSelected: (_) {
-                      HapticFeedback.selectionClick();
-                      setState(() => recovery = seconds);
-                    },
+        ),
+      ],
+    ),
+  );
+}
+
+Future<WorkoutExerciseGroupDraft?> showWorkoutBlockEditor(
+  BuildContext context,
+  WorkoutExerciseGroupDraft initial,
+) => showModalBottomSheet<WorkoutExerciseGroupDraft>(
+  context: context,
+  useSafeArea: true,
+  isScrollControlled: true,
+  backgroundColor: context.exerciseTheme.surfaceElevated,
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  ),
+  builder: (_) => _WorkoutBlockEditor(initial: initial),
+);
+
+class _WorkoutBlockEditor extends StatefulWidget {
+  final WorkoutExerciseGroupDraft initial;
+
+  const _WorkoutBlockEditor({required this.initial});
+
+  @override
+  State<_WorkoutBlockEditor> createState() => _WorkoutBlockEditorState();
+}
+
+class _WorkoutBlockEditorState extends State<_WorkoutBlockEditor> {
+  late int rounds = widget.initial.rounds;
+  late int between = widget.initial.intraExerciseRestSeconds;
+  late int afterRound = widget.initial.roundRestSeconds;
+  late List<WorkoutExerciseDraft> exercises = [...widget.initial.exercises];
+
+  @override
+  Widget build(BuildContext context) => DraggableScrollableSheet(
+    expand: false,
+    initialChildSize: .72,
+    minChildSize: .5,
+    maxChildSize: .92,
+    builder: (context, scrollController) => Column(
+      children: [
+        Expanded(
+          child: ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+            children: [
+              Text(
+                context.tr('workout.builder.configure_block'),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: context.exerciseTheme.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 18),
+              ReorderableListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                buildDefaultDragHandles: false,
+                itemCount: exercises.length,
+                onReorder: (oldIndex, newIndex) => setState(() {
+                  if (newIndex > oldIndex) newIndex -= 1;
+                  final exercise = exercises.removeAt(oldIndex);
+                  exercises.insert(newIndex, exercise);
+                }),
+                itemBuilder: (context, index) => ListTile(
+                  key: ValueKey(exercises[index].localId),
+                  contentPadding: EdgeInsets.zero,
+                  leading: Text('A${index + 1}'),
+                  title: Text(exercises[index].name),
+                  subtitle: Text(
+                    formatPrescription(exercises[index]),
+                    style: TextStyle(
+                      color: context.exerciseTheme.textSecondary,
+                    ),
                   ),
-                )
-                .toList(),
-          ),
-          const SizedBox(height: 18),
-          TextField(
-            controller: load,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                  trailing: ReorderableDragStartListener(
+                    index: index,
+                    child: const SizedBox(
+                      width: CoachlyAthleteTheme.touchTarget,
+                      height: CoachlyAthleteTheme.touchTarget,
+                      child: Icon(Icons.drag_indicator_rounded),
+                    ),
+                  ),
+                ),
+              ),
+              NumericStepper(
+                label: context.tr('workout.detail.rounds'),
+                value: rounds,
+                min: 1,
+                onChanged: (value) => setState(() => rounds = value),
+              ),
+              DurationStepper(
+                label: context.tr('workout.builder.between_exercises'),
+                seconds: between,
+                onChanged: (value) => setState(() => between = value),
+              ),
+              DurationStepper(
+                label: context.tr('workout.builder.after_each_round'),
+                seconds: afterRound,
+                onChanged: (value) => setState(() => afterRound = value),
+              ),
             ],
-            decoration: InputDecoration(
-              labelText: context.tr('workout.detail.target_load'),
-              suffixText: widget.initial.loadUnit,
-            ),
           ),
-          const SizedBox(height: 24),
-          SizedBox(
+        ),
+        SafeArea(
+          top: false,
+          minimum: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+          child: SizedBox(
             width: double.infinity,
-            height: CoachlyAthleteTheme.touchTarget,
+            height: CoachlyAthleteTheme.primaryActionHeight,
             child: FilledButton(
               onPressed: () => Navigator.pop(
                 context,
                 widget.initial.copyWith(
-                  sets: sets,
-                  repTarget: min == max
-                      ? RepTarget.fixed(min)
-                      : RepTarget.range(min: min, max: max),
-                  recoverySeconds: recovery,
-                  targetLoad: double.tryParse(load.text.replaceAll(',', '.')),
+                  exercises: exercises,
+                  rounds: rounds,
+                  intraExerciseRestSeconds: between,
+                  roundRestSeconds: afterRound,
                 ),
               ),
-              child: Text(
-                context.tr(
-                  widget.adding
-                      ? 'workout.builder.add_exercise'
-                      : 'workout.builder.save_changes',
-                ),
-              ),
+              child: Text(context.tr('workout.builder.save_changes')),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     ),
   );
 }
 
 String formatDuration(int seconds) =>
     '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
+String formatPrescription(WorkoutExerciseDraft exercise) =>
+    '${exercise.sets} × ${exercise.repTarget.compactLabel} · ${formatDuration(exercise.recoverySeconds)}';
 String _groupLabel(BuildContext context, WorkoutGroupType type) =>
     context.tr(switch (type) {
       WorkoutGroupType.superset => 'workout.detail.superset',

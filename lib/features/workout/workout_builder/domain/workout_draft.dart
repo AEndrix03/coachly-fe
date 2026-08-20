@@ -229,8 +229,9 @@ abstract final class WorkoutDraftRules {
     for (final section in draft.sections) {
       for (final item in section.items) {
         if (!ids.add(item.id)) errors.add('duplicate_id');
-        if (item is WorkoutExerciseGroupDraft && item.exercises.length < 2)
+        if (item is WorkoutExerciseGroupDraft && item.exercises.length < 2) {
           errors.add('group');
+        }
         for (final exercise in item.exercises) {
           if (exercise.exerciseId.isEmpty ||
               exercise.sets < 1 ||

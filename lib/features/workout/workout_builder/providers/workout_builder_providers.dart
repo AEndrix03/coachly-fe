@@ -105,8 +105,9 @@ abstract mixin class WorkoutDraftMutations {
           (section) => section.copyWith(
             items: section.items.map((item) {
               if (item is WorkoutExerciseItemDraft &&
-                  item.id == exercise.localId)
+                  item.id == exercise.localId) {
                 return WorkoutExerciseItemDraft(exercise);
+              }
               if (item is WorkoutExerciseGroupDraft &&
                   item.exercises.any((e) => e.localId == exercise.localId)) {
                 return item.copyWith(
@@ -117,6 +118,22 @@ abstract mixin class WorkoutDraftMutations {
               }
               return item;
             }).toList(),
+          ),
+        )
+        .toList();
+    current = current.copyWith(
+      draft: current.draft.copyWith(sections: sections),
+      error: null,
+    );
+  }
+
+  void updateGroup(WorkoutExerciseGroupDraft group) {
+    final sections = current.draft.sections
+        .map(
+          (section) => section.copyWith(
+            items: section.items
+                .map((item) => item.id == group.id ? group : item)
+                .toList(),
           ),
         )
         .toList();
@@ -140,12 +157,65 @@ abstract mixin class WorkoutDraftMutations {
     );
   }
 
+  void duplicateItem(String itemId) {
+    final sections = current.draft.sections.map((section) {
+      final index = section.items.indexWhere((item) => item.id == itemId);
+      if (index < 0) return section;
+      final source = section.items[index];
+      final duplicate = switch (source) {
+        WorkoutExerciseItemDraft(:final exercise) => WorkoutExerciseItemDraft(
+          exercise.copyWith(localId: _id()),
+        ),
+        WorkoutExerciseGroupDraft group => WorkoutExerciseGroupDraft(
+          id: _id(),
+          type: group.type,
+          rounds: group.rounds,
+          exercises: group.exercises
+              .map((exercise) => exercise.copyWith(localId: _id()))
+              .toList(),
+          intraExerciseRestSeconds: group.intraExerciseRestSeconds,
+          roundRestSeconds: group.roundRestSeconds,
+        ),
+      };
+      final items = [...section.items]..insert(index + 1, duplicate);
+      return section.copyWith(items: items);
+    }).toList();
+    current = current.copyWith(
+      draft: current.draft.copyWith(sections: sections),
+      error: null,
+    );
+  }
+
+  void moveItemToSection(String itemId, String sectionId) {
+    WorkoutStructureItemDraft? moving;
+    var sections = current.draft.sections.map((section) {
+      final match = section.items
+          .where((item) => item.id == itemId)
+          .firstOrNull;
+      if (match == null) return section;
+      moving = match;
+      return section.copyWith(
+        items: section.items.where((item) => item.id != itemId).toList(),
+      );
+    }).toList();
+    if (moving == null) return;
+    sections = sections.map((section) {
+      if (section.id != sectionId) return section;
+      return section.copyWith(items: [...section.items, moving!]);
+    }).toList();
+    current = current.copyWith(
+      draft: current.draft.copyWith(sections: sections),
+      error: null,
+    );
+  }
+
   void reorderInSection(String sectionId, int oldIndex, int newIndex) {
     final sections = current.draft.sections.map((section) {
       if (section.id != sectionId ||
           oldIndex < 0 ||
-          oldIndex >= section.items.length)
+          oldIndex >= section.items.length) {
         return section;
+      }
       final items = [...section.items];
       if (newIndex > oldIndex) newIndex -= 1;
       final item = items.removeAt(oldIndex);
@@ -162,6 +232,8 @@ abstract mixin class WorkoutDraftMutations {
     required WorkoutGroupType type,
     required List<String> itemIds,
     int rounds = 3,
+    int restBetweenExercisesSeconds = 0,
+    int restAfterRoundSeconds = 90,
   }) {
     final selected = itemIds.toSet();
     if (selected.length < 2) return;
@@ -181,9 +253,13 @@ abstract mixin class WorkoutDraftMutations {
       final firstIndex = section.items.indexWhere(
         (item) => selected.contains(item.id),
       );
-      final exercises = matches
-          .cast<WorkoutExerciseItemDraft>()
-          .map((item) => item.exercise)
+      final byId = {
+        for (final item in matches.cast<WorkoutExerciseItemDraft>())
+          item.id: item.exercise,
+      };
+      final exercises = itemIds
+          .map((id) => byId[id])
+          .whereType<WorkoutExerciseDraft>()
           .toList();
       final items = section.items
           .where((item) => !selected.contains(item.id))
@@ -195,6 +271,8 @@ abstract mixin class WorkoutDraftMutations {
           type: type,
           rounds: rounds,
           exercises: exercises,
+          intraExerciseRestSeconds: restBetweenExercisesSeconds,
+          roundRestSeconds: restAfterRoundSeconds,
         ),
       );
       final sections = [...current.draft.sections];
@@ -280,8 +358,9 @@ class EditWorkoutController extends _$EditWorkoutController
 
   void discard() {
     final baseline = state.baseline;
-    if (baseline != null)
+    if (baseline != null) {
       state = WorkoutBuilderState(draft: baseline, baseline: baseline);
+    }
   }
 
   Future<WorkoutModel?> commit(WorkoutModel source) async {
@@ -373,8 +452,9 @@ WorkoutDraft _fromWorkout(WorkoutModel workout, dynamic locale) {
         }).toList();
   final sectionKeys = <String?>[];
   for (final block in blocks) {
-    if (!sectionKeys.contains(block.sectionId))
+    if (!sectionKeys.contains(block.sectionId)) {
       sectionKeys.add(block.sectionId);
+    }
   }
   final sections = sectionKeys.indexed.map((pair) {
     final matching = blocks.where((b) => b.sectionId == pair.$2).toList();
@@ -435,10 +515,12 @@ WorkoutGroupType _groupType(String value) => switch (value) {
 
 String _goal(String value) {
   final normalized = value.toLowerCase();
-  if (normalized.contains('hyper') || normalized.contains('ipertrof'))
+  if (normalized.contains('hyper') || normalized.contains('ipertrof')) {
     return 'hypertrophy';
-  if (normalized.contains('strength') || normalized.contains('forza'))
+  }
+  if (normalized.contains('strength') || normalized.contains('forza')) {
     return 'strength';
+  }
   return 'general';
 }
 

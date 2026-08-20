@@ -69,7 +69,10 @@ GoRouter router(Ref ref) {
         path: '/exercises/:exerciseId',
         pageBuilder: (context, state) => _fadeTransition(
           state,
-          ExercisePage(id: state.pathParameters['exerciseId']!),
+          ExercisePage(
+            id: state.pathParameters['exerciseId']!,
+            showAddButton: state.uri.queryParameters['mode'] != 'view',
+          ),
         ),
         routes: [
           GoRoute(
