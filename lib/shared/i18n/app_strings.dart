@@ -330,6 +330,10 @@ class AppStrings {
       'it': 'Salva modifiche',
     },
     'workout.builder.new_section': {'en': 'New section', 'it': 'Nuova sezione'},
+    'workout.builder.edit_section': {
+      'en': 'Edit section',
+      'it': 'Modifica sezione',
+    },
     'workout.builder.section_preparation': {
       'en': 'Preparation',
       'it': 'Preparazione',
@@ -395,6 +399,11 @@ class AppStrings {
     'workout.builder.configure_block': {
       'en': 'Configure exercise block',
       'it': 'Configura il blocco di esercizi',
+    },
+    'workout.builder.block_edit_explanation': {
+      'en': 'Review exercise order and the essential block settings.',
+      'it':
+          'Rivedi l’ordine degli esercizi e le impostazioni essenziali del blocco.',
     },
     'workout.builder.rest_after_round': {
       'en': 'Rest after round · {duration}',

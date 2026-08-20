@@ -6,6 +6,122 @@ import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+class WorkoutBuilderUnderlineField extends StatefulWidget {
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final String label;
+  final String hint;
+  final String? helper;
+  final int maxLength;
+  final int? minLines;
+  final int maxLines;
+  final bool autofocus;
+  final TextInputAction textInputAction;
+  final ValueChanged<String> onChanged;
+
+  const WorkoutBuilderUnderlineField({
+    super.key,
+    required this.controller,
+    required this.focusNode,
+    required this.label,
+    required this.hint,
+    required this.maxLength,
+    required this.textInputAction,
+    required this.onChanged,
+    this.helper,
+    this.minLines,
+    this.maxLines = 1,
+    this.autofocus = false,
+  });
+
+  @override
+  State<WorkoutBuilderUnderlineField> createState() =>
+      _WorkoutBuilderUnderlineFieldState();
+}
+
+class _WorkoutBuilderUnderlineFieldState
+    extends State<WorkoutBuilderUnderlineField> {
+  @override
+  void initState() {
+    super.initState();
+    widget.focusNode.addListener(_refresh);
+    widget.controller.addListener(_refresh);
+  }
+
+  @override
+  void dispose() {
+    widget.focusNode.removeListener(_refresh);
+    widget.controller.removeListener(_refresh);
+    super.dispose();
+  }
+
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final focused = widget.focusNode.hasFocus;
+    final colors = context.exerciseTheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                widget.label,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: focused ? colors.primary : colors.textSecondary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            if (widget.helper != null)
+              Text(
+                widget.helper!,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: widget.controller,
+          focusNode: widget.focusNode,
+          autofocus: widget.autofocus,
+          maxLength: widget.maxLength,
+          minLines: widget.minLines,
+          maxLines: widget.maxLines,
+          textInputAction: widget.textInputAction,
+          onChanged: widget.onChanged,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: colors.textPrimary),
+          decoration: InputDecoration(
+            hintText: widget.hint,
+            hintStyle: TextStyle(color: colors.textSecondary),
+            counterText: focused
+                ? '${widget.controller.text.characters.length}/${widget.maxLength}'
+                : '',
+            counterStyle: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
+            contentPadding: const EdgeInsets.only(bottom: 10),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: colors.border),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: colors.primary, width: 2),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class WorkoutBuilderSummary extends StatelessWidget {
   final WorkoutDraft draft;
   final bool compact;
@@ -1079,6 +1195,9 @@ Future<({String name, String? notes})?> showWorkoutSectionNameSheet(
   useSafeArea: true,
   isScrollControlled: true,
   backgroundColor: context.exerciseTheme.surfaceElevated,
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  ),
   builder: (_) => _WorkoutSectionNameSheet(initial: initial),
 );
 
@@ -1093,6 +1212,8 @@ class _WorkoutSectionNameSheet extends StatefulWidget {
 
 class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
   final controller = TextEditingController();
+  final nameFocus = FocusNode();
+  final notesFocus = FocusNode();
   late final TextEditingController notesController = TextEditingController(
     text: widget.initial?.notes,
   );
@@ -1110,6 +1231,8 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
   void dispose() {
     controller.dispose();
     notesController.dispose();
+    nameFocus.dispose();
+    notesFocus.dispose();
     super.dispose();
   }
 
@@ -1129,7 +1252,11 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            context.tr('workout.builder.new_section'),
+            context.tr(
+              widget.initial == null
+                  ? 'workout.builder.new_section'
+                  : 'workout.builder.edit_section',
+            ),
             style: TextStyle(
               color: context.exerciseTheme.textPrimary,
               fontSize: 24,
@@ -1155,6 +1282,9 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
                       (key) => ChoiceChip(
                         selected: selectedType == key,
                         label: Text(context.tr('workout.builder.section_$key')),
+                        showCheckmark: true,
+                        selectedColor: context.exerciseTheme.primaryMuted,
+                        side: BorderSide(color: context.exerciseTheme.border),
                         onSelected: (_) => setState(() {
                           selectedType = key;
                           customizing = false;
@@ -1168,7 +1298,14 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton(
-              onPressed: () => setState(() => customizing = !customizing),
+              onPressed: () {
+                setState(() => customizing = !customizing);
+                if (customizing) {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => nameFocus.requestFocus(),
+                  );
+                }
+              },
               child: Text(context.tr('workout.builder.customize')),
             ),
           ),
@@ -1181,27 +1318,16 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
             child: customizing
                 ? Padding(
                     padding: const EdgeInsets.only(bottom: 18),
-                    child: TextField(
+                    child: WorkoutBuilderUnderlineField(
                       controller: controller,
+                      focusNode: nameFocus,
+                      label: context.tr('workout.builder.custom_name'),
+                      hint: context.tr('workout.builder.custom_section_hint'),
+                      helper: context.tr('workout.builder.optional'),
                       autofocus: true,
                       maxLength: 30,
-                      textCapitalization: TextCapitalization.sentences,
                       textInputAction: TextInputAction.done,
                       onChanged: (_) => setState(() {}),
-                      onSubmitted: (_) => _submit(),
-                      decoration: InputDecoration(
-                        labelText: context.tr('workout.builder.custom_name'),
-                        hintText: context.tr(
-                          'workout.builder.custom_section_hint',
-                        ),
-                        filled: false,
-                        border: const UnderlineInputBorder(),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: context.exerciseTheme.border,
-                          ),
-                        ),
-                      ),
                     ),
                   )
                 : const SizedBox.shrink(),
@@ -1237,7 +1363,14 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
-              onPressed: () => setState(() => showNotes = !showNotes),
+              onPressed: () {
+                setState(() => showNotes = !showNotes);
+                if (showNotes) {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => notesFocus.requestFocus(),
+                  );
+                }
+              },
               icon: const Icon(Icons.notes_rounded),
               label: Text(context.tr('workout.builder.add_notes')),
             ),
@@ -1245,14 +1378,17 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
           AnimatedSize(
             duration: CoachlyAthleteTheme.expandDuration,
             child: showNotes
-                ? TextField(
+                ? WorkoutBuilderUnderlineField(
                     controller: notesController,
+                    focusNode: notesFocus,
+                    label: context.tr('workout.builder.notes_title'),
+                    hint: context.tr('workout.builder.notes_hint'),
+                    helper: context.tr('workout.builder.optional'),
                     minLines: 2,
                     maxLines: 4,
                     maxLength: 300,
-                    decoration: InputDecoration(
-                      hintText: context.tr('workout.builder.notes_hint'),
-                    ),
+                    textInputAction: TextInputAction.done,
+                    onChanged: (_) {},
                   )
                 : const SizedBox.shrink(),
           ),
@@ -1261,7 +1397,13 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
             onPressed: customizing && controller.text.trim().isEmpty
                 ? null
                 : _submit,
-            child: Text(context.tr('workout.builder.add_section')),
+            child: Text(
+              context.tr(
+                widget.initial == null
+                    ? 'workout.builder.add_section'
+                    : 'workout.builder.save_changes',
+              ),
+            ),
           ),
         ],
       ),
@@ -1498,6 +1640,21 @@ class _ProgrammingFutureRow extends StatelessWidget {
   );
 }
 
+class _SheetSectionLabel extends StatelessWidget {
+  final String label;
+  const _SheetSectionLabel(this.label);
+
+  @override
+  Widget build(BuildContext context) => Text(
+    label.toUpperCase(),
+    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+      color: context.exerciseTheme.textSecondary,
+      fontWeight: FontWeight.w800,
+      letterSpacing: .8,
+    ),
+  );
+}
+
 Future<WorkoutExerciseGroupDraft?> showWorkoutBlockEditor(
   BuildContext context,
   WorkoutExerciseGroupDraft initial,
@@ -1529,10 +1686,12 @@ class _WorkoutBlockEditorState extends State<_WorkoutBlockEditor> {
   late final TextEditingController notesController = TextEditingController(
     text: widget.initial.notes,
   );
+  final notesFocus = FocusNode();
 
   @override
   void dispose() {
     notesController.dispose();
+    notesFocus.dispose();
     super.dispose();
   }
 
@@ -1551,43 +1710,65 @@ class _WorkoutBlockEditorState extends State<_WorkoutBlockEditor> {
             children: [
               Text(
                 context.tr('workout.builder.configure_block'),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   color: context.exerciseTheme.textPrimary,
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 18),
-              ReorderableListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                buildDefaultDragHandles: false,
-                itemCount: exercises.length,
-                onReorder: (oldIndex, newIndex) => setState(() {
-                  if (newIndex > oldIndex) newIndex -= 1;
-                  final exercise = exercises.removeAt(oldIndex);
-                  exercises.insert(newIndex, exercise);
-                }),
-                itemBuilder: (context, index) => ListTile(
-                  key: ValueKey(exercises[index].localId),
-                  contentPadding: EdgeInsets.zero,
-                  leading: Text('A${index + 1}'),
-                  title: Text(exercises[index].name),
-                  subtitle: Text(
-                    formatPrescription(exercises[index]),
-                    style: TextStyle(
-                      color: context.exerciseTheme.textSecondary,
+              const SizedBox(height: 6),
+              Text(
+                context.tr('workout.builder.block_edit_explanation'),
+                style: TextStyle(
+                  color: context.exerciseTheme.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 24),
+              _SheetSectionLabel(context.tr('workout.builder.step_exercises')),
+              const SizedBox(height: 10),
+              CoachlySurface(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: ReorderableListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  buildDefaultDragHandles: false,
+                  itemCount: exercises.length,
+                  onReorder: (oldIndex, newIndex) => setState(() {
+                    if (newIndex > oldIndex) newIndex -= 1;
+                    final exercise = exercises.removeAt(oldIndex);
+                    exercises.insert(newIndex, exercise);
+                  }),
+                  itemBuilder: (context, index) => ListTile(
+                    key: ValueKey(exercises[index].localId),
+                    contentPadding: EdgeInsets.zero,
+                    leading: Text(
+                      'A${index + 1}',
+                      style: TextStyle(
+                        color: context.exerciseTheme.primary,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
-                  trailing: ReorderableDragStartListener(
-                    index: index,
-                    child: const SizedBox(
-                      width: CoachlyAthleteTheme.touchTarget,
-                      height: CoachlyAthleteTheme.touchTarget,
-                      child: Icon(Icons.drag_indicator_rounded),
+                    title: Text(exercises[index].name),
+                    subtitle: Text(
+                      formatPrescription(exercises[index]),
+                      style: TextStyle(
+                        color: context.exerciseTheme.textSecondary,
+                      ),
+                    ),
+                    trailing: ReorderableDragStartListener(
+                      index: index,
+                      child: const SizedBox(
+                        width: CoachlyAthleteTheme.touchTarget,
+                        height: CoachlyAthleteTheme.touchTarget,
+                        child: Icon(Icons.drag_indicator_rounded),
+                      ),
                     ),
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
+              _SheetSectionLabel(context.tr('workout.builder.step_setup')),
+              const SizedBox(height: 6),
               NumericStepper(
                 label: context.tr('workout.detail.rounds'),
                 value: rounds,
@@ -1604,16 +1785,18 @@ class _WorkoutBlockEditorState extends State<_WorkoutBlockEditor> {
                 seconds: afterRound,
                 onChanged: (value) => setState(() => afterRound = value),
               ),
-              const SizedBox(height: 12),
-              TextField(
+              const SizedBox(height: 18),
+              WorkoutBuilderUnderlineField(
                 controller: notesController,
+                focusNode: notesFocus,
+                label: context.tr('workout.builder.notes_title'),
+                hint: context.tr('workout.builder.notes_hint'),
+                helper: context.tr('workout.builder.optional'),
                 minLines: 2,
                 maxLines: 4,
                 maxLength: 300,
-                decoration: InputDecoration(
-                  labelText: context.tr('workout.builder.add_notes'),
-                  hintText: context.tr('workout.builder.notes_hint'),
-                ),
+                textInputAction: TextInputAction.done,
+                onChanged: (_) {},
               ),
             ],
           ),

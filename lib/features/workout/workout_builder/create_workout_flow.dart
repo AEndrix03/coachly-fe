@@ -140,7 +140,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
               ),
             ),
             const SizedBox(height: CoachlyAthleteTheme.sectionGap),
-            _WorkoutUnderlineField(
+            WorkoutBuilderUnderlineField(
               controller: _title,
               focusNode: _titleFocus,
               label: context.tr('workout.builder.title_label'),
@@ -172,7 +172,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                 child: FadeTransition(opacity: animation, child: child),
               ),
               child: _showSessionNote
-                  ? _WorkoutUnderlineField(
+                  ? WorkoutBuilderUnderlineField(
                       key: const ValueKey('session-note'),
                       controller: _focus,
                       focusNode: _noteFocus,
@@ -525,6 +525,9 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
       useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: context.exerciseTheme.surfaceElevated,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
       builder: (_) => _CreateBlockSheet(
         candidates: candidates,
         onAddExercise: (sectionId) async {
@@ -612,120 +615,6 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     ],
     primaryActionLabel: context.tr('common.got_it'),
   );
-}
-
-class _WorkoutUnderlineField extends StatefulWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final String label;
-  final String hint;
-  final String? helper;
-  final int maxLength;
-  final int? minLines;
-  final int maxLines;
-  final bool autofocus;
-  final TextInputAction textInputAction;
-  final ValueChanged<String> onChanged;
-
-  const _WorkoutUnderlineField({
-    super.key,
-    required this.controller,
-    required this.focusNode,
-    required this.label,
-    required this.hint,
-    required this.maxLength,
-    required this.textInputAction,
-    required this.onChanged,
-    this.helper,
-    this.minLines,
-    this.maxLines = 1,
-    this.autofocus = false,
-  });
-
-  @override
-  State<_WorkoutUnderlineField> createState() => _WorkoutUnderlineFieldState();
-}
-
-class _WorkoutUnderlineFieldState extends State<_WorkoutUnderlineField> {
-  @override
-  void initState() {
-    super.initState();
-    widget.focusNode.addListener(_refresh);
-    widget.controller.addListener(_refresh);
-  }
-
-  @override
-  void dispose() {
-    widget.focusNode.removeListener(_refresh);
-    widget.controller.removeListener(_refresh);
-    super.dispose();
-  }
-
-  void _refresh() {
-    if (mounted) setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final focused = widget.focusNode.hasFocus;
-    final colors = context.exerciseTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                widget.label,
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: focused ? colors.primary : colors.textSecondary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            if (widget.helper != null)
-              Text(
-                widget.helper!,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
-              ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: widget.controller,
-          focusNode: widget.focusNode,
-          autofocus: widget.autofocus,
-          maxLength: widget.maxLength,
-          minLines: widget.minLines,
-          maxLines: widget.maxLines,
-          textInputAction: widget.textInputAction,
-          onChanged: widget.onChanged,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(color: colors.textPrimary),
-          decoration: InputDecoration(
-            hintText: widget.hint,
-            hintStyle: TextStyle(color: colors.textSecondary),
-            counterText: focused
-                ? '${widget.controller.text.characters.length}/${widget.maxLength}'
-                : '',
-            counterStyle: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
-            contentPadding: const EdgeInsets.only(bottom: 10),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: colors.border),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: colors.primary, width: 2),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 class _GoalSection extends StatelessWidget {
@@ -923,10 +812,12 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
   int restBetweenExercisesSeconds = 0;
   int restAfterRoundSeconds = 90;
   final notesController = TextEditingController();
+  final notesFocus = FocusNode();
 
   @override
   void dispose() {
     notesController.dispose();
+    notesFocus.dispose();
     super.dispose();
   }
 
@@ -1131,15 +1022,17 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
         onChanged: (value) => setState(() => restAfterRoundSeconds = value),
       ),
       const SizedBox(height: 12),
-      TextField(
+      WorkoutBuilderUnderlineField(
         controller: notesController,
+        focusNode: notesFocus,
+        label: context.tr('workout.builder.notes_title'),
+        hint: context.tr('workout.builder.notes_hint'),
+        helper: context.tr('workout.builder.optional'),
         minLines: 2,
         maxLines: 4,
         maxLength: 300,
-        decoration: InputDecoration(
-          labelText: context.tr('workout.builder.add_notes'),
-          hintText: context.tr('workout.builder.notes_hint'),
-        ),
+        textInputAction: TextInputAction.done,
+        onChanged: (_) {},
       ),
       const SizedBox(height: 12),
       CoachlySurface(
@@ -1274,18 +1167,61 @@ class _BlockTypeTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => ListTile(
-    contentPadding: EdgeInsets.zero,
-    minVerticalPadding: 10,
-    onTap: onTap,
-    title: Text(
-      _groupTypeLabel(context, type),
-      style: const TextStyle(fontWeight: FontWeight.w700),
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: CoachlyPressable(
+      onTap: onTap,
+      semanticLabel: _groupTypeLabel(context, type),
+      child: AnimatedContainer(
+        duration: CoachlyAthleteTheme.expandDuration,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: selected
+              ? context.exerciseTheme.primaryMuted.withValues(alpha: .42)
+              : context.exerciseTheme.surface,
+          borderRadius: BorderRadius.circular(CoachlyAthleteTheme.cardRadius),
+          border: Border.all(
+            color: selected
+                ? context.exerciseTheme.primary.withValues(alpha: .5)
+                : context.exerciseTheme.border,
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _groupTypeLabel(context, type),
+                    style: TextStyle(
+                      color: context.exerciseTheme.textPrimary,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    context.tr('workout.builder.block_type_${type.name}'),
+                    style: TextStyle(
+                      color: context.exerciseTheme.textSecondary,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Icon(
+              selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+              color: selected
+                  ? context.exerciseTheme.primary
+                  : context.exerciseTheme.textSecondary,
+            ),
+          ],
+        ),
+      ),
     ),
-    subtitle: Text(context.tr('workout.builder.block_type_${type.name}')),
-    trailing: selected
-        ? const Icon(Icons.check_circle, color: CoachlyAthleteTheme.primary)
-        : const Icon(Icons.circle_outlined),
   );
 }
 
