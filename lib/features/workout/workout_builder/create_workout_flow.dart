@@ -262,6 +262,9 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                 onReorder: (section, oldIndex, newIndex) => ref
                     .read(createWorkoutControllerProvider.notifier)
                     .reorderInSection(section, oldIndex, newIndex),
+                onReorderSections: ref
+                    .read(createWorkoutControllerProvider.notifier)
+                    .reorderSections,
                 onRemove: ref
                     .read(createWorkoutControllerProvider.notifier)
                     .removeItem,
@@ -286,16 +289,6 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
             ),
             WorkoutStructureComposer(
               onAddExercise: () => _addExercise(null),
-              exerciseLabel: state.draft.sections.isEmpty
-                  ? null
-                  : context.tr(
-                      'workout.builder.add_exercise_to_section',
-                      params: {
-                        'section':
-                            state.draft.sections.last.name ??
-                            context.tr('workout.builder.main_section'),
-                      },
-                    ),
               onAddSection: _addSection,
               onCreateBlock: _createBlock,
             ),
@@ -359,6 +352,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
               onUpdateBlock: (_) {},
               onOpenExercise: _openExerciseDetail,
               onReorder: (_, _, _) {},
+              onReorderSections: (_, _) {},
               onRemove: (_) {},
               onRemoveExercise: (_) {},
               onDuplicate: (_) {},
@@ -382,6 +376,14 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
   );
 
   Future<WorkoutExerciseDraft?> _addExercise(String? sectionId) async {
+    var destinationId = sectionId;
+    if (destinationId == null) {
+      destinationId = await showWorkoutSectionPicker(
+        context,
+        ref.read(createWorkoutControllerProvider).draft.sections,
+      );
+      if (destinationId == null || !mounted) return null;
+    }
     WorkoutExerciseDraft? picked;
     await showModalBottomSheet<void>(
       context: context,
@@ -406,7 +408,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     if (configured == null || !mounted) return null;
     ref
         .read(createWorkoutControllerProvider.notifier)
-        .addExercise(configured, sectionId: sectionId);
+        .addExercise(configured, sectionId: destinationId);
     HapticFeedback.lightImpact();
     return configured;
   }

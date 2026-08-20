@@ -173,14 +173,12 @@ class WorkoutBuilderSummary extends StatelessWidget {
 
 class WorkoutStructureComposer extends StatelessWidget {
   final VoidCallback onAddExercise;
-  final String? exerciseLabel;
   final VoidCallback onAddSection;
   final VoidCallback onCreateBlock;
 
   const WorkoutStructureComposer({
     super.key,
     required this.onAddExercise,
-    this.exerciseLabel,
     required this.onAddSection,
     required this.onCreateBlock,
   });
@@ -216,9 +214,7 @@ class WorkoutStructureComposer extends StatelessWidget {
                 size: 22,
                 color: context.exerciseTheme.primary,
               ),
-              label: Text(
-                exerciseLabel ?? context.tr('workout.builder.add_exercise'),
-              ),
+              label: Text(context.tr('workout.builder.add_exercise')),
               onPressed: onAddExercise,
             ),
           ),
@@ -350,6 +346,7 @@ class WorkoutDraftStructure extends StatelessWidget {
   final ValueChanged<WorkoutExerciseGroupDraft> onUpdateBlock;
   final ValueChanged<WorkoutExerciseDraft> onOpenExercise;
   final void Function(String sectionId, int oldIndex, int newIndex) onReorder;
+  final void Function(int oldIndex, int newIndex) onReorderSections;
   final ValueChanged<String> onRemove;
   final ValueChanged<String> onRemoveExercise;
   final ValueChanged<String> onDuplicate;
@@ -371,6 +368,7 @@ class WorkoutDraftStructure extends StatelessWidget {
     required this.onUpdateBlock,
     required this.onOpenExercise,
     required this.onReorder,
+    required this.onReorderSections,
     required this.onRemove,
     required this.onRemoveExercise,
     required this.onDuplicate,
@@ -389,134 +387,291 @@ class WorkoutDraftStructure extends StatelessWidget {
     if (draft.exerciseCount == 0 && draft.sections.isEmpty) {
       return const _WorkoutEmptyState();
     }
-    return Column(
-      children: draft.sections
-          .map(
-            (section) => Padding(
-              padding: const EdgeInsets.only(
-                bottom: CoachlyAthleteTheme.sectionGap,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (section.name != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Semantics(
-                        header: true,
-                        button: editable && onEditSection != null,
-                        child: InkWell(
-                          onTap: editable && onEditSection != null
-                              ? () => onEditSection!(section)
-                              : null,
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(minHeight: 44),
-                            child: Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    section.name!.toUpperCase(),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: CoachlyAthleteTheme.textSecondary,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: .8,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                const Expanded(child: Divider()),
-                                if (editable && onUpdateSection != null) ...[
-                                  const SizedBox(width: 8),
-                                  IconButton(
-                                    onPressed: () => _showItemActions(
-                                      context,
-                                      initialNotes: section.notes,
-                                      onNotesChanged: (notes) =>
-                                          onUpdateSection!(
-                                            section.copyWith(notes: notes),
-                                          ),
-                                      onRemove: () =>
-                                          onRemoveSection?.call(section.id),
-                                    ),
-                                    tooltip: context.tr(
-                                      'workout.builder.section_actions',
-                                    ),
-                                    icon: const Icon(Icons.more_horiz_rounded),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  if (section.items.isEmpty)
-                    const _SectionEmpty()
-                  else if (editable)
-                    ReorderableListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      buildDefaultDragHandles: false,
-                      itemCount: section.items.length,
-                      onReorderStart: (_) => HapticFeedback.selectionClick(),
-                      onReorderEnd: (_) => HapticFeedback.lightImpact(),
-                      onReorder: (oldIndex, newIndex) =>
-                          onReorder(section.id, oldIndex, newIndex),
-                      proxyDecorator: (child, _, animation) => AnimatedBuilder(
-                        animation: animation,
-                        builder: (_, child) => Transform.scale(
-                          scale: 1 + animation.value * .015,
-                          child: Material(
-                            color: Colors.transparent,
-                            elevation: 8,
-                            child: child,
-                          ),
-                        ),
-                        child: child,
-                      ),
-                      itemBuilder: (context, index) => _DraftItem(
-                        key: ValueKey(section.items[index].id),
-                        item: section.items[index],
-                        index: index,
-                        editable: editable,
-                        onEditExercise: onEditExercise,
-                        onEditBlock: onEditBlock,
-                        onUpdateExercise: onUpdateExercise,
-                        onUpdateBlock: onUpdateBlock,
-                        onOpenExercise: onOpenExercise,
-                        onRemove: onRemove,
-                        onRemoveExercise: onRemoveExercise,
-                        onDuplicate: onDuplicate,
-                        onMove: onMove,
-                      ),
-                    )
-                  else
-                    ...section.items.indexed.map(
-                      (pair) => _DraftItem(
-                        key: ValueKey(pair.$2.id),
-                        item: pair.$2,
-                        index: pair.$1,
-                        editable: false,
-                        onEditExercise: onEditExercise,
-                        onEditBlock: onEditBlock,
-                        onUpdateExercise: onUpdateExercise,
-                        onUpdateBlock: onUpdateBlock,
-                        onOpenExercise: onOpenExercise,
-                        onRemove: onRemove,
-                        onRemoveExercise: onRemoveExercise,
-                        onDuplicate: onDuplicate,
-                        onMove: onMove,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          )
-          .toList(),
+    return ReorderableListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      buildDefaultDragHandles: false,
+      itemCount: draft.sections.length,
+      onReorderStart: (_) => HapticFeedback.selectionClick(),
+      onReorderEnd: (_) => HapticFeedback.lightImpact(),
+      onReorder: onReorderSections,
+      itemBuilder: (context, sectionIndex) {
+        final section = draft.sections[sectionIndex];
+        return _CollapsibleDraftSection(
+          key: ValueKey(section.id),
+          section: section,
+          sectionIndex: sectionIndex,
+          editable: editable,
+          onEditExercise: onEditExercise,
+          onEditBlock: onEditBlock,
+          onUpdateExercise: onUpdateExercise,
+          onUpdateBlock: onUpdateBlock,
+          onOpenExercise: onOpenExercise,
+          onReorder: onReorder,
+          onRemove: onRemove,
+          onRemoveExercise: onRemoveExercise,
+          onDuplicate: onDuplicate,
+          onMove: onMove,
+          onEditSection: onEditSection,
+          onUpdateSection: onUpdateSection,
+          onRemoveSection: onRemoveSection,
+        );
+      },
     );
   }
+}
+
+class _CollapsibleDraftSection extends StatefulWidget {
+  final WorkoutSectionDraft section;
+  final int sectionIndex;
+  final bool editable;
+  final ValueChanged<WorkoutExerciseDraft> onEditExercise;
+  final ValueChanged<WorkoutExerciseGroupDraft> onEditBlock;
+  final ValueChanged<WorkoutExerciseDraft> onUpdateExercise;
+  final ValueChanged<WorkoutExerciseGroupDraft> onUpdateBlock;
+  final ValueChanged<WorkoutExerciseDraft> onOpenExercise;
+  final void Function(String sectionId, int oldIndex, int newIndex) onReorder;
+  final ValueChanged<String> onRemove;
+  final ValueChanged<String> onRemoveExercise;
+  final ValueChanged<String> onDuplicate;
+  final ValueChanged<String> onMove;
+  final ValueChanged<WorkoutSectionDraft>? onEditSection;
+  final ValueChanged<WorkoutSectionDraft>? onUpdateSection;
+  final ValueChanged<String>? onRemoveSection;
+
+  const _CollapsibleDraftSection({
+    super.key,
+    required this.section,
+    required this.sectionIndex,
+    required this.editable,
+    required this.onEditExercise,
+    required this.onEditBlock,
+    required this.onUpdateExercise,
+    required this.onUpdateBlock,
+    required this.onOpenExercise,
+    required this.onReorder,
+    required this.onRemove,
+    required this.onRemoveExercise,
+    required this.onDuplicate,
+    required this.onMove,
+    this.onEditSection,
+    this.onUpdateSection,
+    this.onRemoveSection,
+  });
+
+  @override
+  State<_CollapsibleDraftSection> createState() =>
+      _CollapsibleDraftSectionState();
+}
+
+class _CollapsibleDraftSectionState extends State<_CollapsibleDraftSection> {
+  bool collapsed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final section = widget.section;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: CoachlyAthleteTheme.sectionGap),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Semantics(
+              header: true,
+              button: widget.editable && widget.onEditSection != null,
+              child: InkWell(
+                onTap: widget.editable && widget.onEditSection != null
+                    ? () => widget.onEditSection!(section)
+                    : null,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  child: Row(
+                    children: [
+                      if (widget.editable)
+                        ReorderableDragStartListener(
+                          index: widget.sectionIndex,
+                          child: const _DragHandle(),
+                        ),
+                      Flexible(
+                        child: Text(
+                          workoutSectionLabel(context, section).toUpperCase(),
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: CoachlyAthleteTheme.textSecondary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: .8,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(child: Divider()),
+                      IconButton(
+                        onPressed: () => setState(() => collapsed = !collapsed),
+                        tooltip: context.tr(
+                          collapsed
+                              ? 'workout.builder.expand_section'
+                              : 'workout.builder.collapse_section',
+                        ),
+                        icon: Icon(
+                          collapsed
+                              ? Icons.keyboard_arrow_down_rounded
+                              : Icons.keyboard_arrow_up_rounded,
+                          color: context.exerciseTheme.textSecondary,
+                        ),
+                      ),
+                      if (widget.editable &&
+                          widget.onUpdateSection != null) ...[
+                        const SizedBox(width: 8),
+                        IconButton(
+                          onPressed: () => _showItemActions(
+                            context,
+                            initialNotes: section.notes,
+                            onNotesChanged: (notes) => widget.onUpdateSection!(
+                              section.copyWith(notes: notes),
+                            ),
+                            onRemove: () =>
+                                widget.onRemoveSection?.call(section.id),
+                          ),
+                          tooltip: context.tr(
+                            'workout.builder.section_actions',
+                          ),
+                          icon: const Icon(Icons.more_horiz_rounded),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (collapsed)
+            const SizedBox.shrink()
+          else if (section.items.isEmpty)
+            const _SectionEmpty()
+          else if (widget.editable)
+            ReorderableListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              buildDefaultDragHandles: false,
+              itemCount: section.items.length,
+              onReorderStart: (_) => HapticFeedback.selectionClick(),
+              onReorderEnd: (_) => HapticFeedback.lightImpact(),
+              onReorder: (oldIndex, newIndex) =>
+                  widget.onReorder(section.id, oldIndex, newIndex),
+              proxyDecorator: (child, _, animation) => AnimatedBuilder(
+                animation: animation,
+                builder: (_, child) => Transform.scale(
+                  scale: 1 + animation.value * .015,
+                  child: Material(
+                    color: Colors.transparent,
+                    elevation: 8,
+                    child: child,
+                  ),
+                ),
+                child: child,
+              ),
+              itemBuilder: (context, index) => _DraftItem(
+                key: ValueKey(section.items[index].id),
+                item: section.items[index],
+                index: index,
+                editable: widget.editable,
+                onEditExercise: widget.onEditExercise,
+                onEditBlock: widget.onEditBlock,
+                onUpdateExercise: widget.onUpdateExercise,
+                onUpdateBlock: widget.onUpdateBlock,
+                onOpenExercise: widget.onOpenExercise,
+                onRemove: widget.onRemove,
+                onRemoveExercise: widget.onRemoveExercise,
+                onDuplicate: widget.onDuplicate,
+                onMove: widget.onMove,
+              ),
+            )
+          else
+            ...section.items.indexed.map(
+              (pair) => _DraftItem(
+                key: ValueKey(pair.$2.id),
+                item: pair.$2,
+                index: pair.$1,
+                editable: false,
+                onEditExercise: widget.onEditExercise,
+                onEditBlock: widget.onEditBlock,
+                onUpdateExercise: widget.onUpdateExercise,
+                onUpdateBlock: widget.onUpdateBlock,
+                onOpenExercise: widget.onOpenExercise,
+                onRemove: widget.onRemove,
+                onRemoveExercise: widget.onRemoveExercise,
+                onDuplicate: widget.onDuplicate,
+                onMove: widget.onMove,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+String workoutSectionLabel(BuildContext context, WorkoutSectionDraft section) =>
+    section.name?.trim().isNotEmpty == true
+    ? section.name!.trim()
+    : context.tr('workout.builder.section_main');
+
+Future<String?> showWorkoutSectionPicker(
+  BuildContext context,
+  List<WorkoutSectionDraft> sections,
+) {
+  final main = sections.firstWhere(
+    (section) => section.kind == WorkoutSectionKind.main,
+    orElse: () => sections.first,
+  );
+  return showModalBottomSheet<String>(
+    context: context,
+    useSafeArea: true,
+    backgroundColor: context.exerciseTheme.surfaceElevated,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (sheetContext) => Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            context.tr('workout.builder.choose_destination'),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: context.exerciseTheme.textPrimary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            context.tr('workout.builder.choose_destination_hint'),
+            style: TextStyle(color: context.exerciseTheme.textSecondary),
+          ),
+          const SizedBox(height: 14),
+          ...sections.map(
+            (section) => ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+              minTileHeight: CoachlyAthleteTheme.touchTarget,
+              title: Text(workoutSectionLabel(context, section)),
+              subtitle: section.id == main.id
+                  ? Text(context.tr('workout.builder.default_section'))
+                  : null,
+              trailing: section.id == main.id
+                  ? Icon(
+                      Icons.check_circle_rounded,
+                      color: context.exerciseTheme.primary,
+                    )
+                  : const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.pop(sheetContext, section.id),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _SectionEmpty extends StatelessWidget {
@@ -655,22 +810,51 @@ class _DraftItem extends StatelessWidget {
                   ],
                 ),
               ),
-              ...group.exercises.indexed.map(
-                (pair) => _ExerciseLine(
-                  exercise: pair.$2,
-                  prefix: 'A${pair.$1 + 1}',
-                  onEdit: () => onEditExercise(pair.$2),
-                  onOpen: () => onOpenExercise(pair.$2),
-                  onActions: editable
-                      ? () => _showItemActions(
-                          context,
-                          initialNotes: pair.$2.notes,
-                          onNotesChanged: (notes) =>
-                              onUpdateExercise(pair.$2.copyWith(notes: notes)),
-                          onRemove: () => onRemoveExercise(pair.$2.localId),
-                        )
-                      : null,
-                ),
+              ReorderableListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                buildDefaultDragHandles: false,
+                itemCount: group.exercises.length,
+                onReorderStart: (_) => HapticFeedback.selectionClick(),
+                onReorderEnd: (_) => HapticFeedback.lightImpact(),
+                onReorder: editable
+                    ? (oldIndex, newIndex) {
+                        final exercises = [...group.exercises];
+                        if (newIndex > oldIndex) newIndex -= 1;
+                        final exercise = exercises.removeAt(oldIndex);
+                        exercises.insert(
+                          newIndex.clamp(0, exercises.length),
+                          exercise,
+                        );
+                        onUpdateBlock(group.copyWith(exercises: exercises));
+                      }
+                    : (_, _) {},
+                itemBuilder: (context, exerciseIndex) {
+                  final exercise = group.exercises[exerciseIndex];
+                  return _ExerciseLine(
+                    key: ValueKey(exercise.localId),
+                    exercise: exercise,
+                    prefix: 'A${exerciseIndex + 1}',
+                    leading: editable
+                        ? ReorderableDragStartListener(
+                            index: exerciseIndex,
+                            child: const _DragHandle(),
+                          )
+                        : null,
+                    onEdit: () => onEditExercise(exercise),
+                    onOpen: () => onOpenExercise(exercise),
+                    onActions: editable
+                        ? () => _showItemActions(
+                            context,
+                            initialNotes: exercise.notes,
+                            onNotesChanged: (notes) => onUpdateExercise(
+                              exercise.copyWith(notes: notes),
+                            ),
+                            onRemove: () => onRemoveExercise(exercise.localId),
+                          )
+                        : null,
+                  );
+                },
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 48, top: 6),
@@ -752,12 +936,15 @@ class _ExerciseLine extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onOpen;
   final VoidCallback? onActions;
+  final Widget? leading;
   const _ExerciseLine({
+    super.key,
     required this.exercise,
     required this.prefix,
     required this.onEdit,
     required this.onOpen,
     this.onActions,
+    this.leading,
   });
   @override
   Widget build(BuildContext context) => InkWell(
@@ -767,6 +954,7 @@ class _ExerciseLine extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
+          if (leading != null) leading!,
           SizedBox(
             width: 32,
             child: Text(
@@ -1218,13 +1406,16 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
     text: widget.initial?.notes,
   );
   String selectedType = 'main';
-  late bool customizing = widget.initial != null;
+  late bool customizing = widget.initial?.kind == WorkoutSectionKind.custom;
   late bool showNotes = widget.initial?.notes?.isNotEmpty == true;
 
   @override
   void initState() {
     super.initState();
-    if (widget.initial?.name != null) controller.text = widget.initial!.name!;
+    final initial = widget.initial;
+    if (initial == null) return;
+    selectedType = initial.kind.name;
+    if (customizing && initial.name != null) controller.text = initial.name!;
   }
 
   @override
@@ -1279,13 +1470,10 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
             children:
                 ['preparation', 'main', 'accessories', 'finisher', 'cooldown']
                     .map(
-                      (key) => ChoiceChip(
-                        selected: selectedType == key,
-                        label: Text(context.tr('workout.builder.section_$key')),
-                        showCheckmark: true,
-                        selectedColor: context.exerciseTheme.primaryMuted,
-                        side: BorderSide(color: context.exerciseTheme.border),
-                        onSelected: (_) => setState(() {
+                      (key) => _SectionPreset(
+                        label: context.tr('workout.builder.section_$key'),
+                        selected: selectedType == key && !customizing,
+                        onTap: () => setState(() {
                           selectedType = key;
                           customizing = false;
                           controller.clear();
@@ -1298,6 +1486,9 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: context.exerciseTheme.primary,
+              ),
               onPressed: () {
                 setState(() => customizing = !customizing);
                 if (customizing) {
@@ -1363,6 +1554,9 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
+              style: TextButton.styleFrom(
+                foregroundColor: context.exerciseTheme.primary,
+              ),
               onPressed: () {
                 setState(() => showNotes = !showNotes);
                 if (showNotes) {
@@ -1394,6 +1588,10 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
           ),
           const SizedBox(height: 22),
           FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: context.exerciseTheme.primary,
+              foregroundColor: context.exerciseTheme.background,
+            ),
             onPressed: customizing && controller.text.trim().isEmpty
                 ? null
                 : _submit,
@@ -1423,6 +1621,60 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
   String get _sectionName => customizing && controller.text.trim().isNotEmpty
       ? controller.text.trim()
       : context.tr('workout.builder.section_$selectedType');
+}
+
+class _SectionPreset extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _SectionPreset({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => CoachlyPressable(
+    onTap: onTap,
+    semanticLabel: label,
+    child: AnimatedContainer(
+      duration: CoachlyAthleteTheme.expandDuration,
+      constraints: const BoxConstraints(minHeight: 44),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: selected
+            ? context.exerciseTheme.surface
+            : context.exerciseTheme.surfaceElevated,
+        borderRadius: BorderRadius.circular(CoachlyAthleteTheme.actionRadius),
+        border: Border.all(
+          color: selected
+              ? context.exerciseTheme.textSecondary
+              : context.exerciseTheme.border,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (selected) ...[
+            Icon(
+              Icons.check_rounded,
+              size: 16,
+              color: context.exerciseTheme.primary,
+            ),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              color: context.exerciseTheme.textPrimary,
+              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _PrescriptionEditor extends StatefulWidget {

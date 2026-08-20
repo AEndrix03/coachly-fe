@@ -149,6 +149,13 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                               ).notifier,
                             )
                             .reorderInSection(section, oldIndex, newIndex),
+                        onReorderSections: ref
+                            .read(
+                              editWorkoutControllerProvider(
+                                widget.workoutId,
+                              ).notifier,
+                            )
+                            .reorderSections,
                         onRemove: _removeItem,
                         onRemoveExercise: ref
                             .read(
@@ -187,18 +194,6 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                       const SizedBox(height: 8),
                       WorkoutStructureComposer(
                         onAddExercise: () => _addExercise(null),
-                        exerciseLabel: state.draft.sections.isEmpty
-                            ? null
-                            : context.tr(
-                                'workout.builder.add_exercise_to_section',
-                                params: {
-                                  'section':
-                                      state.draft.sections.last.name ??
-                                      context.tr(
-                                        'workout.builder.main_section',
-                                      ),
-                                },
-                              ),
                         onAddSection: _addSection,
                         onCreateBlock: _createGroup,
                       ),
@@ -317,6 +312,17 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Future<void> _addExercise(String? sectionId) async {
+    var destinationId = sectionId;
+    if (destinationId == null) {
+      final sections = ref
+          .read(editWorkoutControllerProvider(widget.workoutId))
+          .draft
+          .sections;
+      if (sections.isNotEmpty) {
+        destinationId = await showWorkoutSectionPicker(context, sections);
+        if (destinationId == null || !mounted) return;
+      }
+    }
     WorkoutExerciseDraft? picked;
     await showModalBottomSheet<void>(
       context: context,
@@ -341,7 +347,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     if (configured == null || !mounted) return;
     ref
         .read(editWorkoutControllerProvider(widget.workoutId).notifier)
-        .addExercise(configured, sectionId: sectionId);
+        .addExercise(configured, sectionId: destinationId);
     HapticFeedback.lightImpact();
   }
 

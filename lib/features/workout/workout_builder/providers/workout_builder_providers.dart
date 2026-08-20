@@ -66,15 +66,16 @@ abstract mixin class WorkoutDraftMutations {
   }
 
   void addSection(String? name, {String? notes}) {
-    final sections = [
-      ...current.draft.sections,
-      WorkoutSectionDraft(
-        id: _id(),
-        name: name?.trim().isEmpty == true ? null : name?.trim(),
-        position: current.draft.sections.length,
-        notes: notes,
-      ),
-    ];
+    final section = WorkoutSectionDraft(
+      id: _id(),
+      name: name?.trim().isEmpty == true ? null : name?.trim(),
+      position: current.draft.sections.length,
+      notes: notes,
+    );
+    final sections = _insertSectionAtDefaultPosition(
+      current.draft.sections,
+      section,
+    );
     current = current.copyWith(
       draft: current.draft.copyWith(sections: sections),
       error: null,
@@ -136,9 +137,11 @@ abstract mixin class WorkoutDraftMutations {
       sections.add(WorkoutSectionDraft(id: _id(), position: 0));
     }
     var index = sectionId == null
-        ? sections.length - 1
+        ? sections.indexWhere(
+            (section) => section.kind == WorkoutSectionKind.main,
+          )
         : sections.indexWhere((s) => s.id == sectionId);
-    if (index < 0) index = sections.length - 1;
+    if (index < 0) index = 0;
     final section = sections[index];
     sections[index] = section.copyWith(
       items: [...section.items, WorkoutExerciseItemDraft(exercise)],
@@ -305,6 +308,22 @@ abstract mixin class WorkoutDraftMutations {
     );
   }
 
+  void reorderSections(int oldIndex, int newIndex) {
+    final sections = [...current.draft.sections];
+    if (oldIndex < 0 || oldIndex >= sections.length) return;
+    if (newIndex > oldIndex) newIndex -= 1;
+    final section = sections.removeAt(oldIndex);
+    sections.insert(newIndex.clamp(0, sections.length), section);
+    current = current.copyWith(
+      draft: current.draft.copyWith(
+        sections: sections.indexed
+            .map((pair) => pair.$2.copyWith(position: pair.$1))
+            .toList(),
+      ),
+      error: null,
+    );
+  }
+
   void createGroup({
     required WorkoutGroupType type,
     required List<String> itemIds,
@@ -369,8 +388,12 @@ abstract mixin class WorkoutDraftMutations {
 class CreateWorkoutController extends _$CreateWorkoutController
     with WorkoutDraftMutations {
   @override
-  WorkoutBuilderState build() =>
-      WorkoutBuilderState(draft: WorkoutDraft(localDraftId: _id()));
+  WorkoutBuilderState build() => WorkoutBuilderState(
+    draft: WorkoutDraft(
+      localDraftId: _id(),
+      sections: [WorkoutSectionDraft(id: _id(), position: 0)],
+    ),
+  );
   @override
   WorkoutBuilderState get current => state;
   @override
@@ -603,6 +626,54 @@ String _goal(String value) {
     return 'strength';
   }
   return 'general';
+}
+
+List<WorkoutSectionDraft> _insertSectionAtDefaultPosition(
+  List<WorkoutSectionDraft> existing,
+  WorkoutSectionDraft section,
+) {
+  final sections = [...existing];
+  final index = switch (section.kind) {
+    WorkoutSectionKind.preparation => 0,
+    WorkoutSectionKind.main => _afterLastKind(sections, const {
+      WorkoutSectionKind.preparation,
+    }),
+    WorkoutSectionKind.accessories => _beforeFirstKind(sections, const {
+      WorkoutSectionKind.custom,
+      WorkoutSectionKind.cooldown,
+      WorkoutSectionKind.finisher,
+    }),
+    WorkoutSectionKind.custom => _beforeFirstKind(sections, const {
+      WorkoutSectionKind.cooldown,
+      WorkoutSectionKind.finisher,
+    }),
+    WorkoutSectionKind.cooldown => _beforeFirstKind(sections, const {
+      WorkoutSectionKind.finisher,
+    }),
+    WorkoutSectionKind.finisher => sections.length,
+  };
+  sections.insert(index, section);
+  return sections.indexed
+      .map((pair) => pair.$2.copyWith(position: pair.$1))
+      .toList();
+}
+
+int _beforeFirstKind(
+  List<WorkoutSectionDraft> sections,
+  Set<WorkoutSectionKind> kinds,
+) {
+  final index = sections.indexWhere((section) => kinds.contains(section.kind));
+  return index < 0 ? sections.length : index;
+}
+
+int _afterLastKind(
+  List<WorkoutSectionDraft> sections,
+  Set<WorkoutSectionKind> kinds,
+) {
+  final index = sections.lastIndexWhere(
+    (section) => kinds.contains(section.kind),
+  );
+  return index < 0 ? 0 : index + 1;
 }
 
 bool _sameDraft(WorkoutDraft a, WorkoutDraft b) =>

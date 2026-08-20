@@ -298,6 +298,23 @@ class AppStrings {
       'en': 'Add exercise',
       'it': 'Aggiungi esercizio',
     },
+    'workout.builder.choose_destination': {
+      'en': 'Where should it go?',
+      'it': 'Dove vuoi inserirlo?',
+    },
+    'workout.builder.choose_destination_hint': {
+      'en': 'Choose a section. Main is selected by default.',
+      'it': 'Scegli una sezione. Principali è quella predefinita.',
+    },
+    'workout.builder.default_section': {'en': 'Default', 'it': 'Predefinita'},
+    'workout.builder.collapse_section': {
+      'en': 'Collapse section',
+      'it': 'Comprimi sezione',
+    },
+    'workout.builder.expand_section': {
+      'en': 'Expand section',
+      'it': 'Espandi sezione',
+    },
     'workout.builder.add_exercise_to_section': {
       'en': 'Add exercise to {section}',
       'it': 'Aggiungi esercizio a {section}',

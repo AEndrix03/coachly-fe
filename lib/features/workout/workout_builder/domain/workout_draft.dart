@@ -32,6 +32,15 @@ final class RangeRepTarget extends RepTarget {
 
 enum WorkoutGroupType { superset, triset, giantSet, circuit }
 
+enum WorkoutSectionKind {
+  preparation,
+  main,
+  accessories,
+  custom,
+  cooldown,
+  finisher,
+}
+
 class WorkoutExerciseDraft {
   final String localId;
   final String exerciseId;
@@ -153,6 +162,8 @@ class WorkoutSectionDraft {
   final List<WorkoutStructureItemDraft> items;
   final String? notes;
 
+  WorkoutSectionKind get kind => workoutSectionKindFromName(name);
+
   const WorkoutSectionDraft({
     required this.id,
     this.name,
@@ -173,6 +184,30 @@ class WorkoutSectionDraft {
     items: items ?? this.items,
     notes: identical(notes, _unset) ? this.notes : notes as String?,
   );
+}
+
+WorkoutSectionKind workoutSectionKindFromName(String? name) {
+  final normalized = name?.trim().toLowerCase();
+  if (normalized == null || normalized.isEmpty) return WorkoutSectionKind.main;
+  if ({
+    'preparation',
+    'preparazione',
+    'warm-up',
+    'warmup',
+  }.contains(normalized)) {
+    return WorkoutSectionKind.preparation;
+  }
+  if ({'main', 'principale', 'principali'}.contains(normalized)) {
+    return WorkoutSectionKind.main;
+  }
+  if ({'accessories', 'accessori', 'accessory'}.contains(normalized)) {
+    return WorkoutSectionKind.accessories;
+  }
+  if ({'cooldown', 'defaticamento', 'cool down'}.contains(normalized)) {
+    return WorkoutSectionKind.cooldown;
+  }
+  if ({'finisher'}.contains(normalized)) return WorkoutSectionKind.finisher;
+  return WorkoutSectionKind.custom;
 }
 
 class WorkoutDraft {
