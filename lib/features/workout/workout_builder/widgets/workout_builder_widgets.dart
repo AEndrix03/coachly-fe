@@ -199,7 +199,8 @@ class _StructureActionCard extends StatelessWidget {
               height: 1.35,
             ),
           ),
-          const SizedBox(height: 10),
+          const Spacer(),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -608,20 +609,18 @@ class _DraftItem extends StatelessWidget {
                     prefix: '${index + 1}'.padLeft(2, '0'),
                     onEdit: () => onEditExercise(exercise),
                     onOpen: () => onOpenExercise(exercise),
+                    onActions: editable
+                        ? () => _showItemActions(
+                            context,
+                            initialNotes: exercise.notes,
+                            onNotesChanged: (notes) => onUpdateExercise(
+                              exercise.copyWith(notes: notes),
+                            ),
+                            onRemove: () => onRemove(item.id),
+                          )
+                        : null,
                   ),
                 ),
-                if (editable)
-                  IconButton(
-                    onPressed: () => _showItemActions(
-                      context,
-                      initialNotes: exercise.notes,
-                      onNotesChanged: (notes) =>
-                          onUpdateExercise(exercise.copyWith(notes: notes)),
-                      onRemove: () => onRemove(item.id),
-                    ),
-                    tooltip: context.tr('workout.builder.item_actions'),
-                    icon: const Icon(Icons.more_horiz_rounded),
-                  ),
               ],
             ),
           ),
@@ -693,11 +692,6 @@ class _ExerciseLine extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const Icon(
-                            Icons.chevron_right,
-                            size: 18,
-                            color: CoachlyAthleteTheme.textSecondary,
-                          ),
                         ],
                       ),
                     ),
@@ -715,11 +709,37 @@ class _ExerciseLine extends StatelessWidget {
             ),
           ),
           if (onActions != null)
-            IconButton(
-              onPressed: onActions,
-              tooltip: context.tr('workout.builder.item_actions'),
-              icon: const Icon(Icons.more_horiz_rounded),
+            SizedBox(
+              width: CoachlyAthleteTheme.touchTarget,
+              height: CoachlyAthleteTheme.touchTarget,
+              child: IconButton(
+                onPressed: onActions,
+                tooltip: context.tr('workout.builder.item_actions'),
+                icon: const Icon(Icons.more_horiz_rounded),
+              ),
             ),
+          Semantics(
+            button: true,
+            label: context.tr(
+              'workout.builder.open_exercise_details',
+              params: {'name': exercise.name},
+            ),
+            child: InkWell(
+              onTap: onOpen,
+              borderRadius: BorderRadius.circular(
+                CoachlyAthleteTheme.compactRadius,
+              ),
+              child: const SizedBox(
+                width: 36,
+                height: CoachlyAthleteTheme.touchTarget,
+                child: Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: CoachlyAthleteTheme.textSecondary,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     ),
