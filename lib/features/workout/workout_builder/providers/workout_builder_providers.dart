@@ -207,6 +207,32 @@ abstract mixin class WorkoutDraftMutations {
     );
   }
 
+  void removeExercise(String exerciseId) {
+    final sections = current.draft.sections.map((section) {
+      final items = <WorkoutStructureItemDraft>[];
+      for (final item in section.items) {
+        if (item is! WorkoutExerciseGroupDraft ||
+            !item.exercises.any((exercise) => exercise.localId == exerciseId)) {
+          items.add(item);
+          continue;
+        }
+        final remaining = item.exercises
+            .where((exercise) => exercise.localId != exerciseId)
+            .toList();
+        if (remaining.length > 1) {
+          items.add(item.copyWith(exercises: remaining));
+        } else if (remaining.length == 1) {
+          items.add(WorkoutExerciseItemDraft(remaining.single));
+        }
+      }
+      return section.copyWith(items: items);
+    }).toList();
+    current = current.copyWith(
+      draft: current.draft.copyWith(sections: sections),
+      error: null,
+    );
+  }
+
   void duplicateItem(String itemId) {
     final sections = current.draft.sections.map((section) {
       final index = section.items.indexWhere((item) => item.id == itemId);

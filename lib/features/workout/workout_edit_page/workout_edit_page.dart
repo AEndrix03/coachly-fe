@@ -150,6 +150,13 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                             )
                             .reorderInSection(section, oldIndex, newIndex),
                         onRemove: _removeItem,
+                        onRemoveExercise: ref
+                            .read(
+                              editWorkoutControllerProvider(
+                                widget.workoutId,
+                              ).notifier,
+                            )
+                            .removeExercise,
                         onDuplicate: (id) => ref
                             .read(
                               editWorkoutControllerProvider(

@@ -80,10 +80,11 @@ class WorkoutStructureComposer extends StatelessWidget {
         children: [
           SizedBox(
             height: CoachlyAthleteTheme.primaryActionHeight,
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: context.exerciseTheme.primary,
-                foregroundColor: context.exerciseTheme.background,
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                backgroundColor: context.exerciseTheme.surfaceElevated,
+                foregroundColor: context.exerciseTheme.textPrimary,
+                side: BorderSide(color: context.exerciseTheme.border),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(
                     CoachlyAthleteTheme.actionRadius,
@@ -94,7 +95,11 @@ class WorkoutStructureComposer extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              icon: const Icon(Icons.add_rounded, size: 22),
+              icon: Icon(
+                Icons.add_rounded,
+                size: 22,
+                color: context.exerciseTheme.primary,
+              ),
               label: Text(
                 exerciseLabel ?? context.tr('workout.builder.add_exercise'),
               ),
@@ -102,29 +107,33 @@ class WorkoutStructureComposer extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _StructureActionCard(
-                  icon: Icons.view_agenda_outlined,
-                  title: context.tr('workout.builder.sections_hint_title'),
-                  body: context.tr('workout.builder.sections_hint_body'),
-                  actionLabel: context.tr('workout.builder.add_section'),
-                  onTap: onAddSection,
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: _StructureActionCard(
+                    icon: Icons.view_agenda_outlined,
+                    title: context.tr('workout.builder.sections_hint_title'),
+                    body: context.tr('workout.builder.sections_hint_body'),
+                    actionLabel: context.tr('workout.builder.add_section'),
+                    onTap: onAddSection,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _StructureActionCard(
-                  icon: Icons.link_rounded,
-                  title: context.tr('workout.builder.blocks_hint_title'),
-                  body: context.tr('workout.builder.blocks_hint_body'),
-                  actionLabel: context.tr('workout.builder.create_block_short'),
-                  onTap: onCreateBlock,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _StructureActionCard(
+                    icon: Icons.link_rounded,
+                    title: context.tr('workout.builder.blocks_hint_title'),
+                    body: context.tr('workout.builder.blocks_hint_body'),
+                    actionLabel: context.tr(
+                      'workout.builder.create_block_short',
+                    ),
+                    onTap: onCreateBlock,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -225,6 +234,7 @@ class WorkoutDraftStructure extends StatelessWidget {
   final ValueChanged<WorkoutExerciseDraft> onOpenExercise;
   final void Function(String sectionId, int oldIndex, int newIndex) onReorder;
   final ValueChanged<String> onRemove;
+  final ValueChanged<String> onRemoveExercise;
   final ValueChanged<String> onDuplicate;
   final ValueChanged<String> onMove;
   final ValueChanged<String?> onAddExercise;
@@ -245,6 +255,7 @@ class WorkoutDraftStructure extends StatelessWidget {
     required this.onOpenExercise,
     required this.onReorder,
     required this.onRemove,
+    required this.onRemoveExercise,
     required this.onDuplicate,
     required this.onMove,
     required this.onAddExercise,
@@ -359,6 +370,7 @@ class WorkoutDraftStructure extends StatelessWidget {
                         onUpdateBlock: onUpdateBlock,
                         onOpenExercise: onOpenExercise,
                         onRemove: onRemove,
+                        onRemoveExercise: onRemoveExercise,
                         onDuplicate: onDuplicate,
                         onMove: onMove,
                       ),
@@ -376,6 +388,7 @@ class WorkoutDraftStructure extends StatelessWidget {
                         onUpdateBlock: onUpdateBlock,
                         onOpenExercise: onOpenExercise,
                         onRemove: onRemove,
+                        onRemoveExercise: onRemoveExercise,
                         onDuplicate: onDuplicate,
                         onMove: onMove,
                       ),
@@ -449,6 +462,7 @@ class _DraftItem extends StatelessWidget {
   final ValueChanged<WorkoutExerciseGroupDraft> onUpdateBlock;
   final ValueChanged<WorkoutExerciseDraft> onOpenExercise;
   final ValueChanged<String> onRemove;
+  final ValueChanged<String> onRemoveExercise;
   final ValueChanged<String> onDuplicate;
   final ValueChanged<String> onMove;
   const _DraftItem({
@@ -462,6 +476,7 @@ class _DraftItem extends StatelessWidget {
     required this.onUpdateBlock,
     required this.onOpenExercise,
     required this.onRemove,
+    required this.onRemoveExercise,
     required this.onDuplicate,
     required this.onMove,
   });
@@ -529,6 +544,15 @@ class _DraftItem extends StatelessWidget {
                   prefix: 'A${pair.$1 + 1}',
                   onEdit: () => onEditExercise(pair.$2),
                   onOpen: () => onOpenExercise(pair.$2),
+                  onActions: editable
+                      ? () => _showItemActions(
+                          context,
+                          initialNotes: pair.$2.notes,
+                          onNotesChanged: (notes) =>
+                              onUpdateExercise(pair.$2.copyWith(notes: notes)),
+                          onRemove: () => onRemoveExercise(pair.$2.localId),
+                        )
+                      : null,
                 ),
               ),
               Padding(
@@ -612,11 +636,13 @@ class _ExerciseLine extends StatelessWidget {
   final String prefix;
   final VoidCallback onEdit;
   final VoidCallback onOpen;
+  final VoidCallback? onActions;
   const _ExerciseLine({
     required this.exercise,
     required this.prefix,
     required this.onEdit,
     required this.onOpen,
+    this.onActions,
   });
   @override
   Widget build(BuildContext context) => InkWell(
@@ -688,6 +714,12 @@ class _ExerciseLine extends StatelessWidget {
               ],
             ),
           ),
+          if (onActions != null)
+            IconButton(
+              onPressed: onActions,
+              tooltip: context.tr('workout.builder.item_actions'),
+              icon: const Icon(Icons.more_horiz_rounded),
+            ),
         ],
       ),
     ),

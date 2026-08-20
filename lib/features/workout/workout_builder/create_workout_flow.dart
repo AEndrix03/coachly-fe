@@ -265,6 +265,9 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                 onRemove: ref
                     .read(createWorkoutControllerProvider.notifier)
                     .removeItem,
+                onRemoveExercise: ref
+                    .read(createWorkoutControllerProvider.notifier)
+                    .removeExercise,
                 onDuplicate: ref
                     .read(createWorkoutControllerProvider.notifier)
                     .duplicateItem,
@@ -357,6 +360,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
               onOpenExercise: _openExerciseDetail,
               onReorder: (_, _, _) {},
               onRemove: (_) {},
+              onRemoveExercise: (_) {},
               onDuplicate: (_) {},
               onMove: (_) {},
               onAddExercise: (_) {},
