@@ -239,7 +239,6 @@ class AppStrings {
       'it': 'Aggiungi il primo esercizio',
     },
     'workout.builder.add': {'en': 'Add', 'it': 'Aggiungi'},
-    'workout.builder.exercise': {'en': 'Exercise', 'it': 'Esercizio'},
     'workout.builder.section': {'en': 'Section', 'it': 'Sezione'},
     'workout.builder.block': {'en': 'Block', 'it': 'Blocco'},
     'workout.builder.section_empty': {
@@ -299,6 +298,29 @@ class AppStrings {
       'en': 'Add exercise',
       'it': 'Aggiungi esercizio',
     },
+    'workout.builder.add_exercise_to_section': {
+      'en': 'Add exercise to {section}',
+      'it': 'Aggiungi esercizio a {section}',
+    },
+    'workout.builder.sections_hint_title': {'en': 'Sections', 'it': 'Sezioni'},
+    'workout.builder.sections_hint_body': {
+      'en': 'Organize the workout into clear parts.',
+      'it': 'Organizza il workout in parti chiare.',
+    },
+    'workout.builder.blocks_hint_title': {'en': 'Blocks', 'it': 'Blocchi'},
+    'workout.builder.blocks_hint_body': {
+      'en': 'Connect exercises performed together.',
+      'it': 'Collega esercizi eseguiti insieme.',
+    },
+    'workout.builder.create_superset_short': {
+      'en': 'Create a superset →',
+      'it': 'Crea un superset →',
+    },
+    'workout.builder.structure_actions': {
+      'en': 'Add to workout structure',
+      'it': 'Aggiungi alla struttura del workout',
+    },
+    'workout.builder.exercise': {'en': 'Exercise', 'it': 'Esercizio'},
     'workout.builder.save_changes': {
       'en': 'Save changes',
       'it': 'Salva modifiche',

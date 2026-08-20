@@ -224,6 +224,8 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
           children: [
             WorkoutBuilderSummary(draft: state.draft, compact: true),
+            const SizedBox(height: 22),
+            WorkoutStructureHints(onCreateBlock: _createBlock),
             const SizedBox(height: 26),
             AnimatedSwitcher(
               duration: MediaQuery.disableAnimationsOf(context)
@@ -817,40 +819,39 @@ class _BuilderActions extends StatelessWidget {
     required this.onCreateBlock,
   });
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 4),
-    child: Row(
-      children: [
-        TextButton.icon(
-          icon: const Icon(Icons.add, size: 20),
-          label: Text(context.tr('workout.builder.add_exercise')),
-          onPressed: onAddExercise,
-        ),
-        const Spacer(),
-        PopupMenuButton<_StructureAction>(
-          tooltip: context.tr('workout.builder.more_actions'),
-          icon: const Icon(Icons.more_horiz),
-          onSelected: (action) => switch (action) {
-            _StructureAction.section => onAddSection(),
-            _StructureAction.block => onCreateBlock(),
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: _StructureAction.section,
-              child: Text(context.tr('workout.builder.add_section')),
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    label: context.tr('workout.builder.structure_actions'),
+    child: Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: FilledButton.tonalIcon(
+              icon: const Icon(Icons.add, size: 20),
+              label: Text(context.tr('workout.builder.exercise')),
+              onPressed: onAddExercise,
             ),
-            PopupMenuItem(
-              value: _StructureAction.block,
-              child: Text(context.tr('workout.builder.create_block')),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextButton(
+              onPressed: onAddSection,
+              child: Text(context.tr('workout.builder.section')),
             ),
-          ],
-        ),
-      ],
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: TextButton(
+              onPressed: onCreateBlock,
+              child: Text(context.tr('workout.builder.block')),
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }
-
-enum _StructureAction { section, block }
 
 class _BlockCandidate {
   final String sectionId;
