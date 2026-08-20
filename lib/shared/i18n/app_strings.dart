@@ -384,6 +384,10 @@ class AppStrings {
       'en': 'Create exercise block',
       'it': 'Crea un blocco di esercizi',
     },
+    'workout.builder.create_block_short': {
+      'en': 'Create block',
+      'it': 'Crea blocco',
+    },
     'workout.builder.configure_block': {
       'en': 'Configure exercise block',
       'it': 'Configura il blocco di esercizi',

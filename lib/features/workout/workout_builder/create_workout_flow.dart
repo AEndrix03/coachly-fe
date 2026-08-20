@@ -225,8 +225,6 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
           children: [
             WorkoutBuilderSummary(draft: state.draft, compact: true),
-            const SizedBox(height: 22),
-            WorkoutStructureHints(onCreateBlock: _createBlock),
             const SizedBox(height: 26),
             AnimatedSwitcher(
               duration: MediaQuery.disableAnimationsOf(context)
@@ -259,12 +257,11 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                 onEditSection: _editSection,
               ),
             ),
-            if (state.draft.exerciseCount > 0)
-              WorkoutStructureComposer(
-                onAddExercise: () => _addExercise(null),
-                onAddSection: _addSection,
-                onCreateBlock: _createBlock,
-              ),
+            WorkoutStructureComposer(
+              onAddExercise: () => _addExercise(null),
+              onAddSection: _addSection,
+              onCreateBlock: _createBlock,
+            ),
           ],
         ),
       ),

@@ -55,38 +55,6 @@ class WorkoutBuilderSummary extends StatelessWidget {
   );
 }
 
-class WorkoutStructureHints extends StatelessWidget {
-  final VoidCallback? onCreateBlock;
-
-  const WorkoutStructureHints({super.key, this.onCreateBlock});
-
-  @override
-  Widget build(BuildContext context) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Expanded(
-        child: _StructureHint(
-          icon: Icons.view_agenda_outlined,
-          title: context.tr('workout.builder.sections_hint_title'),
-          body: context.tr('workout.builder.sections_hint_body'),
-        ),
-      ),
-      const SizedBox(width: 10),
-      Expanded(
-        child: _StructureHint(
-          icon: Icons.link_rounded,
-          title: context.tr('workout.builder.blocks_hint_title'),
-          body: context.tr('workout.builder.blocks_hint_body'),
-          actionLabel: onCreateBlock == null
-              ? null
-              : context.tr('workout.builder.create_superset_short'),
-          onAction: onCreateBlock,
-        ),
-      ),
-    ],
-  );
-}
-
 class WorkoutStructureComposer extends StatelessWidget {
   final VoidCallback onAddExercise;
   final VoidCallback onAddSection;
@@ -104,29 +72,62 @@ class WorkoutStructureComposer extends StatelessWidget {
     container: true,
     label: context.tr('workout.builder.structure_actions'),
     child: Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Row(
+      padding: const EdgeInsets.only(top: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: FilledButton.tonalIcon(
-              icon: const Icon(Icons.add, size: 20),
-              label: Text(context.tr('workout.builder.exercise')),
+          SizedBox(
+            height: CoachlyAthleteTheme.primaryActionHeight,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: context.exerciseTheme.primary,
+                foregroundColor: context.exerciseTheme.background,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    CoachlyAthleteTheme.actionRadius,
+                  ),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              icon: const Icon(Icons.add_rounded, size: 22),
+              label: Text(context.tr('workout.builder.add_exercise')),
               onPressed: onAddExercise,
             ),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: TextButton(
-              onPressed: onAddSection,
-              child: Text(context.tr('workout.builder.section')),
-            ),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: TextButton(
-              onPressed: onCreateBlock,
-              child: Text(context.tr('workout.builder.block')),
-            ),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final section = _StructureActionCard(
+                icon: Icons.view_agenda_outlined,
+                title: context.tr('workout.builder.sections_hint_title'),
+                body: context.tr('workout.builder.sections_hint_body'),
+                actionLabel: context.tr('workout.builder.add_section'),
+                onTap: onAddSection,
+              );
+              final block = _StructureActionCard(
+                icon: Icons.link_rounded,
+                title: context.tr('workout.builder.blocks_hint_title'),
+                body: context.tr('workout.builder.blocks_hint_body'),
+                actionLabel: context.tr('workout.builder.create_block_short'),
+                onTap: onCreateBlock,
+              );
+              if (constraints.maxWidth < 340) {
+                return Column(
+                  children: [section, const SizedBox(height: 10), block],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: section),
+                  const SizedBox(width: 10),
+                  Expanded(child: block),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -134,66 +135,84 @@ class WorkoutStructureComposer extends StatelessWidget {
   );
 }
 
-class _StructureHint extends StatelessWidget {
+class _StructureActionCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String body;
-  final String? actionLabel;
-  final VoidCallback? onAction;
+  final String actionLabel;
+  final VoidCallback onTap;
 
-  const _StructureHint({
+  const _StructureActionCard({
     required this.icon,
     required this.title,
     required this.body,
-    this.actionLabel,
-    this.onAction,
+    required this.actionLabel,
+    required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    container: true,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+  Widget build(BuildContext context) => CoachlyPressable(
+    onTap: onTap,
+    semanticLabel: '$actionLabel. $body',
+    borderRadius: BorderRadius.circular(CoachlyAthleteTheme.cardRadius),
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: context.exerciseTheme.surface,
+        borderRadius: BorderRadius.circular(CoachlyAthleteTheme.cardRadius),
+        border: Border.all(color: context.exerciseTheme.border),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(icon, size: 16, color: CoachlyAthleteTheme.textSecondary),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    color: CoachlyAthleteTheme.textPrimary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
+          Container(
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: context.exerciseTheme.primaryMuted.withValues(alpha: .48),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(icon, size: 19, color: context.exerciseTheme.primary),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: TextStyle(
+              color: context.exerciseTheme.textPrimary,
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 5),
           Text(
             body,
-            style: const TextStyle(
-              color: CoachlyAthleteTheme.textSecondary,
+            style: TextStyle(
+              color: context.exerciseTheme.textSecondary,
               fontSize: 12,
               height: 1.35,
             ),
           ),
-          if (actionLabel != null) ...[
-            const SizedBox(height: 3),
-            TextButton(
-              onPressed: onAction,
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: const Size(44, 44),
-                alignment: Alignment.centerLeft,
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  actionLabel,
+                  style: TextStyle(
+                    color: context.exerciseTheme.primary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ),
-              child: Text(actionLabel!),
-            ),
-          ],
+              Icon(
+                Icons.arrow_forward_rounded,
+                size: 17,
+                color: context.exerciseTheme.primary,
+              ),
+            ],
+          ),
         ],
       ),
     ),
@@ -235,10 +254,7 @@ class WorkoutDraftStructure extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (draft.exerciseCount == 0 && draft.sections.isEmpty) {
-      return _WorkoutEmptyState(
-        onAddExercise: () => onAddExercise(null),
-        onAddSection: onAddSection,
-      );
+      return const _WorkoutEmptyState();
     }
     return Column(
       children: draft.sections
@@ -385,13 +401,7 @@ class _SectionEmpty extends StatelessWidget {
 }
 
 class _WorkoutEmptyState extends StatelessWidget {
-  final VoidCallback onAddExercise;
-  final VoidCallback onAddSection;
-
-  const _WorkoutEmptyState({
-    required this.onAddExercise,
-    required this.onAddSection,
-  });
+  const _WorkoutEmptyState();
 
   @override
   Widget build(BuildContext context) => AnimatedSwitcher(
@@ -418,17 +428,6 @@ class _WorkoutEmptyState extends StatelessWidget {
               color: context.exerciseTheme.textSecondary,
               height: 1.45,
             ),
-          ),
-          const SizedBox(height: 20),
-          FilledButton.icon(
-            onPressed: onAddExercise,
-            icon: const Icon(Icons.add),
-            label: Text(context.tr('workout.builder.add_first_exercise')),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: onAddSection,
-            child: Text(context.tr('workout.builder.add_section')),
           ),
         ],
       ),
