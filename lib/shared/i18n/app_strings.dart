@@ -416,6 +416,53 @@ class AppStrings {
       'en': 'Connect exercises',
       'it': 'Collega più esercizi',
     },
+    'workout.builder.create_block_title': {
+      'en': 'Create block',
+      'it': 'Crea blocco',
+    },
+    'workout.builder.create_block_explanation': {
+      'en': 'Connect multiple exercises into one group.',
+      'it': 'Collega più esercizi in un unico gruppo.',
+    },
+    'workout.builder.step_type': {'en': 'Type', 'it': 'Tipo'},
+    'workout.builder.step_exercises': {'en': 'Exercises', 'it': 'Esercizi'},
+    'workout.builder.step_setup': {'en': 'Setup', 'it': 'Setup'},
+    'workout.builder.choose_exercises': {
+      'en': 'Choose {count} exercises',
+      'it': 'Scegli {count} esercizi',
+    },
+    'workout.builder.select_more_exercises': {
+      'en': 'Select {count} more to continue.',
+      'it': 'Selezionane ancora {count} per continuare.',
+    },
+    'workout.builder.block_setup_title': {
+      'en': '{type} setup',
+      'it': 'Configura {type}',
+    },
+    'workout.builder.block_setup_hint': {
+      'en': 'Exercises alternate in order before the round rest.',
+      'it': 'Gli esercizi si alternano in ordine prima del recupero del round.',
+    },
+    'workout.builder.create_selected_block': {
+      'en': 'Create {type}',
+      'it': 'Crea {type}',
+    },
+    'workout.builder.block_type_superset': {
+      'en': '2 exercises · Alternate between two exercises.',
+      'it': '2 esercizi · Alterna due esercizi.',
+    },
+    'workout.builder.block_type_triset': {
+      'en': '3 exercises',
+      'it': '3 esercizi',
+    },
+    'workout.builder.block_type_giantSet': {
+      'en': '4+ exercises',
+      'it': '4+ esercizi',
+    },
+    'workout.builder.block_type_circuit': {
+      'en': '2+ exercises',
+      'it': '2+ esercizi',
+    },
     'workout.builder.add_block': {'en': 'Add block', 'it': 'Aggiungi blocco'},
     'workout.builder.add_superset': {
       'en': 'Add superset',

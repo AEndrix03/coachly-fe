@@ -5,6 +5,7 @@ import 'package:coachly/features/workout/workout_edit_page/widgets/exercise_pick
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
+import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -886,6 +887,7 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
   WorkoutGroupType type = WorkoutGroupType.superset;
   final selected = <String>{};
   String? selectedSectionId;
+  int step = 0;
   int rounds = 3;
   int restBetweenExercisesSeconds = 0;
   int restAfterRoundSeconds = 90;
@@ -913,119 +915,40 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
             children: [
               Text(
-                context.tr('workout.builder.connect_exercises'),
+                context.tr('workout.builder.create_block_title'),
                 style: TextStyle(
                   color: context.exerciseTheme.textPrimary,
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: WorkoutGroupType.values.map((value) {
-                  return ChoiceChip(
-                    selected: type == value,
-                    label: Text(_groupTypeLabel(context, value)),
-                    onSelected: (_) => setState(() {
-                      type = value;
-                      selected.clear();
-                      selectedSectionId = null;
-                    }),
-                  );
-                }).toList(),
+              const SizedBox(height: 6),
+              Text(
+                context.tr('workout.builder.create_block_explanation'),
+                style: TextStyle(color: context.exerciseTheme.textSecondary),
               ),
-              const SizedBox(height: 20),
-              ...widget.candidates.map((candidate) {
-                final disabled =
-                    selectedSectionId != null &&
-                    selectedSectionId != candidate.sectionId;
-                return CheckboxListTile(
-                  value: selected.contains(candidate.item.id),
-                  enabled: !disabled,
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(candidate.item.exercise.name),
-                  onChanged: disabled
-                      ? null
-                      : (checked) => setState(() {
-                          if (checked == true) {
-                            selectedSectionId = candidate.sectionId;
-                            selected.add(candidate.item.id);
-                          } else {
-                            selected.remove(candidate.item.id);
-                            if (selected.isEmpty) selectedSectionId = null;
-                          }
-                        }),
-                );
-              }),
-              if (selected.isNotEmpty) ...[
-                const SizedBox(height: 18),
-                Text(
-                  context.tr('workout.builder.selected_exercises'),
-                  style: TextStyle(
-                    color: context.exerciseTheme.textSecondary,
-                    fontWeight: FontWeight.w800,
+              const SizedBox(height: 18),
+              _BlockStepper(currentStep: step),
+              const SizedBox(height: 22),
+              AnimatedSwitcher(
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : CoachlyAthleteTheme.expandDuration,
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween(
+                      begin: const Offset(.04, 0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
                   ),
                 ),
-                const SizedBox(height: 8),
-                ReorderableListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  buildDefaultDragHandles: false,
-                  itemCount: selected.length,
-                  onReorder: (oldIndex, newIndex) => setState(() {
-                    if (newIndex > oldIndex) newIndex -= 1;
-                    final ordered = selected.toList();
-                    final id = ordered.removeAt(oldIndex);
-                    ordered.insert(newIndex, id);
-                    selected
-                      ..clear()
-                      ..addAll(ordered);
-                  }),
-                  itemBuilder: (context, index) {
-                    final id = selected.elementAt(index);
-                    final candidate = widget.candidates.firstWhere(
-                      (entry) => entry.item.id == id,
-                    );
-                    return ListTile(
-                      key: ValueKey(id),
-                      contentPadding: EdgeInsets.zero,
-                      leading: SizedBox(
-                        width: 28,
-                        child: Text('A${index + 1}'),
-                      ),
-                      title: Text(candidate.item.exercise.name),
-                      trailing: ReorderableDragStartListener(
-                        index: index,
-                        child: const SizedBox(
-                          width: CoachlyAthleteTheme.touchTarget,
-                          height: CoachlyAthleteTheme.touchTarget,
-                          child: Icon(Icons.drag_indicator_rounded),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-              const SizedBox(height: 12),
-              NumericStepper(
-                label: context.tr('workout.detail.rounds'),
-                value: rounds,
-                min: 1,
-                onChanged: (value) => setState(() => rounds = value),
-              ),
-              DurationStepper(
-                label: context.tr('workout.builder.between_exercises'),
-                seconds: restBetweenExercisesSeconds,
-                onChanged: (value) =>
-                    setState(() => restBetweenExercisesSeconds = value),
-              ),
-              DurationStepper(
-                label: context.tr('workout.builder.after_each_round'),
-                seconds: restAfterRoundSeconds,
-                onChanged: (value) =>
-                    setState(() => restAfterRoundSeconds = value),
+                child: switch (step) {
+                  0 => _typeStep(),
+                  1 => _exerciseStep(),
+                  _ => _setupStep(),
+                },
               ),
             ],
           ),
@@ -1037,20 +960,15 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
             width: double.infinity,
             height: CoachlyAthleteTheme.touchTarget,
             child: FilledButton(
-              onPressed: _canSubmit
-                  ? () => Navigator.pop(
-                      context,
-                      _BlockSelection(
-                        type: type,
-                        itemIds: selected.toList(),
-                        rounds: rounds,
-                        restBetweenExercisesSeconds:
-                            restBetweenExercisesSeconds,
-                        restAfterRoundSeconds: restAfterRoundSeconds,
-                      ),
-                    )
-                  : null,
-              child: Text(context.tr('workout.builder.add_block')),
+              onPressed: _primaryAction,
+              child: Text(
+                context.tr(
+                  step == 2
+                      ? 'workout.builder.create_selected_block'
+                      : 'workout.builder.continue_action',
+                  params: {'type': _groupTypeLabel(context, type)},
+                ),
+              ),
             ),
           ),
         ),
@@ -1058,14 +976,249 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
     ),
   );
 
-  bool get _canSubmit =>
-      selected.length >=
-      switch (type) {
-        WorkoutGroupType.superset => 2,
-        WorkoutGroupType.triset => 3,
-        WorkoutGroupType.giantSet => 4,
-        WorkoutGroupType.circuit => 2,
-      };
+  Widget _typeStep() => Column(
+    key: const ValueKey('block-type'),
+    children: WorkoutGroupType.values
+        .map(
+          (value) => _BlockTypeTile(
+            type: value,
+            selected: type == value,
+            onTap: () => setState(() {
+              type = value;
+              selected.clear();
+              selectedSectionId = null;
+              HapticFeedback.selectionClick();
+            }),
+          ),
+        )
+        .toList(),
+  );
+
+  Widget _exerciseStep() => Column(
+    key: const ValueKey('block-exercises'),
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: Text(
+              context.tr(
+                'workout.builder.choose_exercises',
+                params: {'count': '$_requiredCount'},
+              ),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: context.exerciseTheme.textPrimary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          Text(
+            '${selected.length} / $_requiredCount',
+            style: const TextStyle(
+              color: CoachlyAthleteTheme.primary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+      ...widget.candidates.map((candidate) {
+        final unavailable =
+            selectedSectionId != null &&
+            selectedSectionId != candidate.sectionId;
+        final checked = selected.contains(candidate.item.id);
+        return Semantics(
+          selected: checked,
+          enabled: !unavailable,
+          child: CheckboxListTile(
+            value: checked,
+            enabled: !unavailable,
+            contentPadding: EdgeInsets.zero,
+            controlAffinity: ListTileControlAffinity.leading,
+            title: Text(candidate.item.exercise.name),
+            onChanged: unavailable
+                ? null
+                : (value) => setState(() {
+                    if (value == true && selected.length < _requiredCount) {
+                      selectedSectionId = candidate.sectionId;
+                      selected.add(candidate.item.id);
+                    } else if (value == false) {
+                      selected.remove(candidate.item.id);
+                      if (selected.isEmpty) selectedSectionId = null;
+                    }
+                    HapticFeedback.selectionClick();
+                  }),
+          ),
+        );
+      }),
+      if (!_selectionComplete)
+        Text(
+          context.tr(
+            'workout.builder.select_more_exercises',
+            params: {'count': '${_requiredCount - selected.length}'},
+          ),
+          style: TextStyle(color: context.exerciseTheme.textSecondary),
+        ),
+    ],
+  );
+
+  Widget _setupStep() => Column(
+    key: const ValueKey('block-setup'),
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text(
+        context.tr(
+          'workout.builder.block_setup_title',
+          params: {'type': _groupTypeLabel(context, type)},
+        ),
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: context.exerciseTheme.textPrimary,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      const SizedBox(height: 12),
+      NumericStepper(
+        label: context.tr('workout.detail.rounds'),
+        value: rounds,
+        min: 1,
+        onChanged: (value) => setState(() => rounds = value),
+      ),
+      DurationStepper(
+        label: context.tr('workout.builder.after_each_round'),
+        seconds: restAfterRoundSeconds,
+        onChanged: (value) => setState(() => restAfterRoundSeconds = value),
+      ),
+      const SizedBox(height: 12),
+      CoachlySurface(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: selected.indexed.map((pair) {
+            final candidate = widget.candidates.firstWhere(
+              (entry) => entry.item.id == pair.$2,
+            );
+            return ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              leading: Text('A${pair.$1 + 1}'),
+              title: Text(candidate.item.exercise.name),
+            );
+          }).toList(),
+        ),
+      ),
+      const SizedBox(height: 10),
+      Text(
+        context.tr('workout.builder.block_setup_hint'),
+        style: TextStyle(
+          color: context.exerciseTheme.textSecondary,
+          height: 1.4,
+        ),
+      ),
+    ],
+  );
+
+  void _primaryAction() {
+    if (step == 0) {
+      setState(() => step = 1);
+    } else if (step == 1) {
+      if (_selectionComplete) setState(() => step = 2);
+    } else {
+      Navigator.pop(
+        context,
+        _BlockSelection(
+          type: type,
+          itemIds: selected.toList(),
+          rounds: rounds,
+          restBetweenExercisesSeconds: restBetweenExercisesSeconds,
+          restAfterRoundSeconds: restAfterRoundSeconds,
+        ),
+      );
+    }
+  }
+
+  int get _requiredCount => switch (type) {
+    WorkoutGroupType.superset => 2,
+    WorkoutGroupType.triset => 3,
+    WorkoutGroupType.giantSet => 4,
+    WorkoutGroupType.circuit => 2,
+  };
+
+  bool get _selectionComplete => selected.length >= _requiredCount;
+}
+
+class _BlockStepper extends StatelessWidget {
+  final int currentStep;
+  const _BlockStepper({required this.currentStep});
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: List.generate(3, (index) {
+      final labels = [
+        context.tr('workout.builder.step_type'),
+        context.tr('workout.builder.step_exercises'),
+        context.tr('workout.builder.step_setup'),
+      ];
+      final active = index <= currentStep;
+      return Expanded(
+        child: Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: active
+                    ? CoachlyAthleteTheme.primary
+                    : context.exerciseTheme.surface,
+              ),
+              child: Text('${index + 1}'),
+            ),
+            const SizedBox(width: 5),
+            Flexible(
+              child: Text(
+                labels[index],
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: active
+                      ? context.exerciseTheme.textPrimary
+                      : context.exerciseTheme.textSecondary,
+                ),
+              ),
+            ),
+            if (index < 2) const Expanded(child: Divider()),
+          ],
+        ),
+      );
+    }),
+  );
+}
+
+class _BlockTypeTile extends StatelessWidget {
+  final WorkoutGroupType type;
+  final bool selected;
+  final VoidCallback onTap;
+  const _BlockTypeTile({
+    required this.type,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    contentPadding: EdgeInsets.zero,
+    minVerticalPadding: 10,
+    onTap: onTap,
+    title: Text(
+      _groupTypeLabel(context, type),
+      style: const TextStyle(fontWeight: FontWeight.w700),
+    ),
+    subtitle: Text(context.tr('workout.builder.block_type_${type.name}')),
+    trailing: selected
+        ? const Icon(Icons.check_circle, color: CoachlyAthleteTheme.primary)
+        : const Icon(Icons.circle_outlined),
+  );
 }
 
 String _groupTypeLabel(BuildContext context, WorkoutGroupType type) =>
