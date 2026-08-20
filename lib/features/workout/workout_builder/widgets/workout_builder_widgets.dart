@@ -106,13 +106,25 @@ class WorkoutDraftStructure extends StatelessWidget {
                   if (section.name != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        section.name!.toUpperCase(),
-                        style: const TextStyle(
-                          color: CoachlyAthleteTheme.textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: .75,
+                      child: Semantics(
+                        header: true,
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                section.name!.toUpperCase(),
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: CoachlyAthleteTheme.textSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: .8,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(child: Divider()),
+                          ],
                         ),
                       ),
                     ),
@@ -283,31 +295,45 @@ class _DraftItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  if (editable)
-                    ReorderableDragStartListener(
-                      index: index,
-                      child: const _DragHandle(),
-                    ),
-                  Expanded(
-                    child: Text(
-                      '${_groupLabel(context, group.type)} · ${context.tr(group.rounds == 1 ? 'workout.detail.round_count_one' : 'workout.detail.round_count_other', params: {'count': '${group.rounds}'})}',
-                      style: const TextStyle(
-                        color: CoachlyAthleteTheme.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
+              InkWell(
+                onTap: editable ? () => onEditBlock(group) : null,
+                onLongPress: editable
+                    ? () => _showItemActions(
+                        context,
+                        onEdit: () => onEditBlock(group),
+                        onDuplicate: () => onDuplicate(group.id),
+                        onMove: () => onMove(group.id),
+                        onRemove: () => onRemove(group.id),
+                      )
+                    : null,
+                borderRadius: BorderRadius.circular(
+                  CoachlyAthleteTheme.compactRadius,
+                ),
+                child: Row(
+                  children: [
+                    if (editable)
+                      ReorderableDragStartListener(
+                        index: index,
+                        child: const _DragHandle(),
+                      ),
+                    Expanded(
+                      child: Text(
+                        '${_groupLabel(context, group.type)} · ${context.tr(group.rounds == 1 ? 'workout.detail.round_count_one' : 'workout.detail.round_count_other', params: {'count': '${group.rounds}'})}',
+                        style: const TextStyle(
+                          color: CoachlyAthleteTheme.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
-                  ),
-                  if (editable)
-                    _ItemMenu(
-                      onEdit: () => onEditBlock(group),
-                      onDuplicate: () => onDuplicate(group.id),
-                      onMove: () => onMove(group.id),
-                      onRemove: () => onRemove(group.id),
-                    ),
-                ],
+                    if (editable)
+                      const SizedBox(
+                        width: CoachlyAthleteTheme.touchTarget,
+                        height: CoachlyAthleteTheme.touchTarget,
+                        child: Icon(Icons.chevron_right),
+                      ),
+                  ],
+                ),
               ),
               ...group.exercises.indexed.map(
                 (pair) => _ExerciseLine(
@@ -342,31 +368,38 @@ class _DraftItem extends StatelessWidget {
       child: Semantics(
         label:
             '${exercise.name}, ${context.tr('workout.builder.position', params: {'position': '${index + 1}'})}',
-        child: CoachlySurface(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Row(
-            children: [
-              if (editable)
-                ReorderableDragStartListener(
-                  index: index,
-                  child: const _DragHandle(),
-                ),
-              Expanded(
-                child: _ExerciseLine(
-                  exercise: exercise,
-                  prefix: '${index + 1}'.padLeft(2, '0'),
-                  onEdit: () => onEditExercise(exercise),
-                  onOpen: () => onOpenExercise(exercise),
-                ),
-              ),
-              if (editable)
-                _ItemMenu(
+        child: InkWell(
+          onLongPress: editable
+              ? () => _showItemActions(
+                  context,
                   onEdit: () => onEditExercise(exercise),
                   onDuplicate: () => onDuplicate(item.id),
                   onMove: () => onMove(item.id),
                   onRemove: () => onRemove(item.id),
+                )
+              : null,
+          borderRadius: BorderRadius.circular(
+            CoachlyAthleteTheme.compactRadius,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              children: [
+                if (editable)
+                  ReorderableDragStartListener(
+                    index: index,
+                    child: const _DragHandle(),
+                  ),
+                Expanded(
+                  child: _ExerciseLine(
+                    exercise: exercise,
+                    prefix: '${index + 1}'.padLeft(2, '0'),
+                    onEdit: () => onEditExercise(exercise),
+                    onOpen: () => onOpenExercise(exercise),
+                  ),
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -476,53 +509,92 @@ class _DragHandle extends StatelessWidget {
 
 enum _ItemAction { edit, duplicate, move, remove }
 
-class _ItemMenu extends StatelessWidget {
-  final VoidCallback onEdit;
-  final VoidCallback onDuplicate;
-  final VoidCallback onMove;
-  final VoidCallback onRemove;
+Future<void> _showItemActions(
+  BuildContext context, {
+  required VoidCallback onEdit,
+  required VoidCallback onDuplicate,
+  required VoidCallback onMove,
+  required VoidCallback onRemove,
+}) async {
+  HapticFeedback.mediumImpact();
+  final action = await showModalBottomSheet<_ItemAction>(
+    context: context,
+    useSafeArea: true,
+    backgroundColor: context.exerciseTheme.surfaceElevated,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) => SafeArea(
+      top: false,
+      minimum: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _ActionTile(
+            icon: Icons.tune_rounded,
+            label: context.tr('common.edit'),
+            action: _ItemAction.edit,
+          ),
+          _ActionTile(
+            icon: Icons.copy_rounded,
+            label: context.tr('common.duplicate'),
+            action: _ItemAction.duplicate,
+          ),
+          _ActionTile(
+            icon: Icons.drive_file_move_outline,
+            label: context.tr('workout.builder.move'),
+            action: _ItemAction.move,
+          ),
+          _ActionTile(
+            icon: Icons.delete_outline_rounded,
+            label: context.tr('common.delete'),
+            action: _ItemAction.remove,
+            destructive: true,
+          ),
+        ],
+      ),
+    ),
+  );
+  switch (action) {
+    case _ItemAction.edit:
+      onEdit();
+    case _ItemAction.duplicate:
+      onDuplicate();
+    case _ItemAction.move:
+      onMove();
+    case _ItemAction.remove:
+      onRemove();
+    case null:
+      break;
+  }
+}
 
-  const _ItemMenu({
-    required this.onEdit,
-    required this.onDuplicate,
-    required this.onMove,
-    required this.onRemove,
+class _ActionTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final _ItemAction action;
+  final bool destructive;
+
+  const _ActionTile({
+    required this.icon,
+    required this.label,
+    required this.action,
+    this.destructive = false,
   });
 
   @override
-  Widget build(BuildContext context) => PopupMenuButton<_ItemAction>(
-    tooltip: context.tr('workout.builder.item_actions'),
-    icon: const Icon(
-      Icons.more_horiz,
-      color: CoachlyAthleteTheme.textSecondary,
+  Widget build(BuildContext context) => ListTile(
+    leading: Icon(
+      icon,
+      color: destructive ? Theme.of(context).colorScheme.error : null,
     ),
-    onSelected: (action) => switch (action) {
-      _ItemAction.edit => onEdit(),
-      _ItemAction.duplicate => onDuplicate(),
-      _ItemAction.move => onMove(),
-      _ItemAction.remove => onRemove(),
-    },
-    itemBuilder: (context) => [
-      PopupMenuItem(
-        value: _ItemAction.edit,
-        child: Text(context.tr('common.edit')),
-      ),
-      PopupMenuItem(
-        value: _ItemAction.duplicate,
-        child: Text(context.tr('common.duplicate')),
-      ),
-      PopupMenuItem(
-        value: _ItemAction.move,
-        child: Text(context.tr('workout.builder.move')),
-      ),
-      PopupMenuItem(
-        value: _ItemAction.remove,
-        child: Text(
-          context.tr('common.delete'),
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
-        ),
-      ),
-    ],
+    title: Text(
+      label,
+      style: destructive
+          ? TextStyle(color: Theme.of(context).colorScheme.error)
+          : null,
+    ),
+    onTap: () => Navigator.pop(context, action),
   );
 }
 
