@@ -341,7 +341,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     ],
   );
 
-  Future<void> _addExercise(String? sectionId) async {
+  Future<WorkoutExerciseDraft?> _addExercise(String? sectionId) async {
     WorkoutExerciseDraft? picked;
     await showModalBottomSheet<void>(
       context: context,
@@ -357,17 +357,18 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
         },
       ),
     );
-    if (!mounted || picked == null) return;
+    if (!mounted || picked == null) return null;
     final configured = await showPrescriptionEditor(
       context,
       picked!,
       adding: true,
     );
-    if (configured == null || !mounted) return;
+    if (configured == null || !mounted) return null;
     ref
         .read(createWorkoutControllerProvider.notifier)
         .addExercise(configured, sectionId: sectionId);
     HapticFeedback.lightImpact();
+    return configured;
   }
 
   Future<void> _editExercise(WorkoutExerciseDraft exercise, bool adding) async {
@@ -451,13 +452,30 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
         candidates.add(_BlockCandidate(sectionId: section.id, item: item));
       }
     }
-    if (candidates.length < 2) return;
+    if (candidates.isEmpty) {
+      await _addExercise(null);
+      return;
+    }
     final selection = await showModalBottomSheet<_BlockSelection>(
       context: context,
       useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: context.exerciseTheme.surfaceElevated,
-      builder: (_) => _CreateBlockSheet(candidates: candidates),
+      builder: (_) => _CreateBlockSheet(
+        candidates: candidates,
+        onAddExercise: (sectionId) async {
+          final exercise = await _addExercise(sectionId);
+          if (exercise == null) return null;
+          final state = ref.read(createWorkoutControllerProvider);
+          final section = state.draft.sections.firstWhere(
+            (entry) => entry.items.any((item) => item.id == exercise.localId),
+          );
+          return _BlockCandidate(
+            sectionId: section.id,
+            item: WorkoutExerciseItemDraft(exercise),
+          );
+        },
+      ),
     );
     if (selection == null || !mounted) return;
     ref
@@ -877,7 +895,11 @@ class _BlockSelection {
 
 class _CreateBlockSheet extends StatefulWidget {
   final List<_BlockCandidate> candidates;
-  const _CreateBlockSheet({required this.candidates});
+  final Future<_BlockCandidate?> Function(String? sectionId) onAddExercise;
+  const _CreateBlockSheet({
+    required this.candidates,
+    required this.onAddExercise,
+  });
 
   @override
   State<_CreateBlockSheet> createState() => _CreateBlockSheetState();
@@ -891,6 +913,7 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
   int rounds = 3;
   int restBetweenExercisesSeconds = 0;
   int restAfterRoundSeconds = 90;
+  late final List<_BlockCandidate> candidates = [...widget.candidates];
 
   @override
   Widget build(BuildContext context) => DraggableScrollableSheet(
@@ -963,7 +986,9 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
               onPressed: _primaryAction,
               child: Text(
                 context.tr(
-                  step == 2
+                  step == 1 && !_selectionComplete
+                      ? 'workout.builder.add_another_exercise'
+                      : step == 2
                       ? 'workout.builder.create_selected_block'
                       : 'workout.builder.continue_action',
                   params: {'type': _groupTypeLabel(context, type)},
@@ -1022,7 +1047,7 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
         ],
       ),
       const SizedBox(height: 10),
-      ...widget.candidates.map((candidate) {
+      ...candidates.map((candidate) {
         final unavailable =
             selectedSectionId != null &&
             selectedSectionId != candidate.sectionId;
@@ -1093,7 +1118,7 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: selected.indexed.map((pair) {
-            final candidate = widget.candidates.firstWhere(
+            final candidate = candidates.firstWhere(
               (entry) => entry.item.id == pair.$2,
             );
             return ListTile(
@@ -1116,11 +1141,23 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
     ],
   );
 
-  void _primaryAction() {
+  Future<void> _primaryAction() async {
     if (step == 0) {
       setState(() => step = 1);
     } else if (step == 1) {
-      if (_selectionComplete) setState(() => step = 2);
+      if (_selectionComplete) {
+        setState(() => step = 2);
+      } else {
+        final added = await widget.onAddExercise(
+          selectedSectionId ?? candidates.firstOrNull?.sectionId,
+        );
+        if (added == null || !mounted) return;
+        setState(() {
+          candidates.add(added);
+          selectedSectionId = added.sectionId;
+          selected.add(added.item.id);
+        });
+      }
     } else {
       Navigator.pop(
         context,

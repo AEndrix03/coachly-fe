@@ -435,6 +435,10 @@ class AppStrings {
       'en': 'Select {count} more to continue.',
       'it': 'Selezionane ancora {count} per continuare.',
     },
+    'workout.builder.add_another_exercise': {
+      'en': 'Add another exercise',
+      'it': 'Aggiungi un altro esercizio',
+    },
     'workout.builder.block_setup_title': {
       'en': '{type} setup',
       'it': 'Configura {type}',
