@@ -302,6 +302,10 @@ class AppStrings {
       'en': 'Add exercise to {section}',
       'it': 'Aggiungi esercizio a {section}',
     },
+    'workout.builder.section_empty_hint': {
+      'en': 'No exercises in this section yet.',
+      'it': 'Nessun esercizio in questa sezione.',
+    },
     'workout.builder.sections_hint_title': {'en': 'Sections', 'it': 'Sezioni'},
     'workout.builder.sections_hint_body': {
       'en': 'Organize the workout into clear parts.',
@@ -442,6 +446,21 @@ class AppStrings {
     'workout.builder.add_another_exercise': {
       'en': 'Add another exercise',
       'it': 'Aggiungi un altro esercizio',
+    },
+    'workout.builder.add_notes': {'en': 'Add notes', 'it': 'Aggiungi note'},
+    'workout.builder.notes_title': {'en': 'Notes', 'it': 'Note'},
+    'workout.builder.notes_hint': {
+      'en': 'Add useful instructions or context…',
+      'it': 'Aggiungi istruzioni o informazioni utili…',
+    },
+    'workout.builder.save_notes': {'en': 'Save notes', 'it': 'Salva note'},
+    'workout.builder.workout_actions': {
+      'en': 'Workout actions',
+      'it': 'Azioni workout',
+    },
+    'workout.builder.section_actions': {
+      'en': 'Section actions',
+      'it': 'Azioni sezione',
     },
     'workout.builder.block_setup_title': {
       'en': '{type} setup',

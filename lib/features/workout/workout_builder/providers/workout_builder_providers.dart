@@ -65,13 +65,14 @@ abstract mixin class WorkoutDraftMutations {
     );
   }
 
-  void addSection(String? name) {
+  void addSection(String? name, {String? notes}) {
     final sections = [
       ...current.draft.sections,
       WorkoutSectionDraft(
         id: _id(),
         name: name?.trim().isEmpty == true ? null : name?.trim(),
         position: current.draft.sections.length,
+        notes: notes,
       ),
     ];
     current = current.copyWith(
@@ -90,6 +91,41 @@ abstract mixin class WorkoutDraftMutations {
         .toList();
     current = current.copyWith(
       draft: current.draft.copyWith(sections: sections),
+      error: null,
+    );
+  }
+
+  void updateSection(WorkoutSectionDraft updated) {
+    final sections = current.draft.sections
+        .map((section) => section.id == updated.id ? updated : section)
+        .toList();
+    current = current.copyWith(
+      draft: current.draft.copyWith(sections: sections),
+      error: null,
+    );
+  }
+
+  void removeSection(String sectionId) {
+    final sections = [...current.draft.sections];
+    final index = sections.indexWhere((section) => section.id == sectionId);
+    if (index < 0) return;
+    final removed = sections.removeAt(index);
+    if (sections.isEmpty) {
+      sections.add(
+        WorkoutSectionDraft(id: _id(), position: 0, items: removed.items),
+      );
+    } else if (removed.items.isNotEmpty) {
+      final destination = (index - 1).clamp(0, sections.length - 1);
+      sections[destination] = sections[destination].copyWith(
+        items: [...sections[destination].items, ...removed.items],
+      );
+    }
+    current = current.copyWith(
+      draft: current.draft.copyWith(
+        sections: sections.indexed
+            .map((pair) => pair.$2.copyWith(position: pair.$1))
+            .toList(),
+      ),
       error: null,
     );
   }
@@ -189,6 +225,7 @@ abstract mixin class WorkoutDraftMutations {
               .toList(),
           intraExerciseRestSeconds: group.intraExerciseRestSeconds,
           roundRestSeconds: group.roundRestSeconds,
+          notes: group.notes,
         ),
       };
       final items = [...section.items]..insert(index + 1, duplicate);
@@ -248,6 +285,7 @@ abstract mixin class WorkoutDraftMutations {
     int rounds = 3,
     int restBetweenExercisesSeconds = 0,
     int restAfterRoundSeconds = 90,
+    String? notes,
   }) {
     final selected = itemIds.toSet();
     if (selected.length < 2) return;
@@ -287,6 +325,7 @@ abstract mixin class WorkoutDraftMutations {
           exercises: exercises,
           intraExerciseRestSeconds: restBetweenExercisesSeconds,
           roundRestSeconds: restAfterRoundSeconds,
+          notes: notes,
         ),
       );
       final sections = [...current.draft.sections];
@@ -492,6 +531,7 @@ WorkoutDraft _fromWorkout(WorkoutModel workout, dynamic locale) {
             recoverySeconds: set?.restSeconds ?? 90,
             targetLoad: set?.load,
             loadUnit: set?.loadUnit ?? 'kg',
+            notes: block.groupType == 'exercise' ? block.notes : null,
           );
         }).toList();
         if (block.groupType != null &&
@@ -504,6 +544,7 @@ WorkoutDraft _fromWorkout(WorkoutModel workout, dynamic locale) {
             rounds: block.rounds ?? 3,
             intraExerciseRestSeconds: block.restBetweenExercisesSeconds ?? 0,
             roundRestSeconds: block.restSeconds ?? 90,
+            notes: block.notes,
           );
         }
         return WorkoutExerciseItemDraft(exercises.first);
@@ -546,10 +587,12 @@ bool _sameDraft(WorkoutDraft a, WorkoutDraft b) =>
     a.sections.indexed.every(
       (p) =>
           p.$2.name == b.sections[p.$1].name &&
+          p.$2.notes == b.sections[p.$1].notes &&
           p.$2.items.length == b.sections[p.$1].items.length &&
           p.$2.items.indexed.every(
             (i) =>
                 i.$2.id == b.sections[p.$1].items[i.$1].id &&
+                _itemNotes(i.$2) == _itemNotes(b.sections[p.$1].items[i.$1]) &&
                 i.$2.exercises.indexed.every((e) {
                   final other = b.sections[p.$1].items[i.$1].exercises[e.$1];
                   return e.$2.sets == other.sets &&
@@ -560,6 +603,11 @@ bool _sameDraft(WorkoutDraft a, WorkoutDraft b) =>
                 }),
           ),
     );
+
+String? _itemNotes(WorkoutStructureItemDraft item) => switch (item) {
+  WorkoutExerciseItemDraft(:final exercise) => exercise.notes,
+  WorkoutExerciseGroupDraft(:final notes) => notes,
+};
 
 String _id() {
   final random = Random.secure();

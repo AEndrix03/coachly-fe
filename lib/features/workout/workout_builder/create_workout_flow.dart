@@ -67,10 +67,22 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
             ),
             actions: stage == _CreateStage.structure
                 ? [
-                    IconButton(
-                      onPressed: _showStructureInfo,
-                      tooltip: context.tr('workout.builder.learn_structure'),
-                      icon: const Icon(Icons.info_outline),
+                    PopupMenuButton<String>(
+                      tooltip: context.tr('workout.builder.workout_actions'),
+                      icon: const Icon(Icons.more_horiz_rounded),
+                      onSelected: (_) => _editWorkoutNotes(state.draft.focus),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'notes',
+                          child: Row(
+                            children: [
+                              const Icon(Icons.notes_rounded),
+                              const SizedBox(width: 12),
+                              Text(context.tr('workout.builder.add_notes')),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ]
                 : null,
@@ -240,6 +252,12 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                 draft: state.draft,
                 onEditExercise: (exercise) => _editExercise(exercise, false),
                 onEditBlock: _editBlock,
+                onUpdateExercise: ref
+                    .read(createWorkoutControllerProvider.notifier)
+                    .updateExercise,
+                onUpdateBlock: ref
+                    .read(createWorkoutControllerProvider.notifier)
+                    .updateGroup,
                 onOpenExercise: _openExerciseDetail,
                 onReorder: (section, oldIndex, newIndex) => ref
                     .read(createWorkoutControllerProvider.notifier)
@@ -255,10 +273,26 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                 onAddSection: _addSection,
                 onCreateBlock: _createBlock,
                 onEditSection: _editSection,
+                onUpdateSection: ref
+                    .read(createWorkoutControllerProvider.notifier)
+                    .updateSection,
+                onRemoveSection: ref
+                    .read(createWorkoutControllerProvider.notifier)
+                    .removeSection,
               ),
             ),
             WorkoutStructureComposer(
               onAddExercise: () => _addExercise(null),
+              exerciseLabel: state.draft.sections.isEmpty
+                  ? null
+                  : context.tr(
+                      'workout.builder.add_exercise_to_section',
+                      params: {
+                        'section':
+                            state.draft.sections.last.name ??
+                            context.tr('workout.builder.main_section'),
+                      },
+                    ),
               onAddSection: _addSection,
               onCreateBlock: _createBlock,
             ),
@@ -318,6 +352,8 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
               editable: false,
               onEditExercise: (_) {},
               onEditBlock: (_) {},
+              onUpdateExercise: (_) {},
+              onUpdateBlock: (_) {},
               onOpenExercise: _openExerciseDetail,
               onReorder: (_, _, _) {},
               onRemove: (_) {},
@@ -326,6 +362,8 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
               onAddExercise: (_) {},
               onAddSection: () {},
               onCreateBlock: () {},
+              onUpdateSection: (_) {},
+              onRemoveSection: (_) {},
             ),
           ],
         ),
@@ -436,18 +474,34 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
   }
 
   Future<void> _addSection() async {
-    final name = await showWorkoutSectionNameSheet(context);
-    if (name?.isNotEmpty == true) {
-      ref.read(createWorkoutControllerProvider.notifier).addSection(name);
+    final result = await showWorkoutSectionNameSheet(context);
+    if (result?.name.isNotEmpty == true) {
+      ref
+          .read(createWorkoutControllerProvider.notifier)
+          .addSection(result!.name, notes: result.notes);
     }
   }
 
-  Future<void> _editSection(WorkoutSectionDraft section) async {
-    final name = await showWorkoutSectionNameSheet(context);
-    if (name?.isNotEmpty != true || !mounted) return;
+  Future<void> _editWorkoutNotes(String? initialValue) async {
+    final notes = await showWorkoutNotesSheet(
+      context,
+      initialValue: initialValue,
+    );
+    if (notes == null || !mounted) return;
+    _focus.text = notes;
     ref
         .read(createWorkoutControllerProvider.notifier)
-        .renameSection(section.id, name!);
+        .updateMetadata(focus: notes.isEmpty ? null : notes);
+  }
+
+  Future<void> _editSection(WorkoutSectionDraft section) async {
+    final result = await showWorkoutSectionNameSheet(context, initial: section);
+    if (result?.name.isNotEmpty != true || !mounted) return;
+    ref
+        .read(createWorkoutControllerProvider.notifier)
+        .updateSection(
+          section.copyWith(name: result!.name, notes: result.notes),
+        );
   }
 
   Future<void> _createBlock() async {
@@ -492,6 +546,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
           rounds: selection.rounds,
           restBetweenExercisesSeconds: selection.restBetweenExercisesSeconds,
           restAfterRoundSeconds: selection.restAfterRoundSeconds,
+          notes: selection.notes,
         );
     HapticFeedback.lightImpact();
   }
@@ -552,22 +607,6 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
       ),
     ],
     primaryActionLabel: context.tr('common.got_it'),
-  );
-  void _showStructureInfo() => CoachlyInfoSheet.show(
-    context,
-    title: context.tr('workout.builder.organize_title'),
-    sections: [
-      CoachlyInfoSection(
-        context.tr('workout.builder.section'),
-        context.tr('workout.builder.section_info'),
-      ),
-      CoachlyInfoSection(
-        context.tr('workout.builder.block'),
-        context.tr('workout.builder.block_info'),
-      ),
-    ],
-    primaryActionLabel: context.tr('common.got_it'),
-    secondaryActionLabel: context.tr('common.learn_more'),
   );
 }
 
@@ -848,12 +887,14 @@ class _BlockSelection {
   final int rounds;
   final int restBetweenExercisesSeconds;
   final int restAfterRoundSeconds;
+  final String? notes;
   const _BlockSelection({
     required this.type,
     required this.itemIds,
     required this.rounds,
     required this.restBetweenExercisesSeconds,
     required this.restAfterRoundSeconds,
+    this.notes,
   });
 }
 
@@ -877,6 +918,14 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
   int rounds = 3;
   int restBetweenExercisesSeconds = 0;
   int restAfterRoundSeconds = 90;
+  final notesController = TextEditingController();
+
+  @override
+  void dispose() {
+    notesController.dispose();
+    super.dispose();
+  }
+
   late final List<_BlockCandidate> candidates = [...widget.candidates];
 
   @override
@@ -1078,6 +1127,17 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
         onChanged: (value) => setState(() => restAfterRoundSeconds = value),
       ),
       const SizedBox(height: 12),
+      TextField(
+        controller: notesController,
+        minLines: 2,
+        maxLines: 4,
+        maxLength: 300,
+        decoration: InputDecoration(
+          labelText: context.tr('workout.builder.add_notes'),
+          hintText: context.tr('workout.builder.notes_hint'),
+        ),
+      ),
+      const SizedBox(height: 12),
       CoachlySurface(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -1131,6 +1191,9 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
           rounds: rounds,
           restBetweenExercisesSeconds: restBetweenExercisesSeconds,
           restAfterRoundSeconds: restAfterRoundSeconds,
+          notes: notesController.text.trim().isEmpty
+              ? null
+              : notesController.text.trim(),
         ),
       );
     }

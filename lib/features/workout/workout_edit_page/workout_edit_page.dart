@@ -69,6 +69,17 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             title: Text(context.tr('workout.builder.edit_title')),
             centerTitle: true,
             actions: [
+              PopupMenuButton<String>(
+                tooltip: context.tr('workout.builder.workout_actions'),
+                icon: const Icon(Icons.more_horiz_rounded),
+                onSelected: (_) => _editWorkoutNotes(state.draft.focus),
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'notes',
+                    child: Text(context.tr('workout.builder.add_notes')),
+                  ),
+                ],
+              ),
               IconButton(
                 onPressed: state.isSaving || _source == null ? null : _commit,
                 tooltip: context.tr('common.confirm'),
@@ -116,6 +127,20 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                         draft: state.draft,
                         onEditExercise: _editExercise,
                         onEditBlock: _editBlock,
+                        onUpdateExercise: ref
+                            .read(
+                              editWorkoutControllerProvider(
+                                widget.workoutId,
+                              ).notifier,
+                            )
+                            .updateExercise,
+                        onUpdateBlock: ref
+                            .read(
+                              editWorkoutControllerProvider(
+                                widget.workoutId,
+                              ).notifier,
+                            )
+                            .updateGroup,
                         onOpenExercise: _openExerciseDetail,
                         onReorder: (section, oldIndex, newIndex) => ref
                             .read(
@@ -137,10 +162,36 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                         onAddSection: _addSection,
                         onCreateBlock: _createGroup,
                         onEditSection: _editSection,
+                        onUpdateSection: ref
+                            .read(
+                              editWorkoutControllerProvider(
+                                widget.workoutId,
+                              ).notifier,
+                            )
+                            .updateSection,
+                        onRemoveSection: ref
+                            .read(
+                              editWorkoutControllerProvider(
+                                widget.workoutId,
+                              ).notifier,
+                            )
+                            .removeSection,
                       ),
                       const SizedBox(height: 8),
                       WorkoutStructureComposer(
                         onAddExercise: () => _addExercise(null),
+                        exerciseLabel: state.draft.sections.isEmpty
+                            ? null
+                            : context.tr(
+                                'workout.builder.add_exercise_to_section',
+                                params: {
+                                  'section':
+                                      state.draft.sections.last.name ??
+                                      context.tr(
+                                        'workout.builder.main_section',
+                                      ),
+                                },
+                              ),
                         onAddSection: _addSection,
                         onCreateBlock: _createGroup,
                       ),
@@ -245,6 +296,17 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             focus: focus.trim().isEmpty ? null : focus.trim(),
           );
     }
+  }
+
+  Future<void> _editWorkoutNotes(String? initialValue) async {
+    final notes = await showWorkoutNotesSheet(
+      context,
+      initialValue: initialValue,
+    );
+    if (notes == null || !mounted) return;
+    ref
+        .read(editWorkoutControllerProvider(widget.workoutId).notifier)
+        .updateMetadata(focus: notes.isEmpty ? null : notes);
   }
 
   Future<void> _addExercise(String? sectionId) async {
@@ -376,20 +438,22 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Future<void> _addSection() async {
-    final name = await showWorkoutSectionNameSheet(context);
-    if (name?.isNotEmpty == true) {
+    final result = await showWorkoutSectionNameSheet(context);
+    if (result?.name.isNotEmpty == true) {
       ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
-          .addSection(name);
+          .addSection(result!.name, notes: result.notes);
     }
   }
 
   Future<void> _editSection(WorkoutSectionDraft section) async {
-    final name = await showWorkoutSectionNameSheet(context);
-    if (name?.isNotEmpty != true || !mounted) return;
+    final result = await showWorkoutSectionNameSheet(context, initial: section);
+    if (result?.name.isNotEmpty != true || !mounted) return;
     ref
         .read(editWorkoutControllerProvider(widget.workoutId).notifier)
-        .renameSection(section.id, name!);
+        .updateSection(
+          section.copyWith(name: result!.name, notes: result.notes),
+        );
   }
 
   Future<void> _createGroup() async {
@@ -402,9 +466,11 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         .toList();
     if (candidates.length < 2) return;
     final selected = <String>{};
+    final notesController = TextEditingController();
     final ok = await showModalBottomSheet<bool>(
       context: context,
       useSafeArea: true,
+      isScrollControlled: true,
       backgroundColor: context.exerciseTheme.surfaceElevated,
       builder: (context) => StatefulBuilder(
         builder: (context, update) => Padding(
@@ -432,6 +498,16 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                   ),
                 ),
               ),
+              TextField(
+                controller: notesController,
+                minLines: 2,
+                maxLines: 4,
+                maxLength: 300,
+                decoration: InputDecoration(
+                  labelText: context.tr('workout.builder.add_notes'),
+                  hintText: context.tr('workout.builder.notes_hint'),
+                ),
+              ),
               FilledButton(
                 onPressed: selected.length > 1
                     ? () => Navigator.pop(context, true)
@@ -443,12 +519,15 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         ),
       ),
     );
+    final notes = notesController.text.trim();
+    notesController.dispose();
     if (ok == true) {
       ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
           .createGroup(
             type: WorkoutGroupType.superset,
             itemIds: selected.toList(),
+            notes: notes.isEmpty ? null : notes,
           );
     }
   }

@@ -41,6 +41,7 @@ class WorkoutExerciseDraft {
   final int recoverySeconds;
   final double? targetLoad;
   final String loadUnit;
+  final String? notes;
 
   const WorkoutExerciseDraft({
     required this.localId,
@@ -51,6 +52,7 @@ class WorkoutExerciseDraft {
     this.recoverySeconds = 90,
     this.targetLoad,
     this.loadUnit = 'kg',
+    this.notes,
   });
 
   WorkoutExerciseDraft copyWith({
@@ -62,6 +64,7 @@ class WorkoutExerciseDraft {
     int? recoverySeconds,
     Object? targetLoad = _unset,
     String? loadUnit,
+    Object? notes = _unset,
   }) => WorkoutExerciseDraft(
     localId: localId ?? this.localId,
     exerciseId: exerciseId ?? this.exerciseId,
@@ -73,6 +76,7 @@ class WorkoutExerciseDraft {
         ? this.targetLoad
         : targetLoad as double?,
     loadUnit: loadUnit ?? this.loadUnit,
+    notes: identical(notes, _unset) ? this.notes : notes as String?,
   );
 }
 
@@ -106,6 +110,7 @@ final class WorkoutExerciseGroupDraft extends WorkoutStructureItemDraft {
   final List<WorkoutExerciseDraft> exercises;
   final int intraExerciseRestSeconds;
   final int roundRestSeconds;
+  final String? notes;
 
   const WorkoutExerciseGroupDraft({
     required this.id,
@@ -114,6 +119,7 @@ final class WorkoutExerciseGroupDraft extends WorkoutStructureItemDraft {
     this.rounds = 3,
     this.intraExerciseRestSeconds = 0,
     this.roundRestSeconds = 90,
+    this.notes,
   });
 
   @override
@@ -127,6 +133,7 @@ final class WorkoutExerciseGroupDraft extends WorkoutStructureItemDraft {
     List<WorkoutExerciseDraft>? exercises,
     int? intraExerciseRestSeconds,
     int? roundRestSeconds,
+    Object? notes = _unset,
   }) => WorkoutExerciseGroupDraft(
     id: id,
     type: type ?? this.type,
@@ -135,6 +142,7 @@ final class WorkoutExerciseGroupDraft extends WorkoutStructureItemDraft {
     intraExerciseRestSeconds:
         intraExerciseRestSeconds ?? this.intraExerciseRestSeconds,
     roundRestSeconds: roundRestSeconds ?? this.roundRestSeconds,
+    notes: identical(notes, _unset) ? this.notes : notes as String?,
   );
 }
 
@@ -143,23 +151,27 @@ class WorkoutSectionDraft {
   final String? name;
   final int position;
   final List<WorkoutStructureItemDraft> items;
+  final String? notes;
 
   const WorkoutSectionDraft({
     required this.id,
     this.name,
     required this.position,
     this.items = const [],
+    this.notes,
   });
 
   WorkoutSectionDraft copyWith({
     Object? name = _unset,
     int? position,
     List<WorkoutStructureItemDraft>? items,
+    Object? notes = _unset,
   }) => WorkoutSectionDraft(
     id: id,
     name: identical(name, _unset) ? this.name : name as String?,
     position: position ?? this.position,
     items: items ?? this.items,
+    notes: identical(notes, _unset) ? this.notes : notes as String?,
   );
 }
 
@@ -261,6 +273,7 @@ abstract final class WorkoutDraftProgrammingMapper {
           sectionKind: section.name == null ? null : 'custom',
           groupType: group == null ? 'exercise' : group.type.name,
           rounds: group?.rounds,
+          notes: _notesFor(section, item),
           restBetweenExercisesSeconds: group?.intraExerciseRestSeconds,
           restSeconds: group?.roundRestSeconds,
           entries: item.exercises.indexed
@@ -293,6 +306,22 @@ abstract final class WorkoutDraftProgrammingMapper {
       ),
     ),
   );
+
+  static String? _notesFor(
+    WorkoutSectionDraft section,
+    WorkoutStructureItemDraft item,
+  ) {
+    final itemNotes = switch (item) {
+      WorkoutExerciseItemDraft(:final exercise) => exercise.notes,
+      WorkoutExerciseGroupDraft(:final notes) => notes,
+    };
+    final values = [section.notes, itemNotes]
+        .whereType<String>()
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toList();
+    return values.isEmpty ? null : values.join('\n\n');
+  }
 }
 
 const _unset = Object();
