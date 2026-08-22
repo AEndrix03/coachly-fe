@@ -19,6 +19,8 @@ import '../features/home/home.dart';
 import '../features/profile/profile_page.dart';
 import '../features/workout/workout_active_page/workout_active_page.dart';
 import '../features/workout/workout_builder/create_workout_flow.dart';
+import '../features/workout/workout_builder/domain/workout_draft.dart';
+import '../features/workout/workout_check/workout_check_page.dart';
 import '../features/workout/add_exercise_page/add_exercise_page.dart';
 import '../features/workout/workout_detail_page/workout_detail_page.dart';
 import '../features/workout/workout_edit_page/workout_edit_page.dart';
@@ -144,6 +146,20 @@ GoRouter router(Ref ref) {
                       );
                     },
                     routes: [
+                      GoRoute(
+                        path: 'check',
+                        parentNavigatorKey: _rootNavigatorKey,
+                        pageBuilder: (context, state) {
+                          final draft = state.extra as WorkoutDraft?;
+                          if (draft == null) {
+                            return _fadeTransition(state, const WorkoutPage());
+                          }
+                          return _athleteTransition(
+                            state,
+                            WorkoutCheckPage(draft: draft),
+                          );
+                        },
+                      ),
                       GoRoute(
                         path: 'add-exercise',
                         pageBuilder: (context, state) => _athleteTransition(
