@@ -1292,10 +1292,12 @@ class _WorkoutNotesSheetState extends State<_WorkoutNotesSheet> {
   late final TextEditingController controller = TextEditingController(
     text: widget.initialValue,
   );
+  final focusNode = FocusNode();
 
   @override
   void dispose() {
     controller.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -1314,28 +1316,42 @@ class _WorkoutNotesSheetState extends State<_WorkoutNotesSheet> {
       children: [
         Text(
           context.tr('workout.builder.notes_title'),
-          style: const TextStyle(
-            color: CoachlyAthleteTheme.textPrimary,
+          style: TextStyle(
+            color: context.exerciseTheme.textPrimary,
             fontSize: 24,
             fontWeight: FontWeight.w800,
           ),
         ),
         const SizedBox(height: 16),
-        TextField(
+        WorkoutBuilderUnderlineField(
           controller: controller,
+          focusNode: focusNode,
           autofocus: true,
+          label: context.tr('workout.builder.notes_title'),
+          hint: context.tr('workout.builder.notes_hint'),
+          helper: context.tr('workout.builder.optional'),
           minLines: 3,
           maxLines: 6,
           maxLength: 300,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(
-            hintText: context.tr('workout.builder.notes_hint'),
-          ),
+          textInputAction: TextInputAction.done,
+          onChanged: (_) {},
         ),
-        const SizedBox(height: 14),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, controller.text.trim()),
-          child: Text(context.tr('workout.builder.save_notes')),
+        const SizedBox(height: 20),
+        SizedBox(
+          height: CoachlyAthleteTheme.primaryActionHeight,
+          child: FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: context.exerciseTheme.primary,
+              foregroundColor: context.exerciseTheme.background,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  CoachlyAthleteTheme.actionRadius,
+                ),
+              ),
+            ),
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: Text(context.tr('workout.builder.save_notes')),
+          ),
         ),
       ],
     ),
