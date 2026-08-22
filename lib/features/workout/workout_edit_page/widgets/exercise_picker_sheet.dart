@@ -5,11 +5,14 @@ import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exe
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
+import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
+import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -40,7 +43,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 350));
   final _listScrollController = ScrollController();
 
-  bool _showAdvanced = false;
+  final bool _showAdvanced = false;
   bool _showScrollToTop = false;
   String _scope = 'community';
 
@@ -148,7 +151,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         weight: '-',
         progress: '0',
         notes: '',
-        accentColorHex: '#2196F3',
+        accentColorHex: '#20D3B0',
         variants: const [],
       ),
     );
@@ -268,8 +271,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.92,
-      decoration: const BoxDecoration(
-        color: Color(0xFF0F0F1E),
+      decoration: BoxDecoration(
+        color: context.exerciseTheme.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -294,7 +297,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.25),
+          color: context.exerciseTheme.textSecondary.withValues(alpha: .4),
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -311,78 +314,73 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         children: [
           Row(
             children: [
-              Container(
-                width: 4,
-                height: 26,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(2),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  context.tr('workout.edit.add_exercise'),
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.tr('workout.edit.add_exercise'),
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: context.exerciseTheme.textPrimary,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      context.tr('workout.builder.exercise_library_hint'),
+                      style: TextStyle(
+                        color: context.exerciseTheme.textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
-              _buildFilterButton(),
             ],
           ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: _showCreateExerciseDialog,
-              icon: const Icon(Icons.add_rounded, size: 18),
-              label: Text(context.tr('exercise.personal.create')),
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF7B4BC1),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
+          const SizedBox(height: 14),
+          CoachlyPressable(
+            onTap: _showCreateExerciseDialog,
+            semanticLabel: context.tr('exercise.personal.create'),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 48),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: context.exerciseTheme.surface,
+                borderRadius: BorderRadius.circular(
+                  CoachlyAthleteTheme.compactRadius,
+                ),
+                border: Border.all(color: context.exerciseTheme.border),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.add_circle_outline_rounded,
+                    color: context.exerciseTheme.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      context.tr('exercise.personal.create'),
+                      style: TextStyle(
+                        color: context.exerciseTheme.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: context.exerciseTheme.textSecondary,
+                  ),
+                ],
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFilterButton() {
-    return GestureDetector(
-      onTap: () => setState(() => _showAdvanced = !_showAdvanced),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: _showAdvanced || _activeCount > 0
-              ? const Color(0xFF2196F3)
-              : Colors.white.withValues(alpha: 0.08),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.tune_rounded, size: 16, color: Colors.white),
-            if (_activeCount > 0) ...[
-              const SizedBox(width: 6),
-              Text(
-                '$_activeCount',
-                style: const TextStyle(color: Colors.white),
-              ),
-            ],
-          ],
-        ),
       ),
     );
   }
@@ -394,26 +392,26 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: context.exerciseTheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
-            width: 1,
-          ),
+          border: Border.all(color: context.exerciseTheme.border),
         ),
         child: TextField(
           controller: _searchCtrl,
           inputFormatters: [PoliteTextInputFormatter()],
-          style: const TextStyle(color: Colors.white, fontSize: 15),
+          style: TextStyle(
+            color: context.exerciseTheme.textPrimary,
+            fontSize: 15,
+          ),
           decoration: InputDecoration(
             hintText: context.tr('workout.search_exercise_hint'),
             hintStyle: TextStyle(
-              color: Colors.white.withValues(alpha: 0.35),
+              color: context.exerciseTheme.textSecondary,
               fontSize: 15,
             ),
             prefixIcon: Icon(
               Icons.search_rounded,
-              color: Colors.white.withValues(alpha: 0.4),
+              color: context.exerciseTheme.textSecondary,
               size: 20,
             ),
             suffixIcon: _searchCtrl.text.isNotEmpty
@@ -424,7 +422,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                     },
                     child: Icon(
                       Icons.close_rounded,
-                      color: Colors.white.withValues(alpha: 0.4),
+                      color: context.exerciseTheme.textSecondary,
                       size: 18,
                     ),
                   )
@@ -440,49 +438,58 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   Widget _buildSourceSelector() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-      child: Row(
-        children: [
-          _sourceChip(
-            label: context.tr('exercise.scope.community'),
-            value: 'community',
-          ),
-          const SizedBox(width: 8),
-          _sourceChip(
-            label: context.tr('exercise.scope.default'),
-            value: 'default',
-          ),
-          const SizedBox(width: 8),
-          _sourceChip(label: context.tr('exercise.scope.mine'), value: 'mine'),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _sourceChip(
+              label: context.tr('exercise.scope.community'),
+              value: 'community',
+            ),
+            const SizedBox(width: 8),
+            _sourceChip(
+              label: context.tr('exercise.scope.default'),
+              value: 'default',
+            ),
+            const SizedBox(width: 8),
+            _sourceChip(
+              label: context.tr('exercise.scope.mine'),
+              value: 'mine',
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _sourceChip({required String label, required String value}) {
     final isActive = _scope == value;
-    return GestureDetector(
+    return CoachlyPressable(
       onTap: () {
         setState(() => _scope = value);
         _applyFilters();
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        constraints: const BoxConstraints(minHeight: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: isActive
-              ? const Color(0xFF2196F3).withValues(alpha: 0.25)
-              : Colors.white.withValues(alpha: 0.06),
+              ? context.exerciseTheme.primaryMuted.withValues(alpha: .58)
+              : context.exerciseTheme.surface,
           border: Border.all(
             color: isActive
-                ? const Color(0xFF2196F3)
-                : Colors.white.withValues(alpha: 0.1),
+                ? context.exerciseTheme.primary.withValues(alpha: .55)
+                : context.exerciseTheme.border,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: isActive ? 0.95 : 0.7),
+            color: isActive
+                ? context.exerciseTheme.textPrimary
+                : context.exerciseTheme.textSecondary,
             fontSize: 12,
             fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           ),
@@ -621,7 +628,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               selected: _muscleId,
               getLabel: (o) => o.label,
               getId: (o) => o.id,
-              color: const Color(0xFF9C27B0),
               onTap: (id) {
                 setState(() => _muscleId = _muscleId == id ? null : id);
                 _applyFilters();
@@ -635,7 +641,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               selected: _mechanics,
               getLabel: (s) => _mechanicsLabel(s),
               getId: (s) => s,
-              color: const Color(0xFF00BCD4),
               onTap: (id) {
                 setState(() => _mechanics = _mechanics == id ? null : id);
                 _applyFilters();
@@ -649,7 +654,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               selected: _forceType,
               getLabel: (s) => _forceLabel(s),
               getId: (s) => s,
-              color: const Color(0xFFFF9800),
               onTap: (id) {
                 setState(() => _forceType = _forceType == id ? null : id);
                 _applyFilters();
@@ -667,7 +671,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                   label: context.tr('exercise.bodyweight_only'),
                   icon: Icons.self_improvement_rounded,
                   active: _bodyweight == true,
-                  color: const Color(0xFF4CAF50),
                   onTap: () {
                     setState(
                       () => _bodyweight = _bodyweight == true ? null : true,
@@ -679,7 +682,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                   label: context.tr('exercise.with_equipment'),
                   icon: Icons.fitness_center_rounded,
                   active: _bodyweight == false,
-                  color: const Color(0xFF2196F3),
                   onTap: () {
                     setState(
                       () => _bodyweight = _bodyweight == false ? null : false,
@@ -691,7 +693,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                   label: context.tr('exercise.unilateral'),
                   icon: Icons.swap_horiz_rounded,
                   active: _unilateral == true,
-                  color: const Color(0xFF7B4BC1),
                   onTap: () {
                     setState(
                       () => _unilateral = _unilateral == true ? null : true,
@@ -728,7 +729,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     required String Function(T) getLabel,
     required String Function(T) getId,
     required void Function(String) onTap,
-    Color color = const Color(0xFF2196F3),
   }) {
     return SizedBox(
       height: 36,
@@ -746,38 +746,22 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
-                gradient: isActive
-                    ? LinearGradient(
-                        colors: [color, color.withValues(alpha: 0.7)],
-                      )
-                    : LinearGradient(
-                        colors: [
-                          Colors.white.withValues(alpha: 0.07),
-                          Colors.white.withValues(alpha: 0.04),
-                        ],
-                      ),
+                color: isActive
+                    ? context.exerciseTheme.primaryMuted
+                    : context.exerciseTheme.surface,
                 border: Border.all(
                   color: isActive
-                      ? color
-                      : Colors.white.withValues(alpha: 0.12),
+                      ? context.exerciseTheme.primary.withValues(alpha: .55)
+                      : context.exerciseTheme.border,
                   width: 1,
                 ),
-                boxShadow: isActive
-                    ? [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.35),
-                          blurRadius: 10,
-                          spreadRadius: -3,
-                        ),
-                      ]
-                    : null,
               ),
               child: Text(
                 getLabel(item),
                 style: TextStyle(
                   color: isActive
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.6),
+                      ? context.exerciseTheme.textPrimary
+                      : context.exerciseTheme.textSecondary,
                   fontSize: 13,
                   fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                 ),
@@ -793,7 +777,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     required String label,
     required IconData icon,
     required bool active,
-    required Color color,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
@@ -803,16 +786,13 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          gradient: active
-              ? LinearGradient(colors: [color, color.withValues(alpha: 0.7)])
-              : LinearGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.07),
-                    Colors.white.withValues(alpha: 0.04),
-                  ],
-                ),
+          color: active
+              ? context.exerciseTheme.primaryMuted
+              : context.exerciseTheme.surface,
           border: Border.all(
-            color: active ? color : Colors.white.withValues(alpha: 0.12),
+            color: active
+                ? context.exerciseTheme.primary.withValues(alpha: .55)
+                : context.exerciseTheme.border,
             width: 1,
           ),
         ),
@@ -823,16 +803,16 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               icon,
               size: 14,
               color: active
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.5),
+                  ? context.exerciseTheme.primary
+                  : context.exerciseTheme.textSecondary,
             ),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 color: active
-                    ? Colors.white
-                    : Colors.white.withValues(alpha: 0.6),
+                    ? context.exerciseTheme.textPrimary
+                    : context.exerciseTheme.textSecondary,
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w700 : FontWeight.w500,
               ),
@@ -850,16 +830,16 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       builder: (context, ref, _) {
         final value = ref.watch(exerciseListProvider);
         return value.when(
-          loading: () => const Center(
+          loading: () => Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(Color(0xFF2196F3)),
+              color: context.exerciseTheme.primary,
               strokeWidth: 2,
             ),
           ),
           error: (err, _) => Center(
             child: Text(
               err.toString(),
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(color: context.exerciseTheme.warning),
             ),
           ),
           data: (exercises) {
@@ -959,13 +939,13 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           Icon(
             Icons.search_off_rounded,
             size: 56,
-            color: Colors.white.withValues(alpha: 0.2),
+            color: context.exerciseTheme.textSecondary.withValues(alpha: .35),
           ),
           const SizedBox(height: 12),
           Text(
             context.tr('workout.no_exercise_found'),
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.45),
+              color: context.exerciseTheme.textSecondary,
               fontSize: 15,
             ),
           ),
@@ -976,7 +956,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               child: Text(
                 context.tr('exercise.clear_filters'),
                 style: TextStyle(
-                  color: Color(0xFF2196F3),
+                  color: context.exerciseTheme.primary,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1016,26 +996,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                const Color(0xFF2A2A3E).withValues(alpha: 0.75),
-                const Color(0xFF1A1A2E).withValues(alpha: 0.90),
-              ],
-            ),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.09),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 14,
-                offset: const Offset(0, 5),
-                spreadRadius: -4,
-              ),
-            ],
+            color: context.exerciseTheme.surface,
+            border: Border.all(color: context.exerciseTheme.border),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1057,20 +1019,14 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                               height: 40,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                gradient: const LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    Color(0xFF2196F3),
-                                    Color(0xFF7B4BC1),
-                                  ],
-                                ),
+                                color: context.exerciseTheme.primaryMuted
+                                    .withValues(alpha: .55),
                               ),
                               child: Icon(
                                 isBodyweight
                                     ? Icons.self_improvement_rounded
                                     : Icons.fitness_center_rounded,
-                                color: Colors.white,
+                                color: context.exerciseTheme.primary,
                                 size: 20,
                               ),
                             ),
@@ -1078,27 +1034,16 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                             Expanded(
                               child: Align(
                                 alignment: Alignment.centerLeft,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.04),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                    ),
-                                    child: Text(
-                                      name,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.3,
-                                        letterSpacing: -0.2,
-                                      ),
-                                    ),
+                                child: Text(
+                                  name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: context.exerciseTheme.textPrimary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.3,
+                                    letterSpacing: -0.2,
                                   ),
                                 ),
                               ),
@@ -1129,23 +1074,11 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                           height: 36,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFF2196F3,
-                                ).withValues(alpha: 0.40),
-                                blurRadius: 10,
-                                spreadRadius: -3,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
+                            color: context.exerciseTheme.primary,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.add_rounded,
-                            color: Colors.white,
+                            color: context.exerciseTheme.background,
                             size: 20,
                           ),
                         ),
@@ -1204,7 +1137,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         weight: defaults.weight,
         progress: '0',
         notes: '',
-        accentColorHex: '#2196F3',
+        accentColorHex: '#20D3B0',
         variants: exercise.variants ?? const [],
       ),
     );

@@ -298,6 +298,14 @@ class AppStrings {
       'en': 'Add exercise',
       'it': 'Aggiungi esercizio',
     },
+    'workout.builder.add_exercise_hint': {
+      'en': 'Choose an exercise and configure its working sets.',
+      'it': 'Scegli un esercizio e configura le serie di lavoro.',
+    },
+    'workout.builder.exercise_library_hint': {
+      'en': 'Search your exercise library',
+      'it': 'Cerca nella libreria esercizi',
+    },
     'workout.builder.choose_destination': {
       'en': 'Where should it go?',
       'it': 'Dove vuoi inserirlo?',

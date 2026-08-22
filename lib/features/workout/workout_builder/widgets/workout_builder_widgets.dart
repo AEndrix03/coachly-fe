@@ -17,6 +17,9 @@ class WorkoutBuilderUnderlineField extends StatefulWidget {
   final int maxLines;
   final bool autofocus;
   final TextInputAction textInputAction;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? suffixText;
   final ValueChanged<String> onChanged;
 
   const WorkoutBuilderUnderlineField({
@@ -28,6 +31,9 @@ class WorkoutBuilderUnderlineField extends StatefulWidget {
     required this.maxLength,
     required this.textInputAction,
     required this.onChanged,
+    this.keyboardType,
+    this.inputFormatters,
+    this.suffixText,
     this.helper,
     this.minLines,
     this.maxLines = 1,
@@ -95,12 +101,16 @@ class _WorkoutBuilderUnderlineFieldState
           minLines: widget.minLines,
           maxLines: widget.maxLines,
           textInputAction: widget.textInputAction,
+          keyboardType: widget.keyboardType,
+          inputFormatters: widget.inputFormatters,
           onChanged: widget.onChanged,
           style: Theme.of(
             context,
           ).textTheme.bodyLarge?.copyWith(color: colors.textPrimary),
           decoration: InputDecoration(
             hintText: widget.hint,
+            suffixText: widget.suffixText,
+            suffixStyle: TextStyle(color: colors.textSecondary),
             hintStyle: TextStyle(color: colors.textSecondary),
             counterText: focused
                 ? '${widget.controller.text.characters.length}/${widget.maxLength}'
@@ -192,30 +202,69 @@ class WorkoutStructureComposer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(
-            height: CoachlyAthleteTheme.primaryActionHeight,
-            child: OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                backgroundColor: context.exerciseTheme.surfaceElevated,
-                foregroundColor: context.exerciseTheme.textPrimary,
-                side: BorderSide(color: context.exerciseTheme.border),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    CoachlyAthleteTheme.actionRadius,
+          CoachlyPressable(
+            onTap: onAddExercise,
+            semanticLabel: context.tr('workout.builder.add_exercise'),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 72),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+              decoration: BoxDecoration(
+                color: context.exerciseTheme.surface,
+                borderRadius: BorderRadius.circular(
+                  CoachlyAthleteTheme.cardRadius,
+                ),
+                border: Border.all(color: context.exerciseTheme.border),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: context.exerciseTheme.primaryMuted.withValues(
+                        alpha: .55,
+                      ),
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Icon(
+                      Icons.add_rounded,
+                      size: 23,
+                      color: context.exerciseTheme.primary,
+                    ),
                   ),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          context.tr('workout.builder.add_exercise'),
+                          style: TextStyle(
+                            color: context.exerciseTheme.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          context.tr('workout.builder.add_exercise_hint'),
+                          style: TextStyle(
+                            color: context.exerciseTheme.textSecondary,
+                            fontSize: 12,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: context.exerciseTheme.textSecondary,
+                  ),
+                ],
               ),
-              icon: Icon(
-                Icons.add_rounded,
-                size: 22,
-                color: context.exerciseTheme.primary,
-              ),
-              label: Text(context.tr('workout.builder.add_exercise')),
-              onPressed: onAddExercise,
             ),
           ),
           const SizedBox(height: 12),
@@ -653,23 +702,66 @@ Future<String?> showWorkoutSectionPicker(
             style: TextStyle(color: context.exerciseTheme.textSecondary),
           ),
           const SizedBox(height: 14),
-          ...sections.map(
-            (section) => ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-              minTileHeight: CoachlyAthleteTheme.touchTarget,
-              title: Text(workoutSectionLabel(context, section)),
-              subtitle: section.id == main.id
-                  ? Text(context.tr('workout.builder.default_section'))
-                  : null,
-              trailing: section.id == main.id
-                  ? Icon(
-                      Icons.check_circle_rounded,
-                      color: context.exerciseTheme.primary,
-                    )
-                  : const Icon(Icons.chevron_right_rounded),
-              onTap: () => Navigator.pop(sheetContext, section.id),
-            ),
-          ),
+          ...sections.map((section) {
+            final isDefault = section.id == main.id;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: CoachlyPressable(
+                onTap: () => Navigator.pop(sheetContext, section.id),
+                semanticLabel: workoutSectionLabel(context, section),
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 56),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: context.exerciseTheme.surface,
+                    borderRadius: BorderRadius.circular(
+                      CoachlyAthleteTheme.compactRadius,
+                    ),
+                    border: Border.all(color: context.exerciseTheme.border),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              workoutSectionLabel(context, section),
+                              style: TextStyle(
+                                color: context.exerciseTheme.textPrimary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            if (isDefault) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                context.tr('workout.builder.default_section'),
+                                style: TextStyle(
+                                  color: context.exerciseTheme.textSecondary,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        isDefault
+                            ? Icons.check_circle_rounded
+                            : Icons.chevron_right_rounded,
+                        color: isDefault
+                            ? context.exerciseTheme.primary
+                            : context.exerciseTheme.textSecondary,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     ),
@@ -1244,56 +1336,102 @@ class NumericStepper extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
     container: true,
     label: '$label. ${formatter?.call(value) ?? value}',
-    child: Row(
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: CoachlyAthleteTheme.textPrimary,
-              fontWeight: FontWeight.w600,
+    child: Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 64),
+        padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+        decoration: BoxDecoration(
+          color: context.exerciseTheme.surface,
+          borderRadius: BorderRadius.circular(
+            CoachlyAthleteTheme.compactRadius,
+          ),
+          border: Border.all(color: context.exerciseTheme.border),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: context.exerciseTheme.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
-          ),
-        ),
-        IconButton(
-          onPressed: value - step >= min
-              ? () {
-                  HapticFeedback.selectionClick();
-                  onChanged(value - step);
-                }
-              : null,
-          tooltip: context.tr(
-            'workout.builder.decrease',
-            params: {'label': label},
-          ),
-          icon: const Icon(Icons.remove),
-        ),
-        ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 44),
-          child: Text(
-            formatter?.call(value) ?? '$value',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: CoachlyAthleteTheme.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
+            _StepperButton(
+              icon: Icons.remove_rounded,
+              tooltip: context.tr(
+                'workout.builder.decrease',
+                params: {'label': label},
+              ),
+              onPressed: value - step >= min
+                  ? () {
+                      HapticFeedback.selectionClick();
+                      onChanged(value - step);
+                    }
+                  : null,
             ),
-          ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 56),
+              child: Text(
+                formatter?.call(value) ?? '$value',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: context.exerciseTheme.textPrimary,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            _StepperButton(
+              icon: Icons.add_rounded,
+              tooltip: context.tr(
+                'workout.builder.increase',
+                params: {'label': label},
+              ),
+              onPressed: value + step <= max
+                  ? () {
+                      HapticFeedback.selectionClick();
+                      onChanged(value + step);
+                    }
+                  : null,
+            ),
+          ],
         ),
-        IconButton(
-          onPressed: value + step <= max
-              ? () {
-                  HapticFeedback.selectionClick();
-                  onChanged(value + step);
-                }
-              : null,
-          tooltip: context.tr(
-            'workout.builder.increase',
-            params: {'label': label},
-          ),
-          icon: const Icon(Icons.add),
+      ),
+    ),
+  );
+}
+
+class _StepperButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+
+  const _StepperButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: CoachlyAthleteTheme.touchTarget,
+    height: CoachlyAthleteTheme.touchTarget,
+    child: IconButton(
+      onPressed: onPressed,
+      tooltip: tooltip,
+      style: IconButton.styleFrom(
+        backgroundColor: context.exerciseTheme.surfaceElevated,
+        disabledBackgroundColor: context.exerciseTheme.surfaceElevated
+            .withValues(alpha: .45),
+        foregroundColor: context.exerciseTheme.primary,
+        disabledForegroundColor: context.exerciseTheme.textSecondary.withValues(
+          alpha: .45,
         ),
-      ],
+      ),
+      icon: Icon(icon, size: 19),
     ),
   );
 }
@@ -1703,10 +1841,14 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
   late final TextEditingController notes = TextEditingController(
     text: widget.initial.notes,
   );
+  final loadFocus = FocusNode();
+  final notesFocus = FocusNode();
   @override
   void dispose() {
     load.dispose();
     notes.dispose();
+    loadFocus.dispose();
+    notesFocus.dispose();
     super.dispose();
   }
 
@@ -1751,7 +1893,7 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
                   letterSpacing: .7,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               NumericStepper(
                 label: context.tr('workout.sets'),
                 value: sets,
@@ -1772,53 +1914,42 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
                 seconds: recovery,
                 onChanged: (value) => setState(() => recovery = value),
               ),
-              const SizedBox(height: 22),
-              Text(
+              const SizedBox(height: 18),
+              _SheetSectionLabel(
                 context.tr('workout.builder.target_load_heading'),
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: CoachlyAthleteTheme.textSecondary,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: .7,
-                ),
               ),
               const SizedBox(height: 10),
-              TextField(
+              WorkoutBuilderUnderlineField(
                 controller: load,
+                focusNode: loadFocus,
+                label: context.tr('workout.detail.target_load'),
+                hint: context.tr('workout.builder.from_history'),
+                helper: context.tr('workout.builder.optional'),
+                maxLength: 8,
+                textInputAction: TextInputAction.next,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
                 ],
-                decoration: InputDecoration(
-                  labelText: context.tr('workout.detail.target_load'),
-                  hintText: context.tr('workout.builder.from_history'),
-                  suffixText: widget.initial.loadUnit,
-                ),
+                suffixText: widget.initial.loadUnit,
+                onChanged: (_) {},
               ),
-              const SizedBox(height: 16),
-              TextField(
+              const SizedBox(height: 22),
+              _SheetSectionLabel(context.tr('workout.builder.notes_title')),
+              const SizedBox(height: 10),
+              WorkoutBuilderUnderlineField(
                 controller: notes,
+                focusNode: notesFocus,
+                label: context.tr('workout.builder.add_notes'),
+                hint: context.tr('workout.builder.notes_hint'),
+                helper: context.tr('workout.builder.optional'),
                 minLines: 2,
                 maxLines: 4,
                 maxLength: 300,
-                decoration: InputDecoration(
-                  labelText: context.tr('workout.builder.add_notes'),
-                  hintText: context.tr('workout.builder.notes_hint'),
-                ),
-              ),
-              const SizedBox(height: 22),
-              _ProgrammingFutureRow(
-                label: context.tr('workout.builder.intensity'),
-                value: context.tr('workout.builder.not_configured'),
-              ),
-              _ProgrammingFutureRow(
-                label: context.tr('workout.builder.progression'),
-                value: context.tr('workout.builder.manual'),
-              ),
-              _ProgrammingFutureRow(
-                label: context.tr('workout.builder.advanced'),
-                value: context.tr('workout.builder.advanced_summary'),
+                textInputAction: TextInputAction.done,
+                onChanged: (_) {},
               ),
             ],
           ),
@@ -1836,6 +1967,10 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
           width: double.infinity,
           height: CoachlyAthleteTheme.primaryActionHeight,
           child: FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: context.exerciseTheme.primary,
+              foregroundColor: context.exerciseTheme.background,
+            ),
             onPressed: () => Navigator.pop(
               context,
               widget.initial.copyWith(
@@ -1859,38 +1994,6 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
         ),
       ),
     ],
-  );
-}
-
-class _ProgrammingFutureRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _ProgrammingFutureRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 10),
-    child: Row(
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: CoachlyAthleteTheme.textPrimary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: const TextStyle(color: CoachlyAthleteTheme.textSecondary),
-          ),
-        ),
-      ],
-    ),
   );
 }
 
