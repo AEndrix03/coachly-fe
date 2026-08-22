@@ -34,6 +34,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
   bool _editing = false;
+  WorkoutModel? _latestWorkout;
 
   @override
   void initState() {
@@ -64,16 +65,15 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final resolved = ref
+    final cachedWorkout = ref
         .watch(workoutListProvider)
         .maybeWhen(
-          data: (workouts) =>
-              workouts
-                  .where((item) => item.id == widget.workout.id)
-                  .firstOrNull ??
-              widget.workout,
-          orElse: () => widget.workout,
+          data: (workouts) => workouts
+              .where((item) => item.id == widget.workout.id)
+              .firstOrNull,
+          orElse: () => null,
         );
+    final resolved = _latestWorkout ?? cachedWorkout ?? widget.workout;
     final locale = ref.watch(languageProvider);
     final draft = ref.watch(workoutEditDraftProvider(resolved.id));
     final presented = _editing && draft.isInitialized
@@ -134,7 +134,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
                 saving: draft.isSaving,
                 scrollOffset: _scrollOffset,
                 onBack: _handleBack,
-                onEdit: () => _enterEdit(resolved),
+                onEdit: () => _openBuilderEdit(resolved),
                 onDone: _saveAndFinish,
               ),
               if (_editing) ...[
@@ -168,11 +168,11 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
                 SliverToBoxAdapter(
                   child: WorkoutStructure(
                     workout: viewData,
-                    onEdit: () => _enterEdit(resolved),
+                    onEdit: () => _openBuilderEdit(resolved),
                     onOpenExercise: (exercise) => context.push(
                       '/workouts/workout/${resolved.id}/workout_exercise_page/${exercise.exerciseId}',
                     ),
-                    onAddExercise: () => _enterEdit(resolved),
+                    onAddExercise: () => _openBuilderEdit(resolved),
                   ),
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: 28)),
@@ -194,10 +194,15 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     );
   }
 
-  void _enterEdit(WorkoutModel workout) {
-    ref.read(workoutEditDraftProvider(workout.id).notifier).initialize(workout);
+  Future<void> _openBuilderEdit(WorkoutModel workout) async {
     HapticFeedback.selectionClick();
-    setState(() => _editing = true);
+    final updated = await context.push<WorkoutModel>(
+      '/workouts/workout/${workout.id}/edit',
+      extra: workout,
+    );
+    if (!mounted || updated == null) return;
+    setState(() => _latestWorkout = updated);
+    ref.invalidate(workoutListProvider);
   }
 
   Future<void> _saveAndFinish() async {
