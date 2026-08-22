@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_builder/providers/workout_builder_providers.dart';
 import 'package:coachly/features/workout/workout_builder/tour/builder_tour_controller.dart';
@@ -32,6 +34,8 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
   bool _showSessionNote = false;
   final _tourRegistry = CoachlyTourTargetRegistry();
   bool _autoTourAttempted = false;
+  bool _showReplayHint = false;
+  Timer? _replayHintTimer;
 
   @override
   void dispose() {
@@ -39,6 +43,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     _focus.dispose();
     _titleFocus.dispose();
     _noteFocus.dispose();
+    _replayHintTimer?.cancel();
     super.dispose();
   }
 
@@ -348,6 +353,13 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                 ),
               ],
             ),
+            if (_showReplayHint)
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: _dismissReplayHint,
+                ),
+              ),
             Positioned(
               right: 16,
               bottom: 16,
@@ -357,32 +369,41 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                 workoutCheckLabel: context.tr('workout.check.open'),
                 workoutCheckHeroTag:
                     'workout-check-${state.draft.localDraftId}',
-                onDiscover: () => ref
-                    .read(builderTourProvider.notifier)
-                    .start(BuilderTourOrigin.manual),
+                showReplayHint: _showReplayHint,
+                replayHintLabel: context.tr('workout.builder.tour_replay_hint'),
+                onDiscover: () {
+                  _dismissReplayHint();
+                  ref
+                      .read(builderTourProvider.notifier)
+                      .start(BuilderTourOrigin.manual);
+                },
                 onWorkoutCheck: () => _openWorkoutCheck(state.draft),
               ),
             ),
           ],
         ),
       ),
-      _BottomAction(
-        label: context.tr('workout.builder.review_action'),
-        enabled: state.draft.exerciseCount > 0,
-        summary: context.tr(
-          'workout.builder.review_summary',
-          params: {
-            'exercises': context.tr(
-              state.draft.exerciseCount == 1
-                  ? 'workout.detail.exercise_count_one'
-                  : 'workout.detail.exercise_count_other',
-              params: {'count': '${state.draft.exerciseCount}'},
-            ),
-            'minutes': '${state.draft.estimatedDurationMinutes}',
-          },
+      CoachlyTourTarget(
+        id: BuilderTourTarget.reviewWorkout,
+        registry: _tourRegistry,
+        child: _BottomAction(
+          label: context.tr('workout.builder.review_action'),
+          enabled: state.draft.exerciseCount > 0,
+          summary: context.tr(
+            'workout.builder.review_summary',
+            params: {
+              'exercises': context.tr(
+                state.draft.exerciseCount == 1
+                    ? 'workout.detail.exercise_count_one'
+                    : 'workout.detail.exercise_count_other',
+                params: {'count': '${state.draft.exerciseCount}'},
+              ),
+              'minutes': '${state.draft.estimatedDurationMinutes}',
+            },
+          ),
+          trailingIcon: Icons.arrow_forward,
+          onPressed: () => setState(() => stage = _CreateStage.review),
         ),
-        trailingIcon: Icons.arrow_forward,
-        onPressed: () => setState(() => stage = _CreateStage.review),
       ),
     ],
   );
@@ -488,6 +509,12 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
       secondary: context.tr('workout.builder.tour_check_secondary'),
       targets: const [BuilderTourTarget.workoutCheck],
     ),
+    CoachlyTourStepDefinition(
+      id: 'review',
+      title: context.tr('workout.builder.tour_review_title'),
+      body: context.tr('workout.builder.tour_review_body'),
+      targets: const [BuilderTourTarget.reviewWorkout],
+    ),
   ];
 
   void _maybeStartTour() {
@@ -505,10 +532,19 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     ref.read(builderTourProvider.notifier).next();
     if (completed) {
       HapticFeedback.lightImpact();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr('workout.builder.tour_replay_hint'))),
-      );
+      _showDiscoverReplayHint();
     }
+  }
+
+  void _showDiscoverReplayHint() {
+    _replayHintTimer?.cancel();
+    setState(() => _showReplayHint = true);
+    _replayHintTimer = Timer(const Duration(seconds: 4), _dismissReplayHint);
+  }
+
+  void _dismissReplayHint() {
+    _replayHintTimer?.cancel();
+    if (mounted && _showReplayHint) setState(() => _showReplayHint = false);
   }
 
   Future<void> _openWorkoutCheck(WorkoutDraft draft) async {
@@ -1326,49 +1362,88 @@ class _BlockStepper extends StatelessWidget {
   const _BlockStepper({required this.currentStep});
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: List.generate(3, (index) {
-      final labels = [
-        context.tr('workout.builder.step_type'),
-        context.tr('workout.builder.step_exercises'),
-        context.tr('workout.builder.step_setup'),
-      ];
-      final active = index <= currentStep;
-      return Expanded(
-        child: Row(
-          children: [
-            Container(
-              width: 24,
-              height: 24,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: active
-                    ? CoachlyAthleteTheme.primary
-                    : context.exerciseTheme.surface,
-              ),
-              child: Text('${index + 1}'),
-            ),
-            const SizedBox(width: 5),
-            Flexible(
-              child: Text(
-                labels[index],
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
+  Widget build(BuildContext context) {
+    final labels = [
+      context.tr('workout.builder.step_type'),
+      context.tr('workout.builder.step_exercises'),
+      context.tr('workout.builder.step_setup'),
+    ];
+    return Semantics(
+      label: labels[currentStep],
+      child: Column(
+        children: [
+          Row(
+            children: List.generate(5, (index) {
+              if (index.isOdd) {
+                final completed = index ~/ 2 < currentStep;
+                return Expanded(
+                  child: Container(
+                    height: 1.5,
+                    color: completed
+                        ? context.exerciseTheme.primary
+                        : context.exerciseTheme.border,
+                  ),
+                );
+              }
+              final stepIndex = index ~/ 2;
+              final active = stepIndex <= currentStep;
+              return Container(
+                width: 28,
+                height: 28,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
                   color: active
-                      ? context.exerciseTheme.textPrimary
-                      : context.exerciseTheme.textSecondary,
+                      ? context.exerciseTheme.primary
+                      : context.exerciseTheme.surface,
+                  border: Border.all(
+                    color: active
+                        ? context.exerciseTheme.primary
+                        : context.exerciseTheme.border,
+                  ),
                 ),
-              ),
-            ),
-            if (index < 2) const Expanded(child: Divider()),
-          ],
-        ),
-      );
-    }),
-  );
+                child: Text(
+                  '${stepIndex + 1}',
+                  style: TextStyle(
+                    color: active
+                        ? context.exerciseTheme.background
+                        : context.exerciseTheme.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: labels.indexed
+                .map(
+                  (entry) => Expanded(
+                    child: Text(
+                      entry.$2,
+                      textAlign: switch (entry.$1) {
+                        0 => TextAlign.left,
+                        2 => TextAlign.right,
+                        _ => TextAlign.center,
+                      },
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: entry.$1 <= currentStep
+                            ? context.exerciseTheme.textPrimary
+                            : context.exerciseTheme.textSecondary,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _BlockTypeTile extends StatelessWidget {

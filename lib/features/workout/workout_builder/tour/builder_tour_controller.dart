@@ -10,6 +10,8 @@ enum BuilderTourTarget {
   mainSectionMenu,
   blocksAction,
   workoutCheck,
+  discover,
+  reviewWorkout,
 }
 
 class BuilderTourState {
@@ -45,7 +47,7 @@ final builderTourProvider =
 
 class BuilderTourController extends Notifier<BuilderTourState> {
   static const _autoShowKey = 'workoutBuilderTourAutoShow';
-  static const stepCount = 6;
+  static const stepCount = 7;
 
   @override
   BuilderTourState build() => const BuilderTourState();

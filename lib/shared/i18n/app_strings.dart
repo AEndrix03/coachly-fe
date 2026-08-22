@@ -390,9 +390,17 @@ class AppStrings {
       'en': 'Coachly explains what stands out. You decide what changes.',
       'it': 'Coachly spiega cosa emerge. Tu decidi cosa cambiare.',
     },
+    'workout.builder.tour_review_title': {
+      'en': 'Review before you finish',
+      'it': 'Rivedi prima di concludere',
+    },
+    'workout.builder.tour_review_body': {
+      'en': 'Review the complete workout before creating it.',
+      'it': 'Controlla la scheda completa prima di crearla.',
+    },
     'workout.builder.tour_replay_hint': {
-      'en': 'Replay anytime from Discover.',
-      'it': 'Puoi rivederlo in qualsiasi momento da Scopri.',
+      'en': 'Discover is always here when you need it.',
+      'it': 'Scopri resta sempre qui quando ne hai bisogno.',
     },
     'workout.check.open': {'en': 'Check workout', 'it': 'Controlla la scheda'},
     'workout.check.title': {'en': 'Workout Check', 'it': 'Controllo scheda'},
