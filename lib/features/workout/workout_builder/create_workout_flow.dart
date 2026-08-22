@@ -1,5 +1,7 @@
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_builder/providers/workout_builder_providers.dart';
+import 'package:coachly/features/workout/workout_builder/tour/builder_tour_controller.dart';
+import 'package:coachly/features/workout/workout_builder/widgets/builder_assist_rail.dart';
 import 'package:coachly/features/workout/workout_builder/widgets/workout_builder_widgets.dart';
 import 'package:coachly/features/workout/workout_edit_page/widgets/exercise_picker_sheet.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
@@ -7,6 +9,7 @@ import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
 import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:coachly/shared/guided_tour/coachly_guided_tour.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,6 +30,8 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
   final _noteFocus = FocusNode();
   _CreateStage stage = _CreateStage.identity;
   bool _showSessionNote = false;
+  final _tourRegistry = CoachlyTourTargetRegistry();
+  bool _autoTourAttempted = false;
 
   @override
   void dispose() {
@@ -40,12 +45,22 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(createWorkoutControllerProvider);
+    final tourState = ref.watch(builderTourProvider);
     return Theme(
       data: exerciseDetailTheme(Theme.of(context)),
       child: PopScope(
-        canPop: stage == _CreateStage.identity && !state.isDirty,
+        canPop:
+            !tourState.isActive &&
+            stage == _CreateStage.identity &&
+            !state.isDirty,
         onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) _back();
+          if (!didPop) {
+            if (tourState.isActive) {
+              ref.read(builderTourProvider.notifier).close();
+            } else {
+              _back();
+            }
+          }
         },
         child: Scaffold(
           backgroundColor: context.exerciseTheme.background,
@@ -89,26 +104,57 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
           ),
           body: SafeArea(
             top: false,
-            child: AnimatedSwitcher(
-              duration: MediaQuery.disableAnimationsOf(context)
-                  ? Duration.zero
-                  : CoachlyAthleteTheme.pageDuration,
-              switchInCurve: CoachlyAthleteTheme.standardCurve,
-              transitionBuilder: (child, animation) => FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: Tween(
-                    begin: const Offset(.035, 0),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: child,
+            child: Stack(
+              children: [
+                AnimatedSwitcher(
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : CoachlyAthleteTheme.pageDuration,
+                  switchInCurve: CoachlyAthleteTheme.standardCurve,
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween(
+                        begin: const Offset(.035, 0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  ),
+                  child: switch (stage) {
+                    _CreateStage.identity => _identity(state),
+                    _CreateStage.structure => _structure(state),
+                    _CreateStage.review => _review(state),
+                  },
                 ),
-              ),
-              child: switch (stage) {
-                _CreateStage.identity => _identity(state),
-                _CreateStage.structure => _structure(state),
-                _CreateStage.review => _review(state),
-              },
+                if (tourState.isActive)
+                  CoachlyTourOverlay(
+                    step: _tourSteps[tourState.currentStepIndex],
+                    stepIndex: tourState.currentStepIndex,
+                    stepCount: _tourSteps.length,
+                    registry: _tourRegistry,
+                    dontShowAgain: tourState.dontShowAgain,
+                    onClose: () =>
+                        ref.read(builderTourProvider.notifier).close(),
+                    onNext: _advanceTour,
+                    onDontShowAgainChanged: (value) => ref
+                        .read(builderTourProvider.notifier)
+                        .setDontShowAgain(value),
+                    stepLabel: context.tr(
+                      'workout.builder.tour_step',
+                      params: {
+                        'current': '${tourState.currentStepIndex + 1}',
+                        'total': '${_tourSteps.length}',
+                      },
+                    ),
+                    nextLabel: context.tr('workout.builder.tour_next'),
+                    doneLabel: context.tr('workout.builder.tour_done'),
+                    dontShowAgainLabel: context.tr(
+                      'workout.builder.tour_dont_show_again',
+                    ),
+                    closeLabel: context.tr('common.close'),
+                  ),
+              ],
             ),
           ),
         ),
@@ -224,6 +270,9 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
         onPressed: () {
           FocusScope.of(context).unfocus();
           setState(() => stage = _CreateStage.structure);
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _maybeStartTour(),
+          );
         },
       ),
     ],
@@ -233,64 +282,86 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     key: const ValueKey('structure'),
     children: [
       Expanded(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+        child: Stack(
           children: [
-            WorkoutBuilderSummary(draft: state.draft, compact: true),
-            const SizedBox(height: 26),
-            AnimatedSwitcher(
-              duration: MediaQuery.disableAnimationsOf(context)
-                  ? Duration.zero
-                  : CoachlyAthleteTheme.expandDuration,
-              switchInCurve: CoachlyAthleteTheme.standardCurve,
-              transitionBuilder: (child, animation) => FadeTransition(
-                opacity: animation,
-                child: SizeTransition(sizeFactor: animation, child: child),
-              ),
-              child: WorkoutDraftStructure(
-                key: ValueKey(state.draft.exerciseCount == 0),
-                draft: state.draft,
-                onEditExercise: (exercise) => _editExercise(exercise, false),
-                onEditBlock: _editBlock,
-                onUpdateExercise: ref
-                    .read(createWorkoutControllerProvider.notifier)
-                    .updateExercise,
-                onUpdateBlock: ref
-                    .read(createWorkoutControllerProvider.notifier)
-                    .updateGroup,
-                onOpenExercise: _openExerciseDetail,
-                onReorder: (section, oldIndex, newIndex) => ref
-                    .read(createWorkoutControllerProvider.notifier)
-                    .reorderInSection(section, oldIndex, newIndex),
-                onReorderSections: ref
-                    .read(createWorkoutControllerProvider.notifier)
-                    .reorderSections,
-                onRemove: ref
-                    .read(createWorkoutControllerProvider.notifier)
-                    .removeItem,
-                onRemoveExercise: ref
-                    .read(createWorkoutControllerProvider.notifier)
-                    .removeExercise,
-                onDuplicate: ref
-                    .read(createWorkoutControllerProvider.notifier)
-                    .duplicateItem,
-                onMove: _moveItem,
-                onAddExercise: _addExercise,
-                onAddSection: _addSection,
-                onCreateBlock: _createBlock,
-                onEditSection: _editSection,
-                onUpdateSection: ref
-                    .read(createWorkoutControllerProvider.notifier)
-                    .updateSection,
-                onRemoveSection: ref
-                    .read(createWorkoutControllerProvider.notifier)
-                    .removeSection,
-              ),
+            ListView(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 96),
+              children: [
+                WorkoutBuilderSummary(draft: state.draft, compact: true),
+                const SizedBox(height: 26),
+                AnimatedSwitcher(
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : CoachlyAthleteTheme.expandDuration,
+                  switchInCurve: CoachlyAthleteTheme.standardCurve,
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: SizeTransition(sizeFactor: animation, child: child),
+                  ),
+                  child: WorkoutDraftStructure(
+                    key: ValueKey(state.draft.exerciseCount == 0),
+                    draft: state.draft,
+                    onEditExercise: (exercise) =>
+                        _editExercise(exercise, false),
+                    onEditBlock: _editBlock,
+                    onUpdateExercise: ref
+                        .read(createWorkoutControllerProvider.notifier)
+                        .updateExercise,
+                    onUpdateBlock: ref
+                        .read(createWorkoutControllerProvider.notifier)
+                        .updateGroup,
+                    onOpenExercise: _openExerciseDetail,
+                    onReorder: (section, oldIndex, newIndex) => ref
+                        .read(createWorkoutControllerProvider.notifier)
+                        .reorderInSection(section, oldIndex, newIndex),
+                    onReorderSections: ref
+                        .read(createWorkoutControllerProvider.notifier)
+                        .reorderSections,
+                    onRemove: ref
+                        .read(createWorkoutControllerProvider.notifier)
+                        .removeItem,
+                    onRemoveExercise: ref
+                        .read(createWorkoutControllerProvider.notifier)
+                        .removeExercise,
+                    onDuplicate: ref
+                        .read(createWorkoutControllerProvider.notifier)
+                        .duplicateItem,
+                    onMove: _moveItem,
+                    onAddExercise: _addExercise,
+                    onAddSection: _addSection,
+                    onCreateBlock: _createBlock,
+                    onEditSection: _editSection,
+                    onUpdateSection: ref
+                        .read(createWorkoutControllerProvider.notifier)
+                        .updateSection,
+                    onRemoveSection: ref
+                        .read(createWorkoutControllerProvider.notifier)
+                        .removeSection,
+                    tourRegistry: _tourRegistry,
+                  ),
+                ),
+                WorkoutStructureComposer(
+                  onAddExercise: () => _addExercise(null),
+                  onAddSection: _addSection,
+                  onCreateBlock: _createBlock,
+                  tourRegistry: _tourRegistry,
+                ),
+              ],
             ),
-            WorkoutStructureComposer(
-              onAddExercise: () => _addExercise(null),
-              onAddSection: _addSection,
-              onCreateBlock: _createBlock,
+            Positioned(
+              right: 16,
+              bottom: 16,
+              child: BuilderAssistRail(
+                tourRegistry: _tourRegistry,
+                discoverLabel: context.tr('workout.builder.discover'),
+                workoutCheckLabel: context.tr('workout.check.open'),
+                workoutCheckHeroTag:
+                    'workout-check-${state.draft.localDraftId}',
+                onDiscover: () => ref
+                    .read(builderTourProvider.notifier)
+                    .start(BuilderTourOrigin.manual),
+                onWorkoutCheck: () => _openWorkoutCheck(state.draft),
+              ),
             ),
           ],
         ),
@@ -374,6 +445,79 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
       ),
     ],
   );
+
+  List<CoachlyTourStepDefinition> get _tourSteps => [
+    CoachlyTourStepDefinition(
+      id: 'intro',
+      title: context.tr('workout.builder.tour_intro_title'),
+      body: context.tr('workout.builder.tour_intro_body'),
+    ),
+    CoachlyTourStepDefinition(
+      id: 'exercise',
+      title: context.tr('workout.builder.tour_exercise_title'),
+      body: context.tr('workout.builder.tour_exercise_body'),
+      targets: const [BuilderTourTarget.addExercise],
+    ),
+    CoachlyTourStepDefinition(
+      id: 'sections',
+      title: context.tr('workout.builder.tour_sections_title'),
+      body: context.tr('workout.builder.tour_sections_body'),
+      targets: const [
+        BuilderTourTarget.mainSectionHeader,
+        BuilderTourTarget.sectionsAction,
+      ],
+    ),
+    CoachlyTourStepDefinition(
+      id: 'notes',
+      title: context.tr('workout.builder.tour_notes_title'),
+      body: context.tr('workout.builder.tour_notes_body'),
+      secondary: context.tr('workout.builder.tour_notes_secondary'),
+      targets: const [BuilderTourTarget.mainSectionMenu],
+    ),
+    CoachlyTourStepDefinition(
+      id: 'blocks',
+      title: context.tr('workout.builder.tour_blocks_title'),
+      body: context.tr('workout.builder.tour_blocks_body'),
+      secondary: context.tr('workout.builder.tour_blocks_secondary'),
+      targets: const [BuilderTourTarget.blocksAction],
+    ),
+    CoachlyTourStepDefinition(
+      id: 'check',
+      title: context.tr('workout.builder.tour_check_title'),
+      body: context.tr('workout.builder.tour_check_body'),
+      secondary: context.tr('workout.builder.tour_check_secondary'),
+      targets: const [BuilderTourTarget.workoutCheck],
+    ),
+  ];
+
+  void _maybeStartTour() {
+    if (_autoTourAttempted || stage != _CreateStage.structure) return;
+    _autoTourAttempted = true;
+    final controller = ref.read(builderTourProvider.notifier);
+    if (controller.shouldAutoShow) {
+      controller.start(BuilderTourOrigin.automatic);
+    }
+  }
+
+  void _advanceTour() {
+    final tour = ref.read(builderTourProvider);
+    final completed = tour.currentStepIndex == _tourSteps.length - 1;
+    ref.read(builderTourProvider.notifier).next();
+    if (completed) {
+      HapticFeedback.lightImpact();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tr('workout.builder.tour_replay_hint'))),
+      );
+    }
+  }
+
+  Future<void> _openWorkoutCheck(WorkoutDraft draft) async {
+    final addExercise = await context.push<bool>(
+      '/workouts/workout/new/check',
+      extra: draft,
+    );
+    if (addExercise == true && mounted) await _addExercise(null);
+  }
 
   Future<WorkoutExerciseDraft?> _addExercise(String? sectionId) async {
     var destinationId = sectionId;

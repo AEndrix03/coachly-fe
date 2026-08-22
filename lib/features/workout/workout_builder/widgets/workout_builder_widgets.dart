@@ -1,8 +1,10 @@
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
+import 'package:coachly/features/workout/workout_builder/tour/builder_tour_controller.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:coachly/shared/guided_tour/coachly_guided_tour.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -185,12 +187,14 @@ class WorkoutStructureComposer extends StatelessWidget {
   final VoidCallback onAddExercise;
   final VoidCallback onAddSection;
   final VoidCallback onCreateBlock;
+  final CoachlyTourTargetRegistry? tourRegistry;
 
   const WorkoutStructureComposer({
     super.key,
     required this.onAddExercise,
     required this.onAddSection,
     required this.onCreateBlock,
+    this.tourRegistry,
   });
 
   @override
@@ -202,68 +206,75 @@ class WorkoutStructureComposer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CoachlyPressable(
-            onTap: onAddExercise,
-            semanticLabel: context.tr('workout.builder.add_exercise'),
-            child: Container(
-              constraints: const BoxConstraints(minHeight: 72),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-              decoration: BoxDecoration(
-                color: context.exerciseTheme.surface,
-                borderRadius: BorderRadius.circular(
-                  CoachlyAthleteTheme.cardRadius,
+          _OptionalTourTarget(
+            id: BuilderTourTarget.addExercise,
+            registry: tourRegistry,
+            child: CoachlyPressable(
+              onTap: onAddExercise,
+              semanticLabel: context.tr('workout.builder.add_exercise'),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 72),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 13,
                 ),
-                border: Border.all(color: context.exerciseTheme.border),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: context.exerciseTheme.primaryMuted.withValues(
-                        alpha: .55,
+                decoration: BoxDecoration(
+                  color: context.exerciseTheme.surface,
+                  borderRadius: BorderRadius.circular(
+                    CoachlyAthleteTheme.cardRadius,
+                  ),
+                  border: Border.all(color: context.exerciseTheme.border),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: context.exerciseTheme.primaryMuted.withValues(
+                          alpha: .55,
+                        ),
+                        borderRadius: BorderRadius.circular(13),
                       ),
-                      borderRadius: BorderRadius.circular(13),
+                      child: Icon(
+                        Icons.add_rounded,
+                        size: 23,
+                        color: context.exerciseTheme.primary,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.add_rounded,
-                      size: 23,
-                      color: context.exerciseTheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          context.tr('workout.builder.add_exercise'),
-                          style: TextStyle(
-                            color: context.exerciseTheme.textPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            context.tr('workout.builder.add_exercise'),
+                            style: TextStyle(
+                              color: context.exerciseTheme.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          context.tr('workout.builder.add_exercise_hint'),
-                          style: TextStyle(
-                            color: context.exerciseTheme.textSecondary,
-                            fontSize: 12,
-                            height: 1.3,
+                          const SizedBox(height: 3),
+                          Text(
+                            context.tr('workout.builder.add_exercise_hint'),
+                            style: TextStyle(
+                              color: context.exerciseTheme.textSecondary,
+                              fontSize: 12,
+                              height: 1.3,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: context.exerciseTheme.textSecondary,
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: context.exerciseTheme.textSecondary,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -273,24 +284,32 @@ class WorkoutStructureComposer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: _StructureActionCard(
-                    icon: Icons.view_agenda_outlined,
-                    title: context.tr('workout.builder.sections_hint_title'),
-                    body: context.tr('workout.builder.sections_hint_body'),
-                    actionLabel: context.tr('workout.builder.add_section'),
-                    onTap: onAddSection,
+                  child: _OptionalTourTarget(
+                    id: BuilderTourTarget.sectionsAction,
+                    registry: tourRegistry,
+                    child: _StructureActionCard(
+                      icon: Icons.view_agenda_outlined,
+                      title: context.tr('workout.builder.sections_hint_title'),
+                      body: context.tr('workout.builder.sections_hint_body'),
+                      actionLabel: context.tr('workout.builder.add_section'),
+                      onTap: onAddSection,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _StructureActionCard(
-                    icon: Icons.link_rounded,
-                    title: context.tr('workout.builder.blocks_hint_title'),
-                    body: context.tr('workout.builder.blocks_hint_body'),
-                    actionLabel: context.tr(
-                      'workout.builder.create_block_short',
+                  child: _OptionalTourTarget(
+                    id: BuilderTourTarget.blocksAction,
+                    registry: tourRegistry,
+                    child: _StructureActionCard(
+                      icon: Icons.link_rounded,
+                      title: context.tr('workout.builder.blocks_hint_title'),
+                      body: context.tr('workout.builder.blocks_hint_body'),
+                      actionLabel: context.tr(
+                        'workout.builder.create_block_short',
+                      ),
+                      onTap: onCreateBlock,
                     ),
-                    onTap: onCreateBlock,
                   ),
                 ),
               ],
@@ -300,6 +319,23 @@ class WorkoutStructureComposer extends StatelessWidget {
       ),
     ),
   );
+}
+
+class _OptionalTourTarget extends StatelessWidget {
+  final Object id;
+  final CoachlyTourTargetRegistry? registry;
+  final Widget child;
+
+  const _OptionalTourTarget({
+    required this.id,
+    required this.registry,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) => registry == null
+      ? child
+      : CoachlyTourTarget(id: id, registry: registry!, child: child);
 }
 
 class _StructureActionCard extends StatelessWidget {
@@ -407,6 +443,7 @@ class WorkoutDraftStructure extends StatelessWidget {
   final ValueChanged<WorkoutSectionDraft>? onUpdateSection;
   final ValueChanged<String>? onRemoveSection;
   final bool editable;
+  final CoachlyTourTargetRegistry? tourRegistry;
 
   const WorkoutDraftStructure({
     super.key,
@@ -429,6 +466,7 @@ class WorkoutDraftStructure extends StatelessWidget {
     this.onUpdateSection,
     this.onRemoveSection,
     this.editable = true,
+    this.tourRegistry,
   });
 
   @override
@@ -464,6 +502,7 @@ class WorkoutDraftStructure extends StatelessWidget {
           onEditSection: onEditSection,
           onUpdateSection: onUpdateSection,
           onRemoveSection: onRemoveSection,
+          tourRegistry: tourRegistry,
         );
       },
     );
@@ -487,6 +526,7 @@ class _CollapsibleDraftSection extends StatefulWidget {
   final ValueChanged<WorkoutSectionDraft>? onEditSection;
   final ValueChanged<WorkoutSectionDraft>? onUpdateSection;
   final ValueChanged<String>? onRemoveSection;
+  final CoachlyTourTargetRegistry? tourRegistry;
 
   const _CollapsibleDraftSection({
     super.key,
@@ -506,6 +546,7 @@ class _CollapsibleDraftSection extends StatefulWidget {
     this.onEditSection,
     this.onUpdateSection,
     this.onRemoveSection,
+    this.tourRegistry,
   });
 
   @override
@@ -524,72 +565,82 @@ class _CollapsibleDraftSectionState extends State<_CollapsibleDraftSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Semantics(
-              header: true,
-              button: widget.editable && widget.onEditSection != null,
-              child: InkWell(
-                onTap: widget.editable && widget.onEditSection != null
-                    ? () => widget.onEditSection!(section)
-                    : null,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 44),
-                  child: Row(
-                    children: [
-                      if (widget.editable)
-                        ReorderableDragStartListener(
-                          index: widget.sectionIndex,
-                          child: const _DragHandle(),
-                        ),
-                      Flexible(
-                        child: Text(
-                          workoutSectionLabel(context, section).toUpperCase(),
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: CoachlyAthleteTheme.textSecondary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: .8,
+          _OptionalTourTarget(
+            id: section.kind == WorkoutSectionKind.main
+                ? BuilderTourTarget.mainSectionHeader
+                : 'section-${section.id}',
+            registry: section.kind == WorkoutSectionKind.main
+                ? widget.tourRegistry
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Semantics(
+                header: true,
+                button: widget.editable && widget.onEditSection != null,
+                child: InkWell(
+                  onTap: widget.editable && widget.onEditSection != null
+                      ? () => widget.onEditSection!(section)
+                      : null,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 44),
+                    child: Row(
+                      children: [
+                        if (widget.editable)
+                          ReorderableDragStartListener(
+                            index: widget.sectionIndex,
+                            child: const _DragHandle(),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(child: Divider()),
-                      IconButton(
-                        onPressed: () => setState(() => collapsed = !collapsed),
-                        tooltip: context.tr(
-                          collapsed
-                              ? 'workout.builder.expand_section'
-                              : 'workout.builder.collapse_section',
-                        ),
-                        icon: Icon(
-                          collapsed
-                              ? Icons.keyboard_arrow_down_rounded
-                              : Icons.keyboard_arrow_up_rounded,
-                          color: context.exerciseTheme.textSecondary,
-                        ),
-                      ),
-                      if (widget.editable &&
-                          widget.onUpdateSection != null) ...[
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: () => _showItemActions(
-                            context,
-                            initialNotes: section.notes,
-                            onNotesChanged: (notes) => widget.onUpdateSection!(
-                              section.copyWith(notes: notes),
+                        Flexible(
+                          child: Text(
+                            workoutSectionLabel(context, section).toUpperCase(),
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: CoachlyAthleteTheme.textSecondary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: .8,
                             ),
-                            onRemove: () =>
-                                widget.onRemoveSection?.call(section.id),
                           ),
-                          tooltip: context.tr(
-                            'workout.builder.section_actions',
-                          ),
-                          icon: const Icon(Icons.more_horiz_rounded),
                         ),
+                        const SizedBox(width: 12),
+                        const Expanded(child: Divider()),
+                        IconButton(
+                          onPressed: () =>
+                              setState(() => collapsed = !collapsed),
+                          tooltip: context.tr(
+                            collapsed
+                                ? 'workout.builder.expand_section'
+                                : 'workout.builder.collapse_section',
+                          ),
+                          icon: Icon(
+                            collapsed
+                                ? Icons.keyboard_arrow_down_rounded
+                                : Icons.keyboard_arrow_up_rounded,
+                            color: context.exerciseTheme.textSecondary,
+                          ),
+                        ),
+                        if (widget.editable &&
+                            widget.onUpdateSection != null) ...[
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () => _showItemActions(
+                              context,
+                              initialNotes: section.notes,
+                              onNotesChanged: (notes) =>
+                                  widget.onUpdateSection!(
+                                    section.copyWith(notes: notes),
+                                  ),
+                              onRemove: () =>
+                                  widget.onRemoveSection?.call(section.id),
+                            ),
+                            tooltip: context.tr(
+                              'workout.builder.section_actions',
+                            ),
+                            icon: const Icon(Icons.more_horiz_rounded),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),

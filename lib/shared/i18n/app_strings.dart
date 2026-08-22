@@ -22,6 +22,8 @@ class AppStrings {
     'common.back_to_top': {'en': 'Back to top', 'it': 'Torna in alto'},
     'common.confirm': {'en': 'Confirm', 'it': 'Conferma'},
     'common.cancel': {'en': 'Cancel', 'it': 'Annulla'},
+    'common.close': {'en': 'Close', 'it': 'Chiudi'},
+    'common.retry': {'en': 'Retry', 'it': 'Riprova'},
     'common.undo': {'en': 'UNDO', 'it': 'ANNULLA'},
     'common.edit': {'en': 'Edit', 'it': 'Modifica'},
     'common.duplicate': {'en': 'Duplicate', 'it': 'Duplica'},
@@ -301,6 +303,244 @@ class AppStrings {
     'workout.builder.add_exercise_hint': {
       'en': 'Choose an exercise and configure its working sets.',
       'it': 'Scegli un esercizio e configura le serie di lavoro.',
+    },
+    'workout.builder.discover': {
+      'en': 'Discover workout builder',
+      'it': 'Scopri il builder della scheda',
+    },
+    'workout.builder.tour_step': {
+      'en': 'Step {current} of {total}',
+      'it': 'Passaggio {current} di {total}',
+    },
+    'workout.builder.tour_next': {'en': 'Next', 'it': 'Avanti'},
+    'workout.builder.tour_done': {'en': 'Done', 'it': 'Fatto'},
+    'workout.builder.tour_dont_show_again': {
+      'en': "Don't show again",
+      'it': 'Non mostrare più automaticamente',
+    },
+    'workout.builder.tour_intro_title': {
+      'en': 'Build it your way',
+      'it': 'Costruiscila come vuoi',
+    },
+    'workout.builder.tour_intro_body': {
+      'en':
+          'Exercises, sections, blocks and notes. Structure your workout exactly how you want it.',
+      'it':
+          'Esercizi, sezioni, blocchi e note. Organizza la scheda esattamente come vuoi.',
+    },
+    'workout.builder.tour_exercise_title': {
+      'en': 'Start with an exercise',
+      'it': 'Inizia da un esercizio',
+    },
+    'workout.builder.tour_exercise_body': {
+      'en': 'Choose from the Coachly library — or create your own.',
+      'it': 'Scegli dalla libreria Coachly oppure crea il tuo esercizio.',
+    },
+    'workout.builder.tour_sections_title': {
+      'en': 'Keep things organized',
+      'it': 'Mantieni tutto organizzato',
+    },
+    'workout.builder.tour_sections_body': {
+      'en':
+          'As your workout grows, split it into sections. Create as many as you need.',
+      'it':
+          'Quando la scheda cresce, dividila in sezioni. Creane quante te ne servono.',
+    },
+    'workout.builder.tour_notes_title': {
+      'en': 'Leave context for later',
+      'it': 'Lascia il contesto per dopo',
+    },
+    'workout.builder.tour_notes_body': {
+      'en': 'Add notes to any section and update them during the workout.',
+      'it':
+          'Aggiungi note a qualsiasi sezione e aggiornalele durante il workout.',
+    },
+    'workout.builder.tour_notes_secondary': {
+      'en': 'Cues, goals, reminders — anything useful.',
+      'it': 'Indicazioni, obiettivi, promemoria: tutto ciò che è utile.',
+    },
+    'workout.builder.tour_blocks_title': {
+      'en': 'Train exercises together',
+      'it': 'Esegui gli esercizi insieme',
+    },
+    'workout.builder.tour_blocks_body': {
+      'en':
+          'Build supersets, circuits and more by grouping exercises into a block.',
+      'it':
+          'Crea superset, circuiti e altro raggruppando gli esercizi in un blocco.',
+    },
+    'workout.builder.tour_blocks_secondary': {
+      'en': 'Control timing and targets together.',
+      'it': 'Gestisci insieme tempi e obiettivi.',
+    },
+    'workout.builder.tour_check_title': {
+      'en': 'Check the whole workout',
+      'it': 'Controlla tutta la scheda',
+    },
+    'workout.builder.tour_check_body': {
+      'en':
+          'See muscle coverage, overlap and structure — evaluated around your goal.',
+      'it':
+          'Scopri copertura muscolare, sovrapposizioni e struttura in relazione al tuo obiettivo.',
+    },
+    'workout.builder.tour_check_secondary': {
+      'en': 'Coachly explains what stands out. You decide what changes.',
+      'it': 'Coachly spiega cosa emerge. Tu decidi cosa cambiare.',
+    },
+    'workout.builder.tour_replay_hint': {
+      'en': 'Replay anytime from Discover.',
+      'it': 'Puoi rivederlo in qualsiasi momento da Scopri.',
+    },
+    'workout.check.open': {'en': 'Check workout', 'it': 'Controlla la scheda'},
+    'workout.check.title': {'en': 'Workout Check', 'it': 'Controllo scheda'},
+    'workout.check.empty_title': {
+      'en': 'Your workout is still empty',
+      'it': 'La scheda è ancora vuota',
+    },
+    'workout.check.empty_body': {
+      'en': 'Add a few exercises and Coachly will start building its analysis.',
+      'it':
+          'Aggiungi alcuni esercizi e Coachly inizierà a costruire la sua analisi.',
+    },
+    'workout.check.capability_muscles': {
+      'en': 'Muscle coverage',
+      'it': 'Copertura muscolare',
+    },
+    'workout.check.capability_patterns': {
+      'en': 'Movement patterns',
+      'it': 'Pattern di movimento',
+    },
+    'workout.check.capability_overlap': {
+      'en': 'Exercise overlap',
+      'it': 'Sovrapposizione esercizi',
+    },
+    'workout.check.capability_structure': {
+      'en': 'Session structure',
+      'it': 'Struttura della sessione',
+    },
+    'workout.check.capability_goal': {
+      'en': 'Goal alignment',
+      'it': 'Coerenza con l’obiettivo',
+    },
+    'workout.check.mode_bodybuilding': {
+      'en': 'BODYBUILDING',
+      'it': 'BODYBUILDING',
+    },
+    'workout.check.summary': {
+      'en':
+          '{passed} checks passed · {review} to review · {missing} need more data',
+      'it':
+          '{passed} controlli superati · {review} da rivedere · {missing} richiedono più dati',
+    },
+    'workout.check.muscle_coverage': {
+      'en': 'Muscle coverage',
+      'it': 'Copertura muscolare',
+    },
+    'workout.check.set_exposure': {
+      'en': '{count} set exposure',
+      'it': '{count} serie coinvolte',
+    },
+    'workout.check.structure_title': {
+      'en': 'The workout has a clear structure',
+      'it': 'La scheda ha una struttura chiara',
+    },
+    'workout.check.structure_body': {
+      'en':
+          '{sections} populated sections and {blocks} connected blocks organize the session.',
+      'it':
+          '{sections} sezioni popolate e {blocks} blocchi collegati organizzano la sessione.',
+    },
+    'workout.check.duration_title': {
+      'en': 'Estimated duration · ~{minutes} min',
+      'it': 'Durata stimata · ~{minutes} min',
+    },
+    'workout.check.duration_body': {
+      'en':
+          'This is an approximate estimate based on working sets and configured rest.',
+      'it':
+          'È una stima approssimativa basata sulle serie di lavoro e sui recuperi configurati.',
+    },
+    'workout.check.goal_title': {
+      'en': 'Goal context is available',
+      'it': 'Il contesto dell’obiettivo è disponibile',
+    },
+    'workout.check.goal_body': {
+      'en': 'Coachly evaluates the workout using the selected {goal} goal.',
+      'it': 'Coachly valuta la scheda usando l’obiettivo selezionato: {goal}.',
+    },
+    'workout.check.goal_missing_title': {
+      'en': 'Goal alignment needs more data',
+      'it': 'La coerenza con l’obiettivo richiede più dati',
+    },
+    'workout.check.goal_missing_body': {
+      'en': 'Choose a training goal to make this check more specific.',
+      'it':
+          'Scegli un obiettivo di allenamento per rendere il controllo più specifico.',
+    },
+    'workout.check.overlap_title': {
+      'en': 'Some exercises have similar profiles',
+      'it': 'Alcuni esercizi hanno profili simili',
+    },
+    'workout.check.overlap_body': {
+      'en':
+          'Coachly found a shared movement profile and {count} common muscle relations. Review whether the overlap is intentional.',
+      'it':
+          'Coachly ha trovato un pattern di movimento condiviso e {count} relazioni muscolari comuni. Valuta se la sovrapposizione è intenzionale.',
+    },
+    'workout.check.overlap_clear_title': {
+      'en': 'No strong exercise overlap stands out',
+      'it': 'Non emergono forti sovrapposizioni',
+    },
+    'workout.check.overlap_clear_body': {
+      'en':
+          'The locally available profiles do not show an obvious duplicate pattern.',
+      'it':
+          'I profili disponibili localmente non mostrano duplicazioni evidenti.',
+    },
+    'workout.check.why': {'en': 'Why?', 'it': 'Perché?'},
+    'workout.check.used_data': {
+      'en': 'Coachly used:',
+      'it': 'Coachly ha utilizzato:',
+    },
+    'workout.check.evidence_sections': {
+      'en': '{count} populated sections',
+      'it': '{count} sezioni popolate',
+    },
+    'workout.check.evidence_blocks': {
+      'en': '{count} exercise blocks',
+      'it': '{count} blocchi di esercizi',
+    },
+    'workout.check.evidence_exercises': {
+      'en': '{count} exercises',
+      'it': '{count} esercizi',
+    },
+    'workout.check.evidence_sets': {
+      'en': '{count} working sets',
+      'it': '{count} serie di lavoro',
+    },
+    'workout.check.evidence_rest': {
+      'en': 'Configured rest times',
+      'it': 'Tempi di recupero configurati',
+    },
+    'workout.check.evidence_execution': {
+      'en': 'Approximate execution time',
+      'it': 'Tempo di esecuzione approssimativo',
+    },
+    'workout.check.evidence_goal': {
+      'en': 'Selected goal: {goal}',
+      'it': 'Obiettivo selezionato: {goal}',
+    },
+    'workout.check.evidence_movement': {
+      'en': 'Shared movement profile: {movement}',
+      'it': 'Pattern di movimento condiviso: {movement}',
+    },
+    'workout.check.evidence_muscles': {
+      'en': '{count} shared muscle relations',
+      'it': '{count} relazioni muscolari condivise',
+    },
+    'workout.check.unavailable': {
+      'en': 'Workout Check is temporarily unavailable.',
+      'it': 'Il controllo della scheda non è momentaneamente disponibile.',
     },
     'workout.builder.exercise_library_hint': {
       'en': 'Search your exercise library',
