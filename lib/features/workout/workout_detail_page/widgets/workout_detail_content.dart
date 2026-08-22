@@ -58,27 +58,6 @@ class WorkoutIdentity extends StatelessWidget {
               ],
             ],
           ),
-          if (workout.syncPending) ...[
-            const SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.cloud_upload_outlined,
-                  size: 15,
-                  color: CoachlyAthleteTheme.textSecondary,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  context.tr('workout.detail.sync_pending'),
-                  style: const TextStyle(
-                    color: CoachlyAthleteTheme.textSecondary,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ],
         ],
       ),
     );

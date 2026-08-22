@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
@@ -30,11 +32,17 @@ class WorkoutDetailPage extends ConsumerStatefulWidget {
   ConsumerState<WorkoutDetailPage> createState() => _WorkoutDetailPageState();
 }
 
-class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
+class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
+    with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
   bool _editing = false;
   WorkoutModel? _latestWorkout;
+  late final AnimationController _saveConfirmationController =
+      AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1100),
+      );
 
   @override
   void initState() {
@@ -54,6 +62,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
       ..removeListener(_handleScroll)
       ..dispose();
     _scrollOffset.dispose();
+    _saveConfirmationController.dispose();
     super.dispose();
   }
 
@@ -117,78 +126,98 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
       },
       child: Scaffold(
         backgroundColor: CoachlyAthleteTheme.background,
-        body: RefreshIndicator(
-          color: CoachlyAthleteTheme.primary,
-          onRefresh: _editing
-              ? () async {}
-              : () async => ref.invalidate(workoutListProvider),
-          child: CustomScrollView(
-            controller: _scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              WorkoutDetailAppBar(
-                title: _editing
-                    ? context.tr('workout.detail.edit_session')
-                    : viewData.title,
-                editing: _editing,
-                saving: draft.isSaving,
-                scrollOffset: _scrollOffset,
-                onBack: _handleBack,
-                onEdit: () => _openBuilderEdit(resolved),
-                onDone: _saveAndFinish,
-              ),
-              if (_editing) ...[
-                const SliverToBoxAdapter(child: SizedBox(height: 18)),
-                SliverToBoxAdapter(
-                  child: WorkoutStructuralEdit(
-                    workoutId: resolved.id,
-                    viewData: viewData,
-                    onAddExercise: () => _openExerciseCatalog(resolved),
+        body: Stack(
+          children: [
+            RefreshIndicator(
+              color: CoachlyAthleteTheme.primary,
+              onRefresh: _editing
+                  ? () async {}
+                  : () async => ref.invalidate(workoutListProvider),
+              child: CustomScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  WorkoutDetailAppBar(
+                    title: _editing
+                        ? context.tr('workout.detail.edit_session')
+                        : viewData.title,
+                    editing: _editing,
+                    saving: draft.isSaving,
+                    scrollOffset: _scrollOffset,
+                    onBack: _handleBack,
+                    onEdit: () => _openBuilderEdit(resolved),
+                    onDone: _saveAndFinish,
                   ),
-                ),
-              ] else ...[
-                SliverToBoxAdapter(child: WorkoutIdentity(workout: viewData)),
-                if (viewData.goal != null) ...[
-                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                  if (_editing) ...[
+                    const SliverToBoxAdapter(child: SizedBox(height: 18)),
+                    SliverToBoxAdapter(
+                      child: WorkoutStructuralEdit(
+                        workoutId: resolved.id,
+                        viewData: viewData,
+                        onAddExercise: () => _openExerciseCatalog(resolved),
+                      ),
+                    ),
+                  ] else ...[
+                    SliverToBoxAdapter(
+                      child: WorkoutIdentity(workout: viewData),
+                    ),
+                    if (viewData.goal != null) ...[
+                      const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                      SliverToBoxAdapter(
+                        child: WorkoutGoalSection(goal: viewData.goal!),
+                      ),
+                    ],
+                    const SliverToBoxAdapter(child: SizedBox(height: 22)),
+                    SliverToBoxAdapter(
+                      child: WorkoutStartButton(
+                        enabled: viewData.exerciseCount > 0,
+                        onPressed: () => context.go(
+                          '/workouts/workout/${resolved.id}/active',
+                          extra: resolved,
+                        ),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 30)),
+                    SliverToBoxAdapter(
+                      child: WorkoutStructure(
+                        workout: viewData,
+                        onEdit: () => _openBuilderEdit(resolved),
+                        onOpenExercise: (exercise) => context.push(
+                          '/workouts/workout/${resolved.id}/workout_exercise_page/${exercise.exerciseId}',
+                        ),
+                        onAddExercise: () => _openBuilderEdit(resolved),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                    SliverToBoxAdapter(
+                      child: WorkoutOverview(workout: viewData),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                    SliverToBoxAdapter(
+                      child: WorkoutConceptsSection(workout: viewData),
+                    ),
+                  ],
                   SliverToBoxAdapter(
-                    child: WorkoutGoalSection(goal: viewData.goal!),
+                    child: SizedBox(
+                      height: 36 + MediaQuery.paddingOf(context).bottom,
+                    ),
                   ),
                 ],
-                const SliverToBoxAdapter(child: SizedBox(height: 22)),
-                SliverToBoxAdapter(
-                  child: WorkoutStartButton(
-                    enabled: viewData.exerciseCount > 0,
-                    onPressed: () => context.go(
-                      '/workouts/workout/${resolved.id}/active',
-                      extra: resolved,
+              ),
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: RepaintBoundary(
+                  child: CustomPaint(
+                    painter: _WorkoutSavedBorderPainter(
+                      animation: _saveConfirmationController,
+                      color: CoachlyAthleteTheme.primary,
                     ),
                   ),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 30)),
-                SliverToBoxAdapter(
-                  child: WorkoutStructure(
-                    workout: viewData,
-                    onEdit: () => _openBuilderEdit(resolved),
-                    onOpenExercise: (exercise) => context.push(
-                      '/workouts/workout/${resolved.id}/workout_exercise_page/${exercise.exerciseId}',
-                    ),
-                    onAddExercise: () => _openBuilderEdit(resolved),
-                  ),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 28)),
-                SliverToBoxAdapter(child: WorkoutOverview(workout: viewData)),
-                const SliverToBoxAdapter(child: SizedBox(height: 28)),
-                SliverToBoxAdapter(
-                  child: WorkoutConceptsSection(workout: viewData),
-                ),
-              ],
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 36 + MediaQuery.paddingOf(context).bottom,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -202,6 +231,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     );
     if (!mounted || updated == null) return;
     setState(() => _latestWorkout = updated);
+    _showSaveConfirmation();
     ref.invalidate(workoutListProvider);
   }
 
@@ -212,12 +242,18 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
     if (!mounted || result == null) return;
     HapticFeedback.mediumImpact();
     setState(() => _editing = false);
-    final state = ref.read(workoutEditDraftProvider(widget.workout.id));
-    if (state.savedOffline) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr('workout.detail.saved_offline'))),
-      );
+    _showSaveConfirmation();
+  }
+
+  void _showSaveConfirmation() {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _saveConfirmationController.value = .5;
+      Future<void>.delayed(const Duration(milliseconds: 420), () {
+        if (mounted) _saveConfirmationController.value = 0;
+      });
+      return;
     }
+    _saveConfirmationController.forward(from: 0);
   }
 
   Future<void> _handleBack() async {
@@ -267,6 +303,41 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage> {
   void _openExerciseCatalog(WorkoutModel resolved) {
     context.push('/workouts/workout/${resolved.id}/add-exercise');
   }
+}
+
+class _WorkoutSavedBorderPainter extends CustomPainter {
+  final Animation<double> animation;
+  final Color color;
+
+  _WorkoutSavedBorderPainter({required this.animation, required this.color})
+    : super(repaint: animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final intensity = math.sin(animation.value * math.pi).clamp(0.0, 1.0);
+    if (intensity == 0) return;
+    final rect = (Offset.zero & size).deflate(3);
+    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(18));
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = color.withValues(alpha: .35 * intensity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 5
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
+    );
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = color.withValues(alpha: .9 * intensity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.8,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _WorkoutSavedBorderPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 final _exerciseNameProvider = FutureProvider.autoDispose
