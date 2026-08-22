@@ -1748,6 +1748,8 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
               const Expanded(child: Divider()),
             ],
           ),
+          const SizedBox(height: 14),
+          _SheetSectionLabel(context.tr('workout.builder.notes_title')),
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
@@ -1762,7 +1764,7 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
                   );
                 }
               },
-              icon: const Icon(Icons.notes_rounded),
+              icon: const Icon(Icons.add_rounded),
               label: Text(context.tr('workout.builder.add_notes')),
             ),
           ),
@@ -1900,6 +1902,8 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
   );
   final loadFocus = FocusNode();
   final notesFocus = FocusNode();
+  late bool showTargetLoad = widget.initial.targetLoad != null;
+  late bool showNotes = widget.initial.notes?.trim().isNotEmpty == true;
   @override
   void dispose() {
     load.dispose();
@@ -1975,38 +1979,68 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
               _SheetSectionLabel(
                 context.tr('workout.builder.target_load_heading'),
               ),
-              const SizedBox(height: 10),
-              WorkoutBuilderUnderlineField(
-                controller: load,
-                focusNode: loadFocus,
-                label: context.tr('workout.detail.target_load'),
-                hint: context.tr('workout.builder.from_history'),
-                helper: context.tr('workout.builder.optional'),
-                maxLength: 8,
-                textInputAction: TextInputAction.next,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-                ],
-                suffixText: widget.initial.loadUnit,
-                onChanged: (_) {},
+              _OptionalFieldAction(
+                expanded: showTargetLoad,
+                label: context.tr('workout.builder.set_target_load'),
+                onPressed: () {
+                  setState(() => showTargetLoad = true);
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => loadFocus.requestFocus(),
+                  );
+                },
+              ),
+              AnimatedSize(
+                duration: CoachlyAthleteTheme.expandDuration,
+                alignment: Alignment.topCenter,
+                child: showTargetLoad
+                    ? WorkoutBuilderUnderlineField(
+                        controller: load,
+                        focusNode: loadFocus,
+                        label: context.tr('workout.detail.target_load'),
+                        hint: context.tr('workout.builder.from_history'),
+                        helper: context.tr('workout.builder.optional'),
+                        maxLength: 8,
+                        textInputAction: TextInputAction.next,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                        ],
+                        suffixText: widget.initial.loadUnit,
+                        onChanged: (_) {},
+                      )
+                    : const SizedBox.shrink(),
               ),
               const SizedBox(height: 22),
               _SheetSectionLabel(context.tr('workout.builder.notes_title')),
-              const SizedBox(height: 10),
-              WorkoutBuilderUnderlineField(
-                controller: notes,
-                focusNode: notesFocus,
+              _OptionalFieldAction(
+                expanded: showNotes,
                 label: context.tr('workout.builder.add_notes'),
-                hint: context.tr('workout.builder.notes_hint'),
-                helper: context.tr('workout.builder.optional'),
-                minLines: 2,
-                maxLines: 4,
-                maxLength: 300,
-                textInputAction: TextInputAction.done,
-                onChanged: (_) {},
+                onPressed: () {
+                  setState(() => showNotes = true);
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => notesFocus.requestFocus(),
+                  );
+                },
+              ),
+              AnimatedSize(
+                duration: CoachlyAthleteTheme.expandDuration,
+                alignment: Alignment.topCenter,
+                child: showNotes
+                    ? WorkoutBuilderUnderlineField(
+                        controller: notes,
+                        focusNode: notesFocus,
+                        label: context.tr('workout.builder.notes_title'),
+                        hint: context.tr('workout.builder.notes_hint'),
+                        helper: context.tr('workout.builder.optional'),
+                        minLines: 2,
+                        maxLines: 4,
+                        maxLength: 300,
+                        textInputAction: TextInputAction.done,
+                        onChanged: (_) {},
+                      )
+                    : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -2051,6 +2085,42 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
         ),
       ),
     ],
+  );
+}
+
+class _OptionalFieldAction extends StatelessWidget {
+  final bool expanded;
+  final String label;
+  final VoidCallback onPressed;
+
+  const _OptionalFieldAction({
+    required this.expanded,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) => AnimatedSize(
+    duration: CoachlyAthleteTheme.expandDuration,
+    alignment: Alignment.topLeft,
+    child: expanded
+        ? const SizedBox(height: 10)
+        : Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: onPressed,
+              style: TextButton.styleFrom(
+                foregroundColor: context.exerciseTheme.primary,
+                minimumSize: const Size(
+                  CoachlyAthleteTheme.touchTarget,
+                  CoachlyAthleteTheme.touchTarget,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+              ),
+              icon: const Icon(Icons.add_rounded, size: 20),
+              label: Text(label),
+            ),
+          ),
   );
 }
 

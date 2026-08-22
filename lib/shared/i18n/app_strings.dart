@@ -264,6 +264,10 @@ class AppStrings {
       'en': 'TARGET LOAD',
       'it': 'CARICO TARGET',
     },
+    'workout.builder.set_target_load': {
+      'en': 'Set target load',
+      'it': 'Imposta carico target',
+    },
     'workout.builder.from_history': {
       'en': 'From history',
       'it': 'Dallo storico',

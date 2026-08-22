@@ -959,6 +959,7 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
   int restAfterRoundSeconds = 90;
   final notesController = TextEditingController();
   final notesFocus = FocusNode();
+  bool showNotes = false;
 
   @override
   void dispose() {
@@ -1037,6 +1038,10 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
             width: double.infinity,
             height: CoachlyAthleteTheme.touchTarget,
             child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: context.exerciseTheme.primary,
+                foregroundColor: context.exerciseTheme.background,
+              ),
               onPressed: _primaryAction,
               child: Text(
                 context.tr(
@@ -1112,6 +1117,8 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
           child: CheckboxListTile(
             value: checked,
             enabled: !unavailable,
+            activeColor: context.exerciseTheme.primary,
+            checkColor: context.exerciseTheme.background,
             contentPadding: EdgeInsets.zero,
             controlAffinity: ListTileControlAffinity.leading,
             title: Text(candidate.item.exercise.name),
@@ -1168,17 +1175,28 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
         onChanged: (value) => setState(() => restAfterRoundSeconds = value),
       ),
       const SizedBox(height: 12),
-      WorkoutBuilderUnderlineField(
-        controller: notesController,
-        focusNode: notesFocus,
-        label: context.tr('workout.builder.notes_title'),
-        hint: context.tr('workout.builder.notes_hint'),
-        helper: context.tr('workout.builder.optional'),
-        minLines: 2,
-        maxLines: 4,
-        maxLength: 300,
-        textInputAction: TextInputAction.done,
-        onChanged: (_) {},
+      _BlockOptionalFieldAction(
+        expanded: showNotes,
+        title: context.tr('workout.builder.notes_title'),
+        actionLabel: context.tr('workout.builder.add_notes'),
+        onPressed: () {
+          setState(() => showNotes = true);
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => notesFocus.requestFocus(),
+          );
+        },
+        child: WorkoutBuilderUnderlineField(
+          controller: notesController,
+          focusNode: notesFocus,
+          label: context.tr('workout.builder.notes_title'),
+          hint: context.tr('workout.builder.notes_hint'),
+          helper: context.tr('workout.builder.optional'),
+          minLines: 2,
+          maxLines: 4,
+          maxLength: 300,
+          textInputAction: TextInputAction.done,
+          onChanged: (_) {},
+        ),
       ),
       const SizedBox(height: 12),
       CoachlySurface(
@@ -1250,6 +1268,57 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
   };
 
   bool get _selectionComplete => selected.length >= _requiredCount;
+}
+
+class _BlockOptionalFieldAction extends StatelessWidget {
+  final bool expanded;
+  final String title;
+  final String actionLabel;
+  final VoidCallback onPressed;
+  final Widget child;
+
+  const _BlockOptionalFieldAction({
+    required this.expanded,
+    required this.title,
+    required this.actionLabel,
+    required this.onPressed,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          color: context.exerciseTheme.textSecondary,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          letterSpacing: .7,
+        ),
+      ),
+      AnimatedSize(
+        duration: CoachlyAthleteTheme.expandDuration,
+        alignment: Alignment.topCenter,
+        child: expanded
+            ? Padding(padding: const EdgeInsets.only(top: 10), child: child)
+            : TextButton.icon(
+                onPressed: onPressed,
+                style: TextButton.styleFrom(
+                  foregroundColor: context.exerciseTheme.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  minimumSize: const Size(
+                    CoachlyAthleteTheme.touchTarget,
+                    CoachlyAthleteTheme.touchTarget,
+                  ),
+                ),
+                icon: const Icon(Icons.add_rounded, size: 20),
+                label: Text(actionLabel),
+              ),
+      ),
+    ],
+  );
 }
 
 class _BlockStepper extends StatelessWidget {
