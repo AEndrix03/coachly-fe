@@ -688,52 +688,29 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
 
   Future<void> _createBlock() async {
     final draft = ref.read(createWorkoutControllerProvider).draft;
-    final candidates = <_BlockCandidate>[];
-    for (final section in draft.sections) {
-      for (final item in section.items.whereType<WorkoutExerciseItemDraft>()) {
-        candidates.add(_BlockCandidate(sectionId: section.id, item: item));
-      }
-    }
-    if (candidates.isEmpty) {
-      await _addExercise(null);
-      return;
-    }
-    final selection = await showModalBottomSheet<_BlockSelection>(
-      context: context,
-      useSafeArea: true,
-      isScrollControlled: true,
-      backgroundColor: context.exerciseTheme.surfaceElevated,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => _CreateBlockSheet(
-        candidates: candidates,
-        onAddExercise: (sectionId) async {
-          final exercise = await _addExercise(sectionId);
-          if (exercise == null) return null;
-          final state = ref.read(createWorkoutControllerProvider);
-          final section = state.draft.sections.firstWhere(
-            (entry) => entry.items.any((item) => item.id == exercise.localId),
-          );
-          return _BlockCandidate(
-            sectionId: section.id,
-            item: WorkoutExerciseItemDraft(exercise),
-          );
-        },
-      ),
-    );
-    if (selection == null || !mounted) return;
-    ref
-        .read(createWorkoutControllerProvider.notifier)
-        .createGroup(
-          type: selection.type,
-          itemIds: selection.itemIds,
-          rounds: selection.rounds,
-          restBetweenExercisesSeconds: selection.restBetweenExercisesSeconds,
-          restAfterRoundSeconds: selection.restAfterRoundSeconds,
-          notes: selection.notes,
+    await showWorkoutBlockCreationFlow(
+      context,
+      draft: draft,
+      onAddExercise: (sectionId) async {
+        final exercise = await _addExercise(sectionId);
+        if (exercise == null) return null;
+        final latest = ref.read(createWorkoutControllerProvider).draft;
+        final section = latest.sections.firstWhere(
+          (entry) => entry.items.any((item) => item.id == exercise.localId),
         );
-    HapticFeedback.lightImpact();
+        return (sectionId: section.id, exercise: exercise);
+      },
+      onCreate: (selection) => ref
+          .read(createWorkoutControllerProvider.notifier)
+          .createGroup(
+            type: selection.type,
+            itemIds: selection.itemIds,
+            rounds: selection.rounds,
+            restBetweenExercisesSeconds: selection.restBetweenExercisesSeconds,
+            restAfterRoundSeconds: selection.restAfterRoundSeconds,
+            notes: selection.notes,
+          ),
+    );
   }
 
   Future<void> _commit() async {
@@ -950,6 +927,70 @@ class _BlockCandidate {
   final String sectionId;
   final WorkoutExerciseItemDraft item;
   const _BlockCandidate({required this.sectionId, required this.item});
+}
+
+typedef WorkoutBlockExerciseInsertion = ({
+  String sectionId,
+  WorkoutExerciseDraft exercise,
+});
+
+typedef WorkoutBlockCreationSelection = ({
+  WorkoutGroupType type,
+  List<String> itemIds,
+  int rounds,
+  int restBetweenExercisesSeconds,
+  int restAfterRoundSeconds,
+  String? notes,
+});
+
+Future<void> showWorkoutBlockCreationFlow(
+  BuildContext context, {
+  required WorkoutDraft draft,
+  required Future<WorkoutBlockExerciseInsertion?> Function(String? sectionId)
+  onAddExercise,
+  required ValueChanged<WorkoutBlockCreationSelection> onCreate,
+}) async {
+  final candidates = <_BlockCandidate>[];
+  for (final section in draft.sections) {
+    for (final item in section.items.whereType<WorkoutExerciseItemDraft>()) {
+      candidates.add(_BlockCandidate(sectionId: section.id, item: item));
+    }
+  }
+  if (candidates.isEmpty) {
+    await onAddExercise(null);
+    return;
+  }
+  if (!context.mounted) return;
+  final selection = await showModalBottomSheet<_BlockSelection>(
+    context: context,
+    useSafeArea: true,
+    isScrollControlled: true,
+    backgroundColor: context.exerciseTheme.surfaceElevated,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (_) => _CreateBlockSheet(
+      candidates: candidates,
+      onAddExercise: (sectionId) async {
+        final inserted = await onAddExercise(sectionId);
+        if (inserted == null) return null;
+        return _BlockCandidate(
+          sectionId: inserted.sectionId,
+          item: WorkoutExerciseItemDraft(inserted.exercise),
+        );
+      },
+    ),
+  );
+  if (selection == null || !context.mounted) return;
+  onCreate((
+    type: selection.type,
+    itemIds: selection.itemIds,
+    rounds: selection.rounds,
+    restBetweenExercisesSeconds: selection.restBetweenExercisesSeconds,
+    restAfterRoundSeconds: selection.restAfterRoundSeconds,
+    notes: selection.notes,
+  ));
+  HapticFeedback.lightImpact();
 }
 
 class _BlockSelection {

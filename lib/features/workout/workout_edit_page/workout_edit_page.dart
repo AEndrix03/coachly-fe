@@ -1,4 +1,5 @@
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
+import 'package:coachly/features/workout/workout_builder/create_workout_flow.dart';
 import 'package:coachly/features/workout/workout_builder/providers/workout_builder_providers.dart';
 import 'package:coachly/features/workout/workout_builder/widgets/workout_builder_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
@@ -562,85 +563,39 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
   }
 
   Future<void> _createGroup() async {
-    final candidates = ref
+    final draft = ref
         .read(editWorkoutControllerProvider(widget.workoutId))
-        .draft
-        .sections
-        .expand((s) => s.items)
-        .whereType<WorkoutExerciseItemDraft>()
-        .toList();
-    if (candidates.length < 2) return;
-    final selected = <String>{};
-    final notesController = TextEditingController();
-    final ok = await showModalBottomSheet<bool>(
-      context: context,
-      useSafeArea: true,
-      isScrollControlled: true,
-      backgroundColor: context.exerciseTheme.surfaceElevated,
-      builder: (context) => StatefulBuilder(
-        builder: (context, update) => Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                context.tr('workout.builder.create_superset'),
-                style: TextStyle(
-                  color: context.exerciseTheme.textPrimary,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              ...candidates.map(
-                (item) => CheckboxListTile(
-                  value: selected.contains(item.id),
-                  activeColor: context.exerciseTheme.primary,
-                  checkColor: context.exerciseTheme.background,
-                  title: Text(item.exercise.name),
-                  onChanged: (value) => update(
-                    () => value == true
-                        ? selected.add(item.id)
-                        : selected.remove(item.id),
-                  ),
-                ),
-              ),
-              TextField(
-                controller: notesController,
-                minLines: 2,
-                maxLines: 4,
-                maxLength: 300,
-                decoration: InputDecoration(
-                  labelText: context.tr('workout.builder.add_notes'),
-                  hintText: context.tr('workout.builder.notes_hint'),
-                ),
-              ),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: context.exerciseTheme.primary,
-                  foregroundColor: context.exerciseTheme.background,
-                ),
-                onPressed: selected.length > 1
-                    ? () => Navigator.pop(context, true)
-                    : null,
-                child: Text(context.tr('workout.builder.add_superset')),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    final notes = notesController.text.trim();
-    notesController.dispose();
-    if (ok == true) {
-      ref
+        .draft;
+    await showWorkoutBlockCreationFlow(
+      context,
+      draft: draft,
+      onAddExercise: (sectionId) async {
+        await _addExercise(sectionId);
+        final latest = ref
+            .read(editWorkoutControllerProvider(widget.workoutId))
+            .draft;
+        final beforeIds = draft.items.map((item) => item.id).toSet();
+        final added = latest.items
+            .whereType<WorkoutExerciseItemDraft>()
+            .where((item) => !beforeIds.contains(item.id))
+            .lastOrNull;
+        if (added == null) return null;
+        final section = latest.sections.firstWhere(
+          (entry) => entry.items.any((item) => item.id == added.id),
+        );
+        return (sectionId: section.id, exercise: added.exercise);
+      },
+      onCreate: (selection) => ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
           .createGroup(
-            type: WorkoutGroupType.superset,
-            itemIds: selected.toList(),
-            notes: notes.isEmpty ? null : notes,
-          );
-    }
+            type: selection.type,
+            itemIds: selection.itemIds,
+            rounds: selection.rounds,
+            restBetweenExercisesSeconds: selection.restBetweenExercisesSeconds,
+            restAfterRoundSeconds: selection.restAfterRoundSeconds,
+            notes: selection.notes,
+          ),
+    );
   }
 
   Future<void> _commit() async {
