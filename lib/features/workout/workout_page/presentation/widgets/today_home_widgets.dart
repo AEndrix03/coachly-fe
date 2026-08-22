@@ -417,36 +417,13 @@ class AtAGlanceSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final sideBySide =
-          constraints.maxWidth >= 680 &&
-          MediaQuery.textScalerOf(context).scale(1) <= 1.2;
-      if (sideBySide)
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: CalendarFeatureCard(data: calendar)),
-            const SizedBox(width: 12),
-            Expanded(child: GoalFeatureCard(data: goal)),
-          ],
-        );
-      final width = (constraints.maxWidth * .86).clamp(280.0, 390.0);
-      return SizedBox(
-        height: goal.hasGoal ? 238 : 210,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          children: [
-            SizedBox(
-              width: width,
-              child: CalendarFeatureCard(data: calendar),
-            ),
-            const SizedBox(width: 12),
-            SizedBox(
-              width: width,
-              child: GoalFeatureCard(data: goal),
-            ),
-          ],
-        ),
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(flex: 6, child: CalendarFeatureCard(data: calendar)),
+          const SizedBox(width: 10),
+          Expanded(flex: 5, child: GoalFeatureCard(data: goal)),
+        ],
       );
     },
   );
@@ -461,30 +438,35 @@ class CalendarFeatureCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _Eyebrow(context.tr('home.calendar.title')),
-        const SizedBox(height: 16),
+        const SizedBox(height: 7),
+        Text(
+          MaterialLocalizations.of(
+            context,
+          ).formatMonthYear(data.days.first.date),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: context.exerciseTheme.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 13),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: data.days.map((day) => _CalendarDay(data: day)).toList(),
+          children: data.days
+              .map((day) => Expanded(child: _CalendarDay(data: day)))
+              .toList(),
         ),
         if (data.nextWorkoutTitle != null) ...[
-          const SizedBox(height: 17),
-          Text(
-            context.tr('home.calendar.next').toUpperCase(),
-            style: TextStyle(
-              color: context.exerciseTheme.textSecondary,
-              fontSize: 10,
-              letterSpacing: .8,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 12),
           Text(
             '${data.nextWorkoutTitle} · ${data.nextWorkoutWhen}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: context.exerciseTheme.textPrimary,
-              fontWeight: FontWeight.w700,
+              color: context.exerciseTheme.textSecondary,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -506,34 +488,39 @@ class _CalendarDay extends StatelessWidget {
         children: [
           Text(
             l.narrowWeekdays[data.date.weekday % 7],
+            maxLines: 1,
             style: TextStyle(
               color: context.exerciseTheme.textSecondary,
-              fontSize: 10,
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Container(
-            width: 29,
-            height: 29,
+            width: 22,
+            height: 22,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: data.isToday
-                  ? context.exerciseTheme.primary
+                  ? context.exerciseTheme.primaryMuted.withValues(alpha: .38)
                   : Colors.transparent,
               shape: BoxShape.circle,
+              border: data.isToday
+                  ? Border.all(color: context.exerciseTheme.primary, width: 1.5)
+                  : null,
             ),
             child: Text(
               '${data.date.day}',
               style: TextStyle(
                 color: data.isToday
-                    ? context.exerciseTheme.background
+                    ? context.exerciseTheme.primary
                     : context.exerciseTheme.textPrimary,
                 fontWeight: FontWeight.w700,
-                fontSize: 12,
+                fontSize: 10,
               ),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Icon(
             data.isComplete
                 ? Icons.check_rounded
@@ -545,7 +532,7 @@ class _CalendarDay extends StatelessWidget {
             color: data.isToday || data.isComplete
                 ? context.exerciseTheme.primary
                 : context.exerciseTheme.textSecondary,
-            size: data.isToday ? 7 : 12,
+            size: data.isToday ? 6 : 10,
           ),
         ],
       ),
