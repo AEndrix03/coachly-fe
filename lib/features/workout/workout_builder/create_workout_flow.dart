@@ -378,11 +378,11 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
   Future<WorkoutExerciseDraft?> _addExercise(String? sectionId) async {
     var destinationId = sectionId;
     if (destinationId == null) {
-      destinationId = await showWorkoutSectionPicker(
-        context,
-        ref.read(createWorkoutControllerProvider).draft.sections,
-      );
-      if (destinationId == null || !mounted) return null;
+      final sections = ref.read(createWorkoutControllerProvider).draft.sections;
+      if (sections.isNotEmpty) {
+        destinationId = await showWorkoutSectionPicker(context, sections);
+        if (destinationId == null || !mounted) return null;
+      }
     }
     WorkoutExerciseDraft? picked;
     await showModalBottomSheet<void>(
