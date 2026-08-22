@@ -1869,6 +1869,177 @@ class AppStrings {
       'it':
           'Questo modello è troppo grande per la RAM disponibile sul tuo dispositivo. Scegli un modello meno potente dalle impostazioni del profilo.',
     },
+    'home.header.greeting': {'en': 'Hi, {name}', 'it': 'Ciao, {name}'},
+    'home.header.greeting_generic': {'en': 'Hi', 'it': 'Ciao'},
+    'home.header.subtitle': {
+      'en': 'Ready to train?',
+      'it': 'Pronto ad allenarti?',
+    },
+    'home.sync.offline': {'en': 'Offline', 'it': 'Offline'},
+    'home.sync.syncing': {'en': 'Syncing…', 'it': 'Sincronizzazione…'},
+    'home.today.title': {'en': 'Today', 'it': 'Oggi'},
+    'home.today.in_progress': {
+      'en': 'Workout in progress',
+      'it': 'Allenamento in corso',
+    },
+    'home.today.planned_break': {
+      'en': 'Planned break',
+      'it': 'Pausa programmata',
+    },
+    'home.today.program_paused': {
+      'en': 'Programming paused',
+      'it': 'Programmazione in pausa',
+    },
+    'home.today.recovery_day': {
+      'en': 'Recovery day',
+      'it': 'Giorno di recupero',
+    },
+    'home.today.start_workout': {
+      'en': 'Start workout',
+      'it': 'Inizia allenamento',
+    },
+    'home.today.resume_workout': {'en': 'Resume', 'it': 'Riprendi'},
+    'home.today.training_metadata': {
+      'en': '~{minutes} min · {sets} working sets',
+      'it': '~{minutes} min · {sets} serie allenanti',
+    },
+    'home.today.progress_metadata': {
+      'en': '{minutes} min · {done} / {total} exercises',
+      'it': '{minutes} min · {done} / {total} esercizi',
+    },
+    'home.today.next_session': {
+      'en': 'Next session: {workout} · {date}',
+      'it': 'Prossima sessione: {workout} · {date}',
+    },
+    'home.empty.title': {
+      'en': 'Start training with Coachly',
+      'it': 'Inizia ad allenarti con Coachly',
+    },
+    'home.empty.body': {
+      'en': 'Create a routine, build a program, or record a free workout.',
+      'it':
+          'Crea una routine, costruisci un programma o registra un workout libero.',
+    },
+    'home.cycle.position': {
+      'en': 'Cycle {position} of {length}',
+      'it': 'Ciclo {position} di {length}',
+    },
+    'home.cycle.semantics': {
+      'en': 'Cycle {position} of {length}, {percent}% complete',
+      'it': 'Ciclo {position} di {length}, completato al {percent}%',
+    },
+    'home.calendar.title': {'en': 'Calendar', 'it': 'Calendario'},
+    'home.calendar.next': {'en': 'Next', 'it': 'Prossimo'},
+    'home.calendar.today': {'en': 'Today', 'it': 'Oggi'},
+    'home.calendar.cycle': {
+      'en': 'Day {position} of a {length}-day cycle',
+      'it': 'Giorno {position} di un ciclo di {length} giorni',
+    },
+    'home.goal.title': {'en': 'Main goal', 'it': 'Obiettivo principale'},
+    'home.goal.baseline': {
+      'en': 'Building your baseline',
+      'it': 'Baseline in costruzione',
+    },
+    'home.goal.empty_title': {
+      'en': 'Set your first goal',
+      'it': 'Imposta il tuo primo obiettivo',
+    },
+    'home.goal.empty_body': {
+      'en': 'Your next concrete milestone will appear here.',
+      'it': 'Il tuo prossimo traguardo concreto apparirà qui.',
+    },
+    'home.insights.title': {'en': 'Coachly Insights', 'it': 'Coachly Insights'},
+    'home.insights.learning_title': {
+      'en': 'Coachly is learning from your training',
+      'it': 'Coachly sta imparando dal tuo allenamento',
+    },
+    'home.insights.learning_body': {
+      'en': 'Complete a few sessions to receive personalized guidance.',
+      'it': 'Completa alcune sessioni per ricevere indicazioni personalizzate.',
+    },
+    'home.insight.progression_title': {
+      'en': 'Ready to progress',
+      'it': 'Pronto ad aumentare',
+    },
+    'home.insight.progression_body': {
+      'en': 'One of your routines is close to its progression target.',
+      'it': 'Una delle tue routine è vicina al target di progressione.',
+    },
+    'home.insight.progression_specific': {
+      'en':
+          'You are close to the progression target. Complete the next comparable session to confirm the increase.',
+      'it':
+          'Sei vicino al target di progressione. Completa la prossima sessione comparabile per confermare l’aumento.',
+    },
+    'home.insight.consistency_title': {
+      'en': 'Your path is taking shape',
+      'it': 'Il tuo percorso prende forma',
+    },
+    'home.insight.consistency_body': {
+      'en':
+          'Keep recording comparable sessions to make suggestions more precise.',
+      'it':
+          'Continua a registrare sessioni comparabili per rendere i suggerimenti più precisi.',
+    },
+    'home.actions.title': {'en': 'Quick actions', 'it': 'Azioni rapide'},
+    'home.action.create_workout': {
+      'en': 'Create workout',
+      'it': 'Crea workout',
+    },
+    'home.action.create_exercise': {
+      'en': 'Create exercise',
+      'it': 'Crea esercizio',
+    },
+    'home.action.empty_workout': {'en': 'Empty workout', 'it': 'Workout vuoto'},
+    'home.guides.title': {'en': 'Coachly Guides', 'it': 'Coachly Guides'},
+    'home.guide.double_progression': {
+      'en': 'How double progression works',
+      'it': 'Come funziona la double progression',
+    },
+    'home.guide.rir': {
+      'en': 'What RIR really means',
+      'it': 'Cosa significa davvero RIR',
+    },
+    'home.guide.machines': {
+      'en': 'Why machine loads are not comparable',
+      'it': 'Perché i carichi delle macchine non sono comparabili',
+    },
+    'home.guide.nine_day_cycle': {
+      'en': 'Build a nine-day training cycle',
+      'it': 'Costruire un ciclo di allenamento di 9 giorni',
+    },
+    'home.guide.beginner': {'en': 'Beginner', 'it': 'Principiante'},
+    'home.guide.intermediate': {'en': 'Intermediate', 'it': 'Intermedio'},
+    'home.guide.all_levels': {'en': 'All levels', 'it': 'Tutti i livelli'},
+    'home.routines.title': {'en': 'Your routines', 'it': 'Le tue routine'},
+    'home.routines.metadata': {
+      'en': '{exercises} exercises · ~{minutes} min',
+      'it': '{exercises} esercizi · ~{minutes} min',
+    },
+    'home.routines.last_yesterday': {
+      'en': 'Last: yesterday',
+      'it': 'Ultimo: ieri',
+    },
+    'home.routines.last_days': {
+      'en': 'Last: {days} days ago',
+      'it': 'Ultimo: {days} giorni fa',
+    },
+    'home.routines.empty_title': {
+      'en': 'Create your first routine',
+      'it': 'Crea la tua prima routine',
+    },
+    'home.routines.empty_body': {
+      'en': 'Turn your next session into a reusable plan.',
+      'it': 'Trasforma la prossima sessione in un piano riutilizzabile.',
+    },
+    'home.error.title': {
+      'en': 'Your local data could not be opened',
+      'it': 'Non è stato possibile aprire i dati locali',
+    },
+    'home.error.body': {
+      'en': 'Pull down to try again.',
+      'it': 'Trascina verso il basso per riprovare.',
+    },
   };
 
   static Locale normalizeLocale(Locale locale) {
