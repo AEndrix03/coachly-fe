@@ -127,14 +127,12 @@ class _WorkoutGoalSectionState extends State<WorkoutGoalSection> {
 
 class WorkoutStructure extends StatelessWidget {
   final WorkoutDetailViewData workout;
-  final VoidCallback onEdit;
   final ValueChanged<WorkoutExerciseViewData> onOpenExercise;
   final VoidCallback onAddExercise;
 
   const WorkoutStructure({
     super.key,
     required this.workout,
-    required this.onEdit,
     required this.onOpenExercise,
     required this.onAddExercise,
   });
@@ -146,13 +144,7 @@ class WorkoutStructure extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CoachlySectionHeader(
-            title: context.tr('workout.detail.structure'),
-            actionLabel: workout.exerciseCount == 0
-                ? null
-                : context.tr('common.edit'),
-            onAction: onEdit,
-          ),
+          CoachlySectionHeader(title: context.tr('workout.detail.structure')),
           if (workout.exerciseCount == 0)
             _EmptyWorkout(onAddExercise: onAddExercise)
           else

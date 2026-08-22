@@ -181,7 +181,6 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
                     SliverToBoxAdapter(
                       child: WorkoutStructure(
                         workout: viewData,
-                        onEdit: () => _openBuilderEdit(resolved),
                         onOpenExercise: (exercise) => context.push(
                           '/workouts/workout/${resolved.id}/workout_exercise_page/${exercise.exerciseId}',
                         ),
