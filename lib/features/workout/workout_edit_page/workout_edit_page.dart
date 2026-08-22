@@ -276,41 +276,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                   hint: context.tr('workout.builder.title_hint'),
                 ),
                 const SizedBox(height: 18),
-                Text(
-                  context.tr('workout.builder.goal_label'),
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: context.exerciseTheme.textSecondary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SegmentedButton<String>(
-                  showSelectedIcon: false,
-                  segments: ['hypertrophy', 'strength', 'general']
-                      .map(
-                        (value) => ButtonSegment(
-                          value: value,
-                          label: Text(
-                            context.tr('workout.builder.goal_$value'),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  selected: {goal ?? 'general'},
-                  onSelectionChanged: (value) =>
-                      setSheetState(() => goal = value.first),
-                  style: ButtonStyle(
-                    foregroundColor: WidgetStateProperty.resolveWith(
-                      (states) => states.contains(WidgetState.selected)
-                          ? context.exerciseTheme.background
-                          : context.exerciseTheme.textSecondary,
-                    ),
-                    backgroundColor: WidgetStateProperty.resolveWith(
-                      (states) => states.contains(WidgetState.selected)
-                          ? context.exerciseTheme.primary
-                          : context.exerciseTheme.surface,
-                    ),
-                  ),
+                WorkoutGoalSelector(
+                  selectedGoal: goal,
+                  onSelected: (value) => setSheetState(() => goal = value),
                 ),
                 const SizedBox(height: 16),
                 Text(

@@ -134,6 +134,159 @@ class _WorkoutBuilderUnderlineFieldState
   }
 }
 
+class WorkoutGoalSelector extends StatelessWidget {
+  final String? selectedGoal;
+  final ValueChanged<String> onSelected;
+  final VoidCallback? onInfo;
+
+  const WorkoutGoalSelector({
+    super.key,
+    required this.selectedGoal,
+    required this.onSelected,
+    this.onInfo,
+  });
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          Text(
+            context.tr('workout.builder.goal_label'),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: context.exerciseTheme.textSecondary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (onInfo != null)
+            IconButton(
+              onPressed: onInfo,
+              tooltip: context.tr('workout.builder.goal_info_tooltip'),
+              constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.help_outline, size: 18),
+              color: context.exerciseTheme.textSecondary,
+            ),
+        ],
+      ),
+      const SizedBox(height: 4),
+      _WorkoutGoalOption(
+        goal: 'hypertrophy',
+        icon: Icons.fitness_center_outlined,
+        selected: selectedGoal == 'hypertrophy',
+        onTap: onSelected,
+      ),
+      const SizedBox(height: 9),
+      _WorkoutGoalOption(
+        goal: 'strength',
+        icon: Icons.bolt_outlined,
+        selected: selectedGoal == 'strength',
+        onTap: onSelected,
+      ),
+      const SizedBox(height: 9),
+      _WorkoutGoalOption(
+        goal: 'general',
+        icon: Icons.track_changes_outlined,
+        selected: selectedGoal == 'general',
+        onTap: onSelected,
+      ),
+    ],
+  );
+}
+
+class _WorkoutGoalOption extends StatelessWidget {
+  final String goal;
+  final IconData icon;
+  final bool selected;
+  final ValueChanged<String> onTap;
+
+  const _WorkoutGoalOption({
+    required this.goal,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.exerciseTheme;
+    final title = context.tr('workout.builder.goal_$goal');
+    final description = context.tr('workout.builder.goal_${goal}_description');
+    return Semantics(
+      selected: selected,
+      button: true,
+      label: '$title. $description',
+      child: AnimatedContainer(
+        duration: MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : CoachlyAthleteTheme.expandDuration,
+        curve: CoachlyAthleteTheme.standardCurve,
+        decoration: BoxDecoration(
+          color: selected
+              ? colors.primaryMuted.withValues(alpha: .45)
+              : colors.surface,
+          borderRadius: BorderRadius.circular(CoachlyAthleteTheme.cardRadius),
+          border: Border.all(
+            color: selected ? colors.primary : colors.border,
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: InkWell(
+          onTap: () => onTap(goal),
+          borderRadius: BorderRadius.circular(CoachlyAthleteTheme.cardRadius),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 72),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    icon,
+                    size: 23,
+                    color: selected ? colors.primary : colors.textSecondary,
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                color: colors.textPrimary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          description,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: colors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (selected) ...[
+                    const SizedBox(width: 12),
+                    Icon(
+                      Icons.check_circle_outline,
+                      color: colors.primary,
+                      size: 21,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class WorkoutBuilderSummary extends StatelessWidget {
   final WorkoutDraft draft;
   final bool compact;
