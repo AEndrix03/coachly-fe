@@ -1,6 +1,86 @@
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_check/domain/workout_check_models.dart';
 
+class MuscleCoverageRule implements WorkoutCheckRule {
+  @override
+  String get id => 'muscle-coverage';
+
+  @override
+  bool supports(WorkoutCheckContext context) => context.exerciseDetails.values
+      .any((detail) => detail.muscles?.isNotEmpty == true);
+
+  @override
+  List<WorkoutCheckFinding> evaluate(WorkoutCheckContext context) {
+    final exposure = <String, int>{};
+    for (final exercise in context.draft.exercises) {
+      final detail = context.exerciseDetails[exercise.exerciseId];
+      for (final relation in detail?.muscles ?? const []) {
+        final muscle = relation.muscle;
+        if (muscle == null) continue;
+        exposure.update(
+          muscle.code,
+          (sets) => sets + exercise.sets,
+          ifAbsent: () => exercise.sets,
+        );
+      }
+    }
+    if (exposure.isEmpty) return const [];
+    final peak = exposure.entries.reduce((a, b) => a.value >= b.value ? a : b);
+    return [
+      WorkoutCheckFinding(
+        id: id,
+        category: WorkoutCheckCategory.muscleCoverage,
+        severity: WorkoutCheckSeverity.information,
+        titleKey: 'workout.check.coverage_title',
+        explanationKey: 'workout.check.coverage_body',
+        params: {'muscles': '${exposure.length}'},
+        evidence: [
+          WorkoutCheckEvidence(
+            'workout.check.evidence_peak_muscle',
+            params: {'muscle': peak.key, 'count': '${peak.value}'},
+          ),
+          const WorkoutCheckEvidence('workout.check.evidence_catalogue'),
+        ],
+      ),
+    ];
+  }
+}
+
+class MovementPatternRule implements WorkoutCheckRule {
+  @override
+  String get id => 'movement-profile';
+
+  @override
+  bool supports(WorkoutCheckContext context) => context.exerciseDetails.values
+      .any((detail) => detail.mechanicsType?.isNotEmpty == true);
+
+  @override
+  List<WorkoutCheckFinding> evaluate(WorkoutCheckContext context) {
+    final patterns = context.exerciseDetails.values
+        .map((detail) => detail.mechanicsType)
+        .whereType<String>()
+        .toSet();
+    return [
+      WorkoutCheckFinding(
+        id: id,
+        category: WorkoutCheckCategory.movementProfile,
+        severity: WorkoutCheckSeverity.information,
+        titleKey: 'workout.check.movement_title',
+        explanationKey: 'workout.check.movement_body',
+        params: {'count': '${patterns.length}'},
+        evidence: patterns
+            .map(
+              (pattern) => WorkoutCheckEvidence(
+                'workout.check.evidence_pattern',
+                params: {'pattern': pattern},
+              ),
+            )
+            .toList(),
+      ),
+    ];
+  }
+}
+
 class WorkoutStructureRule implements WorkoutCheckRule {
   @override
   String get id => 'structure';

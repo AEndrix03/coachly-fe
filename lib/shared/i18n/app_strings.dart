@@ -432,9 +432,41 @@ class AppStrings {
       'it':
           '{passed} controlli superati · {review} da rivedere · {missing} richiedono più dati',
     },
+    'workout.check.data_partial': {
+      'en':
+          'Some exercise metadata is not cached yet. The report only uses data available on this device.',
+      'it':
+          'Alcuni metadata degli esercizi non sono ancora salvati. Il report usa soltanto i dati disponibili su questo dispositivo.',
+    },
+    'workout.check.data_insufficient': {
+      'en':
+          'Detailed exercise metadata is not available locally yet. Structure and timing checks remain available.',
+      'it':
+          'I metadata dettagliati non sono ancora disponibili localmente. I controlli su struttura e tempi restano disponibili.',
+    },
     'workout.check.muscle_coverage': {
       'en': 'Muscle coverage',
       'it': 'Copertura muscolare',
+    },
+    'workout.check.coverage_title': {
+      'en': 'Muscle coverage is available',
+      'it': 'La copertura muscolare è disponibile',
+    },
+    'workout.check.coverage_body': {
+      'en':
+          'Coachly found catalogue muscle relations across {muscles} muscle areas. Treat set exposure as an orientation, not an exact physiological measure.',
+      'it':
+          'Coachly ha trovato relazioni di catalogo per {muscles} aree muscolari. Considera le serie coinvolte come orientamento, non come misura fisiologica esatta.',
+    },
+    'workout.check.movement_title': {
+      'en': 'Movement profile',
+      'it': 'Profilo di movimento',
+    },
+    'workout.check.movement_body': {
+      'en':
+          '{count} locally available movement profiles contribute to this workout.',
+      'it':
+          '{count} profili di movimento disponibili localmente contribuiscono a questa scheda.',
     },
     'workout.check.set_exposure': {
       'en': '{count} set exposure',
@@ -537,6 +569,18 @@ class AppStrings {
     'workout.check.evidence_muscles': {
       'en': '{count} shared muscle relations',
       'it': '{count} relazioni muscolari condivise',
+    },
+    'workout.check.evidence_peak_muscle': {
+      'en': '{muscle}: {count} related working sets',
+      'it': '{muscle}: {count} serie di lavoro correlate',
+    },
+    'workout.check.evidence_catalogue': {
+      'en': 'Locally cached catalogue muscle metadata',
+      'it': 'Metadata muscolari del catalogo salvati localmente',
+    },
+    'workout.check.evidence_pattern': {
+      'en': 'Movement profile: {pattern}',
+      'it': 'Profilo di movimento: {pattern}',
     },
     'workout.check.unavailable': {
       'en': 'Workout Check is temporarily unavailable.',

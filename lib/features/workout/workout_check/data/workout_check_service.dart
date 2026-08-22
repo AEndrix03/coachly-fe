@@ -10,6 +10,8 @@ class WorkoutCheckService {
 
   WorkoutCheckService(this.exerciseCache)
     : rules = [
+        MuscleCoverageRule(),
+        MovementPatternRule(),
         WorkoutStructureRule(),
         EstimatedDurationRule(),
         GoalAlignmentRule(),

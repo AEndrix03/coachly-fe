@@ -183,6 +183,20 @@ class _WorkoutCheckReportView extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
+        if (report.dataQuality != WorkoutCheckDataQuality.complete) ...[
+          const SizedBox(height: 10),
+          Text(
+            context.tr(
+              report.dataQuality == WorkoutCheckDataQuality.insufficient
+                  ? 'workout.check.data_insufficient'
+                  : 'workout.check.data_partial',
+            ),
+            style: TextStyle(
+              color: context.exerciseTheme.textSecondary,
+              height: 1.4,
+            ),
+          ),
+        ],
         if (muscles.isNotEmpty) ...[
           const SizedBox(height: 26),
           Text(
