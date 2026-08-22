@@ -239,18 +239,29 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
     _saveConfirmationOverlay?.remove();
     late final OverlayEntry overlay;
     overlay = OverlayEntry(
-      builder: (_) => Positioned.fill(
-        child: IgnorePointer(
-          child: RepaintBoundary(
-            child: CustomPaint(
-              painter: _WorkoutSavedBorderPainter(
-                animation: _saveConfirmationController,
-                color: CoachlyAthleteTheme.primary,
+      builder: (overlayContext) {
+        final safePadding = MediaQuery.viewPaddingOf(overlayContext);
+        return Positioned.fill(
+          child: IgnorePointer(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                CoachlyAthleteTheme.pagePadding.horizontal / 2,
+                safePadding.top + 8,
+                CoachlyAthleteTheme.pagePadding.horizontal / 2,
+                safePadding.bottom + 8,
+              ),
+              child: RepaintBoundary(
+                child: CustomPaint(
+                  painter: _WorkoutSavedBorderPainter(
+                    animation: _saveConfirmationController,
+                    color: CoachlyAthleteTheme.primary,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
     _saveConfirmationOverlay = overlay;
     Overlay.of(context, rootOverlay: true).insert(overlay);
