@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
@@ -418,6 +420,7 @@ class CreateWorkoutController extends _$CreateWorkoutController
       lastUsed: now,
       durationMinutes: state.draft.estimatedDurationMinutes,
       exercises: state.draft.exerciseCount,
+      workoutExercises: _localWorkoutExercises(state.draft, locale),
       programmingBlocks: WorkoutDraftProgrammingMapper.toProgramming(
         state.draft,
       ),
@@ -481,6 +484,11 @@ class EditWorkoutController extends _$EditWorkoutController
       type: state.draft.trainingGoal ?? source.type,
       durationMinutes: state.draft.estimatedDurationMinutes,
       exercises: state.draft.exerciseCount,
+      workoutExercises: _localWorkoutExercises(
+        state.draft,
+        locale,
+        source.workoutExercises,
+      ),
       programmingBlocks: WorkoutDraftProgrammingMapper.toProgramming(
         state.draft,
       ),
@@ -509,6 +517,48 @@ class EditWorkoutController extends _$EditWorkoutController
     return updated;
   }
 }
+
+List<WorkoutExerciseModel> _localWorkoutExercises(
+  WorkoutDraft draft,
+  String locale, [
+  List<WorkoutExerciseModel> existing = const [],
+]) {
+  final existingByExerciseId = {
+    for (final item in existing)
+      if (item.exercise.id?.isNotEmpty == true) item.exercise.id!: item,
+  };
+  return draft.sections
+      .expand((section) => section.items)
+      .expand((item) => item.exercises)
+      .map((exercise) {
+        final existingItem = existingByExerciseId[exercise.exerciseId];
+        final knownNames = existingItem?.exercise.nameI18n;
+        final exerciseDetail =
+            existingItem?.exercise.copyWith(
+              nameI18n: {...?knownNames, locale: exercise.name},
+            ) ??
+            ExerciseDetailModel(
+              id: exercise.exerciseId,
+              nameI18n: {locale: exercise.name},
+            );
+        final load = exercise.targetLoad;
+        return WorkoutExerciseModel(
+          id: exercise.localId,
+          exercise: exerciseDetail,
+          sets: '${exercise.sets}x${exercise.repTarget.compactLabel}',
+          rest: '${exercise.recoverySeconds}s',
+          weight: load == null
+              ? '-'
+              : '${_compactLoad(load)}${exercise.loadUnit}',
+          progress: existingItem?.progress ?? 0,
+        );
+      })
+      .toList();
+}
+
+String _compactLoad(double value) => value == value.roundToDouble()
+    ? value.toInt().toString()
+    : value.toStringAsFixed(1);
 
 WorkoutDraft _fromWorkout(WorkoutModel workout, dynamic locale) {
   final names = {
