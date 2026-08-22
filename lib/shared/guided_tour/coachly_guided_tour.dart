@@ -9,18 +9,20 @@ class CoachlyTourTargetRegistry {
 
   GlobalKey keyFor(Object id) => _keys.putIfAbsent(id, GlobalKey.new);
 
-  Future<void> ensureVisible(Object id) async {
+  Future<bool> ensureVisible(Object id, {double alignment = .42}) async {
     final context = _keys[id]?.currentContext;
-    if (context == null) return;
+    if (context == null) return false;
     await Scrollable.ensureVisible(
       context,
       duration: MediaQuery.disableAnimationsOf(context)
           ? Duration.zero
-          : const Duration(milliseconds: 260),
+          : const Duration(milliseconds: 340),
       curve: CoachlyAthleteTheme.standardCurve,
-      alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+      alignment: alignment,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
     );
     await WidgetsBinding.instance.endOfFrame;
+    return true;
   }
 
   Rect? rectFor(Object id, BuildContext overlayContext) {
@@ -115,6 +117,7 @@ class _CoachlyTourOverlayState extends State<CoachlyTourOverlay>
     duration: const Duration(milliseconds: 3600),
   );
   List<Rect> rects = const [];
+  int _resolutionId = 0;
 
   @override
   void initState() {
@@ -129,17 +132,26 @@ class _CoachlyTourOverlayState extends State<CoachlyTourOverlay>
   }
 
   Future<void> _resolveTargets() async {
+    final resolutionId = ++_resolutionId;
     borderController.stop();
-    for (final target in widget.step.targets) {
-      await widget.registry.ensureVisible(target);
+    if (mounted && rects.isNotEmpty) setState(() => rects = const []);
+
+    if (widget.step.targets.isNotEmpty) {
+      // The last target is the actionable anchor for multi-target steps.
+      // Centering it leaves room for the message card and avoids merely
+      // keeping a partially obscured element at the viewport edge.
+      await widget.registry.ensureVisible(widget.step.targets.last);
     }
-    if (!mounted) return;
+    if (!mounted || resolutionId != _resolutionId) return;
     await WidgetsBinding.instance.endOfFrame;
-    if (!mounted) return;
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted || resolutionId != _resolutionId) return;
+    final viewport = Offset.zero & MediaQuery.sizeOf(context);
     setState(() {
       rects = widget.step.targets
           .map((target) => widget.registry.rectFor(target, context))
           .whereType<Rect>()
+          .where((rect) => rect.overlaps(viewport))
           .map((rect) => rect.inflate(5))
           .toList();
     });
@@ -148,6 +160,7 @@ class _CoachlyTourOverlayState extends State<CoachlyTourOverlay>
 
   @override
   void dispose() {
+    _resolutionId++;
     borderController.dispose();
     super.dispose();
   }
