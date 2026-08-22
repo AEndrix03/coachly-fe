@@ -80,122 +80,143 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                   ),
                 ],
               ),
-              IconButton(
-                onPressed: state.isSaving || _source == null ? null : _commit,
-                tooltip: context.tr('common.confirm'),
-                icon: state.isSaving
-                    ? const SizedBox.square(
-                        dimension: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.check),
-              ),
             ],
           ),
           body: _source == null
               ? const Center(child: CircularProgressIndicator())
               : SafeArea(
                   top: false,
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
+                  child: Column(
                     children: [
-                      InkWell(
-                        onTap: _editMetadata,
-                        borderRadius: BorderRadius.circular(
-                          CoachlyAthleteTheme.compactRadius,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: WorkoutBuilderSummary(
-                                  draft: state.draft,
-                                  compact: true,
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.fromLTRB(20, 18, 20, 32),
+                          children: [
+                            InkWell(
+                              onTap: _editMetadata,
+                              borderRadius: BorderRadius.circular(
+                                CoachlyAthleteTheme.compactRadius,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: WorkoutBuilderSummary(
+                                        draft: state.draft,
+                                        compact: true,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.edit_outlined,
+                                      color:
+                                          context.exerciseTheme.textSecondary,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Icon(
-                                Icons.edit_outlined,
-                                color: context.exerciseTheme.textSecondary,
-                              ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 26),
+                            WorkoutDraftStructure(
+                              draft: state.draft,
+                              onEditExercise: _editExercise,
+                              onEditBlock: _editBlock,
+                              onUpdateExercise: ref
+                                  .read(
+                                    editWorkoutControllerProvider(
+                                      widget.workoutId,
+                                    ).notifier,
+                                  )
+                                  .updateExercise,
+                              onUpdateBlock: ref
+                                  .read(
+                                    editWorkoutControllerProvider(
+                                      widget.workoutId,
+                                    ).notifier,
+                                  )
+                                  .updateGroup,
+                              onOpenExercise: _openExerciseDetail,
+                              onReorder: (section, oldIndex, newIndex) => ref
+                                  .read(
+                                    editWorkoutControllerProvider(
+                                      widget.workoutId,
+                                    ).notifier,
+                                  )
+                                  .reorderInSection(
+                                    section,
+                                    oldIndex,
+                                    newIndex,
+                                  ),
+                              onReorderSections: ref
+                                  .read(
+                                    editWorkoutControllerProvider(
+                                      widget.workoutId,
+                                    ).notifier,
+                                  )
+                                  .reorderSections,
+                              onRemove: _removeItem,
+                              onRemoveExercise: ref
+                                  .read(
+                                    editWorkoutControllerProvider(
+                                      widget.workoutId,
+                                    ).notifier,
+                                  )
+                                  .removeExercise,
+                              onDuplicate: (id) => ref
+                                  .read(
+                                    editWorkoutControllerProvider(
+                                      widget.workoutId,
+                                    ).notifier,
+                                  )
+                                  .duplicateItem(id),
+                              onMove: _moveItem,
+                              onAddExercise: _addExercise,
+                              onAddSection: _addSection,
+                              onCreateBlock: _createGroup,
+                              onEditSection: _editSection,
+                              onUpdateSection: ref
+                                  .read(
+                                    editWorkoutControllerProvider(
+                                      widget.workoutId,
+                                    ).notifier,
+                                  )
+                                  .updateSection,
+                              onRemoveSection: ref
+                                  .read(
+                                    editWorkoutControllerProvider(
+                                      widget.workoutId,
+                                    ).notifier,
+                                  )
+                                  .removeSection,
+                            ),
+                            const SizedBox(height: 8),
+                            WorkoutStructureComposer(
+                              onAddExercise: () => _addExercise(null),
+                              onAddSection: _addSection,
+                              onCreateBlock: _createGroup,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 26),
-                      WorkoutDraftStructure(
-                        draft: state.draft,
-                        onEditExercise: _editExercise,
-                        onEditBlock: _editBlock,
-                        onUpdateExercise: ref
-                            .read(
-                              editWorkoutControllerProvider(
-                                widget.workoutId,
-                              ).notifier,
-                            )
-                            .updateExercise,
-                        onUpdateBlock: ref
-                            .read(
-                              editWorkoutControllerProvider(
-                                widget.workoutId,
-                              ).notifier,
-                            )
-                            .updateGroup,
-                        onOpenExercise: _openExerciseDetail,
-                        onReorder: (section, oldIndex, newIndex) => ref
-                            .read(
-                              editWorkoutControllerProvider(
-                                widget.workoutId,
-                              ).notifier,
-                            )
-                            .reorderInSection(section, oldIndex, newIndex),
-                        onReorderSections: ref
-                            .read(
-                              editWorkoutControllerProvider(
-                                widget.workoutId,
-                              ).notifier,
-                            )
-                            .reorderSections,
-                        onRemove: _removeItem,
-                        onRemoveExercise: ref
-                            .read(
-                              editWorkoutControllerProvider(
-                                widget.workoutId,
-                              ).notifier,
-                            )
-                            .removeExercise,
-                        onDuplicate: (id) => ref
-                            .read(
-                              editWorkoutControllerProvider(
-                                widget.workoutId,
-                              ).notifier,
-                            )
-                            .duplicateItem(id),
-                        onMove: _moveItem,
-                        onAddExercise: _addExercise,
-                        onAddSection: _addSection,
-                        onCreateBlock: _createGroup,
-                        onEditSection: _editSection,
-                        onUpdateSection: ref
-                            .read(
-                              editWorkoutControllerProvider(
-                                widget.workoutId,
-                              ).notifier,
-                            )
-                            .updateSection,
-                        onRemoveSection: ref
-                            .read(
-                              editWorkoutControllerProvider(
-                                widget.workoutId,
-                              ).notifier,
-                            )
-                            .removeSection,
-                      ),
-                      const SizedBox(height: 8),
-                      WorkoutStructureComposer(
-                        onAddExercise: () => _addExercise(null),
-                        onAddSection: _addSection,
-                        onCreateBlock: _createGroup,
+                      _EditSaveBar(
+                        summary: context.tr(
+                          'workout.builder.review_summary',
+                          params: {
+                            'exercises': context.tr(
+                              state.draft.exerciseCount == 1
+                                  ? 'workout.detail.exercise_count_one'
+                                  : 'workout.detail.exercise_count_other',
+                              params: {'count': '${state.draft.exerciseCount}'},
+                            ),
+                            'minutes':
+                                '${state.draft.estimatedDurationMinutes}',
+                          },
+                        ),
+                        loading: state.isSaving,
+                        enabled: state.isDirty && state.validation.isValid,
+                        onPressed: _commit,
                       ),
                     ],
                   ),
@@ -212,6 +233,11 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     var title = draft.title;
     var focus = draft.focus ?? '';
     var goal = draft.trainingGoal;
+    var showNotes = focus.trim().isNotEmpty;
+    final titleController = TextEditingController(text: title);
+    final notesController = TextEditingController(text: focus);
+    final titleFocus = FocusNode();
+    final notesFocus = FocusNode();
     final apply = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -239,45 +265,107 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextFormField(
-                  initialValue: title,
+                WorkoutBuilderUnderlineField(
+                  controller: titleController,
+                  focusNode: titleFocus,
                   maxLength: 60,
+                  textInputAction: TextInputAction.next,
                   onChanged: (value) => setSheetState(() => title = value),
-                  decoration: InputDecoration(
-                    labelText: context.tr('workout.builder.title_label'),
+                  label: context.tr('workout.builder.title_label'),
+                  hint: context.tr('workout.builder.title_hint'),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  context.tr('workout.builder.goal_label'),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: context.exerciseTheme.textSecondary,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  initialValue: goal,
-                  decoration: InputDecoration(
-                    labelText: context.tr('workout.builder.goal_label'),
-                  ),
-                  items: ['hypertrophy', 'strength', 'general']
+                SegmentedButton<String>(
+                  showSelectedIcon: false,
+                  segments: ['hypertrophy', 'strength', 'general']
                       .map(
-                        (value) => DropdownMenuItem(
+                        (value) => ButtonSegment(
                           value: value,
-                          child: Text(
+                          label: Text(
                             context.tr('workout.builder.goal_$value'),
                           ),
                         ),
                       )
                       .toList(),
-                  onChanged: (value) => setSheetState(() => goal = value),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  initialValue: focus,
-                  minLines: 2,
-                  maxLines: 4,
-                  maxLength: 180,
-                  onChanged: (value) => focus = value,
-                  decoration: InputDecoration(
-                    labelText: context.tr('workout.builder.focus_label'),
+                  selected: {goal ?? 'general'},
+                  onSelectionChanged: (value) =>
+                      setSheetState(() => goal = value.first),
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                          ? context.exerciseTheme.background
+                          : context.exerciseTheme.textSecondary,
+                    ),
+                    backgroundColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.selected)
+                          ? context.exerciseTheme.primary
+                          : context.exerciseTheme.surface,
+                    ),
                   ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  context.tr('workout.builder.session_note'),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: context.exerciseTheme.textSecondary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                AnimatedSize(
+                  duration: CoachlyAthleteTheme.expandDuration,
+                  alignment: Alignment.topCenter,
+                  child: showNotes
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: WorkoutBuilderUnderlineField(
+                            controller: notesController,
+                            focusNode: notesFocus,
+                            label: context.tr('workout.builder.session_note'),
+                            hint: context.tr('workout.builder.focus_hint'),
+                            helper: context.tr('workout.builder.optional'),
+                            minLines: 2,
+                            maxLines: 4,
+                            maxLength: 180,
+                            textInputAction: TextInputAction.done,
+                            onChanged: (value) => focus = value,
+                          ),
+                        )
+                      : Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            style: TextButton.styleFrom(
+                              foregroundColor: context.exerciseTheme.primary,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                            ),
+                            onPressed: () {
+                              setSheetState(() => showNotes = true);
+                              WidgetsBinding.instance.addPostFrameCallback(
+                                (_) => notesFocus.requestFocus(),
+                              );
+                            },
+                            icon: const Icon(Icons.add_rounded),
+                            label: Text(
+                              context.tr('workout.builder.add_session_note'),
+                            ),
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 18),
                 FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: context.exerciseTheme.primary,
+                    foregroundColor: context.exerciseTheme.background,
+                  ),
                   onPressed: title.trim().isEmpty
                       ? null
                       : () => Navigator.pop(context, true),
@@ -289,6 +377,10 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         ),
       ),
     );
+    titleController.dispose();
+    notesController.dispose();
+    titleFocus.dispose();
+    notesFocus.dispose();
     if (apply == true) {
       ref
           .read(editWorkoutControllerProvider(widget.workoutId).notifier)
@@ -503,6 +595,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               ...candidates.map(
                 (item) => CheckboxListTile(
                   value: selected.contains(item.id),
+                  activeColor: context.exerciseTheme.primary,
+                  checkColor: context.exerciseTheme.background,
                   title: Text(item.exercise.name),
                   onChanged: (value) => update(
                     () => value == true
@@ -522,6 +616,10 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                 ),
               ),
               FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: context.exerciseTheme.primary,
+                  foregroundColor: context.exerciseTheme.background,
+                ),
                 onPressed: selected.length > 1
                     ? () => Navigator.pop(context, true)
                     : null,
@@ -590,4 +688,63 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       context.pop();
     }
   }
+}
+
+class _EditSaveBar extends StatelessWidget {
+  final String summary;
+  final bool loading;
+  final bool enabled;
+  final VoidCallback onPressed;
+
+  const _EditSaveBar({
+    required this.summary,
+    required this.loading,
+    required this.enabled,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: EdgeInsets.fromLTRB(
+      20,
+      10,
+      20,
+      12 + MediaQuery.paddingOf(context).bottom,
+    ),
+    decoration: BoxDecoration(
+      color: context.exerciseTheme.background,
+      border: Border(top: BorderSide(color: context.exerciseTheme.border)),
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          summary,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: context.exerciseTheme.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          height: CoachlyAthleteTheme.primaryActionHeight,
+          child: FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: context.exerciseTheme.primary,
+              foregroundColor: context.exerciseTheme.background,
+              disabledBackgroundColor: context.exerciseTheme.surfaceElevated,
+              disabledForegroundColor: context.exerciseTheme.textSecondary,
+            ),
+            onPressed: enabled && !loading ? onPressed : null,
+            child: loading
+                ? const SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(context.tr('workout.builder.save_changes')),
+          ),
+        ),
+      ],
+    ),
+  );
 }
