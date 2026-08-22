@@ -12,6 +12,8 @@ class CoachlyTourTargetRegistry {
   Future<bool> ensureVisible(Object id, {double alignment = .42}) async {
     final context = _keys[id]?.currentContext;
     if (context == null) return false;
+    final renderObject = context.findRenderObject();
+    if (renderObject == null || !renderObject.attached) return false;
     await Scrollable.ensureVisible(
       context,
       duration: MediaQuery.disableAnimationsOf(context)
@@ -135,6 +137,11 @@ class _CoachlyTourOverlayState extends State<CoachlyTourOverlay>
     final resolutionId = ++_resolutionId;
     borderController.stop();
     if (mounted && rects.isNotEmpty) setState(() => rects = const []);
+
+    // A tour can be rebuilt during a hot reload or an AnimatedSize pass.
+    // Never start a scroll while a reorderable sliver is still attaching.
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted || resolutionId != _resolutionId) return;
 
     if (widget.step.targets.isNotEmpty) {
       // The last target is the actionable anchor for multi-target steps.

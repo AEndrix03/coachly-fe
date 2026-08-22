@@ -294,17 +294,13 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
               children: [
                 WorkoutBuilderSummary(draft: state.draft, compact: true),
                 const SizedBox(height: 26),
-                AnimatedSwitcher(
+                AnimatedSize(
                   duration: MediaQuery.disableAnimationsOf(context)
                       ? Duration.zero
                       : CoachlyAthleteTheme.expandDuration,
-                  switchInCurve: CoachlyAthleteTheme.standardCurve,
-                  transitionBuilder: (child, animation) => FadeTransition(
-                    opacity: animation,
-                    child: SizeTransition(sizeFactor: animation, child: child),
-                  ),
+                  curve: CoachlyAthleteTheme.standardCurve,
+                  alignment: Alignment.topCenter,
                   child: WorkoutDraftStructure(
-                    key: ValueKey(state.draft.exerciseCount == 0),
                     draft: state.draft,
                     onEditExercise: (exercise) =>
                         _editExercise(exercise, false),
