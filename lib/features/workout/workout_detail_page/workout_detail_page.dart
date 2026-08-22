@@ -38,6 +38,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
   final ValueNotifier<double> _scrollOffset = ValueNotifier(0);
   bool _editing = false;
   WorkoutModel? _latestWorkout;
+  OverlayEntry? _saveConfirmationOverlay;
   late final AnimationController _saveConfirmationController =
       AnimationController(
         vsync: this,
@@ -62,6 +63,8 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
       ..removeListener(_handleScroll)
       ..dispose();
     _scrollOffset.dispose();
+    _saveConfirmationOverlay?.remove();
+    _saveConfirmationOverlay = null;
     _saveConfirmationController.dispose();
     super.dispose();
   }
@@ -204,18 +207,6 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
                 ],
               ),
             ),
-            Positioned.fill(
-              child: IgnorePointer(
-                child: RepaintBoundary(
-                  child: CustomPaint(
-                    painter: _WorkoutSavedBorderPainter(
-                      animation: _saveConfirmationController,
-                      color: CoachlyAthleteTheme.primary,
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -245,14 +236,40 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
   }
 
   void _showSaveConfirmation() {
+    _saveConfirmationOverlay?.remove();
+    late final OverlayEntry overlay;
+    overlay = OverlayEntry(
+      builder: (_) => Positioned.fill(
+        child: IgnorePointer(
+          child: RepaintBoundary(
+            child: CustomPaint(
+              painter: _WorkoutSavedBorderPainter(
+                animation: _saveConfirmationController,
+                color: CoachlyAthleteTheme.primary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    _saveConfirmationOverlay = overlay;
+    Overlay.of(context, rootOverlay: true).insert(overlay);
+
+    void removeOverlay() {
+      if (_saveConfirmationOverlay != overlay) return;
+      overlay.remove();
+      _saveConfirmationOverlay = null;
+    }
+
     if (MediaQuery.disableAnimationsOf(context)) {
       _saveConfirmationController.value = .5;
       Future<void>.delayed(const Duration(milliseconds: 420), () {
         if (mounted) _saveConfirmationController.value = 0;
+        removeOverlay();
       });
       return;
     }
-    _saveConfirmationController.forward(from: 0);
+    _saveConfirmationController.forward(from: 0).whenComplete(removeOverlay);
   }
 
   Future<void> _handleBack() async {
