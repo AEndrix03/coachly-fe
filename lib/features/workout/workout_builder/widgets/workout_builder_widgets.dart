@@ -622,21 +622,27 @@ class _CollapsibleDraftSectionState extends State<_CollapsibleDraftSection> {
                         if (widget.editable &&
                             widget.onUpdateSection != null) ...[
                           const SizedBox(width: 8),
-                          IconButton(
-                            onPressed: () => _showItemActions(
-                              context,
-                              initialNotes: section.notes,
-                              onNotesChanged: (notes) =>
-                                  widget.onUpdateSection!(
-                                    section.copyWith(notes: notes),
-                                  ),
-                              onRemove: () =>
-                                  widget.onRemoveSection?.call(section.id),
+                          _OptionalTourTarget(
+                            id: BuilderTourTarget.mainSectionMenu,
+                            registry: section.kind == WorkoutSectionKind.main
+                                ? widget.tourRegistry
+                                : null,
+                            child: IconButton(
+                              onPressed: () => _showItemActions(
+                                context,
+                                initialNotes: section.notes,
+                                onNotesChanged: (notes) =>
+                                    widget.onUpdateSection!(
+                                      section.copyWith(notes: notes),
+                                    ),
+                                onRemove: () =>
+                                    widget.onRemoveSection?.call(section.id),
+                              ),
+                              tooltip: context.tr(
+                                'workout.builder.section_actions',
+                              ),
+                              icon: const Icon(Icons.more_horiz_rounded),
                             ),
-                            tooltip: context.tr(
-                              'workout.builder.section_actions',
-                            ),
-                            icon: const Icon(Icons.more_horiz_rounded),
                           ),
                         ],
                       ],

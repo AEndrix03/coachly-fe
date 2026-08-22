@@ -53,7 +53,7 @@ class CoachlyFloatingBubble extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Center(child: icon),
+            Center(child: IgnorePointer(child: icon)),
             if (statusMarker != null)
               Positioned(top: -2, right: -2, child: statusMarker!),
           ],

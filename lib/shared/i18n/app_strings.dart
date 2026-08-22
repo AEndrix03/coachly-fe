@@ -333,7 +333,7 @@ class AppStrings {
       'it': 'Inizia da un esercizio',
     },
     'workout.builder.tour_exercise_body': {
-      'en': 'Choose from the Coachly library — or create your own.',
+      'en': 'Choose from the Coachly library or create your own.',
       'it': 'Scegli dalla libreria Coachly oppure crea il tuo esercizio.',
     },
     'workout.builder.tour_sections_title': {
@@ -356,8 +356,8 @@ class AppStrings {
           'Aggiungi note a qualsiasi sezione e aggiornalele durante il workout.',
     },
     'workout.builder.tour_notes_secondary': {
-      'en': 'Cues, goals, reminders — anything useful.',
-      'it': 'Indicazioni, obiettivi, promemoria: tutto ciò che è utile.',
+      'en': 'Save any useful cues, goals and reminders here.',
+      'it': 'Salva qui indicazioni, obiettivi e promemoria utili.',
     },
     'workout.builder.tour_blocks_title': {
       'en': 'Train exercises together',
@@ -378,8 +378,7 @@ class AppStrings {
       'it': 'Controlla tutta la scheda',
     },
     'workout.builder.tour_check_body': {
-      'en':
-          'See muscle coverage, overlap and structure — evaluated around your goal.',
+      'en': 'See muscle coverage, overlap and structure for your goal.',
       'it':
           'Scopri copertura muscolare, sovrapposizioni e struttura in relazione al tuo obiettivo.',
     },
