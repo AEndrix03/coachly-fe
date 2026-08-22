@@ -245,10 +245,10 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
           child: IgnorePointer(
             child: Padding(
               padding: EdgeInsets.fromLTRB(
-                CoachlyAthleteTheme.pagePadding.horizontal / 2,
-                safePadding.top + 8,
-                CoachlyAthleteTheme.pagePadding.horizontal / 2,
-                safePadding.bottom + 8,
+                0,
+                safePadding.top,
+                0,
+                safePadding.bottom,
               ),
               child: RepaintBoundary(
                 child: CustomPaint(
