@@ -621,6 +621,7 @@ Future<String?> showWorkoutSectionPicker(
   BuildContext context,
   List<WorkoutSectionDraft> sections,
 ) {
+  if (sections.length == 1) return Future.value(sections.single.id);
   final main = sections.firstWhere(
     (section) => section.kind == WorkoutSectionKind.main,
     orElse: () => sections.first,
