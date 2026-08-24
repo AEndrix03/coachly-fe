@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:coachly/features/workout/workout_active_page/domain/workout_execution_resolver.dart';
+import 'package:coachly/features/workout/workout_active_page/data/active_workout_draft_service.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_context.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_event.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/providers/workout_coach_provider.dart';
@@ -38,19 +40,26 @@ class ActiveWorkout extends _$ActiveWorkout {
 
     if (response.success && response.data != null) {
       final workout = response.data!;
-      final exercises = workout.workoutExercises.asMap().entries.map((e) {
+      var exercises = workout.workoutExercises.asMap().entries.map((e) {
         return _buildActiveExercise(e.value, e.key);
       }).toList();
+      final draft = ref.read(activeWorkoutDraftServiceProvider).read(workoutId);
+      exercises = _restoreExercises(exercises, draft);
+      final restoredTarget = _restoreTarget(exercises, draft);
 
       state = state.copyWith(
         status: ActiveWorkoutStatus.active,
-        sessionId: '$workoutId:${DateTime.now().microsecondsSinceEpoch}',
+        sessionId:
+            draft?['sessionId'] as String? ??
+            '$workoutId:${DateTime.now().microsecondsSinceEpoch}',
         workout: workout,
-        startedAt: DateTime.now(),
+        startedAt:
+            DateTime.tryParse(draft?['startedAt'] as String? ?? '') ??
+            DateTime.now(),
         exercises: exercises,
         sessionStatus: WorkoutSessionStatus.active,
         phase: WorkoutPhase.exercising,
-        currentTarget: _firstExecutionTarget(exercises),
+        currentTarget: restoredTarget ?? _firstExecutionTarget(exercises),
       );
     } else {
       state = ActiveWorkoutState.error(
@@ -124,6 +133,7 @@ class ActiveWorkout extends _$ActiveWorkout {
           : WorkoutSessionStatus.active,
       lastSetCompletedAt: DateTime.now(),
     );
+    _persistDraft();
     final exerciseId = coachContext.currentExercise?.exercise.exercise.id;
     if (exerciseId != null) {
       ref
@@ -149,6 +159,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       sessionStatus: WorkoutSessionStatus.active,
       clearPendingCoachDecision: true,
     );
+    _persistDraft();
     ref
         .read(workoutCoachProvider(state.sessionId).notifier)
         .invalidateDecisionDerivedFrom(setId);
@@ -252,6 +263,7 @@ class ActiveWorkout extends _$ActiveWorkout {
 
     exercises[exerciseIndex] = exercise.copyWith(sets: updatedSets);
     state = state.copyWith(exercises: exercises);
+    _persistDraft();
 
     return VoiceApplyOutcome(
       exerciseId: exerciseId,
@@ -276,6 +288,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     );
     exercises[exerciseIdx] = ex.copyWith(sets: [...ex.sets, newSet]);
     state = state.copyWith(exercises: exercises);
+    _persistDraft();
   }
 
   void deleteSet(int exerciseIdx, int setIdx) {
@@ -289,13 +302,18 @@ class ActiveWorkout extends _$ActiveWorkout {
         .toList();
     exercises[exerciseIdx] = ex.copyWith(sets: renumbered);
     state = state.copyWith(exercises: exercises);
+    _persistDraft();
   }
 
   void duplicateSet(int exerciseIdx, int setIdx) {
     final exercises = [...state.exercises];
     final ex = exercises[exerciseIdx];
     final sets = [...ex.sets];
-    final copy = sets[setIdx].copyWith(position: sets.length, completed: false);
+    final copy = sets[setIdx].copyWith(
+      id: '${ex.exercise.id}:set:${DateTime.now().microsecondsSinceEpoch}',
+      position: sets.length,
+      completed: false,
+    );
     sets.insert(setIdx + 1, copy);
     final renumbered = sets
         .asMap()
@@ -304,6 +322,7 @@ class ActiveWorkout extends _$ActiveWorkout {
         .toList();
     exercises[exerciseIdx] = ex.copyWith(sets: renumbered);
     state = state.copyWith(exercises: exercises);
+    _persistDraft();
   }
 
   void _mutateSet(
@@ -317,6 +336,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     sets[setIdx] = mutator(sets[setIdx]);
     exercises[exerciseIdx] = ex.copyWith(sets: sets);
     state = state.copyWith(exercises: exercises);
+    _persistDraft();
   }
 
   void _mutateSetById(
@@ -331,6 +351,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       return exercise.copyWith(sets: sets);
     }).toList();
     state = state.copyWith(exercises: exercises);
+    _persistDraft();
   }
 
   WorkoutExecutionTarget? _targetForSet(String setId) {
@@ -359,6 +380,7 @@ class ActiveWorkout extends _$ActiveWorkout {
           ? WorkoutSessionStatus.completed
           : WorkoutSessionStatus.active,
     );
+    _persistDraft();
   }
 
   CoachContext _coachContextFor(String setId) {
@@ -391,15 +413,7 @@ class ActiveWorkout extends _$ActiveWorkout {
   WorkoutExecutionTarget? _firstExecutionTarget(
     List<ActiveExerciseState> exercises,
   ) {
-    for (final exercise in exercises) {
-      if (exercise.sets.isEmpty) continue;
-      return WorkoutExecutionTarget(
-        blockId: exercise.executionBlockId,
-        exerciseId: exercise.exercise.id,
-        setId: exercise.sets.first.id,
-      );
-    }
-    return null;
+    return _executionResolver.resolveNext(exercises: exercises);
   }
 
   Future<bool> completeWorkout() async {
@@ -417,6 +431,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     }
 
     if (response.success) {
+      await ref.read(activeWorkoutDraftServiceProvider).delete(workoutId);
       ref.invalidate(workoutListProvider);
       ref.invalidate(recentWorkoutsProvider);
       ref.invalidate(workoutStatsProvider);
@@ -532,5 +547,108 @@ class ActiveWorkout extends _$ActiveWorkout {
       }
     }
     return 'Exercise ${index + 1}';
+  }
+
+  void _persistDraft() {
+    if (state.sessionId.isEmpty) return;
+    unawaited(
+      ref.read(activeWorkoutDraftServiceProvider).save(workoutId, state),
+    );
+  }
+
+  List<ActiveExerciseState> _restoreExercises(
+    List<ActiveExerciseState> exercises,
+    Map<String, dynamic>? draft,
+  ) {
+    final rawSets = draft?['sets'];
+    if (rawSets is! List) return exercises;
+    final savedExerciseIds =
+        (draft?['exerciseEntryIds'] as List?)?.whereType<String>().toSet() ??
+        const <String>{};
+    final savedById = <String, Map<String, dynamic>>{};
+    for (final raw in rawSets.whereType<Map>()) {
+      final normalized = raw.map(
+        (key, value) => MapEntry(key.toString(), value),
+      );
+      final id = normalized['setId'] as String?;
+      if (id != null) savedById[id] = normalized;
+    }
+    return exercises.map((exercise) {
+      final savedForExercise =
+          savedById.values
+              .where(
+                (saved) => saved['exerciseEntryId'] == exercise.exercise.id,
+              )
+              .toList()
+            ..sort(
+              (left, right) => ((left['position'] as num?)?.toInt() ?? 0)
+                  .compareTo((right['position'] as num?)?.toInt() ?? 0),
+            );
+      if (savedForExercise.isEmpty) {
+        return savedExerciseIds.contains(exercise.exercise.id)
+            ? exercise.copyWith(sets: const [])
+            : exercise;
+      }
+      final existingById = {for (final set in exercise.sets) set.id: set};
+      final restoredSets = <ActiveSetState>[];
+      for (final saved in savedForExercise) {
+        final savedId = saved['setId'] as String?;
+        if (savedId == null) continue;
+        final existing = existingById[savedId];
+        restoredSets.add(
+          _restoreSet(
+            existing ??
+                ActiveSetState(
+                  id: savedId,
+                  position:
+                      (saved['position'] as num?)?.toInt() ??
+                      restoredSets.length,
+                  setType: saved['setType'] as String? ?? 'Normale',
+                  weight: (saved['weight'] as num?)?.toDouble() ?? 0,
+                  reps: (saved['reps'] as num?)?.toInt() ?? 0,
+                  completed: false,
+                ),
+            saved,
+          ),
+        );
+      }
+      return exercise.copyWith(sets: restoredSets);
+    }).toList();
+  }
+
+  ActiveSetState _restoreSet(ActiveSetState set, Map<String, dynamic> saved) {
+    return set.copyWith(
+      position: (saved['position'] as num?)?.toInt(),
+      setType: saved['setType'] as String?,
+      weight: (saved['weight'] as num?)?.toDouble(),
+      reps: (saved['reps'] as num?)?.toInt(),
+      rir: (saved['rir'] as num?)?.toInt(),
+      durationSeconds: (saved['durationSeconds'] as num?)?.toInt(),
+      distance: (saved['distance'] as num?)?.toDouble(),
+      leftReps: (saved['leftReps'] as num?)?.toInt(),
+      rightReps: (saved['rightReps'] as num?)?.toInt(),
+      completed: saved['completed'] as bool?,
+      skipped: saved['skipped'] as bool?,
+    );
+  }
+
+  WorkoutExecutionTarget? _restoreTarget(
+    List<ActiveExerciseState> exercises,
+    Map<String, dynamic>? draft,
+  ) {
+    final setId = draft?['currentSetId'] as String?;
+    if (setId == null) return null;
+    for (final exercise in exercises) {
+      if (exercise.sets.any((set) => set.id == setId && !set.completed)) {
+        return WorkoutExecutionTarget(
+          blockId:
+              draft?['currentBlockId'] as String? ?? exercise.executionBlockId,
+          exerciseId:
+              draft?['currentExerciseId'] as String? ?? exercise.exercise.id,
+          setId: setId,
+        );
+      }
+    }
+    return null;
   }
 }
