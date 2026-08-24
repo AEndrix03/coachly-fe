@@ -119,6 +119,10 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
                     CurrentExerciseHeader(
                       exercise: exercise,
                       set: set,
+                      nextBlockExerciseName: _nextBlockExerciseName(
+                        state,
+                        exercise,
+                      ),
                       onExerciseTap: () => _openExercise(exercise),
                       onActions: () => _showExerciseActions(exercise),
                     ),
@@ -130,9 +134,10 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
                       showWeight: exercise.inputConfiguration.shows(
                         SetInputField.weight,
                       ),
-                      showReps: exercise.inputConfiguration.shows(
-                        SetInputField.reps,
-                      ),
+                      showReps:
+                          set.leftReps == null &&
+                          set.rightReps == null &&
+                          exercise.inputConfiguration.shows(SetInputField.reps),
                       showRir: exercise.inputConfiguration.shows(
                         SetInputField.rir,
                       ),
@@ -147,6 +152,15 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
                         value,
                       ),
                       onRir: (value) => _notifier.updateSetRir(set.id, value),
+                      onLeftReps: (value) =>
+                          _notifier.updateSetSideReps(set.id, left: value),
+                      onRightReps: (value) =>
+                          _notifier.updateSetSideReps(set.id, right: value),
+                      onMirror: () => _notifier.updateSetSideReps(
+                        set.id,
+                        left: set.leftReps ?? set.reps,
+                        right: set.leftReps ?? set.reps,
+                      ),
                     ),
                     const SizedBox(height: 18),
                     CompactRestTimer(
@@ -304,6 +318,20 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
       context.push(
         '/workouts/workout/${widget.workoutId}/workout_exercise_page/$id',
       );
+
+    String? _nextBlockExerciseName(
+      ActiveWorkoutState state,
+      ActiveExerciseState current,
+    ) {
+      final blockExercises = state.exercises
+          .where(
+            (exercise) => exercise.executionBlockId == current.executionBlockId,
+          )
+          .toList();
+      if (blockExercises.length < 2) return null;
+      final index = blockExercises.indexOf(current);
+      return blockExercises[(index + 1) % blockExercises.length].displayName;
+    }
   }
 
   void _showExerciseActions(ActiveExerciseState exercise) {

@@ -31,6 +31,11 @@ const _activeWorkoutStrings = <String, Map<String, String>>{
   'weight': {'en': 'Weight', 'it': 'Peso'},
   'reps': {'en': 'Reps', 'it': 'Ripetizioni'},
   'rir': {'en': 'Reps in reserve', 'it': 'Ripetizioni in riserva'},
+  'left': {'en': 'LEFT', 'it': 'SINISTRA'},
+  'right': {'en': 'RIGHT', 'it': 'DESTRA'},
+  'mirror': {'en': 'Mirror values', 'it': 'Copia valori'},
+  'superset': {'en': 'SUPERSET', 'it': 'SUPERSET'},
+  'next': {'en': 'Next: {exercise}', 'it': 'Prossimo: {exercise}'},
 };
 
 extension ActiveWorkoutStrings on BuildContext {

@@ -11,6 +11,7 @@ import 'package:coachly/features/workout/workout_active_page/providers/rest_time
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
@@ -41,9 +42,7 @@ class ActiveWorkout extends _$ActiveWorkout {
 
     if (response.success && response.data != null) {
       final workout = response.data!;
-      var exercises = workout.workoutExercises.asMap().entries.map((e) {
-        return _buildActiveExercise(e.value, e.key);
-      }).toList();
+      var exercises = _buildExecutionExercises(workout);
       final draft = ref.read(activeWorkoutDraftServiceProvider).read(workoutId);
       exercises = _restoreExercises(exercises, draft);
       final restoredTarget = _restoreTarget(exercises, draft);
@@ -97,6 +96,58 @@ class ActiveWorkout extends _$ActiveWorkout {
       displayName: _extractDisplayName(exercise, index),
       sets: sets,
     );
+  }
+
+  List<ActiveExerciseState> _buildExecutionExercises(WorkoutModel workout) {
+    if (workout.programmingBlocks.isEmpty) {
+      return workout.workoutExercises.asMap().entries.map((entry) {
+        return _buildActiveExercise(entry.value, entry.key);
+      }).toList();
+    }
+
+    final result = <ActiveExerciseState>[];
+    for (final block in workout.programmingBlocks) {
+      for (final entry in block.entries) {
+        final legacyIndex = workout.workoutExercises.indexWhere(
+          (exercise) =>
+              exercise.id == entry.id ||
+              exercise.exercise.id == entry.exerciseId,
+        );
+        if (legacyIndex == -1) continue;
+        final legacy = workout.workoutExercises[legacyIndex];
+        final fallback = _buildActiveExercise(legacy, legacyIndex);
+        final programmedSets = entry.sets.map((programmed) {
+          final reps =
+              programmed.reps ?? programmed.repsMin ?? programmed.repsMax ?? 0;
+          final rir = programmed.intensityType == 'rir'
+              ? programmed.intensityMax?.round() ??
+                    programmed.intensityMin?.round()
+              : null;
+          return ActiveSetState(
+            id: programmed.id ?? '${entry.id}:set:${programmed.position}',
+            position: programmed.position,
+            setType: programmed.setType,
+            weight: programmed.load ?? fallback.sets.firstOrNull?.weight ?? 0,
+            reps: reps,
+            rir: rir,
+            leftReps: programmed.unilateral ? reps : null,
+            rightReps: programmed.unilateral ? reps : null,
+            completed: false,
+          );
+        }).toList();
+        result.add(
+          fallback.copyWith(
+            executionBlockId: block.id,
+            sets: programmedSets.isEmpty ? fallback.sets : programmedSets,
+          ),
+        );
+      }
+    }
+    return result.isEmpty
+        ? workout.workoutExercises.asMap().entries.map((entry) {
+            return _buildActiveExercise(entry.value, entry.key);
+          }).toList()
+        : result;
   }
 
   // ─── Set mutations ────────────────────────────────────────────────────────
@@ -213,6 +264,13 @@ class ActiveWorkout extends _$ActiveWorkout {
 
   void updateSetRir(String setId, int rir) {
     _mutateSetById(setId, (set) => set.copyWith(rir: rir));
+  }
+
+  void updateSetSideReps(String setId, {int? left, int? right}) {
+    _mutateSetById(
+      setId,
+      (set) => set.copyWith(leftReps: left, rightReps: right),
+    );
   }
 
   void updateSetType(int exerciseIdx, int setIdx, String setType) {

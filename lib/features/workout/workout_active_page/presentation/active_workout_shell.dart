@@ -96,6 +96,7 @@ class CurrentExerciseHeader extends StatelessWidget {
   final ActiveSetState set;
   final VoidCallback onExerciseTap;
   final VoidCallback onActions;
+  final String? nextBlockExerciseName;
 
   const CurrentExerciseHeader({
     super.key,
@@ -103,6 +104,7 @@ class CurrentExerciseHeader extends StatelessWidget {
     required this.set,
     required this.onExerciseTap,
     required this.onActions,
+    this.nextBlockExerciseName,
   });
 
   @override
@@ -115,6 +117,18 @@ class CurrentExerciseHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (nextBlockExerciseName != null) ...[
+                  Text(
+                    context.activeTr('superset'),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                ],
                 Text(
                   exercise.displayName,
                   style: const TextStyle(
@@ -137,6 +151,19 @@ class CurrentExerciseHeader extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                if (nextBlockExerciseName != null) ...[
+                  const SizedBox(height: 5),
+                  Text(
+                    context.activeTr(
+                      'next',
+                      params: {'exercise': nextBlockExerciseName!},
+                    ),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -219,6 +246,9 @@ class CurrentSetControls extends StatelessWidget {
   final ValueChanged<double> onWeight;
   final ValueChanged<int> onReps;
   final ValueChanged<int> onRir;
+  final ValueChanged<int> onLeftReps;
+  final ValueChanged<int> onRightReps;
+  final VoidCallback onMirror;
 
   const CurrentSetControls({
     super.key,
@@ -229,6 +259,9 @@ class CurrentSetControls extends StatelessWidget {
     required this.onWeight,
     required this.onReps,
     required this.onRir,
+    required this.onLeftReps,
+    required this.onRightReps,
+    required this.onMirror,
   });
 
   @override
@@ -243,6 +276,36 @@ class CurrentSetControls extends StatelessWidget {
           onPlus: () => onWeight(set.weight + 2.5),
         ),
       if (showWeight && showReps) const SizedBox(height: 12),
+      if (set.leftReps != null || set.rightReps != null) ...[
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _SideControl(
+                label: context.activeTr('left'),
+                value: set.leftReps ?? set.reps,
+                onChanged: onLeftReps,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _SideControl(
+                label: context.activeTr('right'),
+                value: set.rightReps ?? set.reps,
+                onChanged: onRightReps,
+              ),
+            ),
+          ],
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: onMirror,
+            icon: const Icon(Icons.content_copy_rounded, size: 16),
+            label: Text(context.activeTr('mirror')),
+          ),
+        ),
+      ],
       if (showReps)
         _StepperControl(
           semanticLabel: context.activeTr('reps'),
@@ -279,6 +342,40 @@ class CurrentSetControls extends StatelessWidget {
           ],
         ),
       ],
+    ],
+  );
+}
+
+class _SideControl extends StatelessWidget {
+  final String label;
+  final int value;
+  final ValueChanged<int> onChanged;
+
+  const _SideControl({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+      const SizedBox(height: 6),
+      _StepperControl(
+        semanticLabel: label,
+        value: '$value reps',
+        onMinus: () => onChanged((value - 1).clamp(0, 999).toInt()),
+        onPlus: () => onChanged(value + 1),
+      ),
     ],
   );
 }
@@ -382,6 +479,28 @@ class ExerciseSetStrip extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                 ),
+                if (_setTypeBadge(set.setType) != null) ...[
+                  Container(
+                    width: 26,
+                    height: 22,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: .12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      _setTypeBadge(set.setType)!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
                 Expanded(
                   child: Text(
                     set.id == currentSetId
@@ -519,3 +638,11 @@ class CoachDecisionCard extends StatelessWidget {
 String _weight(double value) => value == value.truncateToDouble()
     ? value.toStringAsFixed(0)
     : value.toStringAsFixed(1);
+
+String? _setTypeBadge(String setType) => switch (setType.toLowerCase()) {
+  'warmup' || 'warm-up' || 'riscaldamento' => 'W',
+  'top' || 'top_set' => 'T',
+  'backoff' || 'back_off' => 'B',
+  'dropset' || 'drop_set' => 'D',
+  _ => null,
+};
