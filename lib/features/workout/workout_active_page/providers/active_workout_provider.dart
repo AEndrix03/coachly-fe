@@ -27,6 +27,13 @@ class ActiveWorkout extends _$ActiveWorkout {
   @override
   ActiveWorkoutState build(String workoutId) {
     final token = ++_loadToken;
+    ref.listen<RestTimerState>(restTimerProvider, (previous, next) {
+      if (previous?.isActive == true && !next.isActive) {
+        unawaited(
+          ref.read(activeWorkoutDraftServiceProvider).clearRest(workoutId),
+        );
+      }
+    });
     _loadWorkout(workoutId, token);
     return ActiveWorkoutState.loading();
   }
@@ -171,6 +178,32 @@ class ActiveWorkout extends _$ActiveWorkout {
   void completeCurrentSet() {
     final setId = state.currentTarget?.setId;
     if (setId != null) completeSetById(setId);
+  }
+
+  void completeSetAndStartRest(String setId) {
+    final exercise = state.exercises
+        .where((item) => item.sets.any((set) => set.id == setId))
+        .firstOrNull;
+    if (exercise == null) return;
+    completeSetById(setId);
+    if (state.currentTarget != null) {
+      final restSeconds = exercise.restSeconds;
+      ref.read(restTimerProvider.notifier).startTimer(restSeconds);
+      unawaited(
+        ref
+            .read(activeWorkoutDraftServiceProvider)
+            .saveRest(
+              workoutId: workoutId,
+              endsAt: DateTime.now().add(Duration(seconds: restSeconds)),
+              initialSeconds: restSeconds,
+            ),
+      );
+    }
+  }
+
+  void undoSetAndRest(String setId) {
+    ref.read(restTimerProvider.notifier).stopTimer();
+    undoSetCompletion(setId);
   }
 
   void completeSetById(String setId) {

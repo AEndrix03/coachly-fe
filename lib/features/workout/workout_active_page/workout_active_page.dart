@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/providers/workout_coach_provider.dart';
-import 'package:coachly/features/workout/workout_active_page/data/active_workout_draft_service.dart';
 import 'package:coachly/features/workout/workout_active_page/domain/set_input_configuration.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/active_workout_shell.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/active_workout_strings.dart';
@@ -57,11 +56,6 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
           next.completedNaturally) {
         HapticFeedback.mediumImpact();
         if (next.isBellEnabled) unawaited(_playRestCompleteAlert());
-        unawaited(
-          ref
-              .read(activeWorkoutDraftServiceProvider)
-              .clearRest(widget.workoutId),
-        );
       }
     });
     final state = ref.watch(activeWorkoutProvider(widget.workoutId));
@@ -231,7 +225,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
                   ? null
                   : allDone
                   ? _completeWorkout
-                  : () => _completeSet(exercise!, set!),
+                  : () => _completeSet(set!),
               style: FilledButton.styleFrom(
                 backgroundColor: CoachlyAthleteTheme.primary,
                 foregroundColor: Colors.black,
@@ -262,19 +256,9 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
       .exercises
       .indexWhere((item) => item.exercise.id == exercise.exercise.id);
 
-  void _completeSet(ActiveExerciseState exercise, ActiveSetState set) {
+  void _completeSet(ActiveSetState set) {
     HapticFeedback.lightImpact();
-    _notifier.completeSetById(set.id);
-    ref.read(restTimerProvider.notifier).startTimer(exercise.restSeconds);
-    unawaited(
-      ref
-          .read(activeWorkoutDraftServiceProvider)
-          .saveRest(
-            workoutId: widget.workoutId,
-            endsAt: DateTime.now().add(Duration(seconds: exercise.restSeconds)),
-            initialSeconds: exercise.restSeconds,
-          ),
-    );
+    _notifier.completeSetAndStartRest(set.id);
     _undoTimer?.cancel();
     setState(() => _undoSetId = set.id);
     _undoTimer = Timer(const Duration(seconds: 6), () {
@@ -286,19 +270,12 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
     final setId = _undoSetId;
     if (setId == null) return;
     _undoTimer?.cancel();
-    ref.read(restTimerProvider.notifier).stopTimer();
-    unawaited(
-      ref.read(activeWorkoutDraftServiceProvider).clearRest(widget.workoutId),
-    );
-    _notifier.undoSetCompletion(setId);
+    _notifier.undoSetAndRest(setId);
     setState(() => _undoSetId = null);
   }
 
   void _skipRest() {
     ref.read(restTimerProvider.notifier).stopTimer();
-    unawaited(
-      ref.read(activeWorkoutDraftServiceProvider).clearRest(widget.workoutId),
-    );
   }
 
   Future<void> _completeWorkout() async {
