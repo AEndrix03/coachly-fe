@@ -7,12 +7,14 @@ class RestTimerState {
   final bool isActive;
   final int initialSeconds;
   final bool isBellEnabled;
+  final bool completedNaturally;
 
   const RestTimerState({
     required this.remainingSeconds,
     required this.isActive,
     required this.initialSeconds,
     required this.isBellEnabled,
+    this.completedNaturally = false,
   });
 
   RestTimerState copyWith({
@@ -20,12 +22,14 @@ class RestTimerState {
     bool? isActive,
     int? initialSeconds,
     bool? isBellEnabled,
+    bool? completedNaturally,
   }) {
     return RestTimerState(
       remainingSeconds: remainingSeconds ?? this.remainingSeconds,
       isActive: isActive ?? this.isActive,
       initialSeconds: initialSeconds ?? this.initialSeconds,
       isBellEnabled: isBellEnabled ?? this.isBellEnabled,
+      completedNaturally: completedNaturally ?? this.completedNaturally,
     );
   }
 }
@@ -41,6 +45,7 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
       isActive: false,
       initialSeconds: 0,
       isBellEnabled: true,
+      completedNaturally: false,
     );
   }
 
@@ -51,13 +56,14 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
       isActive: true,
       initialSeconds: seconds,
       isBellEnabled: state.isBellEnabled,
+      completedNaturally: false,
     );
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       // Finish in the same tick that reaches zero.  The completion listener
       // relies on this active -> inactive transition to trigger the alarm.
       if (state.remainingSeconds <= 1) {
-        stopTimer();
+        stopTimer(completedNaturally: true);
       } else {
         state = state.copyWith(remainingSeconds: state.remainingSeconds - 1);
       }
@@ -81,9 +87,13 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
     }
   }
 
-  void stopTimer() {
+  void stopTimer({bool completedNaturally = false}) {
     _timer?.cancel();
-    state = state.copyWith(isActive: false, remainingSeconds: 0);
+    state = state.copyWith(
+      isActive: false,
+      remainingSeconds: 0,
+      completedNaturally: completedNaturally,
+    );
   }
 
   void setBellEnabled(bool enabled) {

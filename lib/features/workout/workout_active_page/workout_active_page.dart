@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/providers/workout_coach_provider.dart';
+import 'package:coachly/features/workout/workout_active_page/data/active_workout_draft_service.dart';
 import 'package:coachly/features/workout/workout_active_page/domain/set_input_configuration.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/active_workout_shell.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/active_workout_strings.dart';
@@ -52,9 +53,15 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
     ref.listen<RestTimerState>(restTimerProvider, (previous, next) {
       if (previous?.isActive == true &&
           previous!.remainingSeconds > 0 &&
-          !next.isActive) {
+          !next.isActive &&
+          next.completedNaturally) {
         HapticFeedback.mediumImpact();
         if (next.isBellEnabled) unawaited(_playRestCompleteAlert());
+        unawaited(
+          ref
+              .read(activeWorkoutDraftServiceProvider)
+              .clearRest(widget.workoutId),
+        );
       }
     });
     final state = ref.watch(activeWorkoutProvider(widget.workoutId));
@@ -148,8 +155,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
                           ref.read(restTimerProvider.notifier).addTime(-30),
                       onPlus: () =>
                           ref.read(restTimerProvider.notifier).addTime(30),
-                      onSkip: () =>
-                          ref.read(restTimerProvider.notifier).stopTimer(),
+                      onSkip: _skipRest,
                     ),
                     if (decision != null) ...[
                       const SizedBox(height: 16),
@@ -246,6 +252,15 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
     HapticFeedback.lightImpact();
     _notifier.completeSetById(set.id);
     ref.read(restTimerProvider.notifier).startTimer(exercise.restSeconds);
+    unawaited(
+      ref
+          .read(activeWorkoutDraftServiceProvider)
+          .saveRest(
+            workoutId: widget.workoutId,
+            endsAt: DateTime.now().add(Duration(seconds: exercise.restSeconds)),
+            initialSeconds: exercise.restSeconds,
+          ),
+    );
     _undoTimer?.cancel();
     setState(() => _undoSetId = set.id);
     _undoTimer = Timer(const Duration(seconds: 6), () {
@@ -258,8 +273,18 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
     if (setId == null) return;
     _undoTimer?.cancel();
     ref.read(restTimerProvider.notifier).stopTimer();
+    unawaited(
+      ref.read(activeWorkoutDraftServiceProvider).clearRest(widget.workoutId),
+    );
     _notifier.undoSetCompletion(setId);
     setState(() => _undoSetId = null);
+  }
+
+  void _skipRest() {
+    ref.read(restTimerProvider.notifier).stopTimer();
+    unawaited(
+      ref.read(activeWorkoutDraftServiceProvider).clearRest(widget.workoutId),
+    );
   }
 
   Future<void> _completeWorkout() async {

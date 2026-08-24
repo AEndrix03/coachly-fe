@@ -7,6 +7,7 @@ import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_
 import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_event.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/providers/workout_coach_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
+import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
@@ -61,6 +62,7 @@ class ActiveWorkout extends _$ActiveWorkout {
         phase: WorkoutPhase.exercising,
         currentTarget: restoredTarget ?? _firstExecutionTarget(exercises),
       );
+      _restoreRestTimer(draft);
     } else {
       state = ActiveWorkoutState.error(
         response.message ?? 'Unable to load workout.',
@@ -554,6 +556,19 @@ class ActiveWorkout extends _$ActiveWorkout {
     unawaited(
       ref.read(activeWorkoutDraftServiceProvider).save(workoutId, state),
     );
+  }
+
+  void _restoreRestTimer(Map<String, dynamic>? draft) {
+    final restEndsAt = DateTime.tryParse(draft?['restEndsAt'] as String? ?? '');
+    if (restEndsAt == null) return;
+    final remaining = restEndsAt.difference(DateTime.now()).inSeconds;
+    if (remaining > 0) {
+      ref.read(restTimerProvider.notifier).startTimer(remaining);
+    } else {
+      unawaited(
+        ref.read(activeWorkoutDraftServiceProvider).clearRest(workoutId),
+      );
+    }
   }
 
   List<ActiveExerciseState> _restoreExercises(

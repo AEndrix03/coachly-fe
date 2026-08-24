@@ -55,5 +55,26 @@ class ActiveWorkoutDraftService {
     return raw?.map((key, value) => MapEntry(key.toString(), value));
   }
 
+  Future<void> saveRest({
+    required String workoutId,
+    required DateTime endsAt,
+    required int initialSeconds,
+  }) async {
+    final current = read(workoutId) ?? <String, dynamic>{};
+    await _box.put(workoutId, {
+      ...current,
+      'restEndsAt': endsAt.toIso8601String(),
+      'restInitialSeconds': initialSeconds,
+    });
+  }
+
+  Future<void> clearRest(String workoutId) async {
+    final current = read(workoutId);
+    if (current == null) return;
+    current.remove('restEndsAt');
+    current.remove('restInitialSeconds');
+    await _box.put(workoutId, current);
+  }
+
   Future<void> delete(String workoutId) => _box.delete(workoutId);
 }
