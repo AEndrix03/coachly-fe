@@ -1,5 +1,6 @@
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/workout_active_page/domain/set_input_configuration.dart';
 
 enum ActiveWorkoutStatus { loading, active, saving, saved, error }
 
@@ -29,6 +30,11 @@ class ActiveSetState {
   final int reps;
   final bool completed;
   final bool skipped;
+  final int? rir;
+  final int? durationSeconds;
+  final double? distance;
+  final int? leftReps;
+  final int? rightReps;
 
   const ActiveSetState({
     required this.id,
@@ -38,6 +44,11 @@ class ActiveSetState {
     required this.reps,
     required this.completed,
     this.skipped = false,
+    this.rir,
+    this.durationSeconds,
+    this.distance,
+    this.leftReps,
+    this.rightReps,
   });
 
   ActiveSetState copyWith({
@@ -48,6 +59,11 @@ class ActiveSetState {
     int? reps,
     bool? completed,
     bool? skipped,
+    int? rir,
+    int? durationSeconds,
+    double? distance,
+    int? leftReps,
+    int? rightReps,
   }) {
     return ActiveSetState(
       id: id ?? this.id,
@@ -57,6 +73,11 @@ class ActiveSetState {
       reps: reps ?? this.reps,
       completed: completed ?? this.completed,
       skipped: skipped ?? this.skipped,
+      rir: rir ?? this.rir,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
+      distance: distance ?? this.distance,
+      leftReps: leftReps ?? this.leftReps,
+      rightReps: rightReps ?? this.rightReps,
     );
   }
 }
@@ -78,6 +99,8 @@ class ActiveExerciseState {
 
   int get completedSets => sets.where((s) => s.completed).length;
   int get totalSets => sets.length;
+  SetInputConfiguration get inputConfiguration =>
+      SetInputConfiguration.forExercise(exercise.exercise);
 
   int get restSeconds {
     final match = RegExp(r'\d+').firstMatch(exercise.rest);
