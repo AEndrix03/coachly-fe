@@ -42,6 +42,9 @@ class ActiveWorkout extends _$ActiveWorkout {
         workout: workout,
         startedAt: DateTime.now(),
         exercises: exercises,
+        sessionStatus: WorkoutSessionStatus.active,
+        phase: WorkoutPhase.exercising,
+        currentTarget: _firstExecutionTarget(exercises),
       );
     } else {
       state = ActiveWorkoutState.error(
@@ -62,6 +65,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     final sets = List.generate(
       setCount,
       (i) => ActiveSetState(
+        id: '${exercise.id}:set:$i',
         position: i,
         setType: 'Normale',
         weight: weight,
@@ -71,6 +75,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     );
 
     return ActiveExerciseState(
+      executionBlockId: 'block:${exercise.id}',
       exercise: exercise,
       displayName: _extractDisplayName(exercise, index),
       sets: sets,
@@ -128,6 +133,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     final updatedSets = List.generate(resolvedSetCount, (index) {
       final previous = index < existingSets.length ? existingSets[index] : null;
       return ActiveSetState(
+        id: previous?.id ?? '${exercise.exercise.id}:set:$index',
         position: index,
         setType: previous?.setType ?? firstSet?.setType ?? 'Normale',
         weight: resolvedWeight,
@@ -153,6 +159,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     final ex = exercises[exerciseIdx];
     final last = ex.sets.isNotEmpty ? ex.sets.last : null;
     final newSet = ActiveSetState(
+      id: '${ex.exercise.id}:set:${DateTime.now().microsecondsSinceEpoch}',
       position: ex.sets.length,
       setType: last?.setType ?? 'Normale',
       weight: last?.weight ?? 0,
@@ -205,6 +212,20 @@ class ActiveWorkout extends _$ActiveWorkout {
   }
 
   // ─── Complete workout ─────────────────────────────────────────────────────
+
+  WorkoutExecutionTarget? _firstExecutionTarget(
+    List<ActiveExerciseState> exercises,
+  ) {
+    for (final exercise in exercises) {
+      if (exercise.sets.isEmpty) continue;
+      return WorkoutExecutionTarget(
+        blockId: exercise.executionBlockId,
+        exerciseId: exercise.exercise.id,
+        setId: exercise.sets.first.id,
+      );
+    }
+    return null;
+  }
 
   Future<bool> completeWorkout() async {
     final workout = state.workout;
