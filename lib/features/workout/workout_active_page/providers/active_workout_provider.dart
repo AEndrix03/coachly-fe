@@ -198,6 +198,10 @@ class ActiveWorkout extends _$ActiveWorkout {
     _mutateSet(exerciseIdx, setIdx, (s) => s.copyWith(reps: reps));
   }
 
+  void updateSetRir(String setId, int rir) {
+    _mutateSetById(setId, (set) => set.copyWith(rir: rir));
+  }
+
   void updateSetType(int exerciseIdx, int setIdx, String setType) {
     _mutateSet(exerciseIdx, setIdx, (s) => s.copyWith(setType: setType));
   }
@@ -227,7 +231,9 @@ class ActiveWorkout extends _$ActiveWorkout {
     final resolvedSetCount = (sets != null && sets > 0)
         ? sets
         : max(1, existingSets.length);
-    final resolvedReps = (reps != null && reps > 0) ? reps : (firstSet?.reps ?? 0);
+    final resolvedReps = (reps != null && reps > 0)
+        ? reps
+        : (firstSet?.reps ?? 0);
     final resolvedWeight = (weightKg != null && weightKg >= 0)
         ? weightKg
         : (firstSet?.weight ?? 0);
