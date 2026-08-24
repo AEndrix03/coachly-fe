@@ -4,7 +4,6 @@ import 'package:coachly/features/workout/workout_active_page/providers/active_wo
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class ActiveWorkoutSessionHeader extends StatelessWidget {
   final String title;

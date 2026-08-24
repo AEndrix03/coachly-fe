@@ -304,34 +304,36 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   Future<void> _completeWorkout() async {
     final success = await _notifier.completeWorkout();
     if (!mounted) return;
-    if (success)
+    if (success) {
       context.pop();
-    else
+    } else {
       ref
           .read(appToastServiceProvider)
           .showError(context, context.tr('workout.save_error'));
+    }
   }
 
   void _openExercise(ActiveExerciseState exercise) {
     final id = exercise.exercise.exercise.id;
-    if (id != null && id.isNotEmpty)
+    if (id != null && id.isNotEmpty) {
       context.push(
         '/workouts/workout/${widget.workoutId}/workout_exercise_page/$id',
       );
-
-    String? _nextBlockExerciseName(
-      ActiveWorkoutState state,
-      ActiveExerciseState current,
-    ) {
-      final blockExercises = state.exercises
-          .where(
-            (exercise) => exercise.executionBlockId == current.executionBlockId,
-          )
-          .toList();
-      if (blockExercises.length < 2) return null;
-      final index = blockExercises.indexOf(current);
-      return blockExercises[(index + 1) % blockExercises.length].displayName;
     }
+  }
+
+  String? _nextBlockExerciseName(
+    ActiveWorkoutState state,
+    ActiveExerciseState current,
+  ) {
+    final blockExercises = state.exercises
+        .where(
+          (exercise) => exercise.executionBlockId == current.executionBlockId,
+        )
+        .toList();
+    if (blockExercises.length < 2) return null;
+    final index = blockExercises.indexOf(current);
+    return blockExercises[(index + 1) % blockExercises.length].displayName;
   }
 
   void _showExerciseActions(ActiveExerciseState exercise) {
