@@ -35,11 +35,14 @@ final todayHomeViewDataProvider =
           ? HomeSyncState.syncing
           : HomeSyncState.synced;
       final now = DateTime.now();
-      final start = DateTime(
-        now.year,
-        now.month,
-        now.day,
-      ).subtract(Duration(days: now.weekday - 1));
+      final displayedMonth = DateTime(now.year, now.month);
+      final firstGridDay = displayedMonth.subtract(
+        Duration(days: displayedMonth.weekday - DateTime.monday),
+      );
+      final lastMonthDay = DateTime(now.year, now.month + 1, 0);
+      final trailingDays = DateTime.sunday - lastMonthDay.weekday;
+      final lastGridDay = lastMonthDay.add(Duration(days: trailingDays));
+      final calendarDayCount = lastGridDay.difference(firstGridDay).inDays + 1;
       final suggested = active.isEmpty ? null : active.first;
       final openSession = openSessions.isEmpty ? null : openSessions.first;
       WorkoutModel? openWorkout;
@@ -52,17 +55,19 @@ final todayHomeViewDataProvider =
         }
       }
       final calendar = HomeCalendarPreviewViewData(
+        displayedMonth: displayedMonth,
         nextWorkoutTitle: suggested?.titleI18n?.fromI18n(locale),
         nextWorkoutWhen: suggested == null
             ? null
             : AppStrings.translate('home.calendar.today', locale: locale),
-        days: List.generate(7, (index) {
-          final date = start.add(Duration(days: index));
+        days: List.generate(calendarDayCount, (index) {
+          final date = firstGridDay.add(Duration(days: index));
           final matchesLastSession = items.any(
             (item) => _sameDay(item.lastUsed, date),
           );
           return HomeCalendarDayViewData(
             date: date,
+            isInDisplayedMonth: date.month == displayedMonth.month,
             isToday: _sameDay(date, now),
             isComplete: matchesLastSession && date.isBefore(now),
             hasTraining:

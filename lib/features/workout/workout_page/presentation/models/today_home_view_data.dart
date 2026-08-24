@@ -95,11 +95,13 @@ class HomeProgramContextViewData {
 class HomeCalendarDayViewData {
   const HomeCalendarDayViewData({
     required this.date,
+    required this.isInDisplayedMonth,
     required this.isToday,
     required this.isComplete,
     required this.hasTraining,
   });
   final DateTime date;
+  final bool? isInDisplayedMonth;
   final bool isToday;
   final bool isComplete;
   final bool hasTraining;
@@ -107,10 +109,12 @@ class HomeCalendarDayViewData {
 
 class HomeCalendarPreviewViewData {
   const HomeCalendarPreviewViewData({
+    required this.displayedMonth,
     required this.days,
     this.nextWorkoutTitle,
     this.nextWorkoutWhen,
   });
+  final DateTime? displayedMonth;
   final List<HomeCalendarDayViewData> days;
   final String? nextWorkoutTitle;
   final String? nextWorkoutWhen;

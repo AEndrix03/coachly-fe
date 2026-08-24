@@ -101,7 +101,7 @@ class WorkoutPage extends ConsumerWidget {
       }
     }
     if (workout == null) return;
-    HapticFeedback.mediumImpact();
+    if (active) HapticFeedback.mediumImpact();
     context.push(
       '/workouts/workout/$id${active ? '/active' : ''}',
       extra: workout,
@@ -153,6 +153,9 @@ class _HomeContent extends StatelessWidget {
           sliver: SliverToBoxAdapter(
             child: TodayHero(
               data: data.today,
+              onOpen: data.today.workoutId == null
+                  ? null
+                  : () => onRoutine(data.today.workoutId!),
               onStart: data.today.workoutId == null
                   ? null
                   : () => onStart(data.today.workoutId!),
@@ -170,7 +173,7 @@ class _HomeContent extends StatelessWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
           sliver: SliverToBoxAdapter(
-            child: AtAGlanceSection(calendar: data.calendar, goal: data.goal),
+            child: CalendarFeatureCard(data: data.calendar),
           ),
         ),
         _section(

@@ -92,10 +92,12 @@ class TodayHero extends StatelessWidget {
   const TodayHero({
     super.key,
     required this.data,
+    required this.onOpen,
     required this.onStart,
     required this.onCreate,
   });
   final HomeTodayViewData data;
+  final VoidCallback? onOpen;
   final VoidCallback? onStart;
   final VoidCallback onCreate;
   @override
@@ -103,32 +105,37 @@ class TodayHero extends StatelessWidget {
     duration: MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : CoachlyAthleteTheme.expandDuration,
-    child: Container(
+    child: CoachlyPressable(
       key: ValueKey(data.kind),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: context.exerciseTheme.surface,
-        borderRadius: BorderRadius.circular(CoachlyAthleteTheme.cardRadius),
-        border: Border.all(
-          color: context.exerciseTheme.primary.withValues(alpha: .22),
+      onTap: onOpen,
+      semanticLabel: data.title,
+      excludeChildSemantics: false,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: context.exerciseTheme.surface,
+          borderRadius: BorderRadius.circular(CoachlyAthleteTheme.cardRadius),
+          border: Border.all(
+            color: context.exerciseTheme.primary.withValues(alpha: .22),
+          ),
         ),
+        child: switch (data.kind) {
+          HomeTrainingStateKind.noTrainingConfigured => _NoTraining(
+            onCreate: onCreate,
+          ),
+          HomeTrainingStateKind.restDay => _PassiveToday(
+            data: data,
+            eyebrowKey: 'home.today.title',
+            titleKey: 'home.today.recovery_day',
+          ),
+          HomeTrainingStateKind.plannedBreak => _PassiveToday(
+            data: data,
+            eyebrowKey: 'home.today.planned_break',
+            titleKey: 'home.today.program_paused',
+          ),
+          _ => _ActionToday(data: data, onStart: onStart),
+        },
       ),
-      child: switch (data.kind) {
-        HomeTrainingStateKind.noTrainingConfigured => _NoTraining(
-          onCreate: onCreate,
-        ),
-        HomeTrainingStateKind.restDay => _PassiveToday(
-          data: data,
-          eyebrowKey: 'home.today.title',
-          titleKey: 'home.today.recovery_day',
-        ),
-        HomeTrainingStateKind.plannedBreak => _PassiveToday(
-          data: data,
-          eyebrowKey: 'home.today.planned_break',
-          titleKey: 'home.today.program_paused',
-        ),
-        _ => _ActionToday(data: data, onStart: onStart),
-      },
     ),
   );
 }
@@ -406,73 +413,121 @@ class _ProgramStep extends StatelessWidget {
   );
 }
 
-class AtAGlanceSection extends StatelessWidget {
-  const AtAGlanceSection({
-    super.key,
-    required this.calendar,
-    required this.goal,
-  });
-  final HomeCalendarPreviewViewData calendar;
-  final HomeGoalPreviewViewData goal;
-  @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(flex: 6, child: CalendarFeatureCard(data: calendar)),
-          const SizedBox(width: 10),
-          Expanded(flex: 5, child: GoalFeatureCard(data: goal)),
-        ],
-      );
-    },
-  );
-}
-
 class CalendarFeatureCard extends StatelessWidget {
   const CalendarFeatureCard({super.key, required this.data});
   final HomeCalendarPreviewViewData data;
   @override
-  Widget build(BuildContext context) => _FeatureSurface(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _Eyebrow(context.tr('home.calendar.title')),
-        const SizedBox(height: 7),
-        Text(
-          MaterialLocalizations.of(
-            context,
-          ).formatMonthYear(data.days.first.date),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: context.exerciseTheme.textPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: 13),
-        Row(
-          children: data.days
-              .map((day) => Expanded(child: _CalendarDay(data: day)))
-              .toList(),
-        ),
-        if (data.nextWorkoutTitle != null) ...[
-          const SizedBox(height: 12),
+  Widget build(BuildContext context) {
+    final displayedMonth =
+        data.displayedMonth ??
+        DateTime(DateTime.now().year, DateTime.now().month);
+    final days = _resolvedMonthDays(displayedMonth);
+    return _FeatureSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Eyebrow(context.tr('home.calendar.title')),
+          const SizedBox(height: 7),
           Text(
-            '${data.nextWorkoutTitle} · ${data.nextWorkoutWhen}',
+            MaterialLocalizations.of(context).formatMonthYear(displayedMonth),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: context.exerciseTheme.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+              color: context.exerciseTheme.textPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
             ),
           ),
+          const SizedBox(height: 18),
+          Row(
+            children: List.generate(
+              DateTime.daysPerWeek,
+              (index) => Expanded(
+                child: Text(
+                  MaterialLocalizations.of(
+                    context,
+                  ).narrowWeekdays[(index + DateTime.monday) % 7].toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: context.exerciseTheme.textSecondary,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 9),
+          GridView.builder(
+            shrinkWrap: true,
+            primary: false,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: DateTime.daysPerWeek,
+              childAspectRatio: .92,
+            ),
+            itemCount: days.length,
+            itemBuilder: (context, index) => _CalendarDay(data: days[index]),
+          ),
+          if (data.nextWorkoutTitle != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              '${data.nextWorkoutTitle} · ${data.nextWorkoutWhen}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: context.exerciseTheme.textSecondary,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ],
-      ],
-    ),
-  );
+      ),
+    );
+  }
+
+  List<HomeCalendarDayViewData> _resolvedMonthDays(DateTime displayedMonth) {
+    if (data.days.length >= 28) return data.days;
+
+    final firstMonthDay = DateTime(displayedMonth.year, displayedMonth.month);
+    final firstGridDay = firstMonthDay.subtract(
+      Duration(days: firstMonthDay.weekday - DateTime.monday),
+    );
+    final lastMonthDay = DateTime(
+      displayedMonth.year,
+      displayedMonth.month + 1,
+      0,
+    );
+    final lastGridDay = lastMonthDay.add(
+      Duration(days: DateTime.sunday - lastMonthDay.weekday),
+    );
+    final count = lastGridDay.difference(firstGridDay).inDays + 1;
+
+    return List.generate(count, (index) {
+      final date = firstGridDay.add(Duration(days: index));
+      HomeCalendarDayViewData? existing;
+      for (final day in data.days) {
+        if (day.date.year == date.year &&
+            day.date.month == date.month &&
+            day.date.day == date.day) {
+          existing = day;
+          break;
+        }
+      }
+      return HomeCalendarDayViewData(
+        date: date,
+        isInDisplayedMonth: date.month == displayedMonth.month,
+        isToday:
+            existing?.isToday ??
+            (date.year == DateTime.now().year &&
+                date.month == DateTime.now().month &&
+                date.day == DateTime.now().day),
+        isComplete: existing?.isComplete ?? false,
+        hasTraining: existing?.hasTraining ?? false,
+      );
+    });
+  }
 }
 
 class _CalendarDay extends StatelessWidget {
@@ -485,20 +540,11 @@ class _CalendarDay extends StatelessWidget {
       selected: data.isToday,
       label: l.formatFullDate(data.date),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            l.narrowWeekdays[data.date.weekday % 7],
-            maxLines: 1,
-            style: TextStyle(
-              color: context.exerciseTheme.textSecondary,
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 5),
           Container(
-            width: 22,
-            height: 22,
+            width: 34,
+            height: 34,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: data.isToday
@@ -514,26 +560,26 @@ class _CalendarDay extends StatelessWidget {
               style: TextStyle(
                 color: data.isToday
                     ? context.exerciseTheme.primary
-                    : context.exerciseTheme.textPrimary,
+                    : data.isInDisplayedMonth != false
+                    ? context.exerciseTheme.textPrimary
+                    : context.exerciseTheme.textSecondary.withValues(
+                        alpha: .42,
+                      ),
                 fontWeight: FontWeight.w700,
-                fontSize: 10,
+                fontSize: 13,
               ),
             ),
           ),
-          const SizedBox(height: 5),
-          Icon(
-            data.isComplete
-                ? Icons.check_rounded
-                : data.isToday
-                ? Icons.circle
-                : data.hasTraining
-                ? Icons.circle_outlined
-                : Icons.remove_rounded,
-            color: data.isToday || data.isComplete
-                ? context.exerciseTheme.primary
-                : context.exerciseTheme.textSecondary,
-            size: data.isToday ? 6 : 10,
-          ),
+          if (data.hasTraining || data.isComplete)
+            Container(
+              width: 4,
+              height: 4,
+              margin: const EdgeInsets.only(top: 2),
+              decoration: BoxDecoration(
+                color: context.exerciseTheme.primary,
+                shape: BoxShape.circle,
+              ),
+            ),
         ],
       ),
     );
