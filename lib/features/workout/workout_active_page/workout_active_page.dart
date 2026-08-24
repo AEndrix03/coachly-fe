@@ -375,20 +375,106 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   void _showSessionMenu(bool allDone) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
-        child: ListTile(
-          leading: const Icon(Icons.flag_outlined),
-          title: Text(context.activeTr('completeWorkout')),
-          enabled: allDone,
-          onTap: allDone
-              ? () {
+      builder: (context) {
+        final state = ref.read(activeWorkoutProvider(widget.workoutId));
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.table_rows_rounded),
+                title: Text(context.activeTr('overview')),
+                onTap: () {
                   Navigator.pop(context);
-                  _completeWorkout();
-                }
-              : null,
+                  _showWorkoutOverview(state);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(
+                  context.activeTr(allDone ? 'completeWorkout' : 'finishEarly'),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  if (allDone) {
+                    _completeWorkout();
+                  } else {
+                    _confirmFinishEarly(state);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showWorkoutOverview(ActiveWorkoutState state) {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => SafeArea(
+        child: DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: .68,
+          builder: (context, controller) => ListView(
+            controller: controller,
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+            children: [
+              Text(
+                context.activeTr('overview'),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 16),
+              for (final exercise in state.exercises) ...[
+                Text(
+                  exercise.displayName,
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 6),
+                ExerciseSetStrip(
+                  exercise: exercise,
+                  currentSetId: state.currentTarget?.setId ?? '',
+                  onSetTap: (setId) {
+                    Navigator.pop(context);
+                    _notifier.goToSet(setId);
+                  },
+                ),
+                const SizedBox(height: 20),
+              ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _confirmFinishEarly(ActiveWorkoutState state) async {
+    final remaining = state.totalSetCount - state.completedSetCount;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.activeTr('finishEarlyTitle')),
+        content: Text(
+          context.activeTr('finishEarlyBody', params: {'sets': '$remaining'}),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(context.activeTr('keepTraining')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(context.activeTr('finishEarly')),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) await _completeWorkout();
   }
 
   void _showCoachReason(dynamic decision) {
@@ -411,7 +497,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
               ),
               const SizedBox(height: 18),
               Text(
-                decision.primary.reasonKey,
+                context.activeTr(decision.primary.reasonKey),
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),

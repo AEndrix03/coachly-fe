@@ -36,6 +36,49 @@ const _activeWorkoutStrings = <String, Map<String, String>>{
   'mirror': {'en': 'Mirror values', 'it': 'Copia valori'},
   'superset': {'en': 'SUPERSET', 'it': 'SUPERSET'},
   'next': {'en': 'Next: {exercise}', 'it': 'Prossimo: {exercise}'},
+  'finishEarly': {'en': 'Finish workout', 'it': 'Termina allenamento'},
+  'finishEarlyTitle': {'en': 'Finish workout early?', 'it': 'Terminare prima?'},
+  'finishEarlyBody': {
+    'en': '{sets} sets are still incomplete.',
+    'it': '{sets} serie non sono ancora completate.',
+  },
+  'keepTraining': {'en': 'Keep training', 'it': 'Continua allenamento'},
+  'coach.progress_reps.title': {
+    'en': 'Progress reps on the next set',
+    'it': 'Aumenta le ripetizioni nella prossima serie',
+  },
+  'coach.progress_reps.reason': {
+    'en': 'The comparable set met the effort target.',
+    'it': 'La serie comparabile ha rispettato il target di sforzo.',
+  },
+  'coach.observe.title': {
+    'en': 'Keep the current target',
+    'it': 'Mantieni il target corrente',
+  },
+  'coach.observe.reason': {
+    'en': 'One result is not enough to confirm a regression.',
+    'it': 'Un singolo risultato non conferma una regressione.',
+  },
+  'coach.comparability.new_baseline': {
+    'en': 'New baseline',
+    'it': 'Nuova baseline',
+  },
+  'coach.data_quality.unusual_load_title': {
+    'en': 'Load looks unusual',
+    'it': 'Il carico sembra insolito',
+  },
+  'coach.data_quality.unusual_load_reason': {
+    'en': 'The load is much higher than recent comparable entries.',
+    'it': 'Il carico è molto più alto delle registrazioni comparabili recenti.',
+  },
+  'coach.guardian.pacing_title': {
+    'en': 'Review the remaining session',
+    'it': 'Rivedi la sessione rimanente',
+  },
+  'coach.guardian.pacing_reason': {
+    'en': 'The session is taking longer than expected.',
+    'it': 'La sessione sta richiedendo più tempo del previsto.',
+  },
 };
 
 extension ActiveWorkoutStrings on BuildContext {

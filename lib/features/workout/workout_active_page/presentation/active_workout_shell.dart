@@ -621,7 +621,7 @@ class CoachDecisionCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  decision.primary.titleKey,
+                  context.activeTr(decision.primary.titleKey),
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ],
