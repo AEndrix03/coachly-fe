@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'package:coachly/features/workout/workout_active_page/domain/workout_execution_resolver.dart';
+import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_context.dart';
+import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_event.dart';
+import 'package:coachly/features/workout/workout_active_page/coach/providers/workout_coach_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
@@ -41,6 +44,7 @@ class ActiveWorkout extends _$ActiveWorkout {
 
       state = state.copyWith(
         status: ActiveWorkoutStatus.active,
+        sessionId: '$workoutId:${DateTime.now().microsecondsSinceEpoch}',
         workout: workout,
         startedAt: DateTime.now(),
         exercises: exercises,
@@ -101,6 +105,7 @@ class ActiveWorkout extends _$ActiveWorkout {
   }
 
   void completeSetById(String setId) {
+    final coachContext = _coachContextFor(setId);
     final previousTarget = state.currentTarget;
     _mutateSetById(
       setId,
@@ -119,6 +124,20 @@ class ActiveWorkout extends _$ActiveWorkout {
           : WorkoutSessionStatus.active,
       lastSetCompletedAt: DateTime.now(),
     );
+    final exerciseId = coachContext.currentExercise?.exercise.exercise.id;
+    if (exerciseId != null) {
+      ref
+          .read(workoutCoachProvider(state.sessionId).notifier)
+          .observe(
+            SetCompleted(
+              sessionId: state.sessionId,
+              occurredAt: DateTime.now(),
+              exerciseId: exerciseId,
+              setId: setId,
+            ),
+            coachContext,
+          );
+    }
   }
 
   void undoSetCompletion(String setId) {
@@ -130,6 +149,9 @@ class ActiveWorkout extends _$ActiveWorkout {
       sessionStatus: WorkoutSessionStatus.active,
       clearPendingCoachDecision: true,
     );
+    ref
+        .read(workoutCoachProvider(state.sessionId).notifier)
+        .invalidateDecisionDerivedFrom(setId);
   }
 
   void skipSet(String setId) {
@@ -330,6 +352,31 @@ class ActiveWorkout extends _$ActiveWorkout {
       sessionStatus: next == null
           ? WorkoutSessionStatus.completed
           : WorkoutSessionStatus.active,
+    );
+  }
+
+  CoachContext _coachContextFor(String setId) {
+    ActiveExerciseState? currentExercise;
+    ActiveSetState? currentSet;
+    for (final exercise in state.exercises) {
+      final match = exercise.sets.where((set) => set.id == setId).firstOrNull;
+      if (match == null) continue;
+      currentExercise = exercise;
+      currentSet = match;
+      break;
+    }
+    final startedAt = state.startedAt;
+    return CoachContext(
+      sessionId: state.sessionId,
+      currentExercise: currentExercise,
+      currentSet: currentSet,
+      elapsedSessionTime: startedAt == null
+          ? Duration.zero
+          : DateTime.now().difference(startedAt),
+      remainingSetCount: state.totalSetCount - state.completedSetCount,
+      expectedSessionDuration: state.workout == null
+          ? null
+          : Duration(minutes: state.workout!.durationMinutes),
     );
   }
 

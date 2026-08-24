@@ -130,6 +130,7 @@ class ActiveExerciseState {
 // ─── Workout ──────────────────────────────────────────────────────────────────
 
 class ActiveWorkoutState {
+  final String sessionId;
   final ActiveWorkoutStatus status;
   final WorkoutModel? workout;
   final DateTime? startedAt;
@@ -143,6 +144,7 @@ class ActiveWorkoutState {
   final String? errorMessage;
 
   const ActiveWorkoutState({
+    this.sessionId = '',
     required this.status,
     this.workout,
     this.startedAt,
@@ -197,6 +199,7 @@ class ActiveWorkoutState {
   }
 
   ActiveWorkoutState copyWith({
+    String? sessionId,
     ActiveWorkoutStatus? status,
     WorkoutModel? workout,
     DateTime? startedAt,
@@ -212,6 +215,7 @@ class ActiveWorkoutState {
     String? errorMessage,
   }) {
     return ActiveWorkoutState(
+      sessionId: sessionId ?? this.sessionId,
       status: status ?? this.status,
       workout: workout ?? this.workout,
       startedAt: startedAt ?? this.startedAt,
