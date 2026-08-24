@@ -28,6 +28,7 @@ class ActiveSetState {
   final double weight;
   final int reps;
   final bool completed;
+  final bool skipped;
 
   const ActiveSetState({
     required this.id,
@@ -36,6 +37,7 @@ class ActiveSetState {
     required this.weight,
     required this.reps,
     required this.completed,
+    this.skipped = false,
   });
 
   ActiveSetState copyWith({
@@ -45,6 +47,7 @@ class ActiveSetState {
     double? weight,
     int? reps,
     bool? completed,
+    bool? skipped,
   }) {
     return ActiveSetState(
       id: id ?? this.id,
@@ -53,6 +56,7 @@ class ActiveSetState {
       weight: weight ?? this.weight,
       reps: reps ?? this.reps,
       completed: completed ?? this.completed,
+      skipped: skipped ?? this.skipped,
     );
   }
 }

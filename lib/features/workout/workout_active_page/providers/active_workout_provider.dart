@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:coachly/features/workout/workout_active_page/domain/workout_execution_resolver.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
@@ -13,6 +14,7 @@ part 'active_workout_provider.g.dart';
 
 @riverpod
 class ActiveWorkout extends _$ActiveWorkout {
+  static const _executionResolver = WorkoutExecutionResolver();
   int _loadToken = 0;
 
   @override
@@ -85,7 +87,85 @@ class ActiveWorkout extends _$ActiveWorkout {
   // ─── Set mutations ────────────────────────────────────────────────────────
 
   void completeSet(int exerciseIdx, int setIdx, bool completed) {
-    _mutateSet(exerciseIdx, setIdx, (s) => s.copyWith(completed: completed));
+    final setId = state.exercises[exerciseIdx].sets[setIdx].id;
+    if (completed) {
+      completeSetById(setId);
+    } else {
+      undoSetCompletion(setId);
+    }
+  }
+
+  void completeCurrentSet() {
+    final setId = state.currentTarget?.setId;
+    if (setId != null) completeSetById(setId);
+  }
+
+  void completeSetById(String setId) {
+    final previousTarget = state.currentTarget;
+    _mutateSetById(
+      setId,
+      (set) => set.copyWith(completed: true, skipped: false),
+    );
+    final next = _executionResolver.resolveNext(
+      exercises: state.exercises,
+      after: previousTarget,
+    );
+    state = state.copyWith(
+      currentTarget: next,
+      clearCurrentTarget: next == null,
+      phase: next == null ? WorkoutPhase.completed : WorkoutPhase.resting,
+      sessionStatus: next == null
+          ? WorkoutSessionStatus.completed
+          : WorkoutSessionStatus.active,
+      lastSetCompletedAt: DateTime.now(),
+    );
+  }
+
+  void undoSetCompletion(String setId) {
+    _mutateSetById(setId, (set) => set.copyWith(completed: false));
+    final target = _targetForSet(setId);
+    state = state.copyWith(
+      currentTarget: target,
+      phase: WorkoutPhase.exercising,
+      sessionStatus: WorkoutSessionStatus.active,
+      clearPendingCoachDecision: true,
+    );
+  }
+
+  void skipSet(String setId) {
+    _mutateSetById(setId, (set) => set.copyWith(skipped: true));
+    _advanceFrom(state.currentTarget);
+  }
+
+  void skipExercise(String exerciseId) {
+    final exercises = state.exercises.map((exercise) {
+      if (exercise.exercise.id != exerciseId) return exercise;
+      return exercise.copyWith(
+        sets: exercise.sets
+            .map((set) => set.completed ? set : set.copyWith(skipped: true))
+            .toList(),
+      );
+    }).toList();
+    state = state.copyWith(exercises: exercises);
+    _advanceFrom(state.currentTarget);
+  }
+
+  void goToSet(String setId) {
+    final target = _targetForSet(setId);
+    if (target == null) return;
+    state = state.copyWith(
+      currentTarget: target,
+      phase: WorkoutPhase.exercising,
+    );
+  }
+
+  void goToExercise(String exerciseId) {
+    final exercise = state.exercises
+        .where((item) => item.exercise.id == exerciseId)
+        .firstOrNull;
+    if (exercise == null) return;
+    final set = exercise.sets.where((item) => !item.completed).firstOrNull;
+    if (set != null) goToSet(set.id);
   }
 
   void updateSetWeight(int exerciseIdx, int setIdx, double weight) {
@@ -209,6 +289,48 @@ class ActiveWorkout extends _$ActiveWorkout {
     sets[setIdx] = mutator(sets[setIdx]);
     exercises[exerciseIdx] = ex.copyWith(sets: sets);
     state = state.copyWith(exercises: exercises);
+  }
+
+  void _mutateSetById(
+    String setId,
+    ActiveSetState Function(ActiveSetState) mutator,
+  ) {
+    final exercises = state.exercises.map((exercise) {
+      final setIndex = exercise.sets.indexWhere((set) => set.id == setId);
+      if (setIndex == -1) return exercise;
+      final sets = [...exercise.sets];
+      sets[setIndex] = mutator(sets[setIndex]);
+      return exercise.copyWith(sets: sets);
+    }).toList();
+    state = state.copyWith(exercises: exercises);
+  }
+
+  WorkoutExecutionTarget? _targetForSet(String setId) {
+    for (final exercise in state.exercises) {
+      if (exercise.sets.any((set) => set.id == setId)) {
+        return WorkoutExecutionTarget(
+          blockId: exercise.executionBlockId,
+          exerciseId: exercise.exercise.id,
+          setId: setId,
+        );
+      }
+    }
+    return null;
+  }
+
+  void _advanceFrom(WorkoutExecutionTarget? previousTarget) {
+    final next = _executionResolver.resolveNext(
+      exercises: state.exercises,
+      after: previousTarget,
+    );
+    state = state.copyWith(
+      currentTarget: next,
+      clearCurrentTarget: next == null,
+      phase: next == null ? WorkoutPhase.completed : WorkoutPhase.exercising,
+      sessionStatus: next == null
+          ? WorkoutSessionStatus.completed
+          : WorkoutSessionStatus.active,
+    );
   }
 
   // ─── Complete workout ─────────────────────────────────────────────────────
