@@ -59,6 +59,10 @@ class WorkoutCoachController extends Notifier<WorkoutCoachState> {
 
   void dismiss() => state = state.copyWith(clearDecision: true);
 
+  void restore(CoachDecision? decision) {
+    state = state.copyWith(decision: decision, clearDecision: decision == null);
+  }
+
   void invalidateDecisionDerivedFrom(String setId) {
     final primaryId = state.decision?.primary.id;
     if (primaryId?.contains(setId) == true) dismiss();
@@ -70,8 +74,7 @@ extension _TakeLast<T> on List<T> {
       length <= count ? this : sublist(length - count);
 }
 
-final workoutCoachProvider = NotifierProvider.family<
-  WorkoutCoachController,
-  WorkoutCoachState,
-  String
->(WorkoutCoachController.new);
+final workoutCoachProvider =
+    NotifierProvider.family<WorkoutCoachController, WorkoutCoachState, String>(
+      WorkoutCoachController.new,
+    );

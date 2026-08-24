@@ -62,6 +62,13 @@ class ActiveWorkout extends _$ActiveWorkout {
         currentTarget: restoredTarget ?? _firstExecutionTarget(exercises),
       );
       _restoreRestTimer(draft);
+      ref
+          .read(workoutCoachProvider(state.sessionId).notifier)
+          .restore(
+            ref
+                .read(activeWorkoutDraftServiceProvider)
+                .readCoachDecision(draft),
+          );
     } else {
       state = ActiveWorkoutState.error(
         response.message ?? 'Unable to load workout.',
@@ -189,17 +196,24 @@ class ActiveWorkout extends _$ActiveWorkout {
     _persistDraft();
     final exerciseId = coachContext.currentExercise?.exercise.exercise.id;
     if (exerciseId != null) {
-      ref
-          .read(workoutCoachProvider(state.sessionId).notifier)
-          .observe(
-            SetCompleted(
-              sessionId: state.sessionId,
-              occurredAt: DateTime.now(),
-              exerciseId: exerciseId,
-              setId: setId,
+      final coach = ref.read(workoutCoachProvider(state.sessionId).notifier);
+      coach.observe(
+        SetCompleted(
+          sessionId: state.sessionId,
+          occurredAt: DateTime.now(),
+          exerciseId: exerciseId,
+          setId: setId,
+        ),
+        coachContext,
+      );
+      unawaited(
+        ref
+            .read(activeWorkoutDraftServiceProvider)
+            .saveCoachDecision(
+              workoutId,
+              ref.read(workoutCoachProvider(state.sessionId)).decision,
             ),
-            coachContext,
-          );
+      );
     }
   }
 
@@ -216,6 +230,14 @@ class ActiveWorkout extends _$ActiveWorkout {
     ref
         .read(workoutCoachProvider(state.sessionId).notifier)
         .invalidateDecisionDerivedFrom(setId);
+    unawaited(
+      ref
+          .read(activeWorkoutDraftServiceProvider)
+          .saveCoachDecision(
+            workoutId,
+            ref.read(workoutCoachProvider(state.sessionId)).decision,
+          ),
+    );
   }
 
   void skipSet(String setId) {
