@@ -77,6 +77,13 @@ class AppDataSyncService {
       _sessionSyncService.syncPendingSessions(trigger: 'authenticated_access'),
     );
 
+    // Network-only debugging deliberately bypasses local reads and writes.
+    // A background catalogue refresh would therefore discard its response and
+    // force the visible page to issue the same request again.
+    if (!AppCachePolicy.isEnabled) {
+      return;
+    }
+
     _isSyncing = true;
     try {
       final workoutResult = await _workoutRepository.refreshFromRemote();
@@ -103,6 +110,7 @@ class AppDataSyncService {
   /// been saved. A running full sync already refreshes exercises, so concurrent
   /// resume events do not issue duplicate requests.
   Future<void> refreshExercisesOnAppResume() async {
+    if (!AppCachePolicy.isEnabled) return;
     if (_isSyncing || !await _canSync()) return;
 
     _isSyncing = true;
