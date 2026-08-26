@@ -10,11 +10,30 @@ import 'package:coachly/features/exercise/exercise_info_page/data/services/exerc
 class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   final ExerciseInfoPageService _service;
   final ExerciseHiveService _hiveService;
+  final Map<String, Future<ApiResponse<ExerciseDetailModel>>>
+  _ongoingDetailRequests = {};
+  Future<ApiResponse<List<ExerciseModel>>>? _ongoingNetworkSummariesRequest;
 
-  const ExerciseInfoPageRepositoryImpl(this._service, this._hiveService);
+  ExerciseInfoPageRepositoryImpl(this._service, this._hiveService);
 
   @override
   Future<ApiResponse<ExerciseDetailModel>> getExerciseDetail(
+    String exerciseId,
+  ) {
+    final existing = _ongoingDetailRequests[exerciseId];
+    if (existing != null) return existing;
+
+    final request = _loadExerciseDetail(exerciseId);
+    _ongoingDetailRequests[exerciseId] = request;
+    request.whenComplete(() {
+      if (identical(_ongoingDetailRequests[exerciseId], request)) {
+        _ongoingDetailRequests.remove(exerciseId);
+      }
+    });
+    return request;
+  }
+
+  Future<ApiResponse<ExerciseDetailModel>> _loadExerciseDetail(
     String exerciseId,
   ) async {
     try {
@@ -47,7 +66,7 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   Future<ApiResponse<List<ExerciseModel>>> getAllExercises() async {
     try {
       if (!AppCachePolicy.isEnabled) {
-        return _service.fetchAllExercises();
+        return _fetchNetworkSummariesDeduplicated();
       }
 
       await _ensureLocalCache();
@@ -62,9 +81,7 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   Future<ApiResponse<List<ExerciseModel>>> getExerciseSummaries() async {
     try {
       if (!AppCachePolicy.isEnabled) {
-        // Debug/network-only mode deliberately does not write Hive, but the
-        // provider still fetches this unfiltered catalogue only once.
-        return _service.fetchAllExercises();
+        return _fetchNetworkSummariesDeduplicated();
       }
       await _ensureLocalCache();
       return ApiResponse.success(
@@ -187,7 +204,7 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
       'isUnilateral': isUnilateral,
       'isBodyweight': isBodyweight,
     });
-    if (response.success) {
+    if (response.success && AppCachePolicy.isEnabled) {
       await refreshFromRemote();
     }
     return response;
@@ -215,7 +232,7 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
       'isUnilateral': isUnilateral,
       'isBodyweight': isBodyweight,
     });
-    if (response.success) {
+    if (response.success && AppCachePolicy.isEnabled) {
       await refreshFromRemote();
     }
     return response;
@@ -224,7 +241,7 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   @override
   Future<ApiResponse<void>> deletePersonalExercise(String exerciseId) async {
     final response = await _service.deletePersonalExercise(exerciseId);
-    if (response.success) {
+    if (response.success && AppCachePolicy.isEnabled) {
       await refreshFromRemote();
     }
     return response;
@@ -263,5 +280,20 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     if (!response.success) {
       throw Exception(response.message ?? 'Failed to populate exercise cache');
     }
+  }
+
+  Future<ApiResponse<List<ExerciseModel>>>
+  _fetchNetworkSummariesDeduplicated() {
+    final existing = _ongoingNetworkSummariesRequest;
+    if (existing != null) return existing;
+
+    final request = _service.fetchAllExercises();
+    _ongoingNetworkSummariesRequest = request;
+    request.whenComplete(() {
+      if (identical(_ongoingNetworkSummariesRequest, request)) {
+        _ongoingNetworkSummariesRequest = null;
+      }
+    });
+    return request;
   }
 }
