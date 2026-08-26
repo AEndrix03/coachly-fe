@@ -9,6 +9,7 @@ import 'package:coachly/features/workout/workout_active_page/coach/providers/wor
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
@@ -50,6 +51,10 @@ class ActiveWorkout extends _$ActiveWorkout {
     if (response.success && response.data != null) {
       final workout = response.data!;
       var exercises = _buildExecutionExercises(workout);
+      exercises = await _resolveMissingExerciseNames(exercises);
+      if (!ref.mounted || token != _loadToken) {
+        return;
+      }
       final draft = ref.read(activeWorkoutDraftServiceProvider).read(workoutId);
       exercises = _restoreExercises(exercises, draft);
       final restoredTarget = _restoreTarget(exercises, draft);
@@ -110,6 +115,70 @@ class ActiveWorkout extends _$ActiveWorkout {
       displayName: _extractDisplayName(exercise, index),
       sets: sets,
     );
+  }
+
+  Future<List<ActiveExerciseState>> _resolveMissingExerciseNames(
+    List<ActiveExerciseState> exercises,
+  ) async {
+    final repository = ref.read(exerciseInfoPageRepositoryProvider);
+    return Future.wait(
+      exercises.map((exercise) async {
+        if (!_hasMissingExerciseName(exercise.exercise)) {
+          return exercise;
+        }
+
+        final exerciseId = exercise.exercise.exercise.id?.trim();
+        if (exerciseId == null || exerciseId.isEmpty) {
+          return exercise;
+        }
+
+        final response = await repository.getExerciseDetail(exerciseId);
+        final resolvedExercise = response.data;
+        if (resolvedExercise == null) {
+          return exercise;
+        }
+        final resolvedName = _displayNameFromI18n(
+          resolvedExercise.nameI18n,
+          exerciseId: exerciseId,
+        );
+        if (resolvedName == null) return exercise;
+
+        return exercise.copyWith(
+          exercise: exercise.exercise.copyWith(exercise: resolvedExercise),
+          displayName: resolvedName,
+        );
+      }),
+    );
+  }
+
+  bool _hasMissingExerciseName(WorkoutExerciseModel exercise) {
+    final exerciseId = exercise.exercise.id?.trim();
+    return _displayNameFromI18n(
+          exercise.exercise.nameI18n,
+          exerciseId: exerciseId,
+        ) ==
+        null;
+  }
+
+  String? _displayNameFromI18n(
+    Map<String, String>? names, {
+    required String? exerciseId,
+  }) {
+    if (names == null || names.isEmpty) return null;
+    final normalized = names.map(
+      (key, value) => MapEntry(key.toLowerCase().replaceAll('-', '_'), value),
+    );
+    for (final locale in ['it', 'it_it', 'en', 'en_us', 'en_en']) {
+      final name = normalized[locale]?.trim();
+      if (name != null && name.isNotEmpty && name != exerciseId) {
+        return name;
+      }
+    }
+    for (final name in normalized.values) {
+      final trimmed = name.trim();
+      if (trimmed.isNotEmpty && trimmed != exerciseId) return trimmed;
+    }
+    return null;
   }
 
   List<ActiveExerciseState> _buildExecutionExercises(WorkoutModel workout) {
@@ -645,23 +714,11 @@ class ActiveWorkout extends _$ActiveWorkout {
   }
 
   String _extractDisplayName(WorkoutExerciseModel exercise, int index) {
-    final exerciseId = exercise.exercise.id;
-    final names = exercise.exercise.nameI18n;
-    if (names != null) {
-      final normalizedNames = names.map(
-        (key, value) => MapEntry(key.toLowerCase().replaceAll('-', '_'), value),
-      );
-      for (final lang in ['en', 'en_us', 'en_en', 'it', 'it_it']) {
-        final name = normalizedNames[lang];
-        if (name != null && name.isNotEmpty && name != exerciseId) {
-          return name;
-        }
-      }
-      for (final name in normalizedNames.values) {
-        if (name.isNotEmpty && name != exerciseId) return name;
-      }
-    }
-    return 'Exercise ${index + 1}';
+    return _displayNameFromI18n(
+          exercise.exercise.nameI18n,
+          exerciseId: exercise.exercise.id,
+        ) ??
+        'Exercise ${index + 1}';
   }
 
   void _persistDraft() {

@@ -168,7 +168,9 @@ class WorkoutRemoteMapper {
         ? '${_formatNum(load)}${loadUnit ?? ''}'
         : '-';
 
-    final exerciseNameI18n = _toStringMap(exerciseMap?['nameI18n']);
+    final exerciseNameI18n =
+        _toStringMap(exerciseMap?['nameI18n']) ??
+        _extractTranslatedField(exerciseMap ?? const {}, field: 'name');
     final exerciseName =
         _asString(entry['exerciseName']) ?? _asString(exerciseMap?['name']);
 
@@ -176,11 +178,11 @@ class WorkoutRemoteMapper {
       id: _asString(entry['id']) ?? '${workoutId}_entry_$position',
       exercise: ExerciseDetailModel(
         id: exerciseId,
-        nameI18n:
-            exerciseNameI18n ??
-            (exerciseName != null
-                ? {'it': exerciseName, 'en': exerciseName}
-                : {'it': exerciseId, 'en': exerciseId}),
+        nameI18n: exerciseNameI18n.isNotEmpty
+            ? exerciseNameI18n
+            : (exerciseName != null
+                  ? {'it': exerciseName, 'en': exerciseName}
+                  : {'it': exerciseId, 'en': exerciseId}),
         difficultyLevel: _asString(exerciseMap?['difficultyLevel']),
       ),
       sets: setsLabel,
