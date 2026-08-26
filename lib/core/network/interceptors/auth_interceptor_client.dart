@@ -19,6 +19,7 @@ AuthHttpClient authHttpClient(Ref ref) {
 class AuthHttpClient extends http.BaseClient {
   final http.Client _inner;
   final Ref _ref;
+  Future<bool>? _ongoingTokenRefresh;
 
   AuthHttpClient(this._inner, this._ref);
 
@@ -98,6 +99,23 @@ class AuthHttpClient extends http.BaseClient {
   }
 
   Future<bool> _refreshToken() async {
+    final ongoingRefresh = _ongoingTokenRefresh;
+    if (ongoingRefresh != null) {
+      return ongoingRefresh;
+    }
+
+    final refresh = _performTokenRefresh();
+    _ongoingTokenRefresh = refresh;
+    try {
+      return await refresh;
+    } finally {
+      if (identical(_ongoingTokenRefresh, refresh)) {
+        _ongoingTokenRefresh = null;
+      }
+    }
+  }
+
+  Future<bool> _performTokenRefresh() async {
     final authService = _ref.read(authServiceProvider);
     final refreshToken = await authService.getRefreshToken();
 
