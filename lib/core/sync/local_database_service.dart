@@ -178,13 +178,6 @@ class LocalDatabaseService {
     debugPrint('Cleared all local data');
   }
 
-  bool get isSyncEnabled => settings.get('syncEnabled', defaultValue: true);
-
-  Future<void> setSyncEnabled(bool enabled) async {
-    await settings.put('syncEnabled', enabled);
-    debugPrint('Sync ${enabled ? 'enabled' : 'disabled'}');
-  }
-
   DateTime? get lastSyncTime {
     final timestamp = settings.get('lastSyncTime');
     if (timestamp is! String) {
