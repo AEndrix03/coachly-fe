@@ -37,7 +37,7 @@ void main() {
         ),
       ),
     );
-    expect(find.text('Aggiungi il primo esercizio'), findsOneWidget);
+    expect(find.text('Costruisci la sessione'), findsOneWidget);
   });
 
   testWidgets('summary renders derived pluralized values', (tester) async {
