@@ -68,7 +68,6 @@ Future<void> _pump(WidgetTester tester, WorkoutDetailViewData workout) async {
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: WorkoutStructure(
             workout: workout,
-            onEdit: () {},
             onOpenExercise: (_) {},
             onAddExercise: () {},
           ),

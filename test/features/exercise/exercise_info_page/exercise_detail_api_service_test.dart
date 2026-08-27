@@ -14,7 +14,11 @@ void main() {
     () async {
       final client = MockClient((request) async {
         expect(request.url.path, '/api/exercises/exercise-id/details');
-        return http.Response(jsonEncode(_exerciseDetailJson), 200);
+        return http.Response.bytes(
+        utf8.encode(jsonEncode(_exerciseDetailJson)),
+        200,
+        headers: _jsonHeaders,
+      );
       });
       final service = ApiExerciseDetailViewService(
         ApiClient(client: client, baseUrl: 'https://coachly.test/api'),
@@ -51,8 +55,8 @@ void main() {
   test('loads the complete catalogue from the filtered endpoint', () async {
     final client = MockClient((request) async {
       expect(request.url.path, '/api/exercises/filtered');
-      return http.Response(
-        jsonEncode([
+      return http.Response.bytes(
+        utf8.encode(jsonEncode([
           _exerciseDetailJson,
           {
             ..._exerciseDetailJson,
@@ -60,8 +64,9 @@ void main() {
             'code': 'BACK_SQUAT',
             'nameI18n': {'it': 'Back Squat'},
           },
-        ]),
+        ])),
         200,
+        headers: _jsonHeaders,
       );
     });
     final service = ApiExerciseDetailViewService(
@@ -170,3 +175,7 @@ const _exerciseDetailJson = <String, Object?>{
     },
   ],
 };
+
+/// Il backend risponde in UTF-8. Senza charset esplicito `http.Response`
+/// decodifica in latin1 e i payload che contengono `•` o accenti falliscono.
+const _jsonHeaders = {'content-type': 'application/json; charset=utf-8'};
