@@ -1,4 +1,4 @@
-import 'failures.dart';
+import 'package:coachly/core/error/failures.dart';
 
 /// Type-safe Either type per gestione errori funzionale
 /// Alternativa a dartz per evitare dipendenze extra
@@ -104,7 +104,7 @@ Either<Failure, T> tryCatch<T>(
   try {
     return Either.right(operation());
   } catch (e) {
-    final failure = onError?.call(e) ?? UnknownFailure(e.toString());
+    final failure = onError?.call(e) ?? UnexpectedFailure(e.toString(), e);
     return Either.left(failure);
   }
 }
@@ -118,7 +118,7 @@ Future<Either<Failure, T>> tryCatchAsync<T>(
     final result = await operation();
     return Either.right(result);
   } catch (e) {
-    final failure = onError?.call(e) ?? UnknownFailure(e.toString());
+    final failure = onError?.call(e) ?? UnexpectedFailure(e.toString(), e);
     return Either.left(failure);
   }
 }
