@@ -16,16 +16,31 @@ nessuno stato in cui il progetto non compila.
 
 Nulla di architetturale. Senza queste, tutto il resto non è verificabile.
 
-| # | Azione |
-|---|---|
-| 0.1 | Riparare la suite di test (oggi non compila) |
-| 0.2 | Escludere `qual/` dall'analyzer — 211 dei 308 issue vengono da lì |
-| 0.3 | Rimuovere le 5 dipendenze a zero utilizzi + `equatable` |
-| 0.4 | Guardare i `debugPrint`, togliere i body dalle risposte |
-| 0.5 | Rimuovere `syncEnabled` (codice morto) e i mock rimasti |
-| 0.6 | **Guardia sul logout con outbox non vuota** — perdita di dati attiva |
-| 0.7 | Correggere il default di `KEYCLOAK_CLIENT_ID` |
-| 0.8 | Passata di dead code: Coach e Feedback erano scollegate dal router senza che nessuno se ne accorgesse |
+| # | Azione | Stato |
+|---|---|---|
+| 0.1 | Riparare la suite di test (non compilava) | ✅ compila e gira |
+| 0.2 | Escludere `qual/` dall'analyzer | ✅ 308 → 104 issue |
+| 0.3 | Rimuovere le dipendenze a zero utilizzi + `equatable` | ✅ 7 rimosse |
+| 0.4 | Guardare i `debugPrint`, togliere i body dalle risposte | ✅ `AppLogger` |
+| 0.5 | Rimuovere `syncEnabled` (codice morto) e i mock rimasti | ✅ |
+| 0.6 | **Guardia sul logout con outbox non vuota** | ✅ con test, **UI da collegare** |
+| 0.7 | Correggere il default di `KEYCLOAK_CLIENT_ID` | ⏳ serve il valore reale dal realm Keycloak |
+| 0.8 | Passata di dead code | ⏳ |
+
+**Residuo della Fase 0**
+
+- 12 test rossi per deriva fra UI e asserzioni: 4 golden con diff ~20%, 6 su
+  `exercise_detail_redesign`, 1 su `workout_exercise_card`, 1 sul foglio sezioni
+  del builder. Non si "aggiustano" senza decidere caso per caso se ha ragione il
+  test o la UI, e diversi toccano schermate in corso di riscrittura.
+- `logout()` ora ritorna `bool` e rifiuta se la coda non è vuota. I due call
+  site (`profile_page.dart`, `offline_mode_banner.dart`) ignorano il valore:
+  finché non vengono collegati, il logout con dati pendenti **non fa nulla** e
+  logga un warning. Va aggiunto un dialog che chiami `logout(force: true)` dopo
+  conferma esplicita.
+- Come effetto collaterale della tassonomia sealed, `Result<T, Failure>` della
+  Fase 1.4 è già mezzo fatto: manca solo il tipo `Result` e la conversione al
+  confine.
 
 ## Fase 1 — Fondamenta invisibili
 
