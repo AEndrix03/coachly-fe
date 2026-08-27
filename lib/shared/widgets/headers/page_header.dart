@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Header gradient con pill-badge, identico allo stile di WorkoutHeader.
-/// Usato da FeedbackPage, ProfilePage e qualsiasi futura pagina top-level.
+/// Usato da ProfilePage e qualsiasi futura pagina top-level.
 class PageHeader extends StatelessWidget {
   final IconData badgeIcon;
   final String badgeLabel;
@@ -24,8 +24,11 @@ class PageHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = gradientColors ??
-        const [Color(0xFF2196F3), Color(0xFF1976D2), Color(0xFF7B4BC1)];
+    final scheme = Theme.of(context).colorScheme;
+    final colors = gradientColors ?? [
+      scheme.primaryContainer,
+      scheme.primaryContainer,
+    ];
 
     return Container(
       width: double.infinity,
@@ -51,8 +54,8 @@ class PageHeader extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: scheme.onPrimaryContainer,
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.3,
@@ -64,7 +67,7 @@ class PageHeader extends StatelessWidget {
                 Text(
                   subtitle!,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.70),
+                    color: scheme.onPrimaryContainer.withValues(alpha: 0.70),
                     fontSize: 14,
                     height: 1.4,
                   ),
@@ -88,21 +91,21 @@ class PageHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
-            color: scheme.onPrimary.withValues(alpha: 0.22),
+            color: scheme.onPrimaryContainer.withValues(alpha: 0.22),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: scheme.onPrimary.withValues(alpha: 0.28),
+              color: scheme.onPrimaryContainer.withValues(alpha: 0.28),
             ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(badgeIcon, color: Colors.white, size: 14),
+              Icon(badgeIcon, color: scheme.onPrimaryContainer, size: 14),
               const SizedBox(width: 7),
               Text(
                 badgeLabel,
                 style: TextStyle(
-                  color: scheme.onPrimary.withValues(alpha: 0.95),
+                  color: scheme.onPrimaryContainer.withValues(alpha: 0.95),
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),

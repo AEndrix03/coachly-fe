@@ -1552,20 +1552,6 @@ class AppStrings {
           'Progetta allenamenti su misura per te.\nInizia il tuo percorso fitness oggi.',
     },
     'workout.empty.start': {'en': "Let's start", 'it': 'Iniziamo'},
-    'feedback.offline_connection': {
-      'en': 'An internet connection is required to send feedback.',
-      'it': 'Per inviare feedback è necessaria una connessione a Internet.',
-    },
-    'feedback.idea_hint': {
-      'en': 'E.g. "I would like to track progress over time..."',
-      'it': 'Es. "Vorrei poter vedere i progressi nel tempo..."',
-    },
-    'feedback.thanks_detail': {
-      'en':
-          'Your feedback is valuable and helps us build a better app for everyone.',
-      'it':
-          "Il tuo feedback è prezioso e ci aiuterà a costruire un'app migliore per tutti.",
-    },
     'offline.mode': {'en': 'Offline mode', 'it': 'Modalità Offline'},
     'offline.session_expired': {
       'en': 'Session expired. Reconnect to sync.',
