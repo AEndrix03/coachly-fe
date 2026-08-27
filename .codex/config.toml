@@ -1,0 +1,15 @@
+# Configurazione Codex per il repository Coachly (client Flutter).
+#
+# Codex NON supporta gli @import dentro AGENTS.md: il gate di lettura è quindi
+# scritto per esteso all'inizio di AGENTS.md, che Codex carica nativamente
+# concatenando dalla root del repository fino alla directory corrente.
+#
+# Le regole complete stanno in .claude/rules/development.md e l'architettura in
+# docs/development/. AGENTS.md ordina di leggerle come prima azione.
+
+# Se AGENTS.md dovesse mancare in una directory, prova anche questi nomi.
+project_doc_fallback_filenames = ["CLAUDE.md"]
+
+# AGENTS.md + gate esteso restano ampiamente sotto il default di 32 KiB,
+# ma lo alziamo per sicurezza se il gate dovesse crescere.
+project_doc_max_bytes = 65536

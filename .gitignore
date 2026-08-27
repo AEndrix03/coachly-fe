@@ -41,3 +41,7 @@ qual
 # I documenti di architettura devono essere versionati:
 # neutralizza "docs/" del gitignore globale.
 !docs/
+
+# Le istruzioni per gli agenti devono essere versionate:
+# neutralizza "AGENTS.md" del gitignore globale.
+!AGENTS.md
