@@ -8,6 +8,57 @@ enum WorkoutSessionStatus { preparing, active, paused, completed }
 
 enum WorkoutPhase { preparing, exercising, resting, completed }
 
+/// The purpose of a set is independent from the technique applied to it.
+enum SetRole { working, warmup, topSet, backoff }
+
+enum SetTechnique { none, dropSet, restPause, myoReps, amrap, failure, cluster }
+
+enum ExerciseGroupType {
+  superset,
+  triset,
+  giantSet,
+  circuit,
+  preparation,
+  mobility,
+}
+
+class DropSetState {
+  final String id;
+  final double weight;
+  final int reps;
+
+  const DropSetState({
+    required this.id,
+    required this.weight,
+    required this.reps,
+  });
+
+  DropSetState copyWith({String? id, double? weight, int? reps}) =>
+      DropSetState(
+        id: id ?? this.id,
+        weight: weight ?? this.weight,
+        reps: reps ?? this.reps,
+      );
+}
+
+class ActiveExerciseGroup {
+  final String id;
+  final ExerciseGroupType type;
+  final List<String> exerciseIds;
+  final int? restBetweenExercisesSeconds;
+  final int? restAfterRoundSeconds;
+  final int? rounds;
+
+  const ActiveExerciseGroup({
+    required this.id,
+    required this.type,
+    required this.exerciseIds,
+    this.restBetweenExercisesSeconds,
+    this.restAfterRoundSeconds,
+    this.rounds,
+  });
+}
+
 class WorkoutExecutionTarget {
   final String blockId;
   final String exerciseId;
@@ -35,6 +86,9 @@ class ActiveSetState {
   final double? distance;
   final int? leftReps;
   final int? rightReps;
+  final SetRole role;
+  final SetTechnique technique;
+  final List<DropSetState> drops;
 
   const ActiveSetState({
     required this.id,
@@ -49,6 +103,9 @@ class ActiveSetState {
     this.distance,
     this.leftReps,
     this.rightReps,
+    this.role = SetRole.working,
+    this.technique = SetTechnique.none,
+    this.drops = const [],
   });
 
   ActiveSetState copyWith({
@@ -64,6 +121,9 @@ class ActiveSetState {
     double? distance,
     int? leftReps,
     int? rightReps,
+    SetRole? role,
+    SetTechnique? technique,
+    List<DropSetState>? drops,
   }) {
     return ActiveSetState(
       id: id ?? this.id,
@@ -78,6 +138,9 @@ class ActiveSetState {
       distance: distance ?? this.distance,
       leftReps: leftReps ?? this.leftReps,
       rightReps: rightReps ?? this.rightReps,
+      role: role ?? this.role,
+      technique: technique ?? this.technique,
+      drops: drops ?? this.drops,
     );
   }
 }
@@ -141,6 +204,7 @@ class ActiveWorkoutState {
   final String? pendingCoachDecisionId;
   final List<String> sessionChanges;
   final List<ActiveExerciseState> exercises;
+  final List<ActiveExerciseGroup> groups;
   final String? errorMessage;
 
   const ActiveWorkoutState({
@@ -155,6 +219,7 @@ class ActiveWorkoutState {
     this.pendingCoachDecisionId,
     this.sessionChanges = const [],
     this.exercises = const [],
+    this.groups = const [],
     this.errorMessage,
   });
 
@@ -168,15 +233,11 @@ class ActiveWorkoutState {
 
   int get totalExercises => exercises.length;
 
-  int get completedSetCount => exercises.fold(
-    0,
-    (total, exercise) => total + exercise.completedSets,
-  );
+  int get completedSetCount =>
+      exercises.fold(0, (total, exercise) => total + exercise.completedSets);
 
-  int get totalSetCount => exercises.fold(
-    0,
-    (total, exercise) => total + exercise.totalSets,
-  );
+  int get totalSetCount =>
+      exercises.fold(0, (total, exercise) => total + exercise.totalSets);
 
   ActiveExerciseState? get currentExercise {
     final exerciseId = currentTarget?.exerciseId;
@@ -212,6 +273,7 @@ class ActiveWorkoutState {
     bool clearCurrentTarget = false,
     bool clearPendingCoachDecision = false,
     List<ActiveExerciseState>? exercises,
+    List<ActiveExerciseGroup>? groups,
     String? errorMessage,
   }) {
     return ActiveWorkoutState(
@@ -230,6 +292,7 @@ class ActiveWorkoutState {
           : pendingCoachDecisionId ?? this.pendingCoachDecisionId,
       sessionChanges: sessionChanges ?? this.sessionChanges,
       exercises: exercises ?? this.exercises,
+      groups: groups ?? this.groups,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }

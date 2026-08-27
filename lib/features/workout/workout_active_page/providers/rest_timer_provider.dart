@@ -8,6 +8,7 @@ class RestTimerState {
   final int initialSeconds;
   final bool isBellEnabled;
   final bool completedNaturally;
+  final bool isPaused;
 
   const RestTimerState({
     required this.remainingSeconds,
@@ -15,6 +16,7 @@ class RestTimerState {
     required this.initialSeconds,
     required this.isBellEnabled,
     this.completedNaturally = false,
+    this.isPaused = false,
   });
 
   RestTimerState copyWith({
@@ -23,6 +25,7 @@ class RestTimerState {
     int? initialSeconds,
     bool? isBellEnabled,
     bool? completedNaturally,
+    bool? isPaused,
   }) {
     return RestTimerState(
       remainingSeconds: remainingSeconds ?? this.remainingSeconds,
@@ -30,6 +33,7 @@ class RestTimerState {
       initialSeconds: initialSeconds ?? this.initialSeconds,
       isBellEnabled: isBellEnabled ?? this.isBellEnabled,
       completedNaturally: completedNaturally ?? this.completedNaturally,
+      isPaused: isPaused ?? this.isPaused,
     );
   }
 }
@@ -46,6 +50,7 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
       initialSeconds: 0,
       isBellEnabled: true,
       completedNaturally: false,
+      isPaused: false,
     );
   }
 
@@ -57,11 +62,13 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
       initialSeconds: seconds,
       isBellEnabled: state.isBellEnabled,
       completedNaturally: false,
+      isPaused: false,
     );
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       // Finish in the same tick that reaches zero.  The completion listener
       // relies on this active -> inactive transition to trigger the alarm.
+      if (state.isPaused) return;
       if (state.remainingSeconds <= 1) {
         stopTimer(completedNaturally: true);
       } else {
@@ -93,7 +100,13 @@ class RestTimerNotifier extends Notifier<RestTimerState> {
       isActive: false,
       remainingSeconds: 0,
       completedNaturally: completedNaturally,
+      isPaused: false,
     );
+  }
+
+  void togglePause() {
+    if (!state.isActive) return;
+    state = state.copyWith(isPaused: !state.isPaused);
   }
 
   void setBellEnabled(bool enabled) {

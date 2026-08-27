@@ -44,9 +44,26 @@ class ActiveWorkoutDraftService {
               'distance': set.distance,
               'leftReps': set.leftReps,
               'rightReps': set.rightReps,
+              'role': set.role.name,
+              'technique': set.technique.name,
+              'drops': [
+                for (final drop in set.drops)
+                  {'id': drop.id, 'weight': drop.weight, 'reps': drop.reps},
+              ],
               'completed': set.completed,
               'skipped': set.skipped,
             },
+      ],
+      'groups': [
+        for (final group in state.groups)
+          {
+            'id': group.id,
+            'type': group.type.name,
+            'exerciseIds': group.exerciseIds,
+            'restBetweenExercisesSeconds': group.restBetweenExercisesSeconds,
+            'restAfterRoundSeconds': group.restAfterRoundSeconds,
+            'rounds': group.rounds,
+          },
       ],
     });
   }

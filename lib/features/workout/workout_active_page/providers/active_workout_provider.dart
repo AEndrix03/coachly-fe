@@ -10,6 +10,7 @@ import 'package:coachly/features/workout/workout_active_page/providers/active_wo
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
@@ -17,12 +18,14 @@ import 'package:coachly/features/workout/workout_page/data/repositories/workout_
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'active_workout_provider.g.dart';
 
 @riverpod
 class ActiveWorkout extends _$ActiveWorkout {
   static const _executionResolver = WorkoutExecutionResolver();
+  static const _uuid = Uuid();
   int _loadToken = 0;
 
   @override
@@ -51,12 +54,14 @@ class ActiveWorkout extends _$ActiveWorkout {
     if (response.success && response.data != null) {
       final workout = response.data!;
       var exercises = _buildExecutionExercises(workout);
+      var groups = _buildExecutionGroups(workout, exercises);
       exercises = await _resolveMissingExerciseNames(exercises);
       if (!ref.mounted || token != _loadToken) {
         return;
       }
       final draft = ref.read(activeWorkoutDraftServiceProvider).read(workoutId);
       exercises = _restoreExercises(exercises, draft);
+      groups = _restoreGroups(groups, draft);
       final restoredTarget = _restoreTarget(exercises, draft);
 
       state = state.copyWith(
@@ -69,6 +74,7 @@ class ActiveWorkout extends _$ActiveWorkout {
             DateTime.tryParse(draft?['startedAt'] as String? ?? '') ??
             DateTime.now(),
         exercises: exercises,
+        groups: groups,
         sessionStatus: WorkoutSessionStatus.active,
         phase: WorkoutPhase.exercising,
         currentTarget: restoredTarget ?? _firstExecutionTarget(exercises),
@@ -231,6 +237,42 @@ class ActiveWorkout extends _$ActiveWorkout {
             return _buildActiveExercise(entry.value, entry.key);
           }).toList()
         : result;
+  }
+
+  List<ActiveExerciseGroup> _buildExecutionGroups(
+    WorkoutModel workout,
+    List<ActiveExerciseState> exercises,
+  ) {
+    ExerciseGroupType? groupType(String? raw) => switch (raw) {
+      'superset' => ExerciseGroupType.superset,
+      'triset' => ExerciseGroupType.triset,
+      'giantset' || 'giant_set' || 'giant set' => ExerciseGroupType.giantSet,
+      'circuit' => ExerciseGroupType.circuit,
+      'preparation' => ExerciseGroupType.preparation,
+      'mobility' => ExerciseGroupType.mobility,
+      _ => null,
+    };
+    final result = <ActiveExerciseGroup>[];
+    for (final block in workout.programmingBlocks) {
+      final type = groupType(block.groupType);
+      if (type == null || block.entries.length < 2) continue;
+      final ids = exercises
+          .where((item) => item.executionBlockId == block.id)
+          .map((item) => item.exercise.id)
+          .toList();
+      if (ids.length < 2) continue;
+      result.add(
+        ActiveExerciseGroup(
+          id: block.id,
+          type: type,
+          exerciseIds: ids,
+          restBetweenExercisesSeconds: block.restBetweenExercisesSeconds,
+          restAfterRoundSeconds: block.restSeconds,
+          rounds: block.rounds,
+        ),
+      );
+    }
+    return result;
   }
 
   // ─── Set mutations ────────────────────────────────────────────────────────
@@ -401,6 +443,110 @@ class ActiveWorkout extends _$ActiveWorkout {
     _mutateSet(exerciseIdx, setIdx, (s) => s.copyWith(setType: setType));
   }
 
+  void changeSetTechnique(String setId, SetTechnique technique) {
+    _mutateSetById(
+      setId,
+      (set) => set.copyWith(
+        technique: technique,
+        drops: technique == SetTechnique.dropSet && set.drops.isEmpty
+            ? [
+                DropSetState(
+                  id: '$setId:drop:0',
+                  weight: set.weight * .85,
+                  reps: set.reps,
+                ),
+              ]
+            : set.drops,
+      ),
+    );
+  }
+
+  void addDrop(String setId, {double? weight, int? reps}) {
+    _mutateSetById(setId, (set) {
+      final last = set.drops.isNotEmpty ? set.drops.last : null;
+      final nextWeight = weight ?? (last?.weight ?? set.weight) * .85;
+      return set.copyWith(
+        technique: SetTechnique.dropSet,
+        drops: [
+          ...set.drops,
+          DropSetState(
+            id: '$setId:drop:${set.drops.length}',
+            weight: nextWeight,
+            reps: reps ?? last?.reps ?? set.reps,
+          ),
+        ],
+      );
+    });
+  }
+
+  void createExerciseGroup(List<String> exerciseIds, ExerciseGroupType type) {
+    if (exerciseIds.length < 2) return;
+    final id = 'group:${DateTime.now().microsecondsSinceEpoch}';
+    final group = ActiveExerciseGroup(
+      id: id,
+      type: type,
+      exerciseIds: List.unmodifiable(exerciseIds),
+      restAfterRoundSeconds: 60,
+    );
+    final exercises = state.exercises.map((exercise) {
+      return exerciseIds.contains(exercise.exercise.id)
+          ? exercise.copyWith(executionBlockId: id)
+          : exercise;
+    }).toList();
+    state = state.copyWith(
+      groups: [...state.groups, group],
+      exercises: exercises,
+    );
+    _persistDraft();
+  }
+
+  void ungroupExercises(String groupId) {
+    final group = state.groups.where((item) => item.id == groupId).firstOrNull;
+    final exercises = group == null
+        ? state.exercises
+        : state.exercises.map((exercise) {
+            return group.exerciseIds.contains(exercise.exercise.id)
+                ? exercise.copyWith(
+                    executionBlockId: 'block:${exercise.exercise.id}',
+                  )
+                : exercise;
+          }).toList();
+    state = state.copyWith(
+      groups: state.groups.where((group) => group.id != groupId).toList(),
+      exercises: exercises,
+    );
+    _persistDraft();
+  }
+
+  void updateExerciseGroup({
+    required String groupId,
+    ExerciseGroupType? type,
+    int? restBetweenExercisesSeconds,
+    int? restAfterRoundSeconds,
+    int? rounds,
+  }) {
+    state = state.copyWith(
+      groups: state.groups.map((group) {
+        if (group.id != groupId) return group;
+        return ActiveExerciseGroup(
+          id: group.id,
+          type: type ?? group.type,
+          exerciseIds: group.exerciseIds,
+          restBetweenExercisesSeconds:
+              restBetweenExercisesSeconds ?? group.restBetweenExercisesSeconds,
+          restAfterRoundSeconds:
+              restAfterRoundSeconds ?? group.restAfterRoundSeconds,
+          rounds: rounds ?? group.rounds,
+        );
+      }).toList(),
+    );
+    _persistDraft();
+  }
+
+  void updateSetRole(String setId, SetRole role) {
+    _mutateSetById(setId, (set) => set.copyWith(role: role));
+  }
+
   VoiceApplyOutcome? applyVoiceEntry({
     required String exerciseId,
     required int? sets,
@@ -472,6 +618,135 @@ class ActiveWorkout extends _$ActiveWorkout {
     );
     exercises[exerciseIdx] = ex.copyWith(sets: [...ex.sets, newSet]);
     state = state.copyWith(exercises: exercises);
+    _persistDraft();
+  }
+
+  /// Inserts a locally cached exercise without waiting for a server-generated id.
+  void addExercise(
+    ExerciseDetailModel exercise, {
+    String? afterExerciseId,
+    String? groupId,
+  }) {
+    final exerciseId = exercise.id;
+    if (exerciseId == null || exerciseId.isEmpty) return;
+    final entryId = _uuid.v4();
+    final activeExercise = ActiveExerciseState(
+      executionBlockId: groupId ?? 'block:$entryId',
+      exercise: WorkoutExerciseModel(
+        id: entryId,
+        exercise: exercise,
+        sets: '3x10',
+        rest: '90s',
+        weight: '0 kg',
+        progress: 0,
+      ),
+      displayName:
+          _displayNameFromI18n(exercise.nameI18n, exerciseId: exerciseId) ??
+          'Exercise',
+      sets: List.generate(
+        3,
+        (index) => ActiveSetState(
+          id: _uuid.v4(),
+          position: index,
+          setType: 'normal',
+          weight: 0,
+          reps: 10,
+          completed: false,
+        ),
+      ),
+    );
+    final exercises = [...state.exercises];
+    final anchor = afterExerciseId == null
+        ? -1
+        : exercises.indexWhere((item) => item.exercise.id == afterExerciseId);
+    exercises.insert(
+      anchor < 0 ? exercises.length : anchor + 1,
+      activeExercise,
+    );
+    final groups = state.groups.map((group) {
+      if (group.id != groupId) return group;
+      return ActiveExerciseGroup(
+        id: group.id,
+        type: group.type,
+        exerciseIds: [...group.exerciseIds, entryId],
+        restBetweenExercisesSeconds: group.restBetweenExercisesSeconds,
+        restAfterRoundSeconds: group.restAfterRoundSeconds,
+        rounds: group.rounds,
+      );
+    }).toList();
+    state = state.copyWith(exercises: exercises, groups: groups);
+    _persistDraft();
+  }
+
+  void removeExercise(String entryId) {
+    final exercises = state.exercises
+        .where((exercise) => exercise.exercise.id != entryId)
+        .toList();
+    final groups = state.groups
+        .map(
+          (group) => ActiveExerciseGroup(
+            id: group.id,
+            type: group.type,
+            exerciseIds: group.exerciseIds
+                .where((id) => id != entryId)
+                .toList(),
+            restBetweenExercisesSeconds: group.restBetweenExercisesSeconds,
+            restAfterRoundSeconds: group.restAfterRoundSeconds,
+            rounds: group.rounds,
+          ),
+        )
+        .where((group) => group.exerciseIds.length > 1)
+        .toList();
+    state = state.copyWith(exercises: exercises, groups: groups);
+    _advanceFrom(state.currentTarget);
+  }
+
+  void reorderExercise(int oldIndex, int newIndex) {
+    if (oldIndex < 0 || oldIndex >= state.exercises.length) return;
+    final exercises = [...state.exercises];
+    final item = exercises.removeAt(oldIndex);
+    exercises.insert(newIndex.clamp(0, exercises.length), item);
+    state = state.copyWith(exercises: exercises);
+    _persistDraft();
+  }
+
+  void substituteExercise(String entryId, ExerciseDetailModel replacement) {
+    final index = state.exercises.indexWhere(
+      (exercise) => exercise.exercise.id == entryId,
+    );
+    if (index < 0) return;
+    final replacementId = replacement.id;
+    if (replacementId == null || replacementId.isEmpty) return;
+    final current = state.exercises[index];
+    final replacementEntryId = _uuid.v4();
+    final exercises = [...state.exercises];
+    exercises[index] = current.copyWith(
+      exercise: current.exercise.copyWith(
+        id: replacementEntryId,
+        exercise: replacement,
+      ),
+      displayName:
+          _displayNameFromI18n(
+            replacement.nameI18n,
+            exerciseId: replacementId,
+          ) ??
+          current.displayName,
+    );
+    final groups = state.groups
+        .map(
+          (group) => ActiveExerciseGroup(
+            id: group.id,
+            type: group.type,
+            exerciseIds: group.exerciseIds
+                .map((id) => id == entryId ? replacementEntryId : id)
+                .toList(),
+            restBetweenExercisesSeconds: group.restBetweenExercisesSeconds,
+            restAfterRoundSeconds: group.restAfterRoundSeconds,
+            rounds: group.rounds,
+          ),
+        )
+        .toList();
+    state = state.copyWith(exercises: exercises, groups: groups);
     _persistDraft();
   }
 
@@ -802,6 +1077,24 @@ class ActiveWorkout extends _$ActiveWorkout {
   }
 
   ActiveSetState _restoreSet(ActiveSetState set, Map<String, dynamic> saved) {
+    final technique =
+        SetTechnique.values
+            .where((item) => item.name == saved['technique'])
+            .firstOrNull ??
+        set.technique;
+    final role =
+        SetRole.values
+            .where((item) => item.name == saved['role'])
+            .firstOrNull ??
+        set.role;
+    final drops = (saved['drops'] as List?)?.whereType<Map>().map((raw) {
+      final drop = raw.map((key, value) => MapEntry(key.toString(), value));
+      return DropSetState(
+        id: drop['id'] as String? ?? '${set.id}:drop:0',
+        weight: (drop['weight'] as num?)?.toDouble() ?? set.weight,
+        reps: (drop['reps'] as num?)?.toInt() ?? set.reps,
+      );
+    }).toList();
     return set.copyWith(
       position: (saved['position'] as num?)?.toInt(),
       setType: saved['setType'] as String?,
@@ -812,9 +1105,43 @@ class ActiveWorkout extends _$ActiveWorkout {
       distance: (saved['distance'] as num?)?.toDouble(),
       leftReps: (saved['leftReps'] as num?)?.toInt(),
       rightReps: (saved['rightReps'] as num?)?.toInt(),
+      role: role,
+      technique: technique,
+      drops: drops,
       completed: saved['completed'] as bool?,
       skipped: saved['skipped'] as bool?,
     );
+  }
+
+  List<ActiveExerciseGroup> _restoreGroups(
+    List<ActiveExerciseGroup> defaults,
+    Map<String, dynamic>? draft,
+  ) {
+    final rawGroups = draft?['groups'];
+    if (rawGroups is! List) return defaults;
+    final restored = <ActiveExerciseGroup>[];
+    for (final raw in rawGroups.whereType<Map>()) {
+      final group = raw.map((key, value) => MapEntry(key.toString(), value));
+      final type = ExerciseGroupType.values
+          .where((item) => item.name == group['type'])
+          .firstOrNull;
+      final id = group['id'] as String?;
+      final ids = (group['exerciseIds'] as List?)?.whereType<String>().toList();
+      if (type == null || id == null || ids == null || ids.length < 2) continue;
+      restored.add(
+        ActiveExerciseGroup(
+          id: id,
+          type: type,
+          exerciseIds: ids,
+          restBetweenExercisesSeconds:
+              (group['restBetweenExercisesSeconds'] as num?)?.toInt(),
+          restAfterRoundSeconds: (group['restAfterRoundSeconds'] as num?)
+              ?.toInt(),
+          rounds: (group['rounds'] as num?)?.toInt(),
+        ),
+      );
+    }
+    return restored;
   }
 
   WorkoutExecutionTarget? _restoreTarget(
