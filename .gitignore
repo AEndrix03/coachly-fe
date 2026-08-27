@@ -37,3 +37,7 @@ bin/
 build/
 
 qual
+
+# I documenti di architettura devono essere versionati:
+# neutralizza "docs/" del gitignore globale.
+!docs/
