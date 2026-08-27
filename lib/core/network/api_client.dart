@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/network/api_endpoints.dart';
 import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,12 +16,17 @@ part 'api_client.g.dart';
 @riverpod
 ApiClient apiClient(Ref ref) {
   final httpClient = ref.watch(authHttpClientProvider);
-  return ApiClient(client: httpClient, baseUrl: ApiEndpoints.apiBaseUrl);
+  return ApiClient(
+    client: httpClient,
+    baseUrl: ApiEndpoints.apiBaseUrl,
+    logger: ref.watch(appLoggerProvider),
+  );
 }
 
 /// HTTP Client centralizzato
 class ApiClient {
   final http.Client _client;
+  final AppLogger _logger;
   final String baseUrl;
   final Duration timeout;
   final Map<String, String> defaultHeaders;
@@ -29,9 +34,11 @@ class ApiClient {
   ApiClient({
     required http.Client client,
     required this.baseUrl,
+    AppLogger logger = const ConsoleAppLogger(),
     this.timeout = const Duration(seconds: 30),
     Map<String, String>? defaultHeaders,
   }) : _client = client,
+       _logger = logger,
        defaultHeaders =
            defaultHeaders ??
            {'Content-Type': 'application/json', 'Accept': 'application/json'};
@@ -43,7 +50,7 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(endpoint, queryParameters);
-      debugPrint('📡 GET: $uri');
+      _logger.debug('GET', context: {'path': endpoint});
 
       final response = await _client
           .get(uri, headers: defaultHeaders)
@@ -63,8 +70,7 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(endpoint, queryParameters);
-      debugPrint('📡 POST: $uri');
-      debugPrint('📦 Body: ${jsonEncode(body)}');
+      _logger.debug('POST', context: {'path': endpoint});
 
       final response = await _client
           .post(
@@ -88,7 +94,7 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(endpoint, queryParameters);
-      debugPrint('📡 PUT: $uri');
+      _logger.debug('PUT', context: {'path': endpoint});
 
       final response = await _client
           .put(
@@ -111,7 +117,7 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(endpoint, queryParameters);
-      debugPrint('📡 DELETE: $uri');
+      _logger.debug('DELETE', context: {'path': endpoint});
 
       final response = await _client
           .delete(uri, headers: defaultHeaders)
@@ -132,7 +138,15 @@ class ApiClient {
     http.Response response,
     T Function(dynamic)? fromJson,
   ) {
-    debugPrint('📥 Response ${response.statusCode}: ${response.body}');
+    // Mai il body completo: contiene dati dell'utente e in release sarebbe
+    // comunque stampato. Vedi docs/development/18-observability.md.
+    _logger.debug(
+      'Response',
+      context: {
+        'status': response.statusCode,
+        'bytes': response.bodyBytes.length,
+      },
+    );
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       // Handle empty response body for success codes like 204 No Content
@@ -178,7 +192,7 @@ class ApiClient {
   }
 
   ApiResponse<T> _handleError<T>(dynamic error) {
-    debugPrint('❌ Error: $error');
+    _logger.warn('Request failed', error: error);
 
     if (error is TimeoutException) {
       return ApiResponse.error(
