@@ -75,6 +75,9 @@ class ActiveWorkout extends _$ActiveWorkout {
             DateTime.now(),
         exercises: exercises,
         groups: groups,
+        sessionChanges:
+            (draft?['sessionChanges'] as List?)?.whereType<String>().toList() ??
+            const [],
         sessionStatus: WorkoutSessionStatus.active,
         phase: WorkoutPhase.exercising,
         currentTarget: restoredTarget ?? _firstExecutionTarget(exercises),
@@ -296,7 +299,8 @@ class ActiveWorkout extends _$ActiveWorkout {
         .where((item) => item.sets.any((set) => set.id == setId))
         .firstOrNull;
     if (exercise == null) return;
-    completeSetById(setId);
+    final didComplete = completeSetById(setId);
+    if (!didComplete) return;
     if (state.currentTarget != null) {
       final restSeconds = exercise.restSeconds;
       ref.read(restTimerProvider.notifier).startTimer(restSeconds);
@@ -317,16 +321,22 @@ class ActiveWorkout extends _$ActiveWorkout {
     undoSetCompletion(setId);
   }
 
-  void completeSetById(String setId) {
+  bool completeSetById(String setId) {
+    final target = _targetForSet(setId);
+    if (target == null) return false;
+    final targetSet = state.exercises
+        .expand((exercise) => exercise.sets)
+        .where((set) => set.id == setId)
+        .firstOrNull;
+    if (targetSet == null || targetSet.completed) return false;
     final coachContext = _coachContextFor(setId);
-    final previousTarget = state.currentTarget;
     _mutateSetById(
       setId,
       (set) => set.copyWith(completed: true, skipped: false),
     );
     final next = _executionResolver.resolveNext(
       exercises: state.exercises,
-      after: previousTarget,
+      after: target,
     );
     state = state.copyWith(
       currentTarget: next,
@@ -359,6 +369,7 @@ class ActiveWorkout extends _$ActiveWorkout {
             ),
       );
     }
+    return true;
   }
 
   void undoSetCompletion(String setId) {
@@ -432,6 +443,13 @@ class ActiveWorkout extends _$ActiveWorkout {
     _mutateSetById(setId, (set) => set.copyWith(rir: rir));
   }
 
+  void updateSetNote(String setId, String note, Set<SetNoteTag> tags) {
+    _mutateSetById(
+      setId,
+      (set) => set.copyWith(note: note, noteTags: Set.unmodifiable(tags)),
+    );
+  }
+
   void updateSetSideReps(String setId, {int? left, int? right}) {
     _mutateSetById(
       setId,
@@ -452,8 +470,8 @@ class ActiveWorkout extends _$ActiveWorkout {
             ? [
                 DropSetState(
                   id: '$setId:drop:0',
-                  weight: set.weight * .85,
-                  reps: set.reps,
+                  weight: set.weight * .60,
+                  reps: (set.reps - 2).clamp(0, 999),
                 ),
               ]
             : set.drops,
@@ -464,7 +482,9 @@ class ActiveWorkout extends _$ActiveWorkout {
   void addDrop(String setId, {double? weight, int? reps}) {
     _mutateSetById(setId, (set) {
       final last = set.drops.isNotEmpty ? set.drops.last : null;
-      final nextWeight = weight ?? (last?.weight ?? set.weight) * .85;
+      final sourceWeight = last?.weight ?? set.weight;
+      final sourceReps = last?.reps ?? set.reps;
+      final nextWeight = weight ?? sourceWeight * .60;
       return set.copyWith(
         technique: SetTechnique.dropSet,
         drops: [
@@ -472,11 +492,47 @@ class ActiveWorkout extends _$ActiveWorkout {
           DropSetState(
             id: '$setId:drop:${set.drops.length}',
             weight: nextWeight,
-            reps: reps ?? last?.reps ?? set.reps,
+            reps: reps ?? (sourceReps - 2).clamp(0, 999),
           ),
         ],
       );
     });
+  }
+
+  void removeDrop(String setId, String dropId) {
+    _mutateSetById(setId, (set) {
+      final remaining = set.drops.where((drop) => drop.id != dropId).toList();
+      return set.copyWith(
+        drops: remaining,
+        technique: remaining.isEmpty ? SetTechnique.none : set.technique,
+      );
+    });
+  }
+
+  void updateDropWeight(String setId, String dropId, double weight) {
+    _mutateSetById(
+      setId,
+      (set) => set.copyWith(
+        drops: [
+          for (final drop in set.drops)
+            drop.id == dropId
+                ? drop.copyWith(weight: weight.clamp(0, 9999))
+                : drop,
+        ],
+      ),
+    );
+  }
+
+  void updateDropReps(String setId, String dropId, int reps) {
+    _mutateSetById(
+      setId,
+      (set) => set.copyWith(
+        drops: [
+          for (final drop in set.drops)
+            drop.id == dropId ? drop.copyWith(reps: reps.clamp(0, 999)) : drop,
+        ],
+      ),
+    );
   }
 
   void createExerciseGroup(List<String> exerciseIds, ExerciseGroupType type) {
@@ -617,18 +673,26 @@ class ActiveWorkout extends _$ActiveWorkout {
       completed: false,
     );
     exercises[exerciseIdx] = ex.copyWith(sets: [...ex.sets, newSet]);
-    state = state.copyWith(exercises: exercises);
+    state = state.copyWith(
+      exercises: exercises,
+      currentTarget: WorkoutExecutionTarget(
+        blockId: ex.executionBlockId,
+        exerciseId: ex.exercise.id,
+        setId: newSet.id,
+      ),
+      phase: WorkoutPhase.exercising,
+    );
     _persistDraft();
   }
 
   /// Inserts a locally cached exercise without waiting for a server-generated id.
-  void addExercise(
+  String? addExercise(
     ExerciseDetailModel exercise, {
     String? afterExerciseId,
     String? groupId,
   }) {
     final exerciseId = exercise.id;
-    if (exerciseId == null || exerciseId.isEmpty) return;
+    if (exerciseId == null || exerciseId.isEmpty) return null;
     final entryId = _uuid.v4();
     final activeExercise = ActiveExerciseState(
       executionBlockId: groupId ?? 'block:$entryId',
@@ -676,6 +740,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     }).toList();
     state = state.copyWith(exercises: exercises, groups: groups);
     _persistDraft();
+    return entryId;
   }
 
   void removeExercise(String entryId) {
@@ -919,7 +984,7 @@ class ActiveWorkout extends _$ActiveWorkout {
           load: s.weight,
           loadUnit: 'kg',
           completed: s.completed,
-          notes: null,
+          notes: _setNotePayload(s),
         );
       }).toList();
 
@@ -986,6 +1051,17 @@ class ActiveWorkout extends _$ActiveWorkout {
       default:
         return 'normal';
     }
+  }
+
+  String? _setNotePayload(ActiveSetState set) {
+    final text = set.note?.trim() ?? '';
+    final tags = (set.noteTags ?? const <SetNoteTag>{})
+        .map((tag) => '#${tag.name}')
+        .join(' ');
+    if (text.isEmpty && tags.isEmpty) return null;
+    if (text.isEmpty) return tags;
+    if (tags.isEmpty) return text;
+    return '$tags\n$text';
   }
 
   String _extractDisplayName(WorkoutExerciseModel exercise, int index) {
@@ -1108,6 +1184,18 @@ class ActiveWorkout extends _$ActiveWorkout {
       role: role,
       technique: technique,
       drops: drops,
+      note: saved['note'] as String?,
+      noteTags:
+          (saved['noteTags'] as List?)
+              ?.whereType<String>()
+              .map(
+                (name) => SetNoteTag.values
+                    .where((tag) => tag.name == name)
+                    .firstOrNull,
+              )
+              .whereType<SetNoteTag>()
+              .toSet() ??
+          set.noteTags,
       completed: saved['completed'] as bool?,
       skipped: saved['skipped'] as bool?,
     );

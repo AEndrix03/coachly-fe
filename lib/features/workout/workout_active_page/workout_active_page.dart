@@ -8,7 +8,7 @@ import 'package:coachly/features/workout/workout_active_page/providers/active_wo
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_hive_service.dart';
-import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
+import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,9 +24,8 @@ class WorkoutActivePage extends ConsumerStatefulWidget {
 
 class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   Timer? _clock;
-  Timer? _undoTimer;
   Duration _elapsed = Duration.zero;
-  String? _undoSetId;
+  final String _loadUnit = 'kg';
 
   @override
   void initState() {
@@ -39,7 +38,6 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   @override
   void dispose() {
     _clock?.cancel();
-    _undoTimer?.cancel();
     super.dispose();
   }
 
@@ -58,19 +56,24 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
       }
     });
     final state = ref.watch(activeWorkoutProvider(widget.workoutId));
-    return Scaffold(
-      backgroundColor: CoachlyAthleteTheme.background,
-      body: SafeArea(
-        child: switch (state.status) {
-          ActiveWorkoutStatus.loading => const Center(
-            child: CircularProgressIndicator(),
+    return Theme(
+      data: exerciseDetailTheme(Theme.of(context)),
+      child: Builder(
+        builder: (context) => Scaffold(
+          backgroundColor: context.exerciseTheme.background,
+          body: SafeArea(
+            child: switch (state.status) {
+              ActiveWorkoutStatus.loading => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              ActiveWorkoutStatus.error => _ErrorState(
+                message: state.errorMessage,
+                onBack: context.pop,
+              ),
+              _ => _workspace(context, state),
+            },
           ),
-          ActiveWorkoutStatus.error => _ErrorState(
-            message: state.errorMessage,
-            onBack: context.pop,
-          ),
-          _ => _workspace(context, state),
-        },
+        ),
       ),
     );
   }
@@ -85,27 +88,32 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
       elapsed: _elapsed,
       rest: ref.watch(restTimerProvider),
       decision: decision,
-      undoSetId: _undoSetId,
       onBack: context.pop,
-      onMenu: () => _showSessionMenu(context),
+      onMenu: _completeWorkout,
       onExercise: _controller.goToExercise,
       onSet: _controller.goToSet,
-      onWeight: (set, value) => _controller.updateSetWeight(
-        _exerciseIndexForSet(set.id),
-        set.position,
-        value.toDouble().clamp(0, 9999),
-      ),
-      onReps: (set, value) => _controller.updateSetReps(
-        _exerciseIndexForSet(set.id),
-        set.position,
-        value.toInt().clamp(0, 999),
-      ),
+      onWeight: (set, value) {
+        HapticFeedback.lightImpact();
+        _controller.updateSetWeight(
+          _exerciseIndexForSet(set.id),
+          set.position,
+          value.toDouble().clamp(0, 9999),
+        );
+      },
+      onReps: (set, value) {
+        HapticFeedback.lightImpact();
+        _controller.updateSetReps(
+          _exerciseIndexForSet(set.id),
+          set.position,
+          value.toInt().clamp(0, 999),
+        );
+      },
       onRir: (rir) {
+        HapticFeedback.selectionClick();
         final id = _state.currentSet?.id;
         if (id != null) _controller.updateSetRir(id, rir);
       },
       onComplete: _completeSet,
-      onUndo: _undo,
       onAddSet: (exerciseId) => _controller.addSet(_exerciseIndex(exerciseId)),
       onTechnique: (name) {
         final id = _state.currentSet?.id;
@@ -129,13 +137,16 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
         HapticFeedback.selectionClick();
         _controller.addDrop(setId);
       },
+      onDropWeight: _controller.updateDropWeight,
+      onDropReps: _controller.updateDropReps,
+      onDropRemoved: _controller.removeDrop,
       onExerciseInfo: _openExercise,
-      onSkipExercise: _controller.skipExercise,
-      onCreateGroup: (ids) {
+      onCreateGroup: (ids, type) {
         HapticFeedback.mediumImpact();
-        _controller.createExerciseGroup(ids, ExerciseGroupType.superset);
+        _controller.createExerciseGroup(ids, type);
       },
       onAddExercise: _showAddExerciseSheet,
+      onAddBlockExercise: _addExerciseForBlock,
       onUngroup: _controller.ungroupExercises,
       onCompleteWorkout: _completeWorkout,
       onSkipRest: () => ref.read(restTimerProvider.notifier).stopTimer(),
@@ -143,11 +154,14 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
           ref.read(restTimerProvider.notifier).addTime(seconds),
       onRestTogglePause: () =>
           ref.read(restTimerProvider.notifier).togglePause(),
+      onRestToggleBell: () => ref.read(restTimerProvider.notifier).toggleBell(),
       onDismissGuard: () {
         if (state.sessionId.isNotEmpty) {
           ref.read(workoutCoachProvider(state.sessionId).notifier).dismiss();
         }
       },
+      loadUnit: _loadUnit,
+      onNote: _controller.updateSetNote,
     );
   }
 
@@ -158,28 +172,8 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   );
 
   void _completeSet(String setId) {
-    HapticFeedback.lightImpact();
+    HapticFeedback.mediumImpact();
     _controller.completeSetAndStartRest(setId);
-    _undoTimer?.cancel();
-    setState(() => _undoSetId = setId);
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: const Text('Set completed'),
-          action: SnackBarAction(label: 'UNDO', onPressed: () => _undo(setId)),
-          duration: const Duration(seconds: 6),
-        ),
-      );
-    _undoTimer = Timer(const Duration(seconds: 6), () {
-      if (mounted) setState(() => _undoSetId = null);
-    });
-  }
-
-  void _undo(String setId) {
-    _undoTimer?.cancel();
-    _controller.undoSetAndRest(setId);
-    setState(() => _undoSetId = null);
   }
 
   Future<void> _completeWorkout() async {
@@ -200,30 +194,9 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
         .firstOrNull;
     final id = exercise?.exercise.exercise.id;
     if (id != null && id.isNotEmpty) {
-      context.push(
-        '/workouts/workout/${widget.workoutId}/workout_exercise_page/$id',
-      );
+      context.push('/exercises/$id?mode=view');
     }
   }
-
-  void _showSessionMenu(BuildContext context) => showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    builder: (sheetContext) => SafeArea(
-      child: Wrap(
-        children: [
-          ListTile(
-            leading: const Icon(Icons.flag_outlined),
-            title: const Text('Finish workout'),
-            onTap: () {
-              Navigator.pop(sheetContext);
-              _completeWorkout();
-            },
-          ),
-        ],
-      ),
-    ),
-  );
 
   String _title(ActiveWorkoutState state) {
     final names = state.workout?.titleI18n;
@@ -249,6 +222,27 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
         },
       ),
     );
+  }
+
+  Future<({String id, String name})?> _addExerciseForBlock() async {
+    final catalog = await ref.read(exerciseHiveServiceProvider).getExercises();
+    if (!mounted) return null;
+    final exercise = await showModalBottomSheet<ExerciseDetailModel>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => _LocalExercisePicker(
+        exercises: catalog,
+        onSelected: (exercise) => Navigator.pop(sheetContext, exercise),
+      ),
+    );
+    if (exercise == null || !mounted) return null;
+    final id = _controller.addExercise(exercise);
+    if (id == null) return null;
+    final added = _state.exercises
+        .where((item) => item.exercise.id == id)
+        .firstOrNull;
+    return (id: id, name: added?.displayName ?? 'Exercise');
   }
 
   void _showExerciseDestination(ExerciseDetailModel exercise) {

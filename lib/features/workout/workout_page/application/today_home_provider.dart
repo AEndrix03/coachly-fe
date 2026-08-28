@@ -1,15 +1,15 @@
+import 'dart:ui' show Locale;
+
 import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/features/auth/providers/user_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_session_hive_service.dart';
+import 'package:coachly/features/workout/workout_page/presentation/models/today_home_view_data.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../models/today_home_view_data.dart';
 
 final todayHomeViewDataProvider =
     FutureProvider.family<TodayHomeViewData, Locale>((ref, locale) async {
@@ -36,13 +36,9 @@ final todayHomeViewDataProvider =
           : HomeSyncState.synced;
       final now = DateTime.now();
       final displayedMonth = DateTime(now.year, now.month);
-      final firstGridDay = displayedMonth.subtract(
-        Duration(days: displayedMonth.weekday - DateTime.monday),
+      final firstWeekDay = now.subtract(
+        Duration(days: now.weekday - DateTime.monday),
       );
-      final lastMonthDay = DateTime(now.year, now.month + 1, 0);
-      final trailingDays = DateTime.sunday - lastMonthDay.weekday;
-      final lastGridDay = lastMonthDay.add(Duration(days: trailingDays));
-      final calendarDayCount = lastGridDay.difference(firstGridDay).inDays + 1;
       final suggested = active.isEmpty ? null : active.first;
       final openSession = openSessions.isEmpty ? null : openSessions.first;
       WorkoutModel? openWorkout;
@@ -60,8 +56,8 @@ final todayHomeViewDataProvider =
         nextWorkoutWhen: suggested == null
             ? null
             : AppStrings.translate('home.calendar.today', locale: locale),
-        days: List.generate(calendarDayCount, (index) {
-          final date = firstGridDay.add(Duration(days: index));
+        days: List.generate(DateTime.daysPerWeek, (index) {
+          final date = firstWeekDay.add(Duration(days: index));
           final matchesLastSession = items.any(
             (item) => _sameDay(item.lastUsed, date),
           );

@@ -43,22 +43,25 @@ class ProfilePage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildSection(
+                    context: context,
                     icon: Ionicons.settings_outline,
-                    color: const Color(0xFF2196F3),
+                    color: scheme.primary,
                     title: context.tr('profile.preferences'),
                     child: _buildLanguageSetting(context, ref),
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
+                    context: context,
                     icon: Ionicons.information_circle_outline,
-                    color: const Color(0xFF9C27B0),
+                    color: scheme.secondary,
                     title: context.tr('profile.app_section'),
                     child: _buildAppInfo(context),
                   ),
                   const SizedBox(height: 16),
                   _buildSection(
+                    context: context,
                     icon: Ionicons.barbell_outline,
-                    color: const Color(0xFF00BCD4),
+                    color: scheme.tertiary,
                     title: context.tr('profile.workout_section'),
                     child: _buildPersonalExercisesEntry(context),
                   ),
@@ -74,11 +77,12 @@ class ProfilePage extends ConsumerWidget {
   }
 
   Widget _buildAvatarInHeader(BuildContext context, String initials) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
+        color: scheme.onPrimaryContainer.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -89,13 +93,13 @@ class ProfilePage extends ConsumerWidget {
             height: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.25),
+              color: scheme.onPrimaryContainer.withValues(alpha: 0.25),
             ),
             child: Center(
               child: Text(
                 initials,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: scheme.onPrimaryContainer,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
@@ -106,7 +110,7 @@ class ProfilePage extends ConsumerWidget {
           Text(
             context.tr('profile.member'),
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.80),
+              color: scheme.onPrimaryContainer.withValues(alpha: 0.80),
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
@@ -117,11 +121,13 @@ class ProfilePage extends ConsumerWidget {
   }
 
   Widget _buildSection({
+    required BuildContext context,
     required IconData icon,
     required Color color,
     required String title,
     required Widget child,
   }) {
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -139,7 +145,7 @@ class ProfilePage extends ConsumerWidget {
             Text(
               title,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.55),
+                color: scheme.onSurfaceVariant,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.8,
@@ -152,10 +158,10 @@ class ProfilePage extends ConsumerWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1A2E),
+            color: scheme.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.07),
+              color: scheme.outlineVariant.withValues(alpha: 0.55),
               width: 1,
             ),
           ),
@@ -166,6 +172,7 @@ class ProfilePage extends ConsumerWidget {
   }
 
   Widget _buildLanguageSetting(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
     final language = ref.watch(languageProvider);
     final currentLocale =
         Localizations.maybeLocaleOf(context) ?? AppStrings.defaultLocale;
@@ -174,14 +181,14 @@ class ProfilePage extends ConsumerWidget {
       children: [
         Icon(
           Ionicons.language_outline,
-          color: Colors.white.withValues(alpha: 0.60),
+          color: scheme.onSurfaceVariant,
           size: 18,
         ),
         const SizedBox(width: 12),
         Text(
           context.tr('common.language'),
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: scheme.onSurface,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -193,7 +200,7 @@ class ProfilePage extends ConsumerWidget {
               language,
               displayLocale: currentLocale,
             ),
-            style: const TextStyle(color: Colors.white, fontSize: 13),
+            style: TextStyle(color: scheme.onSurface, fontSize: 13),
           ),
           initialValue: language,
           options: AppStrings.languageOptions.map((l) {
@@ -211,7 +218,7 @@ class ProfilePage extends ConsumerWidget {
           },
           selectedOptionBuilder: (context, value) => Text(
             AppStrings.languageDisplayName(value, displayLocale: currentLocale),
-            style: const TextStyle(color: Colors.white, fontSize: 13),
+            style: TextStyle(color: scheme.onSurface, fontSize: 13),
           ),
         ),
       ],
@@ -219,34 +226,44 @@ class ProfilePage extends ConsumerWidget {
   }
 
   Widget _buildAppInfo(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
-        _infoRow(label: context.tr('common.version'), value: '1.0.0 MVP'),
-        Divider(color: Colors.white.withValues(alpha: 0.07), height: 24),
-        _infoRow(label: context.tr('common.build'), value: 'alpha'),
+        _infoRow(
+          context: context,
+          label: context.tr('common.version'),
+          value: '1.0.0 MVP',
+        ),
+        Divider(color: scheme.outlineVariant.withValues(alpha: 0.55), height: 24),
+        _infoRow(
+          context: context,
+          label: context.tr('common.build'),
+          value: 'alpha',
+        ),
       ],
     );
   }
 
   Widget _buildPersonalExercisesEntry(BuildContext context) {
-    return InkWell(
-      onTap: () => context.push('/profile/personal-exercises'),
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+    final scheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      height: 48,
+      child: InkWell(
+        onTap: () => context.push('/profile/personal-exercises'),
+        borderRadius: BorderRadius.circular(12),
         child: Row(
           children: [
             Icon(
               Ionicons.list_outline,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: scheme.onSurfaceVariant,
               size: 18,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 context.tr('profile.personal_exercises'),
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: scheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -254,7 +271,7 @@ class ProfilePage extends ConsumerWidget {
             ),
             Icon(
               Ionicons.chevron_forward_outline,
-              color: Colors.white.withValues(alpha: 0.5),
+              color: scheme.onSurfaceVariant,
               size: 16,
             ),
           ],
@@ -263,21 +280,26 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _infoRow({required String label, required String value}) {
+  Widget _infoRow({
+    required BuildContext context,
+    required String label,
+    required String value,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.50),
+            color: scheme.onSurfaceVariant,
             fontSize: 14,
           ),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: scheme.onSurface,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -287,49 +309,59 @@ class ProfilePage extends ConsumerWidget {
   }
 
   Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () async {
-        final confirm = await showAppConfirmationDialog(
-          context,
-          title: context.tr('profile.logout_title'),
-          content: context.tr('profile.logout_content'),
-          confirmLabel: context.tr('profile.logout_confirm'),
-          destructive: true,
-          icon: Ionicons.log_out_outline,
-        );
-        if (confirm == true) {
-          ref.read(authProvider.notifier).logout();
-        }
-      },
-      child: Container(
-        width: double.infinity,
-        height: 50,
-        decoration: BoxDecoration(
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      button: true,
+      label: context.tr('profile.logout'),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
           borderRadius: BorderRadius.circular(14),
-          color: const Color(0xFFFF5252).withValues(alpha: 0.10),
-          border: Border.all(
-            color: const Color(0xFFFF5252).withValues(alpha: 0.25),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Ionicons.log_out_outline,
-              color: const Color(0xFFFF5252).withValues(alpha: 0.85),
-              size: 18,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              context.tr('profile.logout'),
-              style: TextStyle(
-                color: const Color(0xFFFF5252).withValues(alpha: 0.85),
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+          onTap: () async {
+            final confirm = await showAppConfirmationDialog(
+              context,
+              title: context.tr('profile.logout_title'),
+              content: context.tr('profile.logout_content'),
+              confirmLabel: context.tr('profile.logout_confirm'),
+              destructive: true,
+              icon: Ionicons.log_out_outline,
+            );
+            if (confirm == true) {
+              ref.read(authProvider.notifier).logout();
+            }
+          },
+          child: Container(
+            width: double.infinity,
+            height: 52,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              color: scheme.errorContainer.withValues(alpha: 0.55),
+              border: Border.all(
+                color: scheme.error.withValues(alpha: 0.45),
+                width: 1,
               ),
             ),
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Ionicons.log_out_outline,
+                  color: scheme.error,
+                  size: 18,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  context.tr('profile.logout'),
+                  style: TextStyle(
+                    color: scheme.error,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -272,7 +273,7 @@ class _MuscleLegend extends StatelessWidget {
       runSpacing: 8,
       children: [
         _LegendItem(color: colors.primary, label: 'Primario'),
-        const _LegendItem(color: Color(0xFF3F8F89), label: 'Secondario'),
+        _LegendItem(color: context.exerciseTheme.primaryMuted, label: 'Secondario'),
         _LegendItem(color: colors.info, label: 'Stabilizzatore'),
       ],
     );

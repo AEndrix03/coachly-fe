@@ -1,7 +1,8 @@
-import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 
 import '../models/today_home_view_data.dart';
@@ -421,7 +422,7 @@ class CalendarFeatureCard extends StatelessWidget {
     final displayedMonth =
         data.displayedMonth ??
         DateTime(DateTime.now().year, DateTime.now().month);
-    final days = _resolvedMonthDays(displayedMonth);
+    final days = _resolvedWeekDays();
     return _FeatureSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -487,25 +488,15 @@ class CalendarFeatureCard extends StatelessWidget {
     );
   }
 
-  List<HomeCalendarDayViewData> _resolvedMonthDays(DateTime displayedMonth) {
-    if (data.days.length >= 28) return data.days;
+  List<HomeCalendarDayViewData> _resolvedWeekDays() {
+    if (data.days.length == DateTime.daysPerWeek) return data.days;
 
-    final firstMonthDay = DateTime(displayedMonth.year, displayedMonth.month);
-    final firstGridDay = firstMonthDay.subtract(
-      Duration(days: firstMonthDay.weekday - DateTime.monday),
+    final now = DateTime.now();
+    final firstWeekDay = now.subtract(
+      Duration(days: now.weekday - DateTime.monday),
     );
-    final lastMonthDay = DateTime(
-      displayedMonth.year,
-      displayedMonth.month + 1,
-      0,
-    );
-    final lastGridDay = lastMonthDay.add(
-      Duration(days: DateTime.sunday - lastMonthDay.weekday),
-    );
-    final count = lastGridDay.difference(firstGridDay).inDays + 1;
-
-    return List.generate(count, (index) {
-      final date = firstGridDay.add(Duration(days: index));
+    return List.generate(DateTime.daysPerWeek, (index) {
+      final date = firstWeekDay.add(Duration(days: index));
       HomeCalendarDayViewData? existing;
       for (final day in data.days) {
         if (day.date.year == date.year &&
@@ -517,7 +508,7 @@ class CalendarFeatureCard extends StatelessWidget {
       }
       return HomeCalendarDayViewData(
         date: date,
-        isInDisplayedMonth: date.month == displayedMonth.month,
+        isInDisplayedMonth: true,
         isToday:
             existing?.isToday ??
             (date.year == DateTime.now().year &&
@@ -994,13 +985,13 @@ class _DurationPill extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
     decoration: BoxDecoration(
-      color: Colors.black.withValues(alpha: .72),
+      color: context.colors.surface.withValues(alpha: .72),
       borderRadius: BorderRadius.circular(8),
     ),
     child: Text(
       '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}',
-      style: const TextStyle(
-        color: Colors.white,
+      style: TextStyle(
+        color: context.colors.textPrimary,
         fontSize: 10,
         fontWeight: FontWeight.w700,
       ),

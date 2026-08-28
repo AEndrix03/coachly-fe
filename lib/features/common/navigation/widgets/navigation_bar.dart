@@ -100,6 +100,7 @@ class _AppNavigationBarState extends State<AppNavigationBar>
   }
 
   Widget _buildBar(int currentIndex) {
+    final scheme = Theme.of(context).colorScheme;
     return ClipRRect(
       borderRadius: BorderRadius.circular(32),
       child: BackdropFilter(
@@ -111,23 +112,23 @@ class _AppNavigationBarState extends State<AppNavigationBar>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.black.withValues(alpha: 0.35),
-                Colors.black.withValues(alpha: 0.50),
+                scheme.surfaceContainerHigh.withValues(alpha: 0.88),
+                scheme.surface.withValues(alpha: 0.96),
               ],
             ),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.10),
+              color: scheme.outline.withValues(alpha: 0.35),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF2196F3).withValues(alpha: 0.15),
+                color: scheme.primary.withValues(alpha: 0.20),
                 blurRadius: 28,
                 spreadRadius: -6,
                 offset: const Offset(0, 6),
               ),
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.45),
+                color: scheme.shadow.withValues(alpha: 0.45),
                 blurRadius: 20,
                 offset: const Offset(0, 6),
               ),
@@ -169,6 +170,7 @@ class _AppNavigationBarState extends State<AppNavigationBar>
   }
 
   Widget _buildIndicator(double totalWidth, int currentIndex) {
+    final scheme = Theme.of(context).colorScheme;
     const indicatorW = 46.0;
     const indicatorH = 42.0;
     const barH = 64.0;
@@ -186,20 +188,20 @@ class _AppNavigationBarState extends State<AppNavigationBar>
         height: indicatorH,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF2196F3), Color(0xFF7B4BC1)],
+            colors: [scheme.primary, scheme.primaryContainer],
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF2196F3).withValues(alpha: 0.55),
+              color: scheme.primary.withValues(alpha: 0.55),
               blurRadius: 18,
               spreadRadius: -3,
               offset: const Offset(0, 3),
             ),
             BoxShadow(
-              color: const Color(0xFF7B4BC1).withValues(alpha: 0.3),
+              color: scheme.primaryContainer.withValues(alpha: 0.3),
               blurRadius: 12,
               spreadRadius: -4,
             ),
@@ -218,6 +220,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Center(
       child: AnimatedScale(
         duration: const Duration(milliseconds: 220),
@@ -227,8 +230,8 @@ class _NavItem extends StatelessWidget {
           tab.icon,
           semanticLabel: context.tr(tab.labelKey),
           color: isSelected
-              ? Colors.white
-              : Colors.white.withValues(alpha: 0.38),
+              ? scheme.onPrimary
+              : scheme.onSurfaceVariant,
           size: isSelected ? 24 : 21,
         ),
       ),

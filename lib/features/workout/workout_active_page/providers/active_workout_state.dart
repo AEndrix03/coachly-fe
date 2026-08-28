@@ -13,6 +13,18 @@ enum SetRole { working, warmup, topSet, backoff }
 
 enum SetTechnique { none, dropSet, restPause, myoReps, amrap, failure, cluster }
 
+enum SetNoteTag {
+  goodSet,
+  feltStrong,
+  formOff,
+  greatPump,
+  lostPosition,
+  romIssue,
+  lowEnergy,
+  gripIssue,
+  equipment,
+}
+
 enum ExerciseGroupType {
   superset,
   triset,
@@ -89,6 +101,8 @@ class ActiveSetState {
   final SetRole role;
   final SetTechnique technique;
   final List<DropSetState> drops;
+  final String? note;
+  final Set<SetNoteTag>? noteTags;
 
   const ActiveSetState({
     required this.id,
@@ -106,6 +120,8 @@ class ActiveSetState {
     this.role = SetRole.working,
     this.technique = SetTechnique.none,
     this.drops = const [],
+    this.note = '',
+    this.noteTags = const {},
   });
 
   ActiveSetState copyWith({
@@ -124,6 +140,8 @@ class ActiveSetState {
     SetRole? role,
     SetTechnique? technique,
     List<DropSetState>? drops,
+    String? note,
+    Set<SetNoteTag>? noteTags,
   }) {
     return ActiveSetState(
       id: id ?? this.id,
@@ -141,6 +159,8 @@ class ActiveSetState {
       role: role ?? this.role,
       technique: technique ?? this.technique,
       drops: drops ?? this.drops,
+      note: note ?? this.note ?? '',
+      noteTags: noteTags ?? this.noteTags ?? const {},
     );
   }
 }

@@ -39,15 +39,15 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
   bool _editing = false;
   WorkoutModel? _latestWorkout;
   OverlayEntry? _saveConfirmationOverlay;
-  late final AnimationController _saveConfirmationController =
-      AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 1100),
-      );
+  late final AnimationController _saveConfirmationController;
 
   @override
   void initState() {
     super.initState();
+    _saveConfirmationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1100),
+    );
     _scrollController.addListener(_handleScroll);
     _editing = widget.initiallyEditing;
     if (_editing) {

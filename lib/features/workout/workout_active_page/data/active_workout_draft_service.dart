@@ -26,6 +26,7 @@ class ActiveWorkoutDraftService {
       'phase': state.phase.name,
       'lastSetCompletedAt': state.lastSetCompletedAt?.toIso8601String(),
       'updatedAt': DateTime.now().toIso8601String(),
+      'sessionChanges': state.sessionChanges,
       'exerciseEntryIds': [
         for (final exercise in state.exercises) exercise.exercise.id,
       ],
@@ -50,6 +51,9 @@ class ActiveWorkoutDraftService {
                 for (final drop in set.drops)
                   {'id': drop.id, 'weight': drop.weight, 'reps': drop.reps},
               ],
+              'note': set.note,
+              'noteTags':
+                  set.noteTags?.map((tag) => tag.name).toList() ?? const [],
               'completed': set.completed,
               'skipped': set.skipped,
             },

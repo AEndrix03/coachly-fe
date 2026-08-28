@@ -9,6 +9,7 @@ import 'package:coachly/features/exercise/exercise_info_page/presentation/widget
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show Drag;
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -904,11 +905,11 @@ class _MorphButton extends StatelessWidget {
                       0.35,
                     )!,
                   ),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x22000000),
+                      color: context.colors.surface.withValues(alpha: 0.55),
                       blurRadius: 12,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
