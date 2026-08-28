@@ -41,10 +41,14 @@ class NoLiteralColors extends DartLintRule {
     });
 
     // Colors.red, Colors.grey.shade300, …
+    //
+    // `Colors.transparent` è escluso di proposito: non è una scelta di
+    // design, è l'assenza di colore. Segnalarlo produrrebbe solo rumore e
+    // spingerebbe a disattivare la regola.
     context.registry.addPrefixedIdentifier((node) {
-      if (node.prefix.name == 'Colors') {
-        reporter.atNode(node, _code);
-      }
+      if (node.prefix.name != 'Colors') return;
+      if (node.identifier.name == 'transparent') return;
+      reporter.atNode(node, _code);
     });
   }
 }

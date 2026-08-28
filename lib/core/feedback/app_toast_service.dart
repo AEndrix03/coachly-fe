@@ -1,3 +1,5 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
+import 'package:coachly/design_system/tokens/coachly_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -101,13 +103,9 @@ class AppToastService {
     final themeContext = appScaffoldMessengerKey.currentContext;
     if (themeContext == null) return;
 
-    final theme = Theme.of(themeContext);
-    final palette = _ToastPalette.from(type, theme.colorScheme);
-    final textColor =
-        ThemeData.estimateBrightnessForColor(palette.backgroundStart) ==
-            Brightness.dark
-        ? Colors.white
-        : Colors.black87;
+    final colors = themeContext.colors;
+    final palette = _ToastPalette.from(type, colors);
+    final textColor = colors.textPrimary;
 
     messenger
       ..hideCurrentSnackBar()
@@ -148,7 +146,7 @@ class _ToastCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(context.radii.card),
         border: Border.all(color: palette.accent.withValues(alpha: 0.45)),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -163,7 +161,9 @@ class _ToastCard extends StatelessWidget {
             spreadRadius: -8,
           ),
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
+            // L'ombra è la superficie di base, non il nero assoluto: su un
+            // fondale già scuro il nero puro crea un alone sporco.
+            color: context.colors.surface.withValues(alpha: 0.45),
             blurRadius: 20,
             offset: const Offset(0, 10),
             spreadRadius: -12,
@@ -237,53 +237,28 @@ class _ToastPalette {
     required this.backgroundEnd,
   });
 
-  factory _ToastPalette.from(AppToastType type, ColorScheme scheme) {
-    switch (type) {
-      case AppToastType.success:
-        return _ToastPalette(
-          icon: Icons.check_circle_rounded,
-          accent: const Color(0xFF41D17E),
-          backgroundStart: _blend(
-            scheme.surface,
-            const Color(0xFF0D3E2B),
-            0.82,
-          ),
-          backgroundEnd: _blend(scheme.surface, const Color(0xFF102A22), 0.9),
-        );
-      case AppToastType.error:
-        return _ToastPalette(
-          icon: Icons.error_rounded,
-          accent: const Color(0xFFFF6B6B),
-          backgroundStart: _blend(
-            scheme.surface,
-            const Color(0xFF4A1620),
-            0.82,
-          ),
-          backgroundEnd: _blend(scheme.surface, const Color(0xFF2D1217), 0.9),
-        );
-      case AppToastType.warning:
-        return _ToastPalette(
-          icon: Icons.warning_rounded,
-          accent: const Color(0xFFFFC145),
-          backgroundStart: _blend(
-            scheme.surface,
-            const Color(0xFF4B3413),
-            0.82,
-          ),
-          backgroundEnd: _blend(scheme.surface, const Color(0xFF322612), 0.9),
-        );
-      case AppToastType.info:
-        return _ToastPalette(
-          icon: Icons.info_rounded,
-          accent: const Color(0xFF56B3FF),
-          backgroundStart: _blend(
-            scheme.surface,
-            const Color(0xFF142F53),
-            0.82,
-          ),
-          backgroundEnd: _blend(scheme.surface, const Color(0xFF16233E), 0.9),
-        );
-    }
+  /// Deriva il fondale dall'accento invece di usare tinte scelte a mano.
+  ///
+  /// Prima esisteva una **seconda palette di feedback** con valori diversi da
+  /// quelli dei temi: stessi ruoli, colori diversi. I token sono ora l'unica
+  /// sorgente. Vedi `docs/development/09-design-tokens.md`.
+  factory _ToastPalette.from(AppToastType type, CoachlyColors colors) {
+    final (icon, accent) = switch (type) {
+      AppToastType.success => (
+        Icons.check_circle_rounded,
+        colors.feedbackSuccess,
+      ),
+      AppToastType.error => (Icons.error_rounded, colors.feedbackDanger),
+      AppToastType.warning => (Icons.warning_rounded, colors.feedbackWarning),
+      AppToastType.info => (Icons.info_rounded, colors.feedbackInfo),
+    };
+
+    return _ToastPalette(
+      icon: icon,
+      accent: accent,
+      backgroundStart: _blend(colors.surfaceElevated, accent, 0.18),
+      backgroundEnd: _blend(colors.surface, accent, 0.10),
+    );
   }
 
   static Color _blend(Color base, Color tint, double opacity) {
