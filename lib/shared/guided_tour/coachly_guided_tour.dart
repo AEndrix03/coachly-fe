@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';

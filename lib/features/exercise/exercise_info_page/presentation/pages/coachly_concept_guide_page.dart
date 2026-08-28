@@ -1,4 +1,4 @@
-import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:flutter/material.dart';
 
 enum CoachlyGuideTopic {

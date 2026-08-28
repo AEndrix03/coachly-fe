@@ -2,7 +2,7 @@ import 'package:coachly/features/workout/workout_builder/domain/workout_draft.da
 import 'package:coachly/features/workout/workout_builder/create_workout_flow.dart';
 import 'package:coachly/features/workout/workout_builder/providers/workout_builder_providers.dart';
 import 'package:coachly/features/workout/workout_builder/widgets/workout_builder_widgets.dart';
-import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/workout/workout_edit_page/widgets/exercise_picker_sheet.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';

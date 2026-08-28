@@ -1,4 +1,4 @@
-import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
+import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/workout/workout_builder/tour/builder_tour_controller.dart';
 import 'package:coachly/shared/design_system/coachly_floating_bubble.dart';
 import 'package:coachly/shared/guided_tour/coachly_guided_tour.dart';
