@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -16,7 +17,7 @@ class LoadingPage extends StatelessWidget {
             'assets/images/auth_page_background.jpg',
             fit: BoxFit.cover,
           ),
-          Container(color: Colors.black.withValues(alpha: 0.5)),
+          Container(color: context.colors.surface.withValues(alpha: 0.5)),
           SafeArea(
             child: Center(
               child: Column(
@@ -32,22 +33,26 @@ class LoadingPage extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       textStyle: textTheme.displaySmall,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 48),
-                  const SizedBox(
+                  SizedBox(
                     width: 40,
                     height: 40,
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        context.colors.textPrimary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),
                   Text(
                     'Caricamento...',
-                    style: textTheme.bodyLarge?.copyWith(color: Colors.white70),
+                    style: textTheme.bodyLarge?.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
                   ),
                 ],
               ),

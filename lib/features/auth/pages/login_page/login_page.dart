@@ -1,5 +1,6 @@
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,7 +25,7 @@ class LoginPage extends ConsumerWidget {
             'assets/images/auth_page_background.jpg',
             fit: BoxFit.cover,
           ),
-          Container(color: Colors.black.withValues(alpha: 0.5)),
+          Container(color: context.colors.surface.withValues(alpha: 0.5)),
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
@@ -45,7 +46,7 @@ class LoginPage extends ConsumerWidget {
                           style: GoogleFonts.poppins(
                             textStyle: textTheme.displaySmall,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                           ),
                         )
                         .animate()
@@ -55,9 +56,9 @@ class LoginPage extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.35),
+                        color: context.colors.surface.withValues(alpha: 0.35),
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white24),
+                        border: Border.all(color: context.colors.border),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -65,7 +66,7 @@ class LoginPage extends ConsumerWidget {
                           Text(
                             context.tr('auth.login.title'),
                             style: textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
+                              color: context.colors.textPrimary,
                               fontWeight: FontWeight.w700,
                             ),
                             textAlign: TextAlign.center,
@@ -74,7 +75,7 @@ class LoginPage extends ConsumerWidget {
                           Text(
                             context.tr('auth.login.description'),
                             style: textTheme.bodyMedium?.copyWith(
-                              color: Colors.white70,
+                              color: context.colors.textSecondary,
                               height: 1.5,
                             ),
                             textAlign: TextAlign.center,
@@ -83,14 +84,18 @@ class LoginPage extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.08),
+                              color: context.colors.textPrimary.withValues(
+                                alpha: 0.08,
+                              ),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.white12),
+                              border: Border.all(
+                                color: context.colors.borderSubtle,
+                              ),
                             ),
                             child: Text(
                               context.tr('auth.login.configuration_hint'),
                               style: textTheme.bodyMedium?.copyWith(
-                                color: Colors.white70,
+                                color: context.colors.textSecondary,
                                 height: 1.45,
                               ),
                               textAlign: TextAlign.center,
@@ -102,7 +107,7 @@ class LoginPage extends ConsumerWidget {
                               errorMessage,
                               textAlign: TextAlign.center,
                               style: textTheme.bodyMedium?.copyWith(
-                                color: const Color(0xFFFFB4B4),
+                                color: context.colors.feedbackDanger,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),

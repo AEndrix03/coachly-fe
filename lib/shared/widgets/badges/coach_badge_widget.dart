@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 
 class CoachBadgeWidget extends StatelessWidget {
@@ -21,22 +22,28 @@ class CoachBadgeWidget extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFFFF9800).withValues(alpha: 0.3),
-            const Color(0xFFFF5722).withValues(alpha: 0.3),
+            context.colors.feedbackWarning.withValues(alpha: 0.3),
+            context.colors.feedbackDanger.withValues(alpha: 0.3),
           ],
         ),
         borderRadius: BorderRadius.circular(7),
-        border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.5)),
+        border: Border.all(
+          color: context.colors.feedbackWarning.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.star, color: const Color(0xFFFF9800), size: iconSize),
+          Icon(
+            Icons.star,
+            color: context.colors.feedbackWarning,
+            size: iconSize,
+          ),
           const SizedBox(width: 3),
           Text(
             label,
             style: TextStyle(
-              color: const Color(0xFFFF9800),
+              color: context.colors.feedbackWarning,
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
             ),
