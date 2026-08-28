@@ -1,6 +1,5 @@
 import 'package:coachly/core/network/api_endpoints.dart';
-import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
-import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/core/network/session_gateway.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -13,31 +12,33 @@ http.Client httpClient(Ref ref) {
 
 @riverpod
 AuthHttpClient authHttpClient(Ref ref) {
-  return AuthHttpClient(ref.watch(httpClientProvider), ref);
+  return AuthHttpClient(
+    ref.watch(httpClientProvider),
+    ref.watch(sessionGatewayProvider),
+  );
 }
 
 class AuthHttpClient extends http.BaseClient {
   final http.Client _inner;
-  final Ref _ref;
+  final SessionGateway _session;
   Future<bool>? _ongoingTokenRefresh;
 
-  AuthHttpClient(this._inner, this._ref);
+  AuthHttpClient(this._inner, this._session);
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     final isAuthRequest = _isAuthRequest(request.url);
-    final authService = _ref.read(authServiceProvider);
     final retryRequest = isAuthRequest ? null : _copyRequest(request);
 
-    String? accessToken = await authService.getAccessToken();
+    String? accessToken = await _session.accessToken();
 
     if (!isAuthRequest) {
       final needsRefresh =
-          accessToken == null || JwtValidator.isRefreshNeeded(accessToken);
+          accessToken == null || _session.shouldRefresh(accessToken);
       if (needsRefresh) {
         final didRefreshToken = await _refreshToken();
         if (didRefreshToken) {
-          accessToken = await authService.getAccessToken();
+          accessToken = await _session.accessToken();
         }
       }
 
@@ -51,7 +52,7 @@ class AuthHttpClient extends http.BaseClient {
     if (response.statusCode == 401 && !isAuthRequest) {
       final didRefreshToken = await _refreshToken();
       if (didRefreshToken) {
-        final refreshedAccessToken = await authService.getAccessToken();
+        final refreshedAccessToken = await _session.accessToken();
         final replayRequest = retryRequest;
         if (refreshedAccessToken != null && replayRequest != null) {
           replayRequest.headers['Authorization'] =
@@ -62,8 +63,7 @@ class AuthHttpClient extends http.BaseClient {
         }
       }
 
-      await authService.clearTokens();
-      _ref.invalidate(authProvider);
+      await _session.invalidateSession();
     }
 
     return response;
@@ -115,25 +115,5 @@ class AuthHttpClient extends http.BaseClient {
     }
   }
 
-  Future<bool> _performTokenRefresh() async {
-    final authService = _ref.read(authServiceProvider);
-    final refreshToken = await authService.getRefreshToken();
-
-    if (refreshToken == null) {
-      await authService.clearTokens();
-      _ref.invalidate(authProvider);
-      return false;
-    }
-
-    try {
-      final loginResponse = await authService.refreshToken(refreshToken);
-      await authService.saveTokens(
-        loginResponse.accessToken,
-        loginResponse.refreshToken,
-      );
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
+  Future<bool> _performTokenRefresh() => _session.refresh();
 }
