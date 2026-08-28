@@ -134,11 +134,37 @@ Scala per **ruolo semantico**, non per dimensione:
 | `label` / `labelStrong` | etichette, chip, bottoni |
 | `mono` | valori numerici allineati in tabella |
 
-Nessun `TextStyle(...)` costruito in una feature. Nessun `fontSize` letterale.
+Nessun `fontSize` letterale: il lint `no_literal_text_style` lo verifica.
+`TextStyle(...)` in sé è ammesso — `copyWith` su un token è legittimo e
+frequente — ma la **dimensione** appartiene al design system.
 
 `displayL` e `displayM` esistono perché durante un allenamento il carico e il
 timer devono essere leggibili a un metro di distanza: è un requisito di prodotto,
 non una scelta estetica.
+
+### Lo stato di partenza, misurato
+
+**194 `fontSize` letterali su 14 dimensioni diverse.** Non è una scala, è un
+continuo in cui ogni schermata sceglie da sé:
+
+| px | occorrenze | token proposto |
+|---|---|---|
+| 9, 10, 11 | 35 | `label` (12) |
+| 12 | 46 | `label` |
+| 13 | 28 | `bodyS` |
+| 14 | 17 | `bodyM` |
+| 15, 16 | 31 | `bodyL` (16) |
+| 17, 18 | 13 | `titleM` (18) |
+| 19, 20, 22 | 17 | `titleL` (22) |
+| 24 e oltre | 7 | `displayM` / `displayL` |
+
+**Questa migrazione non è meccanica.** Portare un 15 a 16 o un 11 a 12 cambia
+l'aspetto, e su 194 occorrenze significa ridisegnare mezza interfaccia. Va fatta
+schermata per schermata, con una decisione visiva, e con i golden test verdi a
+fare da rete — che oggi non lo sono.
+
+Il lint resta quindi in `warning` e blocca solo i file toccati: impedisce che il
+continuo cresca, senza forzare un ridisegno non pianificato.
 
 ## Elevazione
 
