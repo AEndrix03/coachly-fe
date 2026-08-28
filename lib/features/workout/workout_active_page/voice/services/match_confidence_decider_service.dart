@@ -29,7 +29,8 @@ class MatchConfidenceDeciderService {
     final top2 = rankedCandidates.length > 1 ? rankedCandidates[1] : null;
     final delta = top2 == null ? 1.0 : (top1.finalScore - top2.finalScore);
 
-    if (top1.finalScore >= autoMatchThreshold && delta >= minDeltaForAutoMatch) {
+    if (top1.finalScore >= autoMatchThreshold &&
+        delta >= minDeltaForAutoMatch) {
       return VoiceMatchDecision(
         type: VoiceMatchDecisionType.autoMatch,
         confidence: top1.finalScore,

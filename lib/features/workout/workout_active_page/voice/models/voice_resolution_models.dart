@@ -48,7 +48,9 @@ class VoiceResolutionContext {
   final List<VoiceContextExercise> workoutExercises;
 
   bool containsExercise(String exerciseId) {
-    return workoutExercises.any((exercise) => exercise.exerciseId == exerciseId);
+    return workoutExercises.any(
+      (exercise) => exercise.exerciseId == exerciseId,
+    );
   }
 }
 
@@ -105,10 +107,7 @@ class VoiceExerciseCandidate {
 }
 
 class VoiceMatchDecision {
-  const VoiceMatchDecision({
-    required this.type,
-    required this.confidence,
-  });
+  const VoiceMatchDecision({required this.type, required this.confidence});
 
   final VoiceMatchDecisionType type;
   final double confidence;

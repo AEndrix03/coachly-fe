@@ -1412,7 +1412,9 @@ class _ExerciseListScrollRailState extends State<_ExerciseListScrollRail> {
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: context.colors.surface.withValues(alpha: 0.55),
+                                color: context.colors.surface.withValues(
+                                  alpha: 0.55,
+                                ),
                                 blurRadius: _isDragging ? 8 : 4,
                               ),
                             ],

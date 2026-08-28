@@ -21,45 +21,53 @@ class VoiceExerciseCatalogRepository {
     }
 
     final exercises = await _exerciseHiveService.getExercises();
-    final catalog = exercises.map((exercise) {
-      final exerciseId = exercise.id ?? '';
-      final names = exercise.nameI18n?.values.where((name) => name.trim().isNotEmpty);
-      final canonicalName = _firstOrNull(names) ?? _fromId(exerciseId);
+    final catalog = exercises
+        .map((exercise) {
+          final exerciseId = exercise.id ?? '';
+          final names = exercise.nameI18n?.values.where(
+            (name) => name.trim().isNotEmpty,
+          );
+          final canonicalName = _firstOrNull(names) ?? _fromId(exerciseId);
 
-      final aliases = <String>{
-        canonicalName,
-        _fromId(exerciseId),
-      };
+          final aliases = <String>{canonicalName, _fromId(exerciseId)};
 
-      aliases.addAll(exercise.nameI18n?.values ?? const <String>[]);
+          aliases.addAll(exercise.nameI18n?.values ?? const <String>[]);
 
-      for (final variant in exercise.variants ?? const []) {
-        aliases.addAll(variant.nameI18n?.values ?? const <String>[]);
-      }
+          for (final variant in exercise.variants ?? const []) {
+            aliases.addAll(variant.nameI18n?.values ?? const <String>[]);
+          }
 
-      final primaryEquipmentCandidates = exercise.equipments
-              ?.where((entry) => entry.isPrimary)
-              .map((entry) => _firstOrNull(entry.equipment.nameI18n.values))
-              .whereType<String>()
-              .toList(growable: false) ??
-          const <String>[];
-      final resolvedPrimaryEquipment = _firstOrNull(primaryEquipmentCandidates);
+          final primaryEquipmentCandidates =
+              exercise.equipments
+                  ?.where((entry) => entry.isPrimary)
+                  .map((entry) => _firstOrNull(entry.equipment.nameI18n.values))
+                  .whereType<String>()
+                  .toList(growable: false) ??
+              const <String>[];
+          final resolvedPrimaryEquipment = _firstOrNull(
+            primaryEquipmentCandidates,
+          );
 
-      final muscles = exercise.muscles
-          ?.map((muscle) => _firstOrNull(muscle.muscle?.nameI18n.values))
-          .whereType<String>()
-          .toList(growable: false) ??
-          const <String>[];
+          final muscles =
+              exercise.muscles
+                  ?.map(
+                    (muscle) => _firstOrNull(muscle.muscle?.nameI18n.values),
+                  )
+                  .whereType<String>()
+                  .toList(growable: false) ??
+              const <String>[];
 
-      return VoiceExerciseCatalogEntry(
-        exerciseId: exerciseId,
-        canonicalName: canonicalName,
-        aliases: aliases.where((alias) => alias.trim().isNotEmpty).toList(),
-        equipment: resolvedPrimaryEquipment,
-        muscleGroups: muscles,
-        isActive: true,
-      );
-    }).where((entry) => entry.exerciseId.trim().isNotEmpty).toList(growable: false);
+          return VoiceExerciseCatalogEntry(
+            exerciseId: exerciseId,
+            canonicalName: canonicalName,
+            aliases: aliases.where((alias) => alias.trim().isNotEmpty).toList(),
+            equipment: resolvedPrimaryEquipment,
+            muscleGroups: muscles,
+            isActive: true,
+          );
+        })
+        .where((entry) => entry.exerciseId.trim().isNotEmpty)
+        .toList(growable: false);
 
     _cache = catalog;
     return catalog;

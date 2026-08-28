@@ -68,9 +68,9 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
         error: (_, _) =>
             _CatalogError(onRetry: () => ref.invalidate(exerciseListProvider)),
         data: (allExercises) {
-          final exercises = allExercises.map(_toDetailModel).toList(
-            growable: false,
-          );
+          final exercises = allExercises
+              .map(_toDetailModel)
+              .toList(growable: false);
           final results = _filter(exercises, locale);
           final initial = _query.isEmpty && !_hasFilters;
           final displayed = initial ? _recent(exercises) : results;

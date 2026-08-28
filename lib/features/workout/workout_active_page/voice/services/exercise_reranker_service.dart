@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final exerciseRerankerServiceProvider = Provider<ExerciseRerankerService>((ref) {
+final exerciseRerankerServiceProvider = Provider<ExerciseRerankerService>((
+  ref,
+) {
   return const ExerciseRerankerService();
 });
 
@@ -16,7 +18,8 @@ class ExerciseRerankerService {
     required UserVoiceAliasMatch? userAliasMatch,
   }) {
     final exerciseOrderById = {
-      for (final exercise in context.workoutExercises) exercise.exerciseId: exercise.order,
+      for (final exercise in context.workoutExercises)
+        exercise.exerciseId: exercise.order,
     };
     final completedById = {
       for (final exercise in context.workoutExercises)
@@ -36,7 +39,8 @@ class ExerciseRerankerService {
       if (context.currentExerciseOrder != null) {
         final candidateOrder = exerciseOrderById[candidate.exerciseId];
         if (candidateOrder != null) {
-          final distance = (candidateOrder - context.currentExerciseOrder!).abs();
+          final distance = (candidateOrder - context.currentExerciseOrder!)
+              .abs();
           final proximityBoost = max(0.0, 0.10 - (distance * 0.03));
           boost += proximityBoost;
         }
@@ -46,7 +50,8 @@ class ExerciseRerankerService {
         boost += 0.08;
       }
 
-      if (userAliasMatch != null && userAliasMatch.exerciseId == candidate.exerciseId) {
+      if (userAliasMatch != null &&
+          userAliasMatch.exerciseId == candidate.exerciseId) {
         boost += userAliasMatch.confirmations >= 2 ? 0.30 : 0.15;
       }
 

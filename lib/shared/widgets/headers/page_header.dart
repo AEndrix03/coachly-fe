@@ -7,8 +7,10 @@ class PageHeader extends StatelessWidget {
   final String badgeLabel;
   final String title;
   final String? subtitle;
+
   /// Widget opzionale mostrato in fondo all'header (es. info-box, stats).
   final Widget? bottom;
+
   /// Gradient personalizzabile; di default usa il gradient dell'app.
   final List<Color>? gradientColors;
 
@@ -25,10 +27,8 @@ class PageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final colors = gradientColors ?? [
-      scheme.primaryContainer,
-      scheme.primaryContainer,
-    ];
+    final colors =
+        gradientColors ?? [scheme.primaryContainer, scheme.primaryContainer];
 
     return Container(
       width: double.infinity,
@@ -73,10 +73,7 @@ class PageHeader extends StatelessWidget {
                   ),
                 ),
               ],
-              if (bottom != null) ...[
-                const SizedBox(height: 18),
-                bottom!,
-              ],
+              if (bottom != null) ...[const SizedBox(height: 18), bottom!],
             ],
           ),
         ),

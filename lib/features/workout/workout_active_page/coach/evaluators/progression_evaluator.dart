@@ -35,7 +35,8 @@ class ProgressionEvaluator implements CoachEvaluator {
           evidence: [
             CoachEvidence(
               labelKey: 'coach.evidence.previous',
-              value: '${previous.load ?? 0} × ${previous.reps} @${previous.rir}',
+              value:
+                  '${previous.load ?? 0} × ${previous.reps} @${previous.rir}',
             ),
           ],
           isActionable: true,

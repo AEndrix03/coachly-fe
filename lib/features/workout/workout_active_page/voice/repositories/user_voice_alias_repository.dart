@@ -2,7 +2,9 @@ import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final userVoiceAliasRepositoryProvider = Provider<UserVoiceAliasRepository>((ref) {
+final userVoiceAliasRepositoryProvider = Provider<UserVoiceAliasRepository>((
+  ref,
+) {
   final localDb = ref.watch(localDatabaseServiceProvider);
   return UserVoiceAliasRepository(localDb);
 });
@@ -44,7 +46,8 @@ class UserVoiceAliasRepository {
 
     var confirmations = 1;
     if (current != null && current['exerciseId'] == exerciseId) {
-      final currentConfirmations = (current['confirmations'] as num?)?.toInt() ?? 0;
+      final currentConfirmations =
+          (current['confirmations'] as num?)?.toInt() ?? 0;
       confirmations = currentConfirmations + 1;
     }
 

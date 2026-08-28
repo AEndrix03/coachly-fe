@@ -3,6 +3,8 @@ import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -185,12 +187,21 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Inizio ROM', style: _caption(colors)),
-                            Text('Fine ROM', style: _caption(colors)),
+                            Text(
+                              context.tr('exercise.rom_start'),
+                              style: _caption(colors),
+                            ),
+                            Text(
+                              context.tr('exercise.rom_end'),
+                              style: _caption(colors),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Text('Profilo indicativo', style: _caption(colors)),
+                        Text(
+                          context.tr('exercise.profile_indicative'),
+                          style: _caption(colors),
+                        ),
                       ],
                     ),
                   ),

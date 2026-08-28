@@ -1,7 +1,9 @@
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final voiceEntryParserServiceProvider = Provider<VoiceEntryParserService>((ref) {
+final voiceEntryParserServiceProvider = Provider<VoiceEntryParserService>((
+  ref,
+) {
   return const VoiceEntryParserService();
 });
 
@@ -92,6 +94,9 @@ class VoiceEntryParserService {
 
   String _stripFirst(String source, String pattern) {
     final escaped = RegExp.escape(pattern);
-    return source.replaceFirst(RegExp(escaped), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+    return source
+        .replaceFirst(RegExp(escaped), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
   }
 }

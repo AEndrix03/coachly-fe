@@ -229,9 +229,7 @@ class _NavItem extends StatelessWidget {
         child: Icon(
           tab.icon,
           semanticLabel: context.tr(tab.labelKey),
-          color: isSelected
-              ? scheme.onPrimary
-              : scheme.onSurfaceVariant,
+          color: isSelected ? scheme.onPrimary : scheme.onSurfaceVariant,
           size: isSelected ? 24 : 21,
         ),
       ),

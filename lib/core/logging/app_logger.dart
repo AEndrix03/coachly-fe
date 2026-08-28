@@ -14,11 +14,7 @@ abstract interface class AppLogger {
 
   void info(String message, {Map<String, Object?>? context});
 
-  void warn(
-    String message, {
-    Map<String, Object?>? context,
-    Object? error,
-  });
+  void warn(String message, {Map<String, Object?>? context, Object? error});
 
   void error(
     String message, {
@@ -28,7 +24,9 @@ abstract interface class AppLogger {
   });
 }
 
-final appLoggerProvider = Provider<AppLogger>((ref) => const ConsoleAppLogger());
+final appLoggerProvider = Provider<AppLogger>(
+  (ref) => const ConsoleAppLogger(),
+);
 
 /// Implementazione di partenza: scrive su console solo in debug.
 ///

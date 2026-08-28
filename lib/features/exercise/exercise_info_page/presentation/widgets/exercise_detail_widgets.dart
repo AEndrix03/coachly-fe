@@ -9,6 +9,7 @@ import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -332,7 +333,7 @@ class ExerciseAddAction extends StatelessWidget {
             ),
           ),
           icon: const Icon(Icons.add_rounded),
-          label: const Text('Aggiungi all’allenamento'),
+          label: Text(context.tr('exercise.add_to_workout')),
         ),
       ),
     );
@@ -568,7 +569,7 @@ class ExerciseErrorView extends StatelessWidget {
                     const SizedBox(height: 20),
                     OutlinedButton(
                       onPressed: onRetry,
-                      child: const Text('Riprova'),
+                      child: Text(context.tr('common.retry')),
                     ),
                   ],
                 ),

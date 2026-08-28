@@ -164,7 +164,8 @@ class Auth extends _$Auth {
   }) {
     return AuthState(
       isAuthenticated: true,
-      isTokenValid: accessToken != null && JwtValidator.isTokenValid(accessToken),
+      isTokenValid:
+          accessToken != null && JwtValidator.isTokenValid(accessToken),
       isOfflineMode: true,
       tokens: LoginResponseDto.fromTokens(
         accessToken: accessToken ?? '',

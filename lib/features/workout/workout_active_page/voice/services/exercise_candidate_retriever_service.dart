@@ -52,15 +52,17 @@ class ExerciseCandidateRetrieverService {
         final trigramScore = _jaccard(phraseTrigrams, _trigrams(alias));
         final editScore = _editSimilarity(normalizedPhrase, alias);
 
-        final combined = (0.5 * exactScore) +
+        final combined =
+            (0.5 * exactScore) +
             (0.25 * tokenScore) +
             (0.15 * trigramScore) +
             (0.10 * editScore);
 
-        if (combined > (0.5 * bestExactScore) +
-            (0.25 * bestTokenScore) +
-            (0.15 * bestTrigramScore) +
-            (0.10 * bestEditScore)) {
+        if (combined >
+            (0.5 * bestExactScore) +
+                (0.25 * bestTokenScore) +
+                (0.15 * bestTrigramScore) +
+                (0.10 * bestEditScore)) {
           bestExactScore = exactScore;
           bestTokenScore = tokenScore;
           bestTrigramScore = trigramScore;
@@ -69,7 +71,8 @@ class ExerciseCandidateRetrieverService {
         }
       }
 
-      final baseScore = (0.5 * bestExactScore) +
+      final baseScore =
+          (0.5 * bestExactScore) +
           (0.25 * bestTokenScore) +
           (0.15 * bestTrigramScore) +
           (0.10 * bestEditScore);
@@ -174,10 +177,7 @@ class ExerciseCandidateRetrieverService {
       for (var j = 1; j <= b.length; j++) {
         final cost = a[i - 1] == b[j - 1] ? 0 : 1;
         matrix[i][j] = min(
-          min(
-            matrix[i - 1][j] + 1,
-            matrix[i][j - 1] + 1,
-          ),
+          min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1),
           matrix[i - 1][j - 1] + cost,
         );
       }

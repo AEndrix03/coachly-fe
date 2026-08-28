@@ -9,6 +9,8 @@ import 'package:coachly/features/workout/workout_active_page/providers/rest_time
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_hive_service.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -269,7 +271,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
             if (current != null && _groupFor(current.exercise.id) != null)
               ListTile(
                 leading: const Icon(Icons.link_rounded),
-                title: const Text('Add to current group'),
+                title: Text(context.tr('workout.active.add_to_group')),
                 onTap: () {
                   Navigator.pop(sheetContext);
                   _controller.addExercise(
@@ -280,7 +282,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
               ),
             ListTile(
               leading: const Icon(Icons.last_page_rounded),
-              title: const Text('End of workout'),
+              title: Text(context.tr('workout.active.end_of_workout')),
               onTap: () {
                 Navigator.pop(sheetContext);
                 _controller.addExercise(exercise);
@@ -313,7 +315,10 @@ class _ErrorState extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
-          OutlinedButton(onPressed: onBack, child: const Text('Back')),
+          OutlinedButton(
+            onPressed: onBack,
+            child: Text(context.tr('common.back')),
+          ),
         ],
       ),
     ),

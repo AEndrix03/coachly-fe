@@ -1,6 +1,8 @@
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -38,7 +40,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
   Future<void> _next() async {
     if (_step == 0 && _nameIt.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Inserisci almeno il nome in italiano.')),
+        SnackBar(content: Text(context.tr('exercise.create.name_required'))),
       );
       return;
     }
@@ -91,7 +93,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
     return Scaffold(
       backgroundColor: context.colors.surface,
       appBar: AppBar(
-        title: const Text('Crea esercizio'),
+        title: Text(context.tr('exercise.create.title')),
         backgroundColor: Colors.transparent,
       ),
       body: SafeArea(
@@ -140,7 +142,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
                           curve: Curves.easeOut,
                         );
                       },
-                      child: const Text('Indietro'),
+                      child: Text(context.tr('common.back')),
                     ),
                   const Spacer(),
                   FilledButton.icon(
@@ -185,20 +187,20 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
     SwitchListTile(
       value: _bodyweight,
       onChanged: (v) => setState(() => _bodyweight = v),
-      title: const Text('A corpo libero'),
+      title: Text(context.tr('exercise.bodyweight')),
     ),
     SwitchListTile(
       value: _unilateral,
       onChanged: (v) => setState(() => _unilateral = v),
-      title: const Text('Unilaterale'),
+      title: Text(context.tr('exercise.unilateral')),
     ),
   ]);
   Widget _guidance() => _stepBody([
     _field(_tipsIt, 'Istruzioni e suggerimenti', lines: 6),
     const SizedBox(height: 16),
-    const ListTile(
+    ListTile(
       leading: Icon(Icons.photo_library_outlined),
-      title: Text('Foto e video'),
+      title: Text(context.tr('exercise.create.media')),
       subtitle: Text(
         'L’upload sarà disponibile quando verrà configurato lo storage media.',
       ),

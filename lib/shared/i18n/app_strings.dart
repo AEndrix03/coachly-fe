@@ -7,6 +7,57 @@ class AppStrings {
 
   static const Map<String, Map<String, String>> _values = {
     'common.app_name': {'en': 'Coachly', 'it': 'Coachly'},
+    'exercise.create.name_required': {
+      'en': 'At least the Italian name is required.',
+      'it': 'Inserisci almeno il nome in italiano.',
+    },
+    'exercise.create.title': {'en': 'Create exercise', 'it': 'Crea esercizio'},
+    'common.back': {'en': 'Back', 'it': 'Indietro'},
+    'exercise.create.media': {'en': 'Photos and video', 'it': 'Foto e video'},
+    'common.share': {'en': 'Share', 'it': 'Condividi'},
+    'exercise.rom_start': {'en': 'ROM start', 'it': 'Inizio ROM'},
+    'exercise.rom_end': {'en': 'ROM end', 'it': 'Fine ROM'},
+    'exercise.profile_indicative': {
+      'en': 'Indicative profile',
+      'it': 'Profilo indicativo',
+    },
+    'exercise.add_to_workout': {
+      'en': 'Add to workout',
+      'it': 'Aggiungi all’allenamento',
+    },
+    'workout.active.rest_minus_30': {'en': '−30 s', 'it': '−30 s'},
+    'workout.active.rest_plus_30': {'en': '+30 s', 'it': '+30 s'},
+    'workout.active.col_set': {'en': 'SET', 'it': 'SERIE'},
+    'workout.active.col_previous': {'en': 'PREVIOUS', 'it': 'PRECEDENTE'},
+    'workout.active.col_reps': {'en': 'REPS', 'it': 'RIPETIZIONI'},
+    'workout.active.col_rir': {'en': 'RIR', 'it': 'RIR'},
+    'workout.active.rir_explained': {
+      'en': 'RIR · Reps in Reserve',
+      'it': 'RIR · Ripetizioni di riserva',
+    },
+    'workout.active.blocks': {'en': 'BLOCKS', 'it': 'BLOCCHI'},
+    'workout.active.exercises': {'en': 'EXERCISES', 'it': 'ESERCIZI'},
+    'workout.active.add_exercise': {
+      'en': 'Add exercise',
+      'it': 'Aggiungi esercizio',
+    },
+    'workout.active.quick_add': {'en': 'QUICK ADD', 'it': 'AGGIUNTA RAPIDA'},
+    'workout.active.add_to_group': {
+      'en': 'Add to current group',
+      'it': 'Aggiungi al gruppo corrente',
+    },
+    'workout.active.end_of_workout': {
+      'en': 'End of workout',
+      'it': 'Fine allenamento',
+    },
+    'community.placeholder_title': {
+      'en': 'Community is on the way',
+      'it': 'La community sta arrivando',
+    },
+    'community.placeholder_body': {
+      'en': 'Soon you will be able to follow coaches and share your workouts.',
+      'it': 'Presto potrai seguire i coach e condividere i tuoi allenamenti.',
+    },
     'common.settings': {'en': 'Settings', 'it': 'Impostazioni'},
     'common.language': {'en': 'Language', 'it': 'Lingua'},
     'common.select_language': {

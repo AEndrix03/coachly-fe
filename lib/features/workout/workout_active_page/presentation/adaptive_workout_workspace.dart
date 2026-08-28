@@ -5,6 +5,8 @@ import 'package:coachly/features/workout/workout_active_page/presentation/active
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
+import 'package:coachly/shared/extensions/i18n_extension.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
@@ -316,14 +318,18 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => onRestAdjust(-30),
-                          child: const Text('−30 s'),
+                          child: Text(
+                            context.tr('workout.active.rest_minus_30'),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => onRestAdjust(30),
-                          child: const Text('+30 s'),
+                          child: Text(
+                            context.tr('workout.active.rest_plus_30'),
+                          ),
                         ),
                       ),
                     ],
@@ -1391,17 +1397,37 @@ class _SetTable extends StatelessWidget {
           padding: const EdgeInsets.only(left: 18, right: 10, bottom: 7),
           child: Row(
             children: [
-              const SizedBox(width: 42, child: Text('SET', style: _labelStyle)),
-              const Expanded(child: Text('PREVIOUS', style: _labelStyle)),
+              SizedBox(
+                width: 42,
+                child: Text(
+                  context.tr('workout.active.col_set'),
+                  style: _labelStyle,
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  context.tr('workout.active.col_previous'),
+                  style: _labelStyle,
+                ),
+              ),
               SizedBox(
                 width: 54,
                 child: Text(loadUnit.toUpperCase(), style: _labelStyle),
               ),
-              const SizedBox(
+              SizedBox(
                 width: 50,
-                child: Text('REPS', style: _labelStyle),
+                child: Text(
+                  context.tr('workout.active.col_reps'),
+                  style: _labelStyle,
+                ),
               ),
-              const SizedBox(width: 32, child: Text('RIR', style: _labelStyle)),
+              SizedBox(
+                width: 32,
+                child: Text(
+                  context.tr('workout.active.col_rir'),
+                  style: _labelStyle,
+                ),
+              ),
             ],
           ),
         ),
@@ -1637,9 +1663,12 @@ class _ActiveSetEditor extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
-          child: Text('RIR · Reps in Reserve', style: _labelStyle),
+          child: Text(
+            context.tr('workout.active.rir_explained'),
+            style: _labelStyle,
+          ),
         ),
         const SizedBox(height: 10),
         Row(
@@ -2354,7 +2383,7 @@ class _AddToWorkoutDialog extends StatelessWidget {
               onTap: onAddExercise,
             ),
             const SizedBox(height: 20),
-            const Text('BLOCKS', style: _labelStyle),
+            Text(context.tr('workout.active.blocks'), style: _labelStyle),
             const SizedBox(height: 4),
             Text(
               'Combine exercises into a sequence',
@@ -2659,7 +2688,10 @@ class _BlockBuilderDialogState extends State<_BlockBuilderDialog> {
               const SizedBox(height: 18),
               Row(
                 children: [
-                  const Text('EXERCISES', style: _labelStyle),
+                  Text(
+                    context.tr('workout.active.exercises'),
+                    style: _labelStyle,
+                  ),
                   const Spacer(),
                   Text(
                     '${_selected.length}${_maximum == null ? ' / $_minimum+' : ' / $_maximum'}',
@@ -2705,7 +2737,7 @@ class _BlockBuilderDialogState extends State<_BlockBuilderDialog> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.add_rounded),
-                  label: const Text('Add exercise'),
+                  label: Text(context.tr('workout.active.add_exercise')),
                 ),
               ),
               const SizedBox(height: 10),
@@ -2977,7 +3009,7 @@ class _QuickNoteSheetState extends State<_QuickNoteSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text('QUICK ADD', style: _labelStyle),
+            Text(context.tr('workout.active.quick_add'), style: _labelStyle),
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,

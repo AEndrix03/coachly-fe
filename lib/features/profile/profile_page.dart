@@ -234,7 +234,10 @@ class ProfilePage extends ConsumerWidget {
           label: context.tr('common.version'),
           value: '1.0.0 MVP',
         ),
-        Divider(color: scheme.outlineVariant.withValues(alpha: 0.55), height: 24),
+        Divider(
+          color: scheme.outlineVariant.withValues(alpha: 0.55),
+          height: 24,
+        ),
         _infoRow(
           context: context,
           label: context.tr('common.build'),
@@ -290,10 +293,7 @@ class ProfilePage extends ConsumerWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
-            color: scheme.onSurfaceVariant,
-            fontSize: 14,
-          ),
+          style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14),
         ),
         const Spacer(),
         Text(
@@ -345,11 +345,7 @@ class ProfilePage extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Ionicons.log_out_outline,
-                  color: scheme.error,
-                  size: 18,
-                ),
+                Icon(Ionicons.log_out_outline, color: scheme.error, size: 18),
                 const SizedBox(width: 10),
                 Text(
                   context.tr('profile.logout'),
