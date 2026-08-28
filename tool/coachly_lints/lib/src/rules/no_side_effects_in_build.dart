@@ -16,8 +16,7 @@ class NoSideEffectsInBuild extends DartLintRule {
 
   static const _code = LintCode(
     name: 'no_side_effects_in_build',
-    problemMessage:
-        'Side effect nella costruzione dello stato di un Notifier.',
+    problemMessage: 'Side effect nella costruzione dello stato di un Notifier.',
     correctionMessage:
         'Usa AsyncNotifier: espone AsyncLoading/AsyncData/AsyncError senza '
         'flag scritti a mano. Vedi docs/development/03-state-riverpod.md.',

@@ -5,6 +5,7 @@ import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -65,7 +66,7 @@ class _ExerciseMusclesContentState extends State<ExerciseMusclesContent> {
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
     return ExerciseDetailScaffold(
-      title: 'Muscoli',
+      title: context.tr('exercise.muscles.title'),
       exerciseName: widget.data.name,
       body: CustomScrollView(
         key: const Key('muscles-page-scroll'),
@@ -113,7 +114,7 @@ class _ExerciseMusclesContentState extends State<ExerciseMusclesContent> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             _ViewChip(
-              label: 'Fronte',
+              label: context.tr('exercise.muscles.front'),
               selected: !_backView,
               onTap: () {
                 if (!_backView) return;
@@ -122,7 +123,7 @@ class _ExerciseMusclesContentState extends State<ExerciseMusclesContent> {
             ),
             const SizedBox(width: 8),
             _ViewChip(
-              label: 'Retro',
+              label: context.tr('exercise.muscles.back'),
               selected: _backView,
               onTap: () {
                 if (_backView) return;
@@ -183,7 +184,7 @@ class _ModeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
     return Semantics(
-      label: 'Modalità visualizzazione muscoli',
+      label: context.tr('exercise.muscles.view_mode'),
       child: Container(
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
@@ -273,12 +274,18 @@ class _MuscleLegend extends StatelessWidget {
       spacing: 14,
       runSpacing: 8,
       children: [
-        _LegendItem(color: colors.primary, label: 'Primario'),
+        _LegendItem(
+          color: colors.primary,
+          label: context.tr('exercise.muscles.role_primary'),
+        ),
         _LegendItem(
           color: context.exerciseTheme.primaryMuted,
-          label: 'Secondario',
+          label: context.tr('exercise.muscles.role_secondary'),
         ),
-        _LegendItem(color: colors.info, label: 'Stabilizzatore'),
+        _LegendItem(
+          color: colors.info,
+          label: context.tr('exercise.muscles.role_stabilizer'),
+        ),
       ],
     );
   }
@@ -360,9 +367,18 @@ class _SelectedMusclePanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _TensionRow(label: 'Allungato', level: muscle.tension.lengthened),
-          _TensionRow(label: 'Medio ROM', level: muscle.tension.midRange),
-          _TensionRow(label: 'Accorciato', level: muscle.tension.shortened),
+          _TensionRow(
+            label: context.tr('exercise.muscles.lengthened'),
+            level: muscle.tension.lengthened,
+          ),
+          _TensionRow(
+            label: context.tr('exercise.muscles.midrange'),
+            level: muscle.tension.midRange,
+          ),
+          _TensionRow(
+            label: context.tr('exercise.muscles.shortened'),
+            level: muscle.tension.shortened,
+          ),
         ],
       ),
     );
@@ -451,12 +467,15 @@ class _MuscleTable extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
                   _TensionRow(
-                    label: 'Allungato',
+                    label: context.tr('exercise.muscles.lengthened'),
                     level: muscle.tension.lengthened,
                   ),
-                  _TensionRow(label: 'Medio', level: muscle.tension.midRange),
                   _TensionRow(
-                    label: 'Accorciato',
+                    label: context.tr('exercise.muscles.mid'),
+                    level: muscle.tension.midRange,
+                  ),
+                  _TensionRow(
+                    label: context.tr('exercise.muscles.shortened'),
                     level: muscle.tension.shortened,
                   ),
                 ],

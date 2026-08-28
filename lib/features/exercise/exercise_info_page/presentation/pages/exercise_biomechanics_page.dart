@@ -39,7 +39,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
     final colors = context.exerciseTheme;
     final biomechanics = data.biomechanics;
     return ExerciseDetailScaffold(
-      title: 'Biomeccanica',
+      title: context.tr('exercise.biomechanics.title'),
       exerciseName: data.name,
       body: CustomScrollView(
         key: const Key('biomechanics-page-scroll'),
@@ -52,7 +52,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 _HeroMetric(
                   value: data.movementProfile.pattern,
-                  label: 'Pattern principale',
+                  label: context.tr('exercise.biomechanics.main_pattern'),
                 ),
                 const SizedBox(height: 12),
                 _DataRows(
@@ -78,7 +78,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 if (biomechanics.jointActions.isEmpty)
                   Text(
-                    'Dati in aggiornamento',
+                    context.tr('exercise.biomechanics.updating'),
                     style: TextStyle(color: colors.textSecondary),
                   )
                 else
@@ -105,7 +105,10 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                 _DataRows(
                   rows: [
                     ('Stabilità richiesta', biomechanics.training.stability),
-                    ('Carico spinale', biomechanics.training.spinalLoad),
+                    (
+                      context.tr('exercise.spinal_load'),
+                      biomechanics.training.spinalLoad,
+                    ),
                     (
                       'Richiesta tecnica',
                       biomechanics.training.technicalDemand,
@@ -128,7 +131,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 _HeroMetric(
                   value: data.movementProfile.resistanceSource,
-                  label: 'Resistenza esterna',
+                  label: context.tr('exercise.biomechanics.resistance'),
                   compact: true,
                 ),
                 const SizedBox(height: 28),
@@ -164,7 +167,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            'Profilo non ancora disponibile',
+                            context.tr('exercise.biomechanics.no_profile'),
                             style: TextStyle(color: colors.textSecondary),
                           ),
                         ),
@@ -240,13 +243,13 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                             minimumSize: const Size(44, 44),
                             padding: EdgeInsets.zero,
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
                               Icon(Icons.info_outline_rounded, size: 18),
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Come Coachly interpreta questi dati',
+                                  context.tr('exercise.biomechanics.how_read'),
                                 ),
                               ),
                             ],

@@ -42,7 +42,7 @@ class ExerciseSectionTitle extends StatelessWidget {
           SizedBox.square(
             dimension: 44,
             child: IconButton(
-              tooltip: 'Informazioni',
+              tooltip: context.tr('common.information'),
               padding: EdgeInsets.zero,
               onPressed: onInfo,
               icon: Icon(
@@ -138,7 +138,7 @@ class ExerciseMediaHero extends StatelessWidget {
                   Center(
                     child: Semantics(
                       button: true,
-                      label: 'Riproduci media esercizio',
+                      label: context.tr('exercise.play_media'),
                       child: Container(
                         width: 58,
                         height: 58,
@@ -209,7 +209,7 @@ class _MediaPlaceholder extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Media in arrivo',
+                context.tr('exercise.media_soon'),
                 style: TextStyle(color: colors.textSecondary, fontSize: 13),
               ),
             ],
@@ -558,7 +558,7 @@ class ExerciseErrorView extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Impossibile caricare l’esercizio',
+                      context.tr('exercise.load_failed'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: colors.textPrimary,

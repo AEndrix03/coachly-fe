@@ -355,9 +355,9 @@ class _LocalExercisePickerState extends State<_LocalExercisePicker> {
               child: TextField(
                 autofocus: true,
                 onChanged: (value) => setState(() => _query = value),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   prefixIcon: Icon(Icons.search_rounded),
-                  hintText: 'Search local exercises',
+                  hintText: context.tr('workout.active.search_exercises'),
                 ),
               ),
             ),

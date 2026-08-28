@@ -7,6 +7,123 @@ class AppStrings {
 
   static const Map<String, Map<String, String>> _values = {
     'common.app_name': {'en': 'Coachly', 'it': 'Coachly'},
+    'workout.active.search_exercises': {
+      'en': 'Search local exercises',
+      'it': 'Cerca fra gli esercizi locali',
+    },
+    'workout.active.cluster': {'en': 'Cluster', 'it': 'Cluster'},
+    'workout.active.failure': {'en': 'Failure', 'it': 'Cedimento'},
+    'workout.active.weight': {'en': 'Weight', 'it': 'Carico'},
+    'workout.active.reps': {'en': 'Reps', 'it': 'Ripetizioni'},
+    'workout.active.add_title': {
+      'en': 'Add to workout',
+      'it': 'Aggiungi alla scheda',
+    },
+    'workout.active.add_subtitle': {
+      'en': 'Choose what you want to add',
+      'it': 'Scegli cosa aggiungere',
+    },
+    'workout.active.add_set': {'en': 'Add set', 'it': 'Aggiungi serie'},
+    'workout.active.add_set_hint': {
+      'en': 'Add another set to this exercise',
+      'it': 'Aggiungi un’altra serie a questo esercizio',
+    },
+    'workout.active.add_movement': {
+      'en': 'Add another movement',
+      'it': 'Aggiungi un altro movimento',
+    },
+    'workout.active.combine_hint': {
+      'en': 'Combine exercises into a sequence',
+      'it': 'Combina gli esercizi in una sequenza',
+    },
+    'workout.active.note_hint': {
+      'en': 'Write a note…',
+      'it': 'Scrivi una nota…',
+    },
+    'workout.active.saving': {'en': 'Saving…', 'it': 'Salvataggio…'},
+    'workout.active.saved': {'en': 'Saved', 'it': 'Salvato'},
+    'workout.active.plan_guard': {'en': 'PLAN GUARD', 'it': 'PLAN GUARD'},
+    'workout.active.finish': {
+      'en': 'Finish workout',
+      'it': 'Termina allenamento',
+    },
+    'exercise.biomechanics.title': {'en': 'Biomechanics', 'it': 'Biomeccanica'},
+    'exercise.biomechanics.main_pattern': {
+      'en': 'Main pattern',
+      'it': 'Pattern principale',
+    },
+    'exercise.biomechanics.updating': {
+      'en': 'Data being updated',
+      'it': 'Dati in aggiornamento',
+    },
+    'exercise.biomechanics.resistance': {
+      'en': 'External resistance',
+      'it': 'Resistenza esterna',
+    },
+    'exercise.biomechanics.no_profile': {
+      'en': 'Profile not available yet',
+      'it': 'Profilo non ancora disponibile',
+    },
+    'exercise.biomechanics.how_read': {
+      'en': 'How Coachly reads this data',
+      'it': 'Come Coachly interpreta questi dati',
+    },
+    'exercise.create.hint': {
+      'en':
+          'Complete one block at a time: you can always edit the exercise later.',
+      'it':
+          'Completa un blocco alla volta: potrai sempre modificare l’esercizio in seguito.',
+    },
+    'exercise.create.upload_soon': {
+      'en': 'Upload will be available once media storage is configured.',
+      'it':
+          'L’upload sarà disponibile quando verrà configurato lo storage media.',
+    },
+    'exercise.play_media': {
+      'en': 'Play exercise media',
+      'it': 'Riproduci media esercizio',
+    },
+    'exercise.media_soon': {'en': 'Media coming soon', 'it': 'Media in arrivo'},
+    'common.information': {'en': 'Information', 'it': 'Informazioni'},
+    'exercise.common_mistakes': {
+      'en': 'Common mistakes',
+      'it': 'Errori comuni',
+    },
+    'exercise.muscles_primary': {'en': 'Primary', 'it': 'Primari'},
+    'exercise.muscles_secondary': {'en': 'Secondary', 'it': 'Secondari'},
+    'exercise.explore_muscles': {
+      'en': 'Explore muscles',
+      'it': 'Esplora muscoli',
+    },
+    'exercise.pattern': {'en': 'Pattern', 'it': 'Pattern'},
+    'exercise.stability': {'en': 'Stability', 'it': 'Stabilità'},
+    'exercise.spinal_load': {'en': 'Spinal load', 'it': 'Carico spinale'},
+    'exercise.explore_biomechanics': {
+      'en': 'Explore biomechanics',
+      'it': 'Esplora biomeccanica',
+    },
+    'exercise.required': {'en': 'Required', 'it': 'Richiesta'},
+    'exercise.remember': {'en': 'Worth remembering', 'it': 'Da ricordare'},
+    'common.more_actions': {'en': 'More actions', 'it': 'Altre azioni'},
+    'exercise.muscles.front': {'en': 'Front', 'it': 'Fronte'},
+    'exercise.muscles.back': {'en': 'Back', 'it': 'Retro'},
+    'exercise.muscles.view_mode': {
+      'en': 'Muscle view mode',
+      'it': 'Modalità visualizzazione muscoli',
+    },
+    'exercise.muscles.role_primary': {'en': 'Primary', 'it': 'Primario'},
+    'exercise.muscles.role_secondary': {'en': 'Secondary', 'it': 'Secondario'},
+    'exercise.muscles.role_stabilizer': {
+      'en': 'Stabiliser',
+      'it': 'Stabilizzatore',
+    },
+    'exercise.muscles.lengthened': {'en': 'Lengthened', 'it': 'Allungato'},
+    'exercise.muscles.midrange': {'en': 'Mid ROM', 'it': 'Medio ROM'},
+    'exercise.muscles.mid': {'en': 'Mid', 'it': 'Medio'},
+    'exercise.muscles.shortened': {'en': 'Shortened', 'it': 'Accorciato'},
+    'exercise.muscles.title': {'en': 'Muscles', 'it': 'Muscoli'},
+    'exercise.variants.title': {'en': 'Variants', 'it': 'Varianti'},
+    'common.loading': {'en': 'Loading…', 'it': 'Caricamento…'},
     'exercise.create.name_required': {
       'en': 'At least the Italian name is required.',
       'it': 'Inserisci almeno il nome in italiano.',

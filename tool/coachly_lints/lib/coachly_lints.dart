@@ -1,6 +1,7 @@
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'src/rules/layer_imports.dart';
+import 'src/rules/no_hardcoded_strings.dart';
 import 'src/rules/no_literal_colors.dart';
 import 'src/rules/no_raw_datetime_now.dart';
 import 'src/rules/no_side_effects_in_build.dart';
@@ -22,6 +23,8 @@ class _CoachlyLints extends PluginBase {
   List<LintRule> getLintRules(CustomLintConfigs configs) => const [
     // docs/development/09-design-tokens.md
     NoLiteralColors(),
+    // docs/development/13-i18n.md
+    NoHardcodedStrings(),
     // docs/development/19-testing.md
     NoRawDateTimeNow(),
     // docs/development/03-state-riverpod.md

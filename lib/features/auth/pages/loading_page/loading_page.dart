@@ -1,4 +1,5 @@
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -29,7 +30,7 @@ class LoadingPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Coachly',
+                    context.tr('common.app_name'),
                     style: GoogleFonts.poppins(
                       textStyle: textTheme.displaySmall,
                       fontWeight: FontWeight.bold,
@@ -49,7 +50,7 @@ class LoadingPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Caricamento...',
+                    context.tr('common.loading'),
                     style: textTheme.bodyLarge?.copyWith(
                       color: context.colors.textSecondary,
                     ),

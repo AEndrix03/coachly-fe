@@ -2,6 +2,7 @@ import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_det
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,7 +60,7 @@ class _ExerciseVariantsContentState extends State<ExerciseVariantsContent> {
     final filters = _filters;
     final variants = _variants;
     return ExerciseDetailScaffold(
-      title: 'Varianti',
+      title: context.tr('exercise.variants.title'),
       exerciseName: widget.data.name,
       body: CustomScrollView(
         key: const Key('variants-page-scroll'),

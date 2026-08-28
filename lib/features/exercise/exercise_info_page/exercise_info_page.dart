@@ -45,10 +45,13 @@ double _quickNavDeployProgress({
 }
 
 extension on ExerciseQuickNavItem {
-  String get label => switch (this) {
-    ExerciseQuickNavItem.biomechanics => 'Biomeccanica',
-    ExerciseQuickNavItem.muscles => 'Muscoli',
-    ExerciseQuickNavItem.variants => 'Varianti',
+  /// Metodo e non getter: l'etichetta è localizzata e serve il context.
+  String label(BuildContext context) => switch (this) {
+    ExerciseQuickNavItem.biomechanics => context.tr(
+      'exercise.biomechanics.title',
+    ),
+    ExerciseQuickNavItem.muscles => context.tr('exercise.muscles.title'),
+    ExerciseQuickNavItem.variants => context.tr('exercise.variants.title'),
   };
 
   String get actionLabel => switch (this) {
@@ -450,7 +453,7 @@ class _ExerciseHeader extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
       foregroundColor: colors.textPrimary,
       leading: IconButton(
-        tooltip: 'Indietro',
+        tooltip: context.tr('common.back'),
         onPressed: () => Navigator.of(context).maybePop(),
         icon: Icon(
           Icons.arrow_back_ios_new_rounded,
@@ -490,7 +493,7 @@ class _ExerciseHeader extends StatelessWidget {
           ),
         ),
         PopupMenuButton<String>(
-          tooltip: 'Altre azioni',
+          tooltip: context.tr('common.more_actions'),
           color: colors.surfaceElevated,
           icon: const Icon(Icons.more_horiz_rounded),
           itemBuilder: (_) => [
@@ -549,7 +552,7 @@ class ExerciseQuickNavAnchor extends StatelessWidget {
         for (final item in ExerciseQuickNavItem.values)
           Semantics(
             button: true,
-            label: 'Apri ${item.label}',
+            label: 'Apri ${item.label(context)}',
             child: InkResponse(
               key: Key('quick-nav-${item.name}'),
               radius: 34,
@@ -570,7 +573,7 @@ class ExerciseQuickNavAnchor extends StatelessWidget {
                     ),
                     const SizedBox(height: 7),
                     Text(
-                      item.label,
+                      item.label(context),
                       maxLines: 1,
                       style: TextStyle(
                         color: colors.textSecondary,
@@ -1095,7 +1098,7 @@ class _ExecutionSection extends StatelessWidget {
         if (execution.commonMistakes.isNotEmpty) ...[
           const SizedBox(height: 26),
           Text(
-            'Errori comuni',
+            context.tr('exercise.common_mistakes'),
             style: TextStyle(
               color: colors.textPrimary,
               fontSize: 16,
@@ -1244,10 +1247,13 @@ class _MusclesPreview extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _MuscleGroup(label: 'Primari', muscles: primary),
+                    _MuscleGroup(
+                      label: context.tr('exercise.muscles_primary'),
+                      muscles: primary,
+                    ),
                     const SizedBox(height: 16),
                     _MuscleGroup(
-                      label: 'Secondari',
+                      label: context.tr('exercise.muscles_secondary'),
                       muscles: secondary.take(3).toList(),
                     ),
                   ],
@@ -1256,7 +1262,10 @@ class _MusclesPreview extends StatelessWidget {
             ],
           ),
         ),
-        ExerciseLinkButton(label: 'Esplora muscoli', onTap: onOpen),
+        ExerciseLinkButton(
+          label: context.tr('exercise.explore_muscles'),
+          onTap: onOpen,
+        ),
       ],
     );
   }
@@ -1310,7 +1319,7 @@ class _BiomechanicsPreview extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ExerciseSectionTitle(
-          'Biomeccanica',
+          context.tr('exercise.biomechanics.title'),
           onInfo: () => showCoachlyInfoSheet(
             context,
             title: 'Stabilità richiesta',
@@ -1328,23 +1337,29 @@ class _BiomechanicsPreview extends StatelessWidget {
             Expanded(
               child: _Metric(
                 value: data.movementProfile.pattern,
-                label: 'Pattern',
+                label: context.tr('exercise.pattern'),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _Metric(value: training.stability, label: 'Stabilità'),
+              child: _Metric(
+                value: training.stability,
+                label: context.tr('exercise.stability'),
+              ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: _Metric(
                 value: training.spinalLoad,
-                label: 'Carico spinale',
+                label: context.tr('exercise.spinal_load'),
               ),
             ),
           ],
         ),
-        ExerciseLinkButton(label: 'Esplora biomeccanica', onTap: onOpen),
+        ExerciseLinkButton(
+          label: context.tr('exercise.explore_biomechanics'),
+          onTap: onOpen,
+        ),
       ],
     );
   }
@@ -1409,7 +1424,7 @@ class _EquipmentSection extends StatelessWidget {
                 ),
                 if (item.required)
                   Text(
-                    'Richiesta',
+                    context.tr('exercise.required'),
                     style: TextStyle(color: colors.textSecondary, fontSize: 12),
                   ),
               ],
@@ -1449,7 +1464,7 @@ class _SafetySection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Da ricordare',
+                  context.tr('exercise.remember'),
                   style: TextStyle(
                     color: colors.textPrimary,
                     fontWeight: FontWeight.w600,

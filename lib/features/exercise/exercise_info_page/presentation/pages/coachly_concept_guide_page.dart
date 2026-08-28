@@ -1,3 +1,14 @@
+// ignore_for_file: no_hardcoded_strings
+//
+// Contenuto editoriale, non stringhe di interfaccia: 55 paragrafi che spiegano
+// concetti di allenamento (azioni articolari, stabilità, profili di resistenza,
+// tensione nel ROM). Tradurli a macchina significherebbe inventare contenuto
+// formativo, quindi la versione inglese è un **lavoro di contenuto**, non di
+// refactor: vedi `docs/development/13-i18n.md`.
+//
+// Quando la versione inglese esisterà, questo file va diviso per locale e
+// l'ignore rimosso.
+
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:flutter/material.dart';
 

@@ -888,7 +888,7 @@ class _WorkoutHeader extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: onMenu,
-                  tooltip: 'Finish workout',
+                  tooltip: context.tr('workout.active.finish'),
                   icon: const Icon(Icons.flag_outlined),
                 ),
               ],
@@ -1946,14 +1946,14 @@ class _SetTechniqueActions extends StatelessWidget {
         ),
         const Spacer(),
         _TechniqueToggle(
-          label: 'Cluster',
+          label: context.tr('workout.active.cluster'),
           color: scheme.tertiary,
           selected: selected == SetTechnique.cluster,
           onTap: () => onSelected(SetTechnique.cluster),
         ),
         const SizedBox(width: 6),
         _TechniqueToggle(
-          label: 'Failure',
+          label: context.tr('workout.active.failure'),
           color: scheme.error,
           selected: selected == SetTechnique.failure,
           onTap: () => onSelected(SetTechnique.failure),
@@ -2103,7 +2103,7 @@ class _DropEditor extends StatelessWidget {
                     ],
                   ),
                   _DropValueRow(
-                    label: 'Weight',
+                    label: context.tr('workout.active.weight'),
                     value: '${_number(displayedWeight)} $loadUnit',
                     onMinus: () => onWeight(
                       _storedWeight(
@@ -2127,7 +2127,7 @@ class _DropEditor extends StatelessWidget {
                   ),
                   Divider(height: 1, color: scheme.outlineVariant),
                   _DropValueRow(
-                    label: 'Reps',
+                    label: context.tr('workout.active.reps'),
                     value: '${drop.reps}',
                     onMinus: () => onReps((drop.reps - 1).clamp(0, 999)),
                     onPlus: () => onReps((drop.reps + 1).clamp(0, 999)),
@@ -2348,14 +2348,14 @@ class _AddToWorkoutDialog extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Add to workout',
+                        context.tr('workout.active.add_title'),
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'Choose what you want to add',
+                        context.tr('workout.active.add_subtitle'),
                         style: TextStyle(color: scheme.onSurfaceVariant),
                       ),
                     ],
@@ -2371,22 +2371,22 @@ class _AddToWorkoutDialog extends StatelessWidget {
             const SizedBox(height: 16),
             _AddActionRow(
               icon: Icons.add_rounded,
-              title: 'Add set',
-              subtitle: 'Add another set to this exercise',
+              title: context.tr('workout.active.add_set'),
+              subtitle: context.tr('workout.active.add_set_hint'),
               onTap: onAddSet,
             ),
             const SizedBox(height: 10),
             _AddActionRow(
               icon: Icons.fitness_center_rounded,
-              title: 'Add exercise',
-              subtitle: 'Add another movement',
+              title: context.tr('workout.active.add_exercise'),
+              subtitle: context.tr('workout.active.add_movement'),
               onTap: onAddExercise,
             ),
             const SizedBox(height: 20),
             Text(context.tr('workout.active.blocks'), style: _labelStyle),
             const SizedBox(height: 4),
             Text(
-              'Combine exercises into a sequence',
+              context.tr('workout.active.combine_hint'),
               style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13),
             ),
             const SizedBox(height: 12),
@@ -2994,7 +2994,7 @@ class _QuickNoteSheetState extends State<_QuickNoteSheet> {
               onChanged: _onTextChanged,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
-                hintText: 'Write a note…',
+                hintText: context.tr('workout.active.note_hint'),
                 filled: true,
                 fillColor: scheme.surfaceContainerHighest,
                 contentPadding: const EdgeInsets.all(16),
@@ -3052,7 +3052,7 @@ class _QuickNoteSheetState extends State<_QuickNoteSheet> {
                 duration: const Duration(milliseconds: 180),
                 child: _saving
                     ? Text(
-                        'Saving…',
+                        context.tr('workout.active.saving'),
                         key: const ValueKey('saving'),
                         style: TextStyle(color: scheme.onSurfaceVariant),
                       )
@@ -3062,7 +3062,7 @@ class _QuickNoteSheetState extends State<_QuickNoteSheet> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            'Saved',
+                            context.tr('workout.active.saved'),
                             style: TextStyle(color: scheme.onSurfaceVariant),
                           ),
                           const SizedBox(width: 4),
@@ -3297,7 +3297,7 @@ class _CoachInsightBar extends StatelessWidget {
         onTap: onOpen,
         leading: Icon(Icons.diamond_outlined, color: scheme.secondary),
         title: Text(
-          'PLAN GUARD',
+          context.tr('workout.active.plan_guard'),
           style: TextStyle(
             color: scheme.secondary,
             fontSize: 10,

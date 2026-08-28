@@ -117,7 +117,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Completa un blocco alla volta: potrai sempre modificare l’esercizio in seguito.',
+                context.tr('exercise.create.hint'),
                 style: TextStyle(color: context.colors.textSecondary),
               ),
             ),
@@ -182,7 +182,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
         'isolation',
       ].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
       onChanged: (v) => setState(() => _mechanics = v!),
-      decoration: const InputDecoration(labelText: 'Meccanica'),
+      decoration: InputDecoration(labelText: context.tr('exercise.mechanics')),
     ),
     SwitchListTile(
       value: _bodyweight,
@@ -201,9 +201,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
     ListTile(
       leading: Icon(Icons.photo_library_outlined),
       title: Text(context.tr('exercise.create.media')),
-      subtitle: Text(
-        'L’upload sarà disponibile quando verrà configurato lo storage media.',
-      ),
+      subtitle: Text(context.tr('exercise.create.upload_soon')),
     ),
   ]);
   Widget _stepBody(List<Widget> children) =>
