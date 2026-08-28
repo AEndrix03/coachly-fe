@@ -2,7 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../coachly-business-fe" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/qual" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../services/coachly-api-gateway" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../services/coachly-coach-be" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../services/coachly-exercises-be" vcs="Git" />
