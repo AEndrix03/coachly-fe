@@ -1,5 +1,11 @@
+import 'package:coachly/design_system/tokens/coachly_palette.dart';
 import 'package:flutter/material.dart';
 
+/// **Deprecato.** Usare i token via `context.colors` (`lib/design_system/`).
+///
+/// Resta come alias durante la migrazione (ADR-001): i valori **delegano alla
+/// palette**, quindi la sorgente di verità sui colori è una sola. Verrà rimosso
+/// quando i 21 file che lo usano saranno migrati.
 @immutable
 class CoachlyExerciseTheme extends ThemeExtension<CoachlyExerciseTheme> {
   final Color background;
@@ -27,16 +33,16 @@ class CoachlyExerciseTheme extends ThemeExtension<CoachlyExerciseTheme> {
   });
 
   static const dark = CoachlyExerciseTheme(
-    background: Color(0xFF07100F),
-    surface: Color(0xFF0D1717),
-    surfaceElevated: Color(0xFF12201F),
-    primary: Color(0xFF20D3B0),
-    primaryMuted: Color(0xFF284C47),
-    textPrimary: Color(0xFFF4F8F7),
-    textSecondary: Color(0xFFA6B6B3),
-    border: Color(0x17FFFFFF),
-    warning: Color(0xFFE6B75C),
-    info: Color(0xFF77A9C9),
+    background: CoachlyPalette.ink900,
+    surface: CoachlyPalette.ink800,
+    surfaceElevated: CoachlyPalette.ink700,
+    primary: CoachlyPalette.teal400,
+    primaryMuted: CoachlyPalette.teal900,
+    textPrimary: CoachlyPalette.bone50,
+    textSecondary: CoachlyPalette.sage400,
+    border: CoachlyPalette.whiteAlpha09,
+    warning: CoachlyPalette.amber400,
+    info: CoachlyPalette.blue300,
   );
 
   @override
@@ -108,7 +114,7 @@ ThemeData exerciseDetailTheme(ThemeData base) {
     // the recursively bounded ThemeExtension<dynamic> spread incorrectly.
     extensions: const [CoachlyExerciseTheme.dark],
     textSelectionTheme: const TextSelectionThemeData(
-      cursorColor: Color(0xFF20D3B0),
+      cursorColor: CoachlyPalette.teal400,
     ),
   );
 }

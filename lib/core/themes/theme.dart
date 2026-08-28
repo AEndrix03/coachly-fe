@@ -1,16 +1,18 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
+import 'package:coachly/design_system/tokens/coachly_palette.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
 class AppThemeScheme {
   static const FlexSchemeColor customScheme = FlexSchemeColor(
-    primary: Color(0xFF2196F3),
-    primaryContainer: Color(0xFF1976D2),
-    secondary: Color(0xFF9C27B0),
-    secondaryContainer: Color(0xFF7B4BC1),
-    tertiary: Color(0xFFFF9800),
-    tertiaryContainer: Color(0xFFFF5722),
-    appBarColor: Color(0xFF0F0F1E),
-    error: Color(0xFFFF5252),
+    primary: CoachlyPalette.teal400,
+    primaryContainer: CoachlyPalette.teal900,
+    secondary: CoachlyPalette.blue300,
+    secondaryContainer: CoachlyPalette.blue900,
+    tertiary: CoachlyPalette.amber400,
+    tertiaryContainer: CoachlyPalette.amber900,
+    appBarColor: CoachlyPalette.ink900,
+    error: CoachlyPalette.red400,
   );
 
   static ThemeData lightTheme = FlexThemeData.light(
@@ -25,7 +27,7 @@ class AppThemeScheme {
     ),
     visualDensity: VisualDensity.adaptivePlatformDensity,
     useMaterial3: true,
-  );
+  ).copyWith(extensions: const [CoachlyThemeData.dark]);
 
   static ThemeData darkTheme = FlexThemeData.dark(
     colors: customScheme,
@@ -39,5 +41,5 @@ class AppThemeScheme {
     ),
     visualDensity: VisualDensity.adaptivePlatformDensity,
     useMaterial3: true,
-  );
+  ).copyWith(extensions: const [CoachlyThemeData.dark]);
 }
