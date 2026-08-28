@@ -58,20 +58,33 @@ Implementati in `tool/coachly_lints/`, agganciati via
 `analyzer: plugins: [custom_lint]`. Ogni regola implementa una riga di
 `01-principles.md`.
 
-**Stato attuale — 170 violazioni rilevate su 5 regole attive:**
+**Stato attuale — 21 violazioni residue** (erano 170 alla prima esecuzione):
 
-| Regola | Violazioni | Doc |
-|---|---|---|
-| `no_literal_colors` | 142 | 09 |
-| `no_features_in_core` | 15 | 01 D5 |
-| `no_cross_feature_presentation` | 10 | 01 D4 |
-| `no_data_layer_in_presentation` | 3 | 01 D1 |
-| `no_side_effects_in_build` | 0 | 03 |
-| `no_raw_datetime_now` | 0 (attende `core/time`) | 19 |
-| `no_material_in_application` | 0 (attende `application/`) | 01 D2 |
-| `no_data_source_outside_repository` | 0 (attende `data/remote`) | 01 D6 |
+| Regola | Residue | Iniziali | Doc |
+|---|---|---|---|
+| `no_cross_feature_presentation` | 10 | 10 | 01 D4 |
+| `no_literal_colors` | 4 | 142 | 09 |
+| `no_features_in_core` | 4 | 15 | 01 D5 |
+| `no_data_layer_in_presentation` | 3 | 3 | 01 D1 |
+| `no_side_effects_in_build` | 0 | 0 | 03 |
+| `no_raw_datetime_now` | 0 (attende `core/time`) | — | 19 |
+| `no_material_in_application` | 0 (attende `application/`) | — | 01 D2 |
+| `no_data_source_outside_repository` | 0 (attende `data/remote`) | — | 01 D6 |
 
-Le ultime tre non trovano nulla perché le cartelle target non esistono ancora:
+Delle 21 residue, **8 sono in file con modifiche non committate** e non sono
+toccabili senza conflitto.
+
+Le 10 `no_cross_feature_presentation` sono **una sola causa**: la feature
+workout importa `exercise_info_page/presentation/exercise_theme.dart`. Si
+risolvono tutte insieme spostando quel file in `design_system/`, appena i file
+in lavorazione sono committati.
+
+Le 4 `no_features_in_core` restanti sono in `local_database_service`,
+`workout_adapter` e `auth_interceptor_client`: i primi due spariscono con Hive
+nella fase 3, il terzo richiede di invertire la dipendenza verso l'auth
+(interfaccia in `core`, implementazione nella feature).
+
+Le tre a zero non trovano nulla perché le cartelle target non esistono ancora:
 sono attive in anticipo, così la prima feature scritta secondo la nuova
 struttura è già coperta.
 
@@ -137,8 +150,8 @@ flutter test                   → tutto verde
 dart format --set-exit-if-changed
 ```
 
-`dart run custom_lint` da solo riporta tutte le 170 violazioni esistenti: serve
-per misurare il debito, non come gate.
+`dart run custom_lint` da solo riporta tutte le violazioni esistenti: serve per
+misurare il debito, non come gate.
 
 La suite compila e gira (fase 0.1). Restano 12 test rossi per deriva fra UI e
 asserzioni: vedi `26-migration-plan.md`. La CI va attivata accettando quel
