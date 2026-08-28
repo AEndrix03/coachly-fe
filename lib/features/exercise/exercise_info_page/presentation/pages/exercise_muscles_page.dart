@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/components/product/muscle_anatomy_view.dart';
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
@@ -273,7 +274,10 @@ class _MuscleLegend extends StatelessWidget {
       runSpacing: 8,
       children: [
         _LegendItem(color: colors.primary, label: 'Primario'),
-        _LegendItem(color: context.exerciseTheme.primaryMuted, label: 'Secondario'),
+        _LegendItem(
+          color: context.exerciseTheme.primaryMuted,
+          label: 'Secondario',
+        ),
         _LegendItem(color: colors.info, label: 'Stabilizzatore'),
       ],
     );

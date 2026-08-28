@@ -1,6 +1,6 @@
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
-import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
+import 'package:coachly/design_system/components/product/muscle_anatomy_view.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_check/domain/workout_check_models.dart';
 import 'package:coachly/features/workout/workout_check/providers/workout_check_provider.dart';

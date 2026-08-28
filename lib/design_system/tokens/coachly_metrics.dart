@@ -41,7 +41,8 @@ class CoachlySpacing {
   /// Padding interno di una card.
   double get card => md;
 
-  EdgeInsets get pagePadding => EdgeInsets.symmetric(horizontal: pageHorizontal);
+  EdgeInsets get pagePadding =>
+      EdgeInsets.symmetric(horizontal: pageHorizontal);
 
   EdgeInsets get cardPadding => EdgeInsets.all(card);
 }

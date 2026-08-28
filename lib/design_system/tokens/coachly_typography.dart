@@ -39,7 +39,11 @@ class CoachlyTypography {
   });
 
   static const standard = CoachlyTypography(
-    displayL: TextStyle(fontSize: 40, fontWeight: FontWeight.w800, height: 1.05),
+    displayL: TextStyle(
+      fontSize: 40,
+      fontWeight: FontWeight.w800,
+      height: 1.05,
+    ),
     displayM: TextStyle(fontSize: 30, fontWeight: FontWeight.w800, height: 1.1),
     titleL: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, height: 1.2),
     titleM: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.25),
