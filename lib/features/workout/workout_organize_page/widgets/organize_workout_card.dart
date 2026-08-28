@@ -5,6 +5,7 @@ import 'package:coachly/features/workout/workout_page/data/models/workout_model/
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/badges/coach_badge_widget.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -59,17 +60,17 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF23233A).withValues(alpha: 0.85),
-              const Color(0xFF2A2A3E).withValues(alpha: 0.65),
+              context.colors.surfaceElevated.withValues(alpha: 0.85),
+              context.colors.surfaceSunken.withValues(alpha: 0.65),
             ],
           ),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: const Color(0xFF2196F3).withValues(alpha: 0.14),
+            color: context.colors.surfaceAccent.withValues(alpha: 0.14),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.13),
+              color: context.colors.surface.withValues(alpha: 0.45),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
@@ -98,12 +99,10 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                               child: Text(
                                 widget.workout.titleI18n?.fromI18n(language) ??
                                     '',
-                                style: const TextStyle(
-                                  fontSize: 14,
+                                style: context.text.bodyM.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: context.colors.textPrimary,
                                   letterSpacing: 0.15,
-                                  height: 1.2,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -152,7 +151,10 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                     ),
                   ),
                   PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: context.colors.textPrimary,
+                    ),
                     onSelected: (String result) {
                       if (result == 'toggleActive') {
                         setState(() {
@@ -199,21 +201,28 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
       width: 38,
       height: 38,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+        gradient: LinearGradient(
+          colors: [
+            context.colors.surfaceAccent,
+            context.colors.surfaceAccentMuted,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2196F3).withValues(alpha: 0.16),
+            color: context.colors.surfaceAccent.withValues(alpha: 0.16),
             blurRadius: 6,
             offset: const Offset(0, 1),
           ),
         ],
       ),
-      child: const Icon(Icons.assignment, color: Colors.white, size: 18),
+      child: Icon(
+        Icons.assignment,
+        color: context.colors.textOnAccent,
+        size: 18,
+      ),
     );
   }
 
@@ -221,20 +230,22 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.10),
+        color: context.colors.textPrimary.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        border: Border.all(
+          color: context.colors.textPrimary.withValues(alpha: 0.16),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: Colors.white.withValues(alpha: 0.80), size: 10),
+          Icon(icon, color: context.colors.textSecondary, size: 10),
           const SizedBox(width: 4),
           Text(
             text,
             style: TextStyle(
               fontSize: 10,
-              color: Colors.white.withValues(alpha: 0.80),
+              color: context.colors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),

@@ -6,6 +6,7 @@ import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/buttons/glass_icon_button.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -80,13 +81,17 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
   Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2196F3), Color(0xFF1976D2), Color(0xFF7B4BC1)],
+          colors: [
+            context.colors.surfaceAccent,
+            context.colors.surfaceAccentMuted,
+            context.colors.surfaceElevated,
+          ],
         ),
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
         ),
@@ -106,7 +111,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
                     onPressed: () {
                       context.pop();
                     },
-                    iconColor: Colors.white,
+                    iconColor: context.colors.textOnAccent,
                     size: 20,
                     marginRight: 0,
                   ),
@@ -115,7 +120,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
                     onPressed: () {
                       // TODO: Implement save functionality
                     },
-                    iconColor: Colors.white,
+                    iconColor: context.colors.textOnAccent,
                     size: 20,
                     marginRight: 0,
                   ),
@@ -127,10 +132,8 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
               padding: EdgeInsets.fromLTRB(24, 8, 24, 16),
               child: Text(
                 context.tr('workout.organize.title'),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+                style: context.text.displayM.copyWith(
+                  color: context.colors.textOnAccent,
                 ),
               ),
             ),
@@ -152,7 +155,9 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
           padding: const EdgeInsets.all(32),
           child: Text(
             context.tr('workout.organize.empty'),
-            style: const TextStyle(color: Colors.grey),
+            style: context.text.bodyM.copyWith(
+              color: context.colors.textSecondary,
+            ),
           ),
         ),
       );
