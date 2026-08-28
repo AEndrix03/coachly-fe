@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -32,10 +33,17 @@ class NoLiteralColors extends DartLintRule {
   ) {
     if (isTokenFile(resolver.path)) return;
 
-    // Color(0xFF…), Color.fromARGB(…), Color.fromRGBO(…)
+    // Color(0xFF…), Color.fromARGB(1, 2, 3), …
+    //
+    // Solo con argomenti **letterali**: `Color(int.parse(hex))` costruisce un
+    // colore da un dato, non è una scelta di design, e segnalarlo renderebbe
+    // la regola inaffidabile.
     context.registry.addInstanceCreationExpression((node) {
-      final typeName = node.constructorName.type.name2.lexeme;
-      if (typeName == 'Color') {
+      if (node.constructorName.type.name2.lexeme != 'Color') return;
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+      final allLiteral = args.every((arg) => arg is IntegerLiteral);
+      if (allLiteral) {
         reporter.atNode(node, _code);
       }
     });

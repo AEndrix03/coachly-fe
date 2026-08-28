@@ -7,6 +7,7 @@ import 'package:coachly/features/exercise/exercise_info_page/presentation/exerci
 import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -241,12 +242,12 @@ class _HeroSheenState extends State<_HeroSheen>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-      child: const DecoratedBox(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0x0FFFFFFF), Colors.transparent],
+            colors: [context.colors.borderSubtle, Colors.transparent],
           ),
         ),
       ),
@@ -375,7 +376,7 @@ class _AnatomyPainter extends CustomPainter {
     canvas.scale(scale);
 
     final body = Paint()
-      ..color = const Color(0xFF253230)
+      ..color = theme.surfaceElevated
       ..style = PaintingStyle.fill;
     final bodyEdge = Paint()
       ..color = theme.border
@@ -465,8 +466,8 @@ class _AnatomyPainter extends CustomPainter {
 
     final teresLeft = Path()..addOval(const Rect.fromLTWH(55, 69, 28, 23));
     final teresRight = Path()..addOval(const Rect.fromLTWH(97, 69, 28, 23));
-    muscle(teresLeft, const Color(0xFF3DAF9E), 'teres-major');
-    muscle(teresRight, const Color(0xFF3DAF9E), 'teres-major');
+    muscle(teresLeft, theme.primary, 'teres-major');
+    muscle(teresRight, theme.primary, 'teres-major');
 
     final bicepsLeft = Path()
       ..addRRect(
@@ -482,8 +483,8 @@ class _AnatomyPainter extends CustomPainter {
           const Radius.circular(8),
         ),
       );
-    muscle(bicepsLeft, const Color(0xFF3F8F89), 'biceps-brachii');
-    muscle(bicepsRight, const Color(0xFF3F8F89), 'biceps-brachii');
+    muscle(bicepsLeft, theme.primaryMuted, 'biceps-brachii');
+    muscle(bicepsRight, theme.primaryMuted, 'biceps-brachii');
 
     final rhomboids = Path()
       ..moveTo(90, 73)

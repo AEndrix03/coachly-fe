@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:coachly/features/exercise/exercise_info_page/presentation/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 
 class CoachlyTourTargetRegistry {
@@ -196,6 +197,8 @@ class _CoachlyTourOverlayState extends State<CoachlyTourOverlay>
                     animation: borderController,
                     reduceMotion: MediaQuery.disableAnimationsOf(context),
                     accent: context.exerciseTheme.primary,
+                    scrim: context.colors.surface,
+                    highlight: context.colors.textPrimary,
                   ),
                 ),
               ),
@@ -375,11 +378,18 @@ class CoachlyTourHighlightPainter extends CustomPainter {
   final bool reduceMotion;
   final Color accent;
 
+  /// Fondale dello scrim e punta di luce del bordo: passati dal chiamante
+  /// perché un painter non ha accesso al `BuildContext`.
+  final Color scrim;
+  final Color highlight;
+
   CoachlyTourHighlightPainter({
     required this.rects,
     required this.animation,
     required this.reduceMotion,
     required this.accent,
+    required this.scrim,
+    required this.highlight,
   }) : super(repaint: animation);
 
   @override
@@ -389,7 +399,7 @@ class CoachlyTourHighlightPainter extends CustomPainter {
     for (final rect in rects) {
       path.addRRect(RRect.fromRectAndRadius(rect, const Radius.circular(16)));
     }
-    canvas.drawPath(path, Paint()..color = Colors.black.withValues(alpha: .22));
+    canvas.drawPath(path, Paint()..color = scrim.withValues(alpha: .55));
     for (final rect in rects) {
       final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(16));
       final border = Paint()
@@ -402,7 +412,7 @@ class CoachlyTourHighlightPainter extends CustomPainter {
                 colors: [
                   Colors.transparent,
                   accent,
-                  Color.lerp(accent, Colors.white, .45)!,
+                  Color.lerp(accent, highlight, .45)!,
                   Colors.transparent,
                 ],
               ).createShader(rect);

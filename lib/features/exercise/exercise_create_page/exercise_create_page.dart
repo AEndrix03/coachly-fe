@@ -1,5 +1,6 @@
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -88,7 +89,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F1E),
+      backgroundColor: context.colors.surface,
       appBar: AppBar(
         title: const Text('Crea esercizio'),
         backgroundColor: Colors.transparent,
@@ -104,19 +105,18 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 ['Identità', 'Tecnica', 'Istruzioni e media'][_step],
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+                style: context.text.titleL.copyWith(
+                  color: context.colors.textPrimary,
                   fontWeight: FontWeight.w800,
                 ),
               ),
             ),
             const SizedBox(height: 8),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 'Completa un blocco alla volta: potrai sempre modificare l’esercizio in seguito.',
-                style: TextStyle(color: Colors.white60),
+                style: TextStyle(color: context.colors.textSecondary),
               ),
             ),
             Expanded(
@@ -218,7 +218,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
       decoration: InputDecoration(
         labelText: label,
         filled: true,
-        fillColor: Colors.white10,
+        fillColor: context.colors.surfaceSunken,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       ),
     ),

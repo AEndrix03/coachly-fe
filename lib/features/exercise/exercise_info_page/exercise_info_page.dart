@@ -448,7 +448,11 @@ class _ExerciseHeader extends StatelessWidget {
       leading: IconButton(
         tooltip: 'Indietro',
         onPressed: () => Navigator.of(context).maybePop(),
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+        icon: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          size: 20,
+          color: colors.textPrimary,
+        ),
       ),
       title: ValueListenableBuilder<double>(
         valueListenable: scrollOffset,

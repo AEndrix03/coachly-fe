@@ -14,6 +14,7 @@ import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -605,7 +606,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         Container(
           height: 1,
           margin: const EdgeInsets.symmetric(horizontal: 20),
-          color: Colors.white.withValues(alpha: 0.07),
+          color: context.colors.textPrimary.withValues(alpha: 0.07),
         ),
       ],
     );
@@ -714,7 +715,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       child: Text(
         label,
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.45),
+          color: context.colors.textPrimary.withValues(alpha: 0.45),
           fontSize: 11,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.8,
@@ -1411,7 +1412,7 @@ class _ExerciseListScrollRailState extends State<_ExerciseListScrollRail> {
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.22),
+                                color: context.colors.surface.withValues(alpha: 0.55),
                                 blurRadius: _isDragging ? 8 : 4,
                               ),
                             ],
