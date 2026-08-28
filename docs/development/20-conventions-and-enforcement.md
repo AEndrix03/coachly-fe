@@ -75,23 +75,19 @@ Le ultime tre non trovano nulla perché le cartelle target non esistono ancora:
 sono attive in anticipo, così la prima feature scritta secondo la nuova
 struttura è già coperta.
 
-Regole ancora da implementare:
+Regole ancora da implementare, in ordine di valore:
 
-| Regola | Cosa vieta | Doc |
-|---|---|---|
-| `no_literal_colors` | `Color(0x…)` e `Colors.*` fuori da `design_system/tokens/` | 09 |
-| `no_literal_text_style` | `TextStyle(...)` costruito fuori dai token | 09 |
-| `no_magic_spacing` | `SizedBox`/`EdgeInsets`/`BorderRadius` con letterali non-token | 09 |
-| `no_hardcoded_strings` | stringhe letterali in `Text()` e proprietà user-facing | 13 |
-| `no_service_outside_repository` | import di `*_data_source.dart` fuori da `data/repositories/` | 01 D6 |
-| `no_data_layer_in_presentation` | import di `core/network`, `core/database`, `data/` da `presentation/` | 01 D1 |
-| `no_material_in_application` | import di `flutter/material.dart` da `application/` | 01 D2 |
-| `no_cross_feature_presentation` | import di `features/x/presentation` da `features/y` | 01 D4 |
-| `no_features_in_core` | import di `features/` da `core/` | 01 D5 |
-| `no_side_effects_in_build` | `Future.microtask` / chiamate async nel `build()` di un Notifier | 01 |
-| `no_non_material_icons` | import di `ionicons`, `lucide_icons_flutter`, `cupertino_icons` | 12 |
-| `no_raw_datetime_now` | `DateTime.now()` fuori da `core/time/` | 01 |
-| `no_manual_uuid` | generazione id fuori da `core/ids/` | 05 |
+| Regola | Cosa vieta | Doc | Prerequisito |
+|---|---|---|---|
+| `no_hardcoded_strings` | stringhe letterali in `Text()` e proprietà user-facing | 13 | ARB (fase 5.2) |
+| `no_literal_text_style` | `TextStyle(...)` costruito fuori dai token | 09 | — |
+| `no_magic_spacing` | `SizedBox`/`EdgeInsets`/`BorderRadius` con letterali non-token | 09 | — |
+| `no_non_material_icons` | import di `ionicons`, `lucide_icons_flutter` | 12 | — |
+| `no_manual_uuid` | generazione id fuori da `core/ids/` | 05 | `core/ids` |
+
+`no_magic_spacing` è la più delicata: deve distinguere un numero magico da un
+token, quindi va scritta solo dopo che i token di spazio sono realmente in uso,
+altrimenti segnala tutto e viene disattivata.
 
 ### Regola di adozione
 
@@ -144,9 +140,9 @@ dart format --set-exit-if-changed
 `dart run custom_lint` da solo riporta tutte le 170 violazioni esistenti: serve
 per misurare il debito, non come gate.
 
-La suite oggi **non compila** (`workout_builder_widgets_test.dart` e
-`workout_detail_golden_test.dart` hanno argomenti mancanti). Ripararla è il
-prerequisito zero: una CI che non gira non impone niente.
+La suite compila e gira (fase 0.1). Restano 12 test rossi per deriva fra UI e
+asserzioni: vedi `26-migration-plan.md`. La CI va attivata accettando quel
+residuo come baseline nota, non aspettando che sia zero.
 
 ## Convenzioni di codice
 
@@ -173,7 +169,7 @@ il codice sottostante è rumore.
 
 Una PR è completa quando:
 
-- [ ] `flutter analyze` e `custom_lint` puliti sui file toccati
+- [ ] `flutter analyze` pulito e `tool/check_changed.sh` verde
 - [ ] test verdi, e nuovi test per la logica non banale introdotta
 - [ ] nessuna stringa letterale user-facing, nessun colore o misura letterale
 - [ ] le dependency rules di `01-principles.md` sono rispettate
@@ -198,5 +194,5 @@ Data: YYYY-MM-DD
 ```
 
 Una decisione presa e non registrata è una decisione che verrà rimessa in
-discussione fra sei mesi senza memoria del perché. Gli ADR-001…005 già presi
-vanno scritti come primo atto.
+discussione fra sei mesi senza memoria del perché. Gli ADR-001…006 sono scritti
+in `adr/`.
