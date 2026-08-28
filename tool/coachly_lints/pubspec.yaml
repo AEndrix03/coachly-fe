@@ -1,0 +1,12 @@
+name: coachly_lints
+description: Lint che rendono verificabili le regole di docs/development.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  analyzer: ">=8.0.0 <10.0.0"
+  analyzer_plugin: ">=0.13.0 <0.14.0"
+  custom_lint_builder: ^0.8.0

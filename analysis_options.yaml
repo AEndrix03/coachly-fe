@@ -7,6 +7,9 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  plugins:
+    - custom_lint
+
   exclude:
     # Copia di lavoro non tracciata: non fa parte del progetto.
     - qual/**

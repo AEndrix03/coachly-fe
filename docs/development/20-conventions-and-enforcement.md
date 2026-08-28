@@ -54,8 +54,28 @@ delle dependency rules a qualsiasi analisi statica.
 
 ### Custom lint
 
-Con `custom_lint` + `riverpod_lint`. Ogni regola qui implementa una riga di
-`01-principles.md`:
+Implementati in `tool/coachly_lints/`, agganciati via
+`analyzer: plugins: [custom_lint]`. Ogni regola implementa una riga di
+`01-principles.md`.
+
+**Stato attuale — 170 violazioni rilevate su 5 regole attive:**
+
+| Regola | Violazioni | Doc |
+|---|---|---|
+| `no_literal_colors` | 142 | 09 |
+| `no_features_in_core` | 15 | 01 D5 |
+| `no_cross_feature_presentation` | 10 | 01 D4 |
+| `no_data_layer_in_presentation` | 3 | 01 D1 |
+| `no_side_effects_in_build` | 0 | 03 |
+| `no_raw_datetime_now` | 0 (attende `core/time`) | 19 |
+| `no_material_in_application` | 0 (attende `application/`) | 01 D2 |
+| `no_data_source_outside_repository` | 0 (attende `data/remote`) | 01 D6 |
+
+Le ultime tre non trovano nulla perché le cartelle target non esistono ancora:
+sono attive in anticipo, così la prima feature scritta secondo la nuova
+struttura è già coperta.
+
+Regole ancora da implementare:
 
 | Regola | Cosa vieta | Doc |
 |---|---|---|
@@ -75,12 +95,23 @@ Con `custom_lint` + `riverpod_lint`. Ogni regola qui implementa una riga di
 
 ### Regola di adozione
 
-I lint nuovi si attivano con severità `warning` su tutto il repository e
-`error` **solo sui file toccati dal PR**. Attivarli come errore ovunque il primo
-giorno bloccherebbe qualsiasi lavoro e finirebbe con un `// ignore_for_file`
-generalizzato — cioè esattamente il fallimento di `AGENTS.md`, ripetuto.
+I lint restano `warning` su tutto il repository e sono **bloccanti solo sui file
+toccati dal PR**. Attivarli come errore ovunque il primo giorno bloccherebbe
+qualsiasi lavoro e finirebbe con un `// ignore_for_file` generalizzato — cioè
+esattamente il fallimento di `AGENTS.md`, ripetuto.
 
-Il debito si assorbe file per file, mentre il lint impedisce che ne nasca di nuovo.
+Il meccanismo è `tool/check_changed.sh`:
+
+```bash
+tool/check_changed.sh              # confronto con origin/master
+tool/check_changed.sh develop      # confronto con un'altra base
+```
+
+Esce con codice 1 se un file che hai modificato viola una regola, e ignora tutto
+il resto. È lo script che la CI esegue sui PR.
+
+Il debito si assorbe file per file, mentre il lint impedisce che ne nasca di
+nuovo.
 
 ## Test che valgono come regole
 
@@ -104,11 +135,14 @@ verificata da nessuno.
 ## Pipeline CI
 
 ```
-flutter analyze          → zero issue sui file del PR
-dart run custom_lint     → zero error
-flutter test             → tutto verde
+flutter analyze                → zero errori
+tool/check_changed.sh          → zero violazioni sui file del PR
+flutter test                   → tutto verde
 dart format --set-exit-if-changed
 ```
+
+`dart run custom_lint` da solo riporta tutte le 170 violazioni esistenti: serve
+per misurare il debito, non come gate.
 
 La suite oggi **non compila** (`workout_builder_widgets_test.dart` e
 `workout_detail_golden_test.dart` hanno argomenti mancanti). Ripararla è il
