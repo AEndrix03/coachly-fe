@@ -1,4 +1,4 @@
-import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/session_sync_job_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

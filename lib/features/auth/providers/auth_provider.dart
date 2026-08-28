@@ -1,5 +1,5 @@
 import 'package:coachly/core/logging/app_logger.dart';
-import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/models/auth_state/auth_state.dart';
 import 'package:coachly/features/auth/data/repositories/auth_repository.dart';

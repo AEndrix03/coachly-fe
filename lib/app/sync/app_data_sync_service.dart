@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:coachly/core/config/app_cache_policy.dart';
-import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';

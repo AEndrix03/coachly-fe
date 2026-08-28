@@ -191,6 +191,7 @@ GoRouter router(Ref ref) {
                       ),
                       GoRoute(
                         path: 'active',
+                        parentNavigatorKey: _rootNavigatorKey,
                         pageBuilder: (context, state) => _athleteTransition(
                           state,
                           WorkoutActivePage(

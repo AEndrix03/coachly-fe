@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
-import 'package:coachly/core/sync/adapters/workout_adapter.dart';
+import 'package:coachly/app/sync/adapters/workout_adapter.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/session_sync_job_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';

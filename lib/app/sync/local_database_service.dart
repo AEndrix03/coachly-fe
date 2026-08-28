@@ -1,4 +1,4 @@
-import 'package:coachly/core/sync/adapters/workout_adapter.dart';
+import 'package:coachly/app/sync/adapters/workout_adapter.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

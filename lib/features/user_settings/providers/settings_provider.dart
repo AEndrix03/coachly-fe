@@ -1,4 +1,4 @@
-import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

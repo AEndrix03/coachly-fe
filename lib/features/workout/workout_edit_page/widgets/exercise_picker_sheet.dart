@@ -1,4 +1,4 @@
-import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';

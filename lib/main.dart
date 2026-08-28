@@ -1,5 +1,6 @@
+import 'package:coachly/app/bootstrap/provider_overrides.dart';
 import 'package:coachly/app/sync/app_data_sync_service.dart';
-import 'package:coachly/core/sync/local_database_service.dart';
+import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
@@ -16,7 +17,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalDatabaseService().initialize();
 
-  runApp(const ProviderScope(child: CoachlyApplication()));
+  runApp(buildAppScope(child: const CoachlyApplication()));
 }
 
 class CoachlyApplication extends ConsumerWidget {
