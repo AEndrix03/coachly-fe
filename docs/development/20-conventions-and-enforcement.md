@@ -58,35 +58,40 @@ Implementati in `tool/coachly_lints/`, agganciati via
 `analyzer: plugins: [custom_lint]`. Ogni regola implementa una riga di
 `01-principles.md`.
 
-**Stato attuale — 21 violazioni residue** (erano 170 alla prima esecuzione):
+**Stato attuale — 0 violazioni** (erano 170 alla prima esecuzione):
 
 | Regola | Residue | Iniziali | Doc |
 |---|---|---|---|
-| `no_cross_feature_presentation` | 10 | 10 | 01 D4 |
-| `no_literal_colors` | 4 | 142 | 09 |
-| `no_features_in_core` | 4 | 15 | 01 D5 |
-| `no_data_layer_in_presentation` | 3 | 3 | 01 D1 |
+| `no_literal_colors` | 0 | 142 | 09 |
+| `no_features_in_core` | 0 | 15 | 01 D5 |
+| `no_cross_feature_presentation` | 0 | 10 | 01 D4 |
+| `no_data_layer_in_presentation` | 0 | 3 | 01 D1 |
 | `no_side_effects_in_build` | 0 | 0 | 03 |
 | `no_raw_datetime_now` | 0 (attende `core/time`) | — | 19 |
-| `no_material_in_application` | 0 (attende `application/`) | — | 01 D2 |
+| `no_material_in_application` | 0 | — | 01 D2 |
 | `no_data_source_outside_repository` | 0 (attende `data/remote`) | — | 01 D6 |
 
-Delle 21 residue, **8 sono in file con modifiche non committate** e non sono
-toccabili senza conflitto.
+Come ci si è arrivati, in ordine di resa:
 
-Le 10 `no_cross_feature_presentation` sono **una sola causa**: la feature
-workout importa `exercise_info_page/presentation/exercise_theme.dart`. Si
-risolvono tutte insieme spostando quel file in `design_system/`, appena i file
-in lavorazione sono committati.
+- **27 violazioni cancellate**, non migrate: erano in widget orfani
+  (`workout_card`, `stat_card`, `sparkle_tap_animation`, `offline_mode_banner`).
+- **`app_data_sync_service` e `local_database_service` fuori da `core/`**: 15
+  violazioni. Conoscevano le feature, quindi appartenevano ad `app/`.
+- **`exercise_theme` spostato nel design system**: 9 violazioni in un colpo,
+  tutte la stessa causa.
+- **`MuscleAnatomyView` promosso a componente di prodotto**: era usato da due
+  feature, che è esattamente il criterio di `10-components.md`.
+- **`today_home_provider` spostato in `application/`**: era un controller che
+  viveva in `presentation/`.
+- **Dipendenza auth invertita**: `core/network` dichiara `SessionGateway`, la
+  feature auth la implementa, `app/bootstrap` le collega.
 
-Le 4 `no_features_in_core` restanti sono in `local_database_service`,
-`workout_adapter` e `auth_interceptor_client`: i primi due spariscono con Hive
-nella fase 3, il terzo richiede di invertire la dipendenza verso l'auth
-(interfaccia in `core`, implementazione nella feature).
+`no_raw_datetime_now` e `no_data_source_outside_repository` sono attive in
+anticipo sulle cartelle che non esistono ancora, così la prima feature scritta
+secondo la nuova struttura è già coperta.
 
-Le tre a zero non trovano nulla perché le cartelle target non esistono ancora:
-sono attive in anticipo, così la prima feature scritta secondo la nuova
-struttura è già coperta.
+**Da qui il gate può diventare bloccante su tutto il repository**, non solo sui
+file toccati: il debito è a zero e ogni nuova violazione è una regressione.
 
 Regole ancora da implementare, in ordine di valore:
 
