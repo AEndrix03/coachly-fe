@@ -1,4 +1,4 @@
-import 'package:coachly/core/sync/app_data_sync_service.dart';
+import 'package:coachly/app/sync/app_data_sync_service.dart';
 import 'package:coachly/core/sync/local_database_service.dart';
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
@@ -26,8 +26,8 @@ class CoachlyApplication extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final locale = ref.watch(languageProvider);
-    final colorScheme = AppThemeScheme.lightTheme.colorScheme;
-    final shadColorScheme = ShadSlateColorScheme.light().copyWith(
+    final colorScheme = AppThemeScheme.darkTheme.colorScheme;
+    final shadColorScheme = ShadSlateColorScheme.dark().copyWith(
       primary: colorScheme.primary,
       secondary: colorScheme.secondary,
       background: colorScheme.surface,
@@ -36,7 +36,7 @@ class CoachlyApplication extends ConsumerWidget {
     return ShadTheme(
       data: ShadThemeData(
         colorScheme: shadColorScheme,
-        brightness: Brightness.light,
+        brightness: Brightness.dark,
       ),
       child: _AppSyncBootstrap(
         child: MaterialApp.router(

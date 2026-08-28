@@ -30,6 +30,11 @@ final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
 
 /// Orchestrates full-app data sync on authenticated access.
 ///
+/// Vive in `app/` e non in `core/`: conosce quattro feature diverse e contiene
+/// orchestrazione di dominio Coachly, quindi non soddisfa le condizioni per
+/// stare in `core/` (`docs/development/02-project-structure.md`). Il livello
+/// `app/` è l'unico autorizzato a conoscere le feature.
+///
 /// Sync runs at most once per session unless [force] is passed, or the cache
 /// TTL has expired ([_cacheTtl]). The session is marked as synced only when
 /// both repositories succeed, so a partial failure is automatically retried
