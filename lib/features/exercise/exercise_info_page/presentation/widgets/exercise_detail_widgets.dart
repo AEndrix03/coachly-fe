@@ -194,18 +194,31 @@ class _MediaPlaceholder extends StatelessWidget {
                 color: colors.primary.withValues(alpha: 0.78),
               ),
               const SizedBox(height: 12),
-              Text(
-                media.movementLabel,
-                style: TextStyle(
-                  color: colors.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+              // Il riquadro e' 16:9, quindi ha un'altezza fissa: a text
+              // scaling 2.0 queste due righe la superavano di 27px. Flexible
+              // + ellipsis le fa cedere invece di sfondare. A scala 1 lo
+              // spazio avanza e il layout non cambia
+              // (`docs/development/14-accessibility.md`).
+              Flexible(
+                child: Text(
+                  media.movementLabel,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: colors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                context.tr('exercise.media_soon'),
-                style: TextStyle(color: colors.textSecondary, fontSize: 13),
+              Flexible(
+                child: Text(
+                  context.tr('exercise.media_soon'),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: colors.textSecondary, fontSize: 13),
+                ),
               ),
             ],
           ),

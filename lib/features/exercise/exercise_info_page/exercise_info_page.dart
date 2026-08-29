@@ -464,18 +464,25 @@ class _ExerciseHeader extends StatelessWidget {
         valueListenable: scrollOffset,
         builder: (_, offset, _) {
           final opacity = ((offset - 72) / 52).clamp(0.0, 1.0);
-          return Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Color.lerp(
-                Colors.transparent,
-                colors.textPrimary,
-                opacity,
+          // Finche' il titolo e' trasparente non deve essere annunciato: un
+          // lettore di schermo leggeva un header invisibile, e il test di
+          // contrasto lo misurava a 1.00 perche' il calcolo era corretto.
+          // Il nome dell'esercizio resta annunciato dal blocco identita'.
+          return ExcludeSemantics(
+            excluding: opacity == 0,
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Color.lerp(
+                  Colors.transparent,
+                  colors.textPrimary,
+                  opacity,
+                ),
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
               ),
-              fontSize: 17,
-              fontWeight: FontWeight.w600,
             ),
           );
         },
