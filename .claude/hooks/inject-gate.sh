@@ -14,12 +14,19 @@ PRIMA di scrivere o proporre codice per questo repository DEVI:
 2. leggere docs/development/01-principles.md
 3. leggere i documenti indicati dalla tabella di instradamento della rule
 
-IL CODICE È INDIETRO RISPETTO AI DOCUMENTI. docs/development/ descrive il TARGET.
-NON esistono ancora: token di design, ARB/context.l10n, Clock, core/ids,
-Result<T,Failure>, AppLogger, Drift, Dio, coalescer, outbox.
-Non affermare che esistano. Non violare le regole "per ora". Vedi sezione 3 della rule.
+IL CODICE È INDIETRO RISPETTO AI DOCUMENTI, ma meno di prima. Verifica sempre
+con una ricerca invece di presumere, in entrambe le direzioni.
 
-MAI, nemmeno temporaneamente: Color(0x…) o Colors.* · TextStyle/fontSize a mano ·
+ESISTONO: Drift, Dio, Clock (core/time), core/ids, Result<T,Failure>, AppLogger,
+RequestCoalescer, outbox, core/flags, core/analytics, core/observability,
+ARB + context.l10n, e i token tipografici (context.scale).
+NON esistono ancora: token di colore semantici (context.colors.<ruolo>),
+catalogo pre-seeded, event log delle sessioni.
+Non affermare che esista cio che non hai verificato. Non violare le regole
+"per ora". Vedi sezione 3 della rule.
+
+MAI, nemmeno temporaneamente: Color(0x…) o Colors.* · fontSize a mano (usa
+context.scale.<ruolo>[.<peso>]) ·
 numeri magici in SizedBox/EdgeInsets/BorderRadius · stringhe utente nel codice ·
 DateTime.now() · print/debugPrint · rete da widget o provider · target < 48dp ·
 dipendenze nuove senza chiedere.
