@@ -6,10 +6,15 @@ part 'workout_stats_model.g.dart';
 @freezed
 @JsonSerializable()
 class WorkoutStatsModel with _$WorkoutStatsModel {
+  @override
   final int activeWorkouts;
+  @override
   final int completedWorkouts;
+  @override
   final double progressPercentage;
+  @override
   final int currentStreak;
+  @override
   final int weeklyWorkouts;
 
   const WorkoutStatsModel({

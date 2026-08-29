@@ -137,6 +137,11 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'profile.logout_title': (l10n, _) => l10n.profileLogoutTitle,
   'profile.logout_content': (l10n, _) => l10n.profileLogoutContent,
   'profile.logout_confirm': (l10n, _) => l10n.profileLogoutConfirm,
+  'profile.logout_pending_title': (l10n, _) => l10n.profileLogoutPendingTitle,
+  'profile.logout_pending_content': (l10n, params) =>
+      l10n.profileLogoutPendingContent(params['count'] ?? ''),
+  'profile.logout_pending_confirm': (l10n, _) =>
+      l10n.profileLogoutPendingConfirm,
   'workout.recent': (l10n, _) => l10n.workoutRecent,
   'workout.resume': (l10n, _) => l10n.workoutResume,
   'workout.all': (l10n, _) => l10n.workoutAll,

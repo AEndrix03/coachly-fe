@@ -189,11 +189,11 @@ void main() {
 }
 
 WorkoutWriteCommand _sampleCommand() {
-  return WorkoutWriteCommand(
+  return const WorkoutWriteCommand(
     id: 'workout-id',
     name: 'Push Day',
     description: 'Descrizione',
-    translations: const {
+    translations: {
       'it': WorkoutTranslationWritePayload(
         title: 'Push Day',
         description: 'Descrizione',
@@ -204,7 +204,7 @@ WorkoutWriteCommand _sampleCommand() {
       ),
     },
     status: 'active',
-    blocks: const [
+    blocks: [
       WorkoutBlockWritePayload(
         id: null,
         position: 0,

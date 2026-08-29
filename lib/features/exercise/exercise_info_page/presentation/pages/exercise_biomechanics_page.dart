@@ -3,7 +3,6 @@ import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_detail_view_provider.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -245,8 +244,8 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.info_outline_rounded, size: 18),
-                              SizedBox(width: 8),
+                              const Icon(Icons.info_outline_rounded, size: 18),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   context.tr('exercise.biomechanics.how_read'),

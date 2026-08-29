@@ -1,4 +1,3 @@
-import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';

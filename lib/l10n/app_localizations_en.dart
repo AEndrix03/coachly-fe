@@ -376,6 +376,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileLogoutConfirm => 'Exit';
 
   @override
+  String get profileLogoutPendingTitle => 'Unsynced data';
+
+  @override
+  String profileLogoutPendingContent(String count) {
+    return 'There are $count changes that have not reached the server yet. Logging out deletes the local database and those changes are lost for good. Reconnect and wait for the sync, or confirm to discard them.';
+  }
+
+  @override
+  String get profileLogoutPendingConfirm => 'Discard and exit';
+
+  @override
   String get workoutRecent => 'Recent Workouts';
 
   @override

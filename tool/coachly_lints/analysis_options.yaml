@@ -1,0 +1,6 @@
+# Il plugin è vincolato all'API che `custom_lint_builder` espone: finché quella
+# usa `ErrorReporter`/`ErrorSeverity`, il codice deve usarli. La deprecazione
+# non è debito di questo repository e non deve rumoreggiare nel gate.
+analyzer:
+  errors:
+    deprecated_member_use: ignore

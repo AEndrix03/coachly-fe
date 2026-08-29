@@ -527,7 +527,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     final completed = tour.currentStepIndex == _tourSteps.length - 1;
     ref.read(builderTourProvider.notifier).next();
     if (completed) {
-      HapticFeedback.lightImpact();
+      unawaited(HapticFeedback.lightImpact());
       _showDiscoverReplayHint();
     }
   }
@@ -585,7 +585,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     ref
         .read(createWorkoutControllerProvider.notifier)
         .addExercise(configured, sectionId: destinationId);
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
     return configured;
   }
 
@@ -718,7 +718,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
         .read(createWorkoutControllerProvider.notifier)
         .commit();
     if (!mounted || workout == null) return;
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     context.go('/workouts/workout/${workout.id}', extra: workout);
   }
 
@@ -839,7 +839,7 @@ Future<void> showWorkoutBlockCreationFlow(
     restAfterRoundSeconds: selection.restAfterRoundSeconds,
     notes: selection.notes,
   ));
-  HapticFeedback.lightImpact();
+  unawaited(HapticFeedback.lightImpact());
 }
 
 class _BlockSelection {
@@ -993,7 +993,7 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
               type = value;
               selected.clear();
               selectedSectionId = null;
-              HapticFeedback.selectionClick();
+              unawaited(HapticFeedback.selectionClick());
             }),
           ),
         )
@@ -1054,7 +1054,7 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
                       selected.remove(candidate.item.id);
                       if (selected.isEmpty) selectedSectionId = null;
                     }
-                    HapticFeedback.selectionClick();
+                    unawaited(HapticFeedback.selectionClick());
                   }),
           ),
         );

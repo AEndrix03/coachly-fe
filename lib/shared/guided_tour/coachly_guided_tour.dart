@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'dart:math' as math;
 
 import 'package:coachly/design_system/theme/exercise_theme.dart';
@@ -163,7 +165,10 @@ class _CoachlyTourOverlayState extends State<CoachlyTourOverlay>
           .map((rect) => rect.inflate(5))
           .toList();
     });
-    if (!MediaQuery.disableAnimationsOf(context)) borderController.repeat();
+    if (!MediaQuery.disableAnimationsOf(context)) {
+      // `repeat()` non completa mai: awaitarla bloccherebbe il chiamante.
+      unawaited(borderController.repeat());
+    }
   }
 
   @override
@@ -203,7 +208,9 @@ class _CoachlyTourOverlayState extends State<CoachlyTourOverlay>
                 ),
               ),
             ),
-            Positioned.fill(child: ModalBarrier(color: Colors.transparent)),
+            const Positioned.fill(
+              child: ModalBarrier(color: Colors.transparent),
+            ),
             Positioned(
               left: 18,
               right: 18,

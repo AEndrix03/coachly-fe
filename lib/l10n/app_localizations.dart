@@ -824,6 +824,24 @@ abstract class AppLocalizations {
   /// **'Exit'**
   String get profileLogoutConfirm;
 
+  /// Migrated from profile.logout_pending_title
+  ///
+  /// In en, this message translates to:
+  /// **'Unsynced data'**
+  String get profileLogoutPendingTitle;
+
+  /// Migrated from profile.logout_pending_content
+  ///
+  /// In en, this message translates to:
+  /// **'There are {count} changes that have not reached the server yet. Logging out deletes the local database and those changes are lost for good. Reconnect and wait for the sync, or confirm to discard them.'**
+  String profileLogoutPendingContent(String count);
+
+  /// Migrated from profile.logout_pending_confirm
+  ///
+  /// In en, this message translates to:
+  /// **'Discard and exit'**
+  String get profileLogoutPendingConfirm;
+
   /// Migrated from workout.recent
   ///
   /// In en, this message translates to:

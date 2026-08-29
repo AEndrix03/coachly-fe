@@ -6,17 +6,17 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('WorkoutSessionWriteCommandMapper.applySessionToWorkoutCommand', () {
     test('updates reps/load row by row and ignores extra session rows', () {
-      final plannedWorkout = WorkoutWriteCommand(
+      const plannedWorkout = WorkoutWriteCommand(
         id: 'w-1',
         name: 'Push Day',
-        translations: const {
+        translations: {
           'it': WorkoutTranslationWritePayload(
             title: 'Push Day',
             description: null,
           ),
         },
         status: 'active',
-        blocks: const [
+        blocks: [
           WorkoutBlockWritePayload(
             id: 'b-1',
             position: 0,
@@ -56,11 +56,11 @@ void main() {
         ],
       );
 
-      final session = WorkoutSessionWriteCommand(
+      const session = WorkoutSessionWriteCommand(
         startedAt: null,
         completedAt: null,
         notes: null,
-        entries: const [
+        entries: [
           WorkoutSessionEntryWritePayload(
             exerciseId: 'ex-1',
             position: 0,
@@ -116,17 +116,17 @@ void main() {
     test(
       'keeps remaining planned rows unchanged when session has fewer rows',
       () {
-        final plannedWorkout = WorkoutWriteCommand(
+        const plannedWorkout = WorkoutWriteCommand(
           id: 'w-1',
           name: 'Push Day',
-          translations: const {
+          translations: {
             'it': WorkoutTranslationWritePayload(
               title: 'Push Day',
               description: null,
             ),
           },
           status: 'active',
-          blocks: const [
+          blocks: [
             WorkoutBlockWritePayload(
               id: 'b-1',
               position: 0,
@@ -166,11 +166,11 @@ void main() {
           ],
         );
 
-        final session = WorkoutSessionWriteCommand(
+        const session = WorkoutSessionWriteCommand(
           startedAt: null,
           completedAt: null,
           notes: null,
-          entries: const [
+          entries: [
             WorkoutSessionEntryWritePayload(
               exerciseId: 'ex-1',
               position: 0,
@@ -208,17 +208,17 @@ void main() {
     test(
       'matches duplicated exercise ids in FIFO order and ignores extra exercises',
       () {
-        final plannedWorkout = WorkoutWriteCommand(
+        const plannedWorkout = WorkoutWriteCommand(
           id: 'w-dup',
           name: 'Leg Day',
-          translations: const {
+          translations: {
             'it': WorkoutTranslationWritePayload(
               title: 'Leg Day',
               description: null,
             ),
           },
           status: 'active',
-          blocks: const [
+          blocks: [
             WorkoutBlockWritePayload(
               id: 'b-1',
               position: 0,
@@ -282,11 +282,11 @@ void main() {
           ],
         );
 
-        final session = WorkoutSessionWriteCommand(
+        const session = WorkoutSessionWriteCommand(
           startedAt: null,
           completedAt: null,
           notes: null,
-          entries: const [
+          entries: [
             WorkoutSessionEntryWritePayload(
               exerciseId: 'ex-dup',
               position: 0,

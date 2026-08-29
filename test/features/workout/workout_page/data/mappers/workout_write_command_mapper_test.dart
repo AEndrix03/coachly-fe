@@ -8,13 +8,13 @@ void main() {
   group('WorkoutWriteCommandMapper.fromEditState', () {
     test('maps description into translations payload for save', () {
       const description = 'Descrizione di test workout';
-      final state = WorkoutEditState(
+      const state = WorkoutEditState(
         workoutId: 'f0f6f7ee-4b89-446d-abf3-5e4d844f2f50',
         title: 'Scheda Push',
         description: description,
         duration: '60',
         type: 'Hypertrophy',
-        exercises: const [
+        exercises: [
           EditableExerciseModel(
             id: 'temp_ex_1',
             exerciseId: '33ab4fac-bf4f-4f4d-b1d2-f2cb6b5674ff',

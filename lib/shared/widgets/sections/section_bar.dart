@@ -12,7 +12,7 @@ class SectionBar extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
 
   const SectionBar({
-    Key? key,
+    super.key,
     required this.title,
     this.gradient,
     this.barWidth = 8,
@@ -22,7 +22,7 @@ class SectionBar extends StatelessWidget {
     this.icon,
     this.onIconTap,
     this.padding,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

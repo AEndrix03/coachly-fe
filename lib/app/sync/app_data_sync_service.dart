@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
-import 'package:coachly/core/result/result.dart';
 import 'package:coachly/core/config/app_config.dart';
 import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/time/clock.dart';

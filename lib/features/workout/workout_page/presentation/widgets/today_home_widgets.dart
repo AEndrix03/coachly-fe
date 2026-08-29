@@ -5,7 +5,7 @@ import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 
-import '../models/today_home_view_data.dart';
+import 'package:coachly/features/workout/workout_page/presentation/models/today_home_view_data.dart';
 
 class TodayHeader extends StatelessWidget {
   const TodayHeader({
@@ -1005,13 +1005,14 @@ class RoutinesRail extends StatelessWidget {
   final ValueChanged<HomeRoutineViewData> onTap;
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty)
+    if (items.isEmpty) {
       return _FeatureSurface(
         child: Text(
           context.tr('home.routines.empty_body'),
           style: TextStyle(color: context.exerciseTheme.textSecondary),
         ),
       );
+    }
     return SizedBox(
       height: 116,
       child: ListView.separated(

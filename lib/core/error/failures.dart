@@ -32,20 +32,19 @@ sealed class Failure implements Exception {
 // ── Rete e trasporto ────────────────────────────────────────────────────────
 
 final class NetworkFailure extends Failure {
-  const NetworkFailure([String message = 'Network connection failed'])
-    : super(message, code: 1001);
+  const NetworkFailure([super.message = 'Network connection failed'])
+    : super(code: 1001);
 }
 
 final class TimeoutFailure extends Failure {
-  const TimeoutFailure([String message = 'Request timeout'])
-    : super(message, code: 1002);
+  const TimeoutFailure([super.message = 'Request timeout']) : super(code: 1002);
 }
 
 final class ServerFailure extends Failure {
   const ServerFailure([
-    String message = 'Server error occurred',
+    super.message = 'Server error occurred',
     int? statusCode,
-  ]) : super(message, code: statusCode ?? 5000);
+  ]) : super(code: statusCode ?? 5000);
 }
 
 /// Richiesta annullata perché chi l'aveva chiesta non esiste più.
@@ -53,35 +52,35 @@ final class ServerFailure extends Failure {
 /// **Non è un errore**: non si mostra all'utente e non si riporta al crash
 /// reporter.
 final class CancelledFailure extends Failure {
-  const CancelledFailure([String message = 'Request cancelled'])
-    : super(message, code: 1003);
+  const CancelledFailure([super.message = 'Request cancelled'])
+    : super(code: 1003);
 }
 
 // ── Semantica ───────────────────────────────────────────────────────────────
 
 final class UnauthorizedFailure extends Failure {
-  const UnauthorizedFailure([String message = 'Unauthorized access'])
-    : super(message, code: 401);
+  const UnauthorizedFailure([super.message = 'Unauthorized access'])
+    : super(code: 401);
 }
 
 final class ForbiddenFailure extends Failure {
-  const ForbiddenFailure([String message = 'Access forbidden'])
-    : super(message, code: 403);
+  const ForbiddenFailure([super.message = 'Access forbidden'])
+    : super(code: 403);
 }
 
 final class NotFoundFailure extends Failure {
-  const NotFoundFailure([String message = 'Resource not found'])
-    : super(message, code: 404);
+  const NotFoundFailure([super.message = 'Resource not found'])
+    : super(code: 404);
 }
 
 final class ConflictFailure extends Failure {
-  const ConflictFailure([String message = 'Resource conflict'])
-    : super(message, code: 409);
+  const ConflictFailure([super.message = 'Resource conflict'])
+    : super(code: 409);
 }
 
 final class InvalidCredentialsFailure extends Failure {
-  const InvalidCredentialsFailure([String message = 'Invalid credentials'])
-    : super(message, code: 401);
+  const InvalidCredentialsFailure([super.message = 'Invalid credentials'])
+    : super(code: 401);
 }
 
 final class ValidationFailure extends Failure {
@@ -115,13 +114,13 @@ final class ValidationFailure extends Failure {
 // ── Locale ──────────────────────────────────────────────────────────────────
 
 final class StorageFailure extends Failure {
-  const StorageFailure([String message = 'Storage operation failed'])
-    : super(message, code: 2002);
+  const StorageFailure([super.message = 'Storage operation failed'])
+    : super(code: 2002);
 }
 
 final class ParsingFailure extends Failure {
-  const ParsingFailure([String message = 'Failed to parse data'])
-    : super(message, code: 2003);
+  const ParsingFailure([super.message = 'Failed to parse data'])
+    : super(code: 2003);
 }
 
 /// L'operazione richiede la rete e la rete non c'è.
@@ -129,8 +128,8 @@ final class ParsingFailure extends Failure {
 /// Distinto da [NetworkFailure]: qui il fallimento è previsto e la UI può
 /// spiegarlo, invece di presentarlo come un errore.
 final class NotAvailableOfflineFailure extends Failure {
-  const NotAvailableOfflineFailure([String message = 'Requires connectivity'])
-    : super(message, code: 2004);
+  const NotAvailableOfflineFailure([super.message = 'Requires connectivity'])
+    : super(code: 2004);
 }
 
 // ── Residuo ─────────────────────────────────────────────────────────────────
@@ -138,9 +137,9 @@ final class NotAvailableOfflineFailure extends Failure {
 /// L'unico fallimento che si riporta al crash reporter.
 final class UnexpectedFailure extends Failure {
   const UnexpectedFailure([
-    String message = 'An unexpected error occurred',
+    super.message = 'An unexpected error occurred',
     Object? originalError,
-  ]) : super(message, code: 9999, originalError: originalError);
+  ]) : super(code: 9999, originalError: originalError);
 }
 
 /// Converte un'eccezione tecnica in un [Failure].

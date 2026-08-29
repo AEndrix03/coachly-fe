@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_builder/create_workout_flow.dart';
 import 'package:coachly/features/workout/workout_builder/providers/workout_builder_providers.dart';
@@ -409,7 +411,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     ref
         .read(editWorkoutControllerProvider(widget.workoutId).notifier)
         .addExercise(configured, sectionId: destinationId);
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
   }
 
   Future<void> _editExercise(WorkoutExerciseDraft exercise) async {
@@ -573,7 +575,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
         .read(editWorkoutControllerProvider(widget.workoutId).notifier)
         .commit(source);
     if (!mounted || result == null) return;
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     context.pop(result);
   }
 

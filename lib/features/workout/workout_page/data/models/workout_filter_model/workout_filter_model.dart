@@ -8,9 +8,13 @@ enum WorkoutSortBy { name, date, duration, difficulty }
 @freezed
 @JsonSerializable()
 class WorkoutFilterModel with _$WorkoutFilterModel {
+  @override
   final WorkoutSortBy sortBy;
+  @override
   final bool ascending;
+  @override
   final String? searchQuery;
+  @override
   final List<String>? coachIds;
 
   const WorkoutFilterModel({

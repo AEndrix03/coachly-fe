@@ -484,6 +484,23 @@
   "@profileLogoutConfirm": {
     "description": "Migrated from profile.logout_confirm"
   },
+  "profileLogoutPendingTitle": "Unsynced data",
+  "@profileLogoutPendingTitle": {
+    "description": "Migrated from profile.logout_pending_title"
+  },
+  "profileLogoutPendingContent": "There are {count} changes that have not reached the server yet. Logging out deletes the local database and those changes are lost for good. Reconnect and wait for the sync, or confirm to discard them.",
+  "@profileLogoutPendingContent": {
+    "description": "Migrated from profile.logout_pending_content",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "profileLogoutPendingConfirm": "Discard and exit",
+  "@profileLogoutPendingConfirm": {
+    "description": "Migrated from profile.logout_pending_confirm"
+  },
   "workoutRecent": "Recent Workouts",
   "@workoutRecent": {
     "description": "Migrated from workout.recent"

@@ -8,12 +8,12 @@ class CoachBadgeWidget extends StatelessWidget {
   final EdgeInsetsGeometry padding;
 
   const CoachBadgeWidget({
-    Key? key,
+    super.key,
     this.label = 'Coach',
     this.fontSize = 9,
     this.iconSize = 10,
     this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

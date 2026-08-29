@@ -1,4 +1,5 @@
 import 'package:coachly/app/bootstrap/provider_overrides.dart';
+import 'package:coachly/app/router/app_router.dart';
 import 'package:coachly/app/sync/app_data_sync_service.dart';
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
@@ -10,8 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-
-import 'routes/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +26,7 @@ class CoachlyApplication extends ConsumerWidget {
     final router = ref.watch(routerProvider);
     final locale = ref.watch(languageProvider);
     final colorScheme = AppThemeScheme.darkTheme.colorScheme;
-    final shadColorScheme = ShadSlateColorScheme.dark().copyWith(
+    final shadColorScheme = const ShadSlateColorScheme.dark().copyWith(
       primary: colorScheme.primary,
       secondary: colorScheme.secondary,
       background: colorScheme.surface,

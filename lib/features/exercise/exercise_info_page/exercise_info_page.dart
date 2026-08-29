@@ -11,7 +11,6 @@ import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show Drag;
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

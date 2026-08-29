@@ -236,6 +236,26 @@ class AppStrings {
       'it': 'Sei sicuro di voler uscire?',
     },
     'profile.logout_confirm': {'en': 'Exit', 'it': 'Esci'},
+    'profile.logout_pending_title': {
+      'en': 'Unsynced data',
+      'it': 'Dati non sincronizzati',
+    },
+    'profile.logout_pending_content': {
+      'en':
+          'There are {count} changes that have not reached the server yet. '
+          'Logging out deletes the local database and those changes are '
+          'lost for good. Reconnect and wait for the sync, or confirm to '
+          'discard them.',
+      'it':
+          'Ci sono {count} modifiche che non sono ancora arrivate al server. '
+          'Uscire cancella il database locale e quelle modifiche vanno '
+          'perse definitivamente. Riconnettiti e aspetta la sync, oppure '
+          'conferma per scartarle.',
+    },
+    'profile.logout_pending_confirm': {
+      'en': 'Discard and exit',
+      'it': 'Scarta ed esci',
+    },
 
     'workout.recent': {'en': 'Recent Workouts', 'it': 'Schede Recenti'},
     'workout.resume': {

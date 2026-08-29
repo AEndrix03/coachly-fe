@@ -1,7 +1,6 @@
 import 'package:coachly/core/network/session_gateway.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Implementazione di [SessionGateway] per la feature auth.
 ///

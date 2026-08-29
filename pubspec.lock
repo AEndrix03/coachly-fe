@@ -42,7 +42,7 @@ packages:
     source: hosted
     version: "2.7.0"
   async:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: async
       sha256: e2eb0491ba5ddb6177742d2da23904574082139b07c1e33b8503b9f46f3e1a37
@@ -185,7 +185,7 @@ packages:
     source: hosted
     version: "4.11.0"
   collection:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: collection
       sha256: "2f5709ae4d3d59dd8f7cd309b4e023046b57d8a6c82130785d2b0e5868084e76"
@@ -410,14 +410,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_ringtone_player:
-    dependency: "direct main"
-    description:
-      name: flutter_ringtone_player
-      sha256: ae4a2caab2cfd14902f3ee5fe0307c454b396f0077fa34700238d6c4bd99cfec
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0+4"
   flutter_riverpod:
     dependency: "direct main"
     description:
@@ -524,14 +516,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
-  gap:
-    dependency: "direct main"
-    description:
-      name: gap
-      sha256: f19387d4e32f849394758b91377f9153a1b41d79513ef7668c088c77dbc6955d
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   glob:
     dependency: transitive
     description:
@@ -620,14 +604,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  ionicons:
-    dependency: "direct main"
-    description:
-      name: ionicons
-      sha256: "5496bc65a16115ecf05b15b78f494ee4a8869504357668f0a11d689e970523cf"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.2"
   js:
     dependency: transitive
     description:

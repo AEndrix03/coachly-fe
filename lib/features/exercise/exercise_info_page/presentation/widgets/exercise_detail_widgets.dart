@@ -1,15 +1,10 @@
-import 'dart:math' as math;
-import 'dart:ui' show lerpDouble;
-
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
-import 'package:coachly/design_system/components/product/muscle_anatomy_view.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

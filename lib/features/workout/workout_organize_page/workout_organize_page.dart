@@ -129,7 +129,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             ),
             const SizedBox(height: 16),
             Padding(
-              padding: EdgeInsets.fromLTRB(24, 8, 24, 16),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
               child: Text(
                 context.tr('workout.organize.title'),
                 style: context.text.displayM.copyWith(
@@ -180,7 +180,9 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
               destructive: true,
             );
             if (confirmed) {
-              ref.read(workoutListProvider.notifier).deleteWorkout(workout.id);
+              await ref
+                  .read(workoutListProvider.notifier)
+                  .deleteWorkout(workout.id);
             }
           },
           onToggleActive: (isActive) async {
@@ -202,11 +204,11 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             );
             if (confirmed) {
               if (isActive) {
-                ref
+                await ref
                     .read(workoutListProvider.notifier)
                     .enableWorkout(workout.id);
               } else {
-                ref
+                await ref
                     .read(workoutListProvider.notifier)
                     .disableWorkout(workout.id);
               }

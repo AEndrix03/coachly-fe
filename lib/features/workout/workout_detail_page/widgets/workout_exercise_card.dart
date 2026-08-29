@@ -493,9 +493,9 @@ class _ExerciseThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const size = 52.0;
-    final fallback = ColoredBox(
+    const fallback = ColoredBox(
       color: CoachlyAthleteTheme.surfaceElevated,
-      child: const Center(
+      child: Center(
         child: Icon(
           Icons.fitness_center_rounded,
           size: 20,

@@ -7,7 +7,6 @@ import 'package:coachly/shared/widgets/headers/page_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -29,7 +28,7 @@ class ProfilePage extends ConsumerWidget {
       body: Column(
         children: [
           PageHeader(
-            badgeIcon: Ionicons.person_circle_outline,
+            badgeIcon: Icons.account_circle_outlined,
             badgeLabel: context.tr('profile.profile'),
             title: fullName.isEmpty
                 ? context.tr('profile.your_profile')
@@ -44,7 +43,7 @@ class ProfilePage extends ConsumerWidget {
                 children: [
                   _buildSection(
                     context: context,
-                    icon: Ionicons.settings_outline,
+                    icon: Icons.settings_outlined,
                     color: scheme.primary,
                     title: context.tr('profile.preferences'),
                     child: _buildLanguageSetting(context, ref),
@@ -52,7 +51,7 @@ class ProfilePage extends ConsumerWidget {
                   const SizedBox(height: 16),
                   _buildSection(
                     context: context,
-                    icon: Ionicons.information_circle_outline,
+                    icon: Icons.info_outline,
                     color: scheme.secondary,
                     title: context.tr('profile.app_section'),
                     child: _buildAppInfo(context),
@@ -60,7 +59,7 @@ class ProfilePage extends ConsumerWidget {
                   const SizedBox(height: 16),
                   _buildSection(
                     context: context,
-                    icon: Ionicons.barbell_outline,
+                    icon: Icons.fitness_center_outlined,
                     color: scheme.tertiary,
                     title: context.tr('profile.workout_section'),
                     child: _buildPersonalExercisesEntry(context),
@@ -179,11 +178,7 @@ class ProfilePage extends ConsumerWidget {
 
     return Row(
       children: [
-        Icon(
-          Ionicons.language_outline,
-          color: scheme.onSurfaceVariant,
-          size: 18,
-        ),
+        Icon(Icons.language_outlined, color: scheme.onSurfaceVariant, size: 18),
         const SizedBox(width: 12),
         Text(
           context.tr('common.language'),
@@ -256,11 +251,7 @@ class ProfilePage extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         child: Row(
           children: [
-            Icon(
-              Ionicons.list_outline,
-              color: scheme.onSurfaceVariant,
-              size: 18,
-            ),
+            Icon(Icons.list_outlined, color: scheme.onSurfaceVariant, size: 18),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -272,11 +263,7 @@ class ProfilePage extends ConsumerWidget {
                 ),
               ),
             ),
-            Icon(
-              Ionicons.chevron_forward_outline,
-              color: scheme.onSurfaceVariant,
-              size: 16,
-            ),
+            Icon(Icons.chevron_right, color: scheme.onSurfaceVariant, size: 16),
           ],
         ),
       ),
@@ -325,10 +312,32 @@ class ProfilePage extends ConsumerWidget {
               content: context.tr('profile.logout_content'),
               confirmLabel: context.tr('profile.logout_confirm'),
               destructive: true,
-              icon: Ionicons.log_out_outline,
+              icon: Icons.logout_outlined,
             );
-            if (confirm == true) {
-              ref.read(authProvider.notifier).logout();
+            if (confirm != true) return;
+
+            // `logout()` rifiuta l'uscita se l'outbox non è vuota: quei dati
+            // sono l'unica copia esistente. Il rifiuto va mostrato, non
+            // ingoiato — vedi docs/development/05-sync-and-offline.md.
+            final auth = ref.read(authProvider.notifier);
+            if (await auth.logout()) return;
+
+            final pending = await auth.pendingSyncCount();
+            if (!context.mounted) return;
+
+            final discard = await showAppConfirmationDialog(
+              context,
+              title: context.tr('profile.logout_pending_title'),
+              content: context.tr(
+                'profile.logout_pending_content',
+                params: {'count': '$pending'},
+              ),
+              confirmLabel: context.tr('profile.logout_pending_confirm'),
+              destructive: true,
+              icon: Icons.cloud_off_outlined,
+            );
+            if (discard == true) {
+              await auth.logout(force: true);
             }
           },
           child: Container(
@@ -345,7 +354,7 @@ class ProfilePage extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Ionicons.log_out_outline, color: scheme.error, size: 18),
+                Icon(Icons.logout_outlined, color: scheme.error, size: 18),
                 const SizedBox(width: 10),
                 Text(
                   context.tr('profile.logout'),

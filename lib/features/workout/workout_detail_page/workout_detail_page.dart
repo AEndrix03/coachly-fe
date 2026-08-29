@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'dart:math' as math;
 
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
-import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
@@ -215,7 +216,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
   }
 
   Future<void> _openBuilderEdit(WorkoutModel workout) async {
-    HapticFeedback.selectionClick();
+    unawaited(HapticFeedback.selectionClick());
     final updated = await context.push<WorkoutModel>(
       '/workouts/workout/${workout.id}/edit',
       extra: workout,
@@ -231,7 +232,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
         .read(workoutEditDraftProvider(widget.workout.id).notifier)
         .save();
     if (!mounted || result == null) return;
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     setState(() => _editing = false);
     _showSaveConfirmation();
   }

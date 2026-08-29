@@ -9,18 +9,31 @@ part 'editable_exercise_model.g.dart';
 @freezed
 @JsonSerializable()
 class EditableExerciseModel with _$EditableExerciseModel {
+  @override
   final String id;
+  @override
   final String exerciseId;
+  @override
   final int number;
+  @override
   final String name;
+  @override
   final List<String> muscles;
+  @override
   final String difficulty;
+  @override
   final String sets;
+  @override
   final String rest;
+  @override
   final String weight;
+  @override
   final String progress;
+  @override
   final String notes;
+  @override
   final String accentColorHex;
+  @override
   final List<ExerciseVariantModel> variants;
 
   const EditableExerciseModel({

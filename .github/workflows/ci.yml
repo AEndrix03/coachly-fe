@@ -1,0 +1,82 @@
+# Il gate descritto in `docs/development/20-conventions-and-enforcement.md`.
+#
+# Senza questo file quel documento è una raccomandazione: il repository ha già
+# sperimentato cosa succede a una regola che nessuno verifica (la "UI Theme
+# Rule (mandatory)" di AGENTS.md, violata 216 volte). La CI esiste perché le
+# regole restino regole.
+name: CI
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # `tool/check_changed.sh` confronta con la base del PR: serve la
+          # storia, non lo shallow clone di default.
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          # Allineato alla versione con cui il repository è sviluppato: i
+          # golden e il formatter sono sensibili alla versione dell'SDK.
+          flutter-version: 3.41.4
+          channel: stable
+          cache: true
+
+      - name: Dependencies
+        run: flutter pub get
+
+      - name: Generated code is up to date
+        run: |
+          dart run tool/l10n/arb_from_app_strings.dart
+          flutter gen-l10n
+          dart run build_runner build --delete-conflicting-outputs
+          git diff --exit-code -- lib || {
+            echo "::error::Codice generato non allineato: esegui build_runner e committa."
+            exit 1
+          }
+
+      - name: Format
+        run: dart format --set-exit-if-changed lib test tool
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Custom lint sui file toccati
+        run: |
+          git fetch origin ${{ github.base_ref || 'master' }} --depth=1 || true
+          bash tool/check_changed.sh origin/${{ github.base_ref || 'master' }}
+
+      - name: Test (fallisce solo sulle regressioni)
+        # I golden sono sensibili al font rendering della piattaforma: su
+        # runner Linux divergono da quelli generati in locale. Sono in
+        # `tool/test_baseline.txt` insieme al residuo della Fase 0.
+        run: bash tool/check_tests.sh
+
+  debt:
+    # Non blocca: misura. `docs/development/20` distingue il gate (bloccante,
+    # sui file toccati) dalla misura del debito (informativa, su tutto).
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          # Allineato alla versione con cui il repository è sviluppato: i
+          # golden e il formatter sono sensibili alla versione dell'SDK.
+          flutter-version: 3.41.4
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Debito custom_lint su tutto il repository
+        run: dart run custom_lint --no-fatal-infos || true

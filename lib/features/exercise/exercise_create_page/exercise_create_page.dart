@@ -1,9 +1,7 @@
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -202,7 +200,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
     _field(_tipsIt, 'Istruzioni e suggerimenti', lines: 6),
     const SizedBox(height: 16),
     ListTile(
-      leading: Icon(Icons.photo_library_outlined),
+      leading: const Icon(Icons.photo_library_outlined),
       title: Text(context.tr('exercise.create.media')),
       subtitle: Text(context.tr('exercise.create.upload_soon')),
     ),

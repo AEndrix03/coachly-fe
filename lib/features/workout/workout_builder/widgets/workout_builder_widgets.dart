@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_builder/tour/builder_tour_controller.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
@@ -1375,7 +1377,7 @@ Future<void> _showItemActions(
   required ValueChanged<String?> onNotesChanged,
   required VoidCallback onRemove,
 }) async {
-  HapticFeedback.mediumImpact();
+  unawaited(HapticFeedback.mediumImpact());
   final action = await showModalBottomSheet<_ItemAction>(
     context: context,
     useSafeArea: true,
@@ -1593,7 +1595,7 @@ class NumericStepper extends StatelessWidget {
               ),
               onPressed: value - step >= min
                   ? () {
-                      HapticFeedback.selectionClick();
+                      unawaited(HapticFeedback.selectionClick());
                       onChanged(value - step);
                     }
                   : null,
@@ -1618,7 +1620,7 @@ class NumericStepper extends StatelessWidget {
               ),
               onPressed: value + step <= max
                   ? () {
-                      HapticFeedback.selectionClick();
+                      unawaited(HapticFeedback.selectionClick());
                       onChanged(value + step);
                     }
                   : null,
@@ -1978,7 +1980,7 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
 
   void _submit() {
     if (customizing && controller.text.trim().isEmpty) return;
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
     final notes = notesController.text.trim();
     Navigator.pop(context, (
       name: _sectionName,

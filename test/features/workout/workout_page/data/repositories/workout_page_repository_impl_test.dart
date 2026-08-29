@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:coachly/core/result/result.dart';
 import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/core/network/api_client.dart';

@@ -7,7 +7,6 @@ import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
@@ -293,7 +292,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       height: MediaQuery.of(context).size.height * 0.92,
       decoration: BoxDecoration(
         color: context.exerciseTheme.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
         children: [

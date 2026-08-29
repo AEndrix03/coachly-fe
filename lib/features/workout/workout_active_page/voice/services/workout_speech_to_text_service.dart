@@ -55,10 +55,10 @@ class WorkoutSpeechToTextService {
     final resolvedLocaleId = await _resolveLocaleId(localeId);
 
     await _speech.listen(
-      localeId: resolvedLocaleId,
-      pauseFor: const Duration(seconds: 30),
-      listenFor: const Duration(minutes: 5),
       listenOptions: SpeechListenOptions(
+        localeId: resolvedLocaleId,
+        pauseFor: const Duration(seconds: 30),
+        listenFor: const Duration(minutes: 5),
         partialResults: true,
         cancelOnError: true,
       ),
