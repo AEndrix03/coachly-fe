@@ -1,3 +1,4 @@
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -45,12 +46,13 @@ class WorkoutStatsNotifier extends _$WorkoutStatsNotifier {
       final repository = ref.read(workoutPageRepositoryProvider);
       final response = await repository.getWorkoutStats();
 
-      if (response.success && response.data != null) {
-        state = state.copyWith(stats: response.data, isLoading: false);
+      if (response.isOk && response.valueOrNull != null) {
+        state = state.copyWith(stats: response.valueOrNull, isLoading: false);
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: response.message ?? 'Error loading stats',
+          errorMessage:
+              response.failureOrNull?.message ?? 'Error loading stats',
         );
       }
     } catch (e) {

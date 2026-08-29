@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart'
+    show exerciseInfoPageServiceProvider;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/result/api_response_result.dart';
 import 'package:coachly/core/result/result.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/local/custom_exercise_dao.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_query.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
@@ -25,8 +30,21 @@ import 'package:coachly/features/exercise/exercise_info_page/data/services/exerc
 class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   final ExerciseInfoPageService _service;
   final ExerciseCatalogDao _catalog;
+  final CustomExerciseDao _customExercises;
 
-  ExerciseInfoPageRepositoryImpl(this._service, this._catalog);
+  ExerciseInfoPageRepositoryImpl(
+    this._service,
+    this._catalog,
+    this._customExercises,
+  );
+
+  @override
+  Future<List<ExerciseDetailModel>> getDownloadedDetails() =>
+      _catalog.getAllDetails();
+
+  @override
+  Future<ExerciseDetailModel?> getCachedDetail(String exerciseId) =>
+      _catalog.getDetail(exerciseId);
 
   // API definitiva ───────────────────────────────────────────────────────────
 
@@ -114,8 +132,9 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
       final prepared = await _ensureLocalCache();
       if (prepared case Err(:final failure)) return Err(failure);
       return Ok(
-        await _catalog.getSummaries(
-          toCatalogQuery(filter, excludedExerciseIds: excludedExerciseIds),
+        await _summariesForScope(
+          filter,
+          excludedExerciseIds: excludedExerciseIds,
         ),
       );
     } catch (e) {
@@ -126,10 +145,107 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   @override
   Future<Result<List<ExerciseModel>, Failure>> getMyExercisesResult() async {
     try {
-      return (await _service.fetchMyExercises()).toResult();
+      // Local-first anche qui: la rete rinfresca in background, la lettura
+      // viene dal database (`docs/development/05-sync-and-offline.md`).
+      unawaited(_refreshCustomExercises());
+      return Ok(await _customExercises.getSummaries());
     } catch (e) {
       return Err(exceptionToFailure(e));
     }
+  }
+
+  Future<void> _refreshCustomExercises() async {
+    final remote = (await _service.fetchMyExercises()).toResult();
+    if (remote case Ok(:final value)) {
+      final details = <ExerciseDetailModel>[];
+      for (final summary in value) {
+        final id = summary.id;
+        if (id == null || id.isEmpty) continue;
+        final detail = (await _service.fetchExerciseDetails(id)).toResult();
+        if (detail case Ok(:final value)) details.add(value);
+      }
+      await _customExercises.replaceAll(details);
+    }
+  }
+
+  /// L'elenco che l'utente vede è l'unione di due tabelle.
+  ///
+  /// Catalogo ed esercizi personali sono separati per una ragione di
+  /// persistenza — il primo si sostituisce in blocco, il secondo no
+  /// (`docs/development/04-data-layer.md`) — ma per chi guarda lo schermo sono
+  /// una lista sola. La ricomposizione è compito del repository.
+  Future<List<ExerciseModel>> _summariesForScope(
+    ExerciseFilterModel filter, {
+    Set<String> excludedExerciseIds = const {},
+  }) async {
+    final scope = filter.scope;
+    final query = toCatalogQuery(
+      filter,
+      excludedExerciseIds: excludedExerciseIds,
+    );
+
+    if (scope == 'mine') {
+      return _filterCustom(
+        await _customExercises.getSummaries(),
+        filter,
+        excludedExerciseIds,
+      );
+    }
+
+    final catalog = await _catalog.getSummaries(query);
+    if (scope == 'default') return catalog;
+
+    return [
+      ...catalog,
+      ..._filterCustom(
+        await _customExercises.getSummaries(),
+        filter,
+        excludedExerciseIds,
+      ),
+    ];
+  }
+
+  /// I personali sono pochi: il filtro in memoria è accettabile qui, mentre sul
+  /// catalogo sarebbe la scansione che lo schema Drift esiste per evitare.
+  List<ExerciseModel> _filterCustom(
+    List<ExerciseModel> exercises,
+    ExerciseFilterModel filter,
+    Set<String> excludedExerciseIds,
+  ) {
+    final text = filter.textFilter?.trim().toLowerCase();
+    return exercises
+        .where((exercise) {
+          final id = exercise.id;
+          if (id == null || excludedExerciseIds.contains(id)) return false;
+          if (filter.difficultyLevel != null &&
+              exercise.difficultyLevel != filter.difficultyLevel) {
+            return false;
+          }
+          if (filter.mechanicsType != null &&
+              exercise.mechanicsType != filter.mechanicsType) {
+            return false;
+          }
+          if (filter.forceType != null &&
+              exercise.forceType != filter.forceType) {
+            return false;
+          }
+          if (filter.isUnilateral != null &&
+              exercise.isUnilateral != filter.isUnilateral) {
+            return false;
+          }
+          if (filter.isBodyweight != null &&
+              exercise.isBodyweight != filter.isBodyweight) {
+            return false;
+          }
+          if (text != null && text.isNotEmpty) {
+            final names = exercise.nameI18n?.values ?? const <String>[];
+            if (!names.any((name) => name.toLowerCase().contains(text))) {
+              return false;
+            }
+          }
+          return true;
+        })
+        .toList(growable: false);
   }
 
   @override
@@ -247,8 +363,8 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
 /// Il filtro della presentazione → i criteri che lo schema locale sa esprimere.
 ///
 /// Vive qui e non in `data/local/`: il DAO non deve conoscere
-/// `ExerciseFilterModel`, che porta con sé `langFilter` e `categoryIds`, cioè
-/// parametri di query del backend.
+/// `ExerciseFilterModel`, che porta con sé `langFilter`, cioè un parametro di
+/// query del backend.
 ExerciseCatalogQuery toCatalogQuery(
   ExerciseFilterModel filter, {
   Set<String> excludedExerciseIds = const {},
@@ -262,6 +378,19 @@ ExerciseCatalogQuery toCatalogQuery(
     isUnilateral: filter.isUnilateral,
     isBodyweight: filter.isBodyweight,
     muscleIds: filter.muscleIds ?? const [],
+    categoryIds: filter.categoryIds ?? const [],
     excludedExerciseIds: excludedExerciseIds,
   );
 }
+
+/// La composizione del repository vive accanto al repository, non in un
+/// provider di feature: e' l'unico punto autorizzato a conoscere i DAO
+/// (`docs/development/01-principles.md`, dependency rule D6).
+final exerciseInfoPageRepositoryProvider =
+    Provider<IExerciseInfoPageRepository>(
+      (ref) => ExerciseInfoPageRepositoryImpl(
+        ref.watch(exerciseInfoPageServiceProvider),
+        ref.watch(exerciseCatalogDaoProvider),
+        ref.watch(customExerciseDaoProvider),
+      ),
+    );

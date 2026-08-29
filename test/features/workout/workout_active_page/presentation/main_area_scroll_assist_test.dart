@@ -10,7 +10,7 @@ void main() {
       expect(
         MainAreaScrollPolicy.shouldAssist(
           currentOffset: 500,
-          targetOffset: 760,
+          targetOffset: 680,
           viewportExtent: viewport,
           settleTolerance: tolerance,
         ),
@@ -30,7 +30,7 @@ void main() {
       );
     });
 
-    test('corregge solo un piccolo superamento del MAIN', () {
+    test('non richiama indietro dopo avere superato il MAIN', () {
       expect(
         MainAreaScrollPolicy.shouldAssist(
           currentOffset: 850,
@@ -38,7 +38,7 @@ void main() {
           viewportExtent: viewport,
           settleTolerance: tolerance,
         ),
-        isTrue,
+        isFalse,
       );
     });
 

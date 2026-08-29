@@ -8,7 +8,7 @@ import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service_impl.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
-import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
+import 'package:coachly/core/sync/sync_queue.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -62,8 +62,7 @@ class Auth extends _$Auth {
   /// Vedi `docs/development/24-security-and-privacy.md`.
   Future<int> pendingSyncCount() async {
     try {
-      final pending = await ref.read(outboxDaoProvider).pendingOrdered();
-      return pending.length;
+      return ref.read(syncQueueProvider).pendingCount();
     } catch (error) {
       ref
           .read(appLoggerProvider)

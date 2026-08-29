@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
+import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/core/result/result.dart';
@@ -78,7 +79,9 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   }
 
   Future<void> _loadSessions() async {
-    final sessions = await ref.read(sessionDaoProvider).getAllSessions();
+    final sessions = await ref
+        .read(workoutPageRepositoryProvider)
+        .getAllSessions();
     if (!mounted) return;
     setState(() => _sessions = sessions);
   }

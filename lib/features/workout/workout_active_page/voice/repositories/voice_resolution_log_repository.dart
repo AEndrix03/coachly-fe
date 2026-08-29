@@ -1,16 +1,31 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:coachly/core/ids/id_generator.dart';
+import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/features/workout/workout_active_page/data/local/voice_dao.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final voiceResolutionLogRepositoryProvider =
     Provider<VoiceResolutionLogRepository>((ref) {
-      return VoiceResolutionLogRepository(
+      final repository = VoiceResolutionLogRepository(
         ref.watch(voiceDaoProvider),
         ref.watch(idGeneratorProvider),
       );
+      // La potatura si innesca alla prima creazione del repository, cioe' la
+      // prima volta che il sottosistema vocale viene usato in questa sessione.
+      // Una ritenzione dichiarata e mai eseguita non e' una politica di
+      // privacy, e' un commento (`docs/development/24-security-and-privacy.md`).
+      unawaited(
+        repository.pruneExpired().catchError((Object error) {
+          ref
+              .read(appLoggerProvider)
+              .warn('Potatura dei log vocali fallita', error: error);
+          return 0;
+        }),
+      );
+      return repository;
     });
 
 /// Log di risoluzione vocale, dataset per la calibrazione delle soglie.

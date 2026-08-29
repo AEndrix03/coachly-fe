@@ -57,55 +57,6 @@ final class ExerciseInfoPageServiceProvider
 String _$exerciseInfoPageServiceHash() =>
     r'35caf88efa893b948cfbbb38fb567e079d120de6';
 
-@ProviderFor(exerciseInfoPageRepository)
-const exerciseInfoPageRepositoryProvider =
-    ExerciseInfoPageRepositoryProvider._();
-
-final class ExerciseInfoPageRepositoryProvider
-    extends
-        $FunctionalProvider<
-          IExerciseInfoPageRepository,
-          IExerciseInfoPageRepository,
-          IExerciseInfoPageRepository
-        >
-    with $Provider<IExerciseInfoPageRepository> {
-  const ExerciseInfoPageRepositoryProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'exerciseInfoPageRepositoryProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$exerciseInfoPageRepositoryHash();
-
-  @$internal
-  @override
-  $ProviderElement<IExerciseInfoPageRepository> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  IExerciseInfoPageRepository create(Ref ref) {
-    return exerciseInfoPageRepository(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(IExerciseInfoPageRepository value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<IExerciseInfoPageRepository>(value),
-    );
-  }
-}
-
-String _$exerciseInfoPageRepositoryHash() =>
-    r'43115e6fd2584dd6af8c1a6e017a2b53a60c6d1a';
-
 @ProviderFor(ExerciseInfoNotifier)
 const exerciseInfoProvider = ExerciseInfoNotifierProvider._();
 

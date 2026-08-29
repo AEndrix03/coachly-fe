@@ -1,11 +1,11 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_check/domain/workout_check_models.dart';
 import 'package:coachly/features/workout/workout_check/domain/workout_check_rules.dart';
 
 class WorkoutCheckService {
-  final ExerciseCatalogDao exerciseCache;
+  final IExerciseInfoPageRepository exerciseCache;
   final List<WorkoutCheckRule> rules;
 
   WorkoutCheckService(this.exerciseCache)
@@ -21,7 +21,7 @@ class WorkoutCheckService {
   Future<WorkoutCheckReport> evaluate(WorkoutDraft draft) async {
     final details = <String, ExerciseDetailModel>{};
     for (final exercise in draft.exercises) {
-      final detail = await exerciseCache.getDetail(exercise.exerciseId);
+      final detail = await exerciseCache.getCachedDetail(exercise.exerciseId);
       if (detail != null) details[exercise.exerciseId] = detail;
     }
     final context = WorkoutCheckContext(draft: draft, exerciseDetails: details);

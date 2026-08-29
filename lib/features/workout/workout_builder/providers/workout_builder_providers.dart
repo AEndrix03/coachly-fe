@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
@@ -429,10 +430,10 @@ class CreateWorkoutController extends _$CreateWorkoutController
     final response = await ref
         .read(workoutPageRepositoryProvider)
         .updateWorkout(workout);
-    if (!response.success) {
+    if (!response.isOk) {
       state = state.copyWith(
         isSaving: false,
-        error: response.message ?? 'local_persistence',
+        error: response.failureOrNull?.message ?? 'local_persistence',
       );
       return null;
     }
@@ -497,10 +498,10 @@ class EditWorkoutController extends _$EditWorkoutController
     final response = await ref
         .read(workoutPageRepositoryProvider)
         .updateWorkout(updated);
-    if (!response.success) {
+    if (!response.isOk) {
       state = state.copyWith(
         isSaving: false,
-        error: response.message ?? 'local_persistence',
+        error: response.failureOrNull?.message ?? 'local_persistence',
       );
       return null;
     }

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:coachly/core/database/app_database.dart';
+import 'package:coachly/core/sync/sync_queue.dart';
 import 'package:coachly/core/database/tables/user_tables.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:drift/drift.dart';
@@ -217,3 +218,16 @@ final outboxDaoProvider = Provider<OutboxDao>(
     clock: ref.watch(clockProvider),
   ),
 );
+
+/// Implementazione di [SyncQueue] sopra l'outbox.
+///
+/// La dipendenza punta verso il basso: e' la feature a conoscere `core/sync`,
+/// non il contrario (`docs/development/01-principles.md`).
+class OutboxSyncQueue implements SyncQueue {
+  const OutboxSyncQueue(this._dao);
+
+  final OutboxDao _dao;
+
+  @override
+  Future<int> pendingCount() async => (await _dao.pendingOrdered()).length;
+}

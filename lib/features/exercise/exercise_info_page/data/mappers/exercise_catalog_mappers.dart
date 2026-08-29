@@ -71,11 +71,17 @@ List<LocalizedTextsCompanion> localizedTextRows({
   Map<String, String>? nameI18n,
   Map<String, String>? descriptionI18n,
   Map<String, String>? tipsI18n,
+  String entityType = catalogExerciseEntityType,
 }) {
   return [
-    ..._rowsForField(exerciseId, localizedNameField, nameI18n),
-    ..._rowsForField(exerciseId, localizedDescriptionField, descriptionI18n),
-    ..._rowsForField(exerciseId, localizedTipsField, tipsI18n),
+    ..._rowsForField(exerciseId, localizedNameField, nameI18n, entityType),
+    ..._rowsForField(
+      exerciseId,
+      localizedDescriptionField,
+      descriptionI18n,
+      entityType,
+    ),
+    ..._rowsForField(exerciseId, localizedTipsField, tipsI18n, entityType),
   ];
 }
 
@@ -115,6 +121,24 @@ List<ExerciseEquipmentsCompanion> equipmentRows(ExerciseDetailModel exercise) {
       equipmentId: equipment.id,
       equipmentCode: Value(equipment.code),
       required: Value(entry.isRequired),
+    );
+  }
+  return rows.values.toList(growable: false);
+}
+
+/// Categorie → righe della tabella ponte.
+List<ExerciseCategoriesCompanion> categoryRows(ExerciseDetailModel exercise) {
+  final exerciseId = exercise.id;
+  if (exerciseId == null || exerciseId.isEmpty) return const [];
+
+  final rows = <String, ExerciseCategoriesCompanion>{};
+  for (final category in exercise.categories ?? const []) {
+    final id = category.id;
+    if (id == null || id.isEmpty) continue;
+    rows[id] = ExerciseCategoriesCompanion.insert(
+      exerciseId: exerciseId,
+      categoryId: id,
+      categoryCode: Value(category.code ?? ''),
     );
   }
   return rows.values.toList(growable: false);
@@ -175,12 +199,13 @@ Iterable<LocalizedTextsCompanion> _rowsForField(
   String exerciseId,
   String field,
   Map<String, String>? values,
+  String entityType,
 ) sync* {
   if (values == null) return;
   for (final entry in values.entries) {
     if (entry.key.isEmpty) continue;
     yield LocalizedTextsCompanion.insert(
-      entityType: catalogExerciseEntityType,
+      entityType: entityType,
       entityId: exerciseId,
       field: field,
       locale: entry.key,

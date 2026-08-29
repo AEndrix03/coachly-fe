@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/core/network/api_client.dart';
@@ -76,8 +77,11 @@ void main() {
         _buildSession(),
       );
 
-      expect(response.success, isTrue);
-      expect(response.message, contains('queued'));
+      // Un Result di successo non porta messaggi: il `message` di un Failure e'
+      // diagnostico e non e' contenuto da asserire
+      // (`docs/development/07-errors-and-feedback.md`). Cio' che conta e' che
+      // sessione e riga di outbox siano entrambe presenti.
+      expect(response.isOk, isTrue);
 
       final sessions = await sessionDao.getSessionsForWorkout('workout-1');
       expect(sessions, hasLength(1));
@@ -110,7 +114,7 @@ void main() {
         _buildSession(),
       );
 
-      expect(response.success, isFalse);
+      expect(response.isOk, isFalse);
       expect(await sessionDao.getAllSessions(), isEmpty);
       expect(await outboxDao.pendingOrdered(), hasLength(1));
     });
@@ -203,9 +207,9 @@ void main() {
 
       final stats = await repository.getWorkoutStats();
 
-      expect(stats.success, isTrue);
-      expect(stats.data!.weeklyWorkouts, 2);
-      expect(stats.data!.completedWorkouts, 2);
+      expect(stats.isOk, isTrue);
+      expect(stats.valueOrNull!.weeklyWorkouts, 2);
+      expect(stats.valueOrNull!.completedWorkouts, 2);
     });
 
     test('lo streak conta i giorni locali consecutivi', () async {
@@ -226,8 +230,8 @@ void main() {
 
       final stats = await repository.getWorkoutStats();
 
-      expect(stats.success, isTrue);
-      expect(stats.data!.currentStreak, 2);
+      expect(stats.isOk, isTrue);
+      expect(stats.valueOrNull!.currentStreak, 2);
     });
   });
 

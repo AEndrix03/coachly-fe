@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
@@ -408,10 +409,10 @@ class WorkoutEditDraft extends _$WorkoutEditDraft {
     );
     final repository = ref.read(workoutPageRepositoryProvider);
     final local = await repository.updateWorkout(updated);
-    if (!local.success) {
+    if (!local.isOk) {
       state = state.copyWith(
         isSaving: false,
-        error: local.message ?? 'Unable to save locally.',
+        error: local.failureOrNull?.message ?? 'Unable to save locally.',
       );
       return null;
     }
@@ -431,7 +432,7 @@ class WorkoutEditDraft extends _$WorkoutEditDraft {
     final repository = ref.read(workoutPageRepositoryProvider);
     final command = WorkoutWriteCommandMapper.fromWorkoutModel(updated);
     final response = await repository.patchWorkout(updated.id, command);
-    if (response.success) {
+    if (response.isOk) {
       ref.invalidate(workoutListProvider);
       if (state.source?.id == updated.id) {
         state = state.copyWith(savedOffline: false);

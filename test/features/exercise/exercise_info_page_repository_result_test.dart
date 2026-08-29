@@ -5,6 +5,8 @@ import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exe
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/core/database/app_database.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/local/custom_exercise_dao.dart';
+import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
@@ -90,7 +92,15 @@ void main() {
     service = _FakeService();
     db = AppDatabase(NativeDatabase.memory());
     catalog = ExerciseCatalogDao(db, FixedClock(DateTime.utc(2026, 1, 1)));
-    repository = ExerciseInfoPageRepositoryImpl(service, catalog);
+    repository = ExerciseInfoPageRepositoryImpl(
+      service,
+      catalog,
+      CustomExerciseDao(
+        db,
+        FixedClock(DateTime.utc(2026, 1, 1)),
+        const SilentAppLogger(),
+      ),
+    );
   });
 
   tearDown(() => db.close());

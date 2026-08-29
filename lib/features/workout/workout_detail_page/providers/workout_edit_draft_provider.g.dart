@@ -58,7 +58,7 @@ final class WorkoutEditDraftProvider
   }
 }
 
-String _$workoutEditDraftHash() => r'ef8f7c07541d8ed1e4325fbbe36d08a5eb458b5d';
+String _$workoutEditDraftHash() => r'1bc65cfded97f79af08d4ee83ab2c5169589b7de';
 
 final class WorkoutEditDraftFamily extends $Family
     with

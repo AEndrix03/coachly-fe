@@ -4,7 +4,9 @@ import 'dart:convert';
 
 import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/ids/id_generator.dart';
-import 'package:coachly/core/network/api_response.dart';
+import 'package:coachly/core/error/failures.dart';
+import 'package:coachly/core/result/api_response_result.dart';
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
@@ -77,16 +79,24 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       _sessionDao.watchSessions();
 
   @override
-  Future<ApiResponse<List<WorkoutModel>>> getWorkouts() async {
+  Future<List<LocalWorkoutSession>> getAllSessions() =>
+      _sessionDao.getAllSessions();
+
+  @override
+  Future<int> pendingSyncCount() async =>
+      (await _outboxDao.pendingOrdered()).length;
+
+  @override
+  Future<Result<List<WorkoutModel>, Failure>> getWorkouts() async {
     final localWorkouts = await _workoutDao.getWorkouts();
     if (localWorkouts.isNotEmpty) {
-      return ApiResponse.success(data: localWorkouts);
+      return Ok(localWorkouts);
     }
     return _performRefreshFromRemote();
   }
 
   @override
-  Future<ApiResponse<List<WorkoutModel>>> refreshFromRemote() async {
+  Future<Result<List<WorkoutModel>, Failure>> refreshFromRemote() async {
     final response = await _performRefreshFromRemote();
     unawaited(
       _sessionSyncService.syncPendingSessions(trigger: 'refresh_remote'),
@@ -96,7 +106,8 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
   /// La deduplica delle richieste concorrenti sta nel `RequestCoalescer` di
   /// `ApiClient` (`docs/development/06-networking.md`), non piu' qui.
-  Future<ApiResponse<List<WorkoutModel>>> _performRefreshFromRemote() async {
+  Future<Result<List<WorkoutModel>, Failure>>
+  _performRefreshFromRemote() async {
     List<WorkoutModel>? remoteWorkouts;
     try {
       final remoteResponse = await _apiService.fetchWorkouts();
@@ -107,52 +118,33 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
           updatedAt: _clock.nowUtc(),
         );
       } else {
-        return ApiResponse.error(
-          message:
-              remoteResponse.message ??
-              'Failed to refresh workouts from remote',
-          statusCode: remoteResponse.statusCode,
-          errors: remoteResponse.errors,
-        );
+        return Err(remoteResponse.toFailure());
       }
 
-      final localWorkouts = await _workoutDao.getWorkouts();
-      return ApiResponse.success(data: localWorkouts);
+      return Ok(await _workoutDao.getWorkouts());
     } catch (error) {
+      // Il dato locale vince sull'errore di rete: e' il senso del local-first
+      // (`docs/development/05-sync-and-offline.md`).
       final localWorkouts = await _workoutDao.getWorkouts();
-      if (localWorkouts.isNotEmpty) {
-        return ApiResponse.success(
-          data: localWorkouts,
-          message: 'API failed, showing local data.',
-        );
-      }
-
+      if (localWorkouts.isNotEmpty) return Ok(localWorkouts);
       if (remoteWorkouts != null && remoteWorkouts.isNotEmpty) {
-        return ApiResponse.success(
-          data: remoteWorkouts,
-          message: 'Local cache failed, showing remote data.',
-        );
+        return Ok(remoteWorkouts);
       }
-
-      return ApiResponse.error(
-        message: 'Failed to fetch workouts: ${error.toString()}',
-      );
+      return Err(exceptionToFailure(error));
     }
   }
 
   @override
-  Future<ApiResponse<List<WorkoutModel>>> getRecentWorkouts() async {
-    final response = await getWorkouts();
-    if (response.success) {
-      final allWorkouts = [...?response.data]
+  Future<Result<List<WorkoutModel>, Failure>> getRecentWorkouts() async {
+    return (await getWorkouts()).map((workouts) {
+      final sorted = [...workouts]
         ..sort((a, b) => b.lastUsed.compareTo(a.lastUsed));
-      return ApiResponse.success(data: allWorkouts.take(3).toList());
-    }
-    return response;
+      return sorted.take(3).toList();
+    });
   }
 
   @override
-  Future<ApiResponse<WorkoutModel?>> getWorkout(String workoutId) async {
+  Future<Result<WorkoutModel?, Failure>> getWorkout(String workoutId) async {
     try {
       var workout = await _workoutDao.getWorkout(workoutId);
       if (workout == null) {
@@ -160,18 +152,15 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
         workout = await _workoutDao.getWorkout(workoutId);
       }
 
-      if (workout != null) {
-        return ApiResponse.success(data: workout);
-      }
-
-      return ApiResponse.error(message: 'Workout not found in local cache');
+      if (workout != null) return Ok(workout);
+      return const Err(NotFoundFailure('Workout not in local cache'));
     } catch (error) {
-      return ApiResponse.error(message: error.toString());
+      return Err(exceptionToFailure(error));
     }
   }
 
   @override
-  Future<ApiResponse<WorkoutStatsModel>> getWorkoutStats() async {
+  Future<Result<WorkoutStatsModel, Failure>> getWorkoutStats() async {
     try {
       final workouts = await _workoutDao.getWorkouts();
       final sessions = await _sessionDao.getAllSessions();
@@ -211,8 +200,8 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
         workouts: workouts,
       );
 
-      return ApiResponse.success(
-        data: WorkoutStatsModel(
+      return Ok(
+        WorkoutStatsModel(
           activeWorkouts: activeWorkouts,
           completedWorkouts: completedWorkouts,
           progressPercentage: progressPercentage,
@@ -221,74 +210,73 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
         ),
       );
     } catch (error) {
-      return ApiResponse.error(
-        message: 'Failed to compute workout stats: ${error.toString()}',
-      );
+      return Err(exceptionToFailure(error));
     }
   }
 
   @override
-  Future<ApiResponse<void>> enableWorkout(String workoutId) async {
+  Future<Result<void, Failure>> enableWorkout(String workoutId) async {
     await _workoutDao.setActive(
       workoutId,
       active: true,
       updatedAt: _clock.nowUtc(),
     );
-    return ApiResponse.success(message: 'Enabled workout $workoutId');
+    return const Ok(null);
   }
 
   @override
-  Future<ApiResponse<void>> disableWorkout(String workoutId) async {
+  Future<Result<void, Failure>> disableWorkout(String workoutId) async {
     await _workoutDao.setActive(
       workoutId,
       active: false,
       updatedAt: _clock.nowUtc(),
     );
-    return ApiResponse.success(message: 'Disabled workout $workoutId');
+    return const Ok(null);
   }
 
   @override
-  Future<ApiResponse<void>> deleteWorkout(String workoutId) async {
-    final response = await _apiService.deleteWorkout(workoutId);
-    if (!response.success) {
-      return response;
-    }
+  Future<Result<void, Failure>> deleteWorkout(String workoutId) async {
+    final result = (await _apiService.deleteWorkout(workoutId)).toVoidResult();
+    if (result case Err()) return result;
     await _workoutDao.deleteWorkout(workoutId);
-    return response;
+    return result;
   }
 
   @override
-  Future<ApiResponse<void>> updateWorkout(WorkoutModel updatedWorkout) async {
+  Future<Result<void, Failure>> updateWorkout(
+    WorkoutModel updatedWorkout,
+  ) async {
     await _workoutDao.patchWorkout(updatedWorkout, updatedAt: _clock.nowUtc());
-    return ApiResponse.success(message: 'Updated workout ${updatedWorkout.id}');
+    return const Ok(null);
   }
 
   @override
-  Future<ApiResponse<void>> patchWorkout(
+  Future<Result<void, Failure>> patchWorkout(
     String workoutId,
     WorkoutWriteCommand command,
   ) async {
-    final response = await _apiService.patchWorkout(workoutId, command);
-    if (response.success) {
-      await refreshFromRemote();
-    }
-    return response;
+    final result = (await _apiService.patchWorkout(
+      workoutId,
+      command,
+    )).toVoidResult();
+    if (result case Err()) return result;
+    await refreshFromRemote();
+    return result;
   }
 
   @override
-  Future<ApiResponse<void>> saveSession(
+  Future<Result<void, Failure>> saveSession(
     String workoutId,
     WorkoutSessionWriteCommand sessionCommand,
   ) async {
-    final workoutResponse = await getWorkout(workoutId);
-    final workout = workoutResponse.data;
-    if (!workoutResponse.success || workout == null) {
-      return ApiResponse.error(
-        message:
-            workoutResponse.message ??
-            'Workout not found for local-first session save.',
-        statusCode: workoutResponse.statusCode,
-        errors: workoutResponse.errors,
+    final workoutResult = await getWorkout(workoutId);
+    final workout = switch (workoutResult) {
+      Ok(:final value) => value,
+      Err() => null,
+    };
+    if (workout == null) {
+      return const Err(
+        NotFoundFailure('Workout not found for local-first session save'),
       );
     }
 
@@ -357,13 +345,9 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
       unawaited(
         _sessionSyncService.syncPendingSessions(trigger: 'save_session'),
       );
-      return ApiResponse.success(
-        message: 'Session saved locally and queued for sync.',
-      );
+      return const Ok(null);
     } catch (error) {
-      return ApiResponse.error(
-        message: 'Failed to save session locally: ${error.toString()}',
-      );
+      return Err(exceptionToFailure(error));
     }
   }
 

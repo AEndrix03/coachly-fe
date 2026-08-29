@@ -23,8 +23,12 @@ bool isApplication(String path) => isInLayer(path, 'application');
 
 bool isDataLayer(String path) => isInLayer(path, 'data');
 
-bool isRepository(String path) =>
-    _normalize(path).contains('/data/repositories/');
+/// Qualsiasi cartella `repositories/`, non solo `data/repositories/`.
+///
+/// Il sottosistema vocale tiene i suoi repository in `voice/repositories/`: e'
+/// una collocazione legittima, e cercare solo il percorso canonico faceva
+/// segnalare come violazione un file che la regola vuole permettere.
+bool isRepository(String path) => _normalize(path).contains('/repositories/');
 
 bool isCore(String path) => _normalize(path).contains('/lib/core/');
 

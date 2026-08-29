@@ -8,11 +8,29 @@ part of 'settings_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Lingua dell'interfaccia.
+///
+/// È una **preferenza banale**: sta in `SharedPreferencesAsync`, non in Drift
+/// (`docs/development/04-data-layer.md`, "Cosa non sta in Drift"). Perderla
+/// significa ripartire dalla lingua di default, che è esattamente il
+/// comportamento del primo avvio.
 
 @ProviderFor(Language)
 const languageProvider = LanguageProvider._();
 
+/// Lingua dell'interfaccia.
+///
+/// È una **preferenza banale**: sta in `SharedPreferencesAsync`, non in Drift
+/// (`docs/development/04-data-layer.md`, "Cosa non sta in Drift"). Perderla
+/// significa ripartire dalla lingua di default, che è esattamente il
+/// comportamento del primo avvio.
 final class LanguageProvider extends $NotifierProvider<Language, Locale> {
+  /// Lingua dell'interfaccia.
+  ///
+  /// È una **preferenza banale**: sta in `SharedPreferencesAsync`, non in Drift
+  /// (`docs/development/04-data-layer.md`, "Cosa non sta in Drift"). Perderla
+  /// significa ripartire dalla lingua di default, che è esattamente il
+  /// comportamento del primo avvio.
   const LanguageProvider._()
     : super(
         from: null,
@@ -40,7 +58,14 @@ final class LanguageProvider extends $NotifierProvider<Language, Locale> {
   }
 }
 
-String _$languageHash() => r'b464d0ba3e84e6cdd14f22cf04d4ce42dfc6b804';
+String _$languageHash() => r'8f667d4953302c053b82e892d02b6ffeeb7c42bf';
+
+/// Lingua dell'interfaccia.
+///
+/// È una **preferenza banale**: sta in `SharedPreferencesAsync`, non in Drift
+/// (`docs/development/04-data-layer.md`, "Cosa non sta in Drift"). Perderla
+/// significa ripartire dalla lingua di default, che è esattamente il
+/// comportamento del primo avvio.
 
 abstract class _$Language extends $Notifier<Locale> {
   Locale build();

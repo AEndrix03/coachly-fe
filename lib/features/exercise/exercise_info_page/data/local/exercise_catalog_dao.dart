@@ -29,6 +29,7 @@ part 'exercise_catalog_dao.g.dart';
     LocalizedTexts,
     ExerciseMuscles,
     ExerciseEquipments,
+    ExerciseCategories,
   ],
 )
 class ExerciseCatalogDao extends DatabaseAccessor<AppDatabase>
@@ -133,6 +134,7 @@ class ExerciseCatalogDao extends DatabaseAccessor<AppDatabase>
     final now = _clock.nowUtc();
     final muscles = muscleRows(exercise);
     final equipments = equipmentRows(exercise);
+    final categories = categoryRows(exercise);
 
     await transaction(() async {
       await into(
@@ -144,6 +146,9 @@ class ExerciseCatalogDao extends DatabaseAccessor<AppDatabase>
       )..where((table) => table.exerciseId.equals(exerciseId))).go();
       await (delete(
         exerciseEquipments,
+      )..where((table) => table.exerciseId.equals(exerciseId))).go();
+      await (delete(
+        exerciseCategories,
       )..where((table) => table.exerciseId.equals(exerciseId))).go();
 
       await batch((batch) {
@@ -158,6 +163,7 @@ class ExerciseCatalogDao extends DatabaseAccessor<AppDatabase>
         );
         batch.insertAll(exerciseMuscles, muscles);
         batch.insertAll(exerciseEquipments, equipments);
+        batch.insertAll(exerciseCategories, categories);
       });
     });
   }
@@ -254,6 +260,13 @@ class ExerciseCatalogDao extends DatabaseAccessor<AppDatabase>
       final matches = selectOnly(exerciseEquipments)
         ..addColumns([exerciseEquipments.exerciseId])
         ..where(exerciseEquipments.equipmentId.isIn(query.equipmentIds));
+      conditions.add(catalogExercises.id.isInQuery(matches));
+    }
+
+    if (query.categoryIds.isNotEmpty) {
+      final matches = selectOnly(exerciseCategories)
+        ..addColumns([exerciseCategories.exerciseId])
+        ..where(exerciseCategories.categoryId.isIn(query.categoryIds));
       conditions.add(catalogExercises.id.isInQuery(matches));
     }
 

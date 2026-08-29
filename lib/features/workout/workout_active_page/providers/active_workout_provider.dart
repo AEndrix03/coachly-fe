@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/workout/workout_active_page/domain/workout_execution_resolver.dart';
 import 'package:coachly/features/workout/workout_active_page/data/active_workout_draft_service.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_context.dart';
@@ -51,8 +53,8 @@ class ActiveWorkout extends _$ActiveWorkout {
       return;
     }
 
-    if (response.success && response.data != null) {
-      final workout = response.data!;
+    if (response.isOk && response.valueOrNull != null) {
+      final workout = response.valueOrNull!;
       var exercises = _buildExecutionExercises(workout);
       var groups = _buildExecutionGroups(workout, exercises);
       exercises = await _resolveMissingExerciseNames(exercises);
@@ -97,7 +99,7 @@ class ActiveWorkout extends _$ActiveWorkout {
           );
     } else {
       state = ActiveWorkoutState.error(
-        response.message ?? 'Unable to load workout.',
+        response.failureOrNull?.message ?? 'Unable to load workout.',
       );
     }
   }
@@ -960,7 +962,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       return false;
     }
 
-    if (response.success) {
+    if (response.isOk) {
       await ref.read(activeWorkoutDraftServiceProvider).delete(workoutId);
       ref.invalidate(workoutListProvider);
       ref.invalidate(recentWorkoutsProvider);
@@ -970,7 +972,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     } else {
       state = state.copyWith(
         status: ActiveWorkoutStatus.active,
-        errorMessage: response.message ?? 'Error while saving.',
+        errorMessage: response.failureOrNull?.message ?? 'Error while saving.',
       );
       return false;
     }

@@ -20,6 +20,7 @@ class ExerciseCatalogQuery {
     this.isBodyweight,
     this.muscleIds = const [],
     this.equipmentIds = const [],
+    this.categoryIds = const [],
     this.excludedExerciseIds = const {},
   });
 
@@ -44,6 +45,9 @@ class ExerciseCatalogQuery {
   /// Appartenenza su `ExerciseEquipments`, stessa semantica dei muscoli.
   final List<String> equipmentIds;
 
+  /// Appartenenza su `ExerciseCategories`, stessa semantica dei muscoli.
+  final List<String> categoryIds;
+
   final Set<String> excludedExerciseIds;
 
   /// Vero quando la query non restringe nulla: la lista completa.
@@ -57,5 +61,6 @@ class ExerciseCatalogQuery {
       isBodyweight == null &&
       muscleIds.isEmpty &&
       equipmentIds.isEmpty &&
+      categoryIds.isEmpty &&
       excludedExerciseIds.isEmpty;
 }

@@ -42,7 +42,7 @@ final class CreateWorkoutControllerProvider
 }
 
 String _$createWorkoutControllerHash() =>
-    r'2ed7e6dd13bd40ad6812217317177dae04d952b6';
+    r'8a7d0bea4c71228f149ffb5cee1b81c66d6bc812';
 
 abstract class _$CreateWorkoutController
     extends $Notifier<WorkoutBuilderState> {
@@ -114,7 +114,7 @@ final class EditWorkoutControllerProvider
 }
 
 String _$editWorkoutControllerHash() =>
-    r'fc571ab8f3b82ba560eed9761125e0ac49b37e3b';
+    r'5e427ef986a929bf836cce816ca59a97e86470ab';
 
 final class EditWorkoutControllerFamily extends $Family
     with

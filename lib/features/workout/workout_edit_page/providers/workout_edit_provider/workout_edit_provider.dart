@@ -1,3 +1,4 @@
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_edit_page/data/models/editable_exercise_model/editable_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
@@ -97,8 +98,8 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
 
       if (_disposed) return;
 
-      if (response.success && response.data != null) {
-        final workout = response.data!;
+      if (response.isOk && response.valueOrNull != null) {
+        final workout = response.valueOrNull!;
 
         final editableExercises = workout.workoutExercises
             .asMap()
@@ -123,7 +124,8 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: response.message ?? 'Error loading workout data',
+          error:
+              response.failureOrNull?.message ?? 'Error loading workout data',
         );
       }
     } catch (e) {
@@ -233,7 +235,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
 
       final response = await repository.patchWorkout(state.workoutId, command);
 
-      if (response.success) {
+      if (response.isOk) {
         state = state.copyWith(isLoading: false, isDirty: false);
         // After saving, invalidate the list to show the updated item.
         ref.invalidate(workoutListProvider);
@@ -241,7 +243,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       } else {
         state = state.copyWith(
           isLoading: false,
-          error: response.message ?? 'Error while saving',
+          error: response.failureOrNull?.message ?? 'Error while saving',
         );
         return false;
       }

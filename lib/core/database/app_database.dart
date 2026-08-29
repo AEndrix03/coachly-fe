@@ -26,6 +26,7 @@ part 'app_database.g.dart';
     LocalizedTexts,
     ExerciseMuscles,
     ExerciseEquipments,
+    ExerciseCategories,
     CatalogMeta,
     // Dati utente
     CustomExercises,
@@ -51,7 +52,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(driftDatabase(name: 'coachly_test'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -60,6 +61,14 @@ class AppDatabase extends _$AppDatabase {
       await into(
         catalogMeta,
       ).insert(CatalogMetaCompanion.insert(id: const Value(0)));
+    },
+    onUpgrade: (m, from, to) async {
+      // Nessun utente in produzione (ADR-005): le migrazioni si scrivono
+      // comunque, perche' la disciplina va attivata dal primo giorno e non
+      // quando servira'.
+      if (from < 2) {
+        await m.createTable(exerciseCategories);
+      }
     },
     beforeOpen: (details) async {
       // I vincoli `CHECK` e le foreign key non sono attivi per default in

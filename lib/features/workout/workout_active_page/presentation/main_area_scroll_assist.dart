@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 abstract final class MainAreaScrollPolicy {
-  static const approachingViewportFraction = .5;
-  static const overshootViewportFraction = .18;
+  static const approachingViewportFraction = .25;
 
   static bool shouldAssist({
     required double currentOffset,
@@ -14,10 +13,9 @@ abstract final class MainAreaScrollPolicy {
   }) {
     final delta = targetOffset - currentOffset;
     if (delta.abs() <= settleTolerance) return false;
-    final proximity = delta.isNegative
-        ? viewportExtent * overshootViewportFraction
-        : viewportExtent * approachingViewportFraction;
-    return delta.abs() <= proximity;
+    if (delta.isNegative) return false;
+    final proximity = viewportExtent * approachingViewportFraction;
+    return delta <= proximity;
   }
 }
 
@@ -109,7 +107,7 @@ class _MainAreaScrollAssistState extends State<MainAreaScrollAssist> {
       return;
     }
 
-    final duration = context.motion.resolve(context, context.motion.slow);
+    final duration = context.motion.resolve(context, context.motion.quick);
     if (duration == Duration.zero) {
       _controller.jumpTo(target);
       return;

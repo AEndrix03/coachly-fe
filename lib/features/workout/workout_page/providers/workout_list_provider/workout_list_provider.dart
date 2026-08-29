@@ -1,3 +1,4 @@
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
@@ -14,10 +15,12 @@ class WorkoutList extends _$WorkoutList {
   @override
   Future<List<WorkoutModel>> build() async {
     final response = await _repository.getWorkouts();
-    if (response.success) {
-      return response.data!;
+    if (response.isOk) {
+      return response.valueOrNull!;
     } else {
-      throw Exception(response.message ?? 'Failed to fetch workouts');
+      throw Exception(
+        response.failureOrNull?.message ?? 'Failed to fetch workouts',
+      );
     }
   }
 
@@ -33,8 +36,10 @@ class WorkoutList extends _$WorkoutList {
 
   Future<void> deleteWorkout(String workoutId) async {
     final response = await _repository.deleteWorkout(workoutId);
-    if (!response.success) {
-      throw Exception(response.message ?? 'Failed to delete workout');
+    if (!response.isOk) {
+      throw Exception(
+        response.failureOrNull?.message ?? 'Failed to delete workout',
+      );
     }
     ref.invalidateSelf();
   }

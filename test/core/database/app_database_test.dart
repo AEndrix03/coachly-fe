@@ -12,8 +12,10 @@ void main() {
   setUp(() => db = AppDatabase(NativeDatabase.memory()));
   tearDown(() => db.close());
 
-  test('lo schema si crea e parte dalla versione 1', () async {
-    expect(db.schemaVersion, 1);
+  test('lo schema si crea con il meta del catalogo', () async {
+    // La versione cresce con lo schema: l'aggiunta di `ExerciseCategories`
+    // l'ha portata a 2, con la sua migrazione in `onUpgrade`.
+    expect(db.schemaVersion, greaterThanOrEqualTo(2));
     final meta = await db.select(db.catalogMeta).getSingle();
     expect(meta.version, 0);
   });

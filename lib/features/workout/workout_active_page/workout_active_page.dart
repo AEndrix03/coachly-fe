@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/providers/workout_coach_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/adaptive_workout_workspace.dart';
@@ -7,7 +8,7 @@ import 'package:coachly/features/workout/workout_active_page/providers/active_wo
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -200,7 +201,9 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   }
 
   Future<void> _showAddExerciseSheet() async {
-    final catalog = await ref.read(exerciseCatalogDaoProvider).getAllDetails();
+    final catalog = await ref
+        .read(exerciseInfoPageRepositoryProvider)
+        .getDownloadedDetails();
     if (!mounted) return;
     await showModalBottomSheet<void>(
       context: context,
@@ -217,7 +220,9 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   }
 
   Future<({String id, String name})?> _addExerciseForBlock() async {
-    final catalog = await ref.read(exerciseCatalogDaoProvider).getAllDetails();
+    final catalog = await ref
+        .read(exerciseInfoPageRepositoryProvider)
+        .getDownloadedDetails();
     if (!mounted) return null;
     final exercise = await showModalBottomSheet<ExerciseDetailModel>(
       context: context,

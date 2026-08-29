@@ -1,4 +1,6 @@
 import 'package:coachly/core/network/session_gateway.dart';
+import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
+import 'package:coachly/core/sync/sync_queue.dart';
 import 'package:coachly/features/auth/data/services/auth_session_gateway.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:flutter/widgets.dart';
@@ -21,6 +23,9 @@ ProviderScope buildAppScope({required Widget child}) {
           ref.watch(authServiceProvider),
           () => ref.invalidate(authProvider),
         ),
+      ),
+      syncQueueProvider.overrideWith(
+        (ref) => OutboxSyncQueue(ref.watch(outboxDaoProvider)),
       ),
     ],
     child: child,

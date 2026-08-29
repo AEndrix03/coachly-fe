@@ -1,4 +1,5 @@
-import 'package:coachly/core/network/api_response.dart';
+import 'package:coachly/core/error/failures.dart';
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
@@ -6,36 +7,46 @@ import 'package:coachly/features/workout/workout_page/data/models/workout_model/
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
 
 abstract class IWorkoutPageRepository {
+  /// Tutte le sessioni locali.
+  Future<List<LocalWorkoutSession>> getAllSessions();
+
+  /// Quanti allenamenti registrati non sono ancora saliti.
+  ///
+  /// Serve alla guardia del logout: cancellare il database con la coda non
+  /// vuota e' una perdita irreversibile
+  /// (`docs/development/24-security-and-privacy.md`).
+  Future<int> pendingSyncCount();
+
   /// Letture reattive: il database notifica i lettori, nessuno chiama
   /// `invalidate` (`docs/development/04-data-layer.md`).
   Stream<List<WorkoutModel>> watchWorkouts();
 
   Stream<List<LocalWorkoutSession>> watchSessions();
 
-  Future<ApiResponse<List<WorkoutModel>>> getWorkouts();
+  Future<Result<List<WorkoutModel>, Failure>> getWorkouts();
 
-  Future<ApiResponse<List<WorkoutModel>>> refreshFromRemote();
+  Future<Result<List<WorkoutModel>, Failure>> refreshFromRemote();
 
-  Future<ApiResponse<List<WorkoutModel>>> getRecentWorkouts();
+  Future<Result<List<WorkoutModel>, Failure>> getRecentWorkouts();
 
-  Future<ApiResponse<WorkoutModel?>> getWorkout(String workoutId);
+  Future<Result<WorkoutModel?, Failure>> getWorkout(String workoutId);
 
-  Future<ApiResponse<WorkoutStatsModel>> getWorkoutStats();
+  Future<Result<WorkoutStatsModel, Failure>> getWorkoutStats();
 
-  Future<ApiResponse<void>> enableWorkout(String workoutId);
+  Future<Result<void, Failure>> enableWorkout(String workoutId);
 
-  Future<ApiResponse<void>> disableWorkout(String workoutId);
+  Future<Result<void, Failure>> disableWorkout(String workoutId);
 
-  Future<ApiResponse<void>> deleteWorkout(String workoutId);
+  Future<Result<void, Failure>> deleteWorkout(String workoutId);
 
-  Future<ApiResponse<void>> updateWorkout(WorkoutModel updatedWorkout);
+  Future<Result<void, Failure>> updateWorkout(WorkoutModel updatedWorkout);
 
-  Future<ApiResponse<void>> patchWorkout(
+  Future<Result<void, Failure>> patchWorkout(
     String workoutId,
     WorkoutWriteCommand command,
   );
 
-  Future<ApiResponse<void>> saveSession(
+  Future<Result<void, Failure>> saveSession(
     String workoutId,
     WorkoutSessionWriteCommand sessionCommand,
   );

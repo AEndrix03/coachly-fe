@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/core/config/app_config.dart';
 import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/time/clock.dart';
@@ -98,7 +100,7 @@ class AppDataSyncService {
       final workoutResult = await _workoutRepository.refreshFromRemote();
       final exerciseResult = await _exerciseRepository
           .refreshFromRemoteResult();
-      final success = workoutResult.success && exerciseResult.isOk;
+      final success = workoutResult.isOk && exerciseResult.isOk;
 
       if (success) {
         _hasSyncedCurrentSession = true;

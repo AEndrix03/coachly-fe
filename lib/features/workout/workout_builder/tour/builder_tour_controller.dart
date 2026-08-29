@@ -64,6 +64,12 @@ class BuilderTourController extends Notifier<BuilderTourState> {
 
   @override
   BuilderTourState build() {
+    // Eccezione dichiarata, non regola indebolita: la regola esiste per il
+    // `Future.microtask(load)` che carica DATI nel build di un Notifier, dove
+    // la risposta e' `AsyncNotifier`. Qui si idrata una PREFERENZA che ha gia'
+    // un default valido, e lo stato sincrono e' un requisito dei chiamanti che
+    // si aspettano un valore, non un `AsyncValue`.
+    // ignore: no_side_effects_in_build
     unawaited(_restore());
     return const BuilderTourState();
   }

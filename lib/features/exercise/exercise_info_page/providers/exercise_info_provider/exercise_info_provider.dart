@@ -3,8 +3,8 @@ import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart'
+    show exerciseInfoPageRepositoryProvider;
 import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_info_page_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,14 +15,6 @@ part 'exercise_info_provider.g.dart';
 ExerciseInfoPageService exerciseInfoPageService(Ref ref) {
   final apiClient = ref.watch(apiClientProvider);
   return ExerciseInfoPageService(apiClient);
-}
-
-// Repository Provider
-@riverpod
-IExerciseInfoPageRepository exerciseInfoPageRepository(Ref ref) {
-  final service = ref.watch(exerciseInfoPageServiceProvider);
-  final catalog = ref.watch(exerciseCatalogDaoProvider);
-  return ExerciseInfoPageRepositoryImpl(service, catalog);
 }
 
 // State Class

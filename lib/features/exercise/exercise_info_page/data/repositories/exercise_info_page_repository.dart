@@ -15,6 +15,16 @@ import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exe
 /// non rompere i chiamanti non ancora migrati: quando l'ultimo chiamante sarà
 /// migrato i ponti spariscono e il suffisso `Result` si toglie.
 abstract class IExerciseInfoPageRepository {
+  /// I dettagli gia' scaricati in locale.
+  ///
+  /// Esiste perche' il catalogo vocale e il controllo scheda ne hanno bisogno:
+  /// senza, importerebbero il DAO e violerebbero la dependency rule D6
+  /// (`docs/development/01-principles.md`).
+  Future<List<ExerciseDetailModel>> getDownloadedDetails();
+
+  /// Il dettaglio locale, senza toccare la rete.
+  Future<ExerciseDetailModel?> getCachedDetail(String exerciseId);
+
   // ── API definitiva ────────────────────────────────────────────────────────
 
   Future<Result<ExerciseDetailModel, Failure>> getExerciseDetailResult(

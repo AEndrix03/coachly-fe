@@ -1,4 +1,7 @@
 import 'package:coachly/core/database/app_database.dart';
+import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
+import 'package:coachly/core/time/clock.dart';
+import 'package:coachly/core/sync/sync_queue.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
@@ -24,6 +27,11 @@ void main() {
       overrides: [
         authServiceProvider.overrideWithValue(_FakeAuthService()),
         appDatabaseProvider.overrideWithValue(db),
+        // La guardia dipende da `SyncQueue`, non dalla feature workout: cosi'
+        // il test non trascina dentro l'intero stack di rete.
+        syncQueueProvider.overrideWithValue(
+          OutboxSyncQueue(OutboxDao(db, clock: const SystemClock())),
+        ),
       ],
     );
     addTearDown(container.dispose);

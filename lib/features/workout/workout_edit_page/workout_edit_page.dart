@@ -37,7 +37,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       final response = await ref
           .read(workoutPageRepositoryProvider)
           .getWorkout(widget.workoutId);
-      source = response.data;
+      source = response.valueOrNull;
     }
     if (!mounted || source == null) return;
     _source = source;

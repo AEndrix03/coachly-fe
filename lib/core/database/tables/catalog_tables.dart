@@ -102,6 +102,20 @@ class ExerciseEquipments extends Table {
   Set<Column<Object>> get primaryKey => {exerciseId, equipmentId};
 }
 
+/// Categorie dell'esercizio. Tabella ponte per lo stesso motivo di muscoli e
+/// attrezzi: il filtro è per appartenenza.
+@DataClassName('ExerciseCategoryRow')
+class ExerciseCategories extends Table {
+  TextColumn get exerciseId => text()();
+
+  TextColumn get categoryId => text()();
+
+  TextColumn get categoryCode => text().withDefault(const Constant(''))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {exerciseId, categoryId};
+}
+
 /// Versione del catalogo installato, per i delta.
 @DataClassName('CatalogMetaRow')
 class CatalogMeta extends Table {

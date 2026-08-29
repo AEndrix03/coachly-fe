@@ -2,7 +2,7 @@ import 'dart:ui' show Locale;
 import 'package:coachly/core/assets/app_assets.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/features/auth/providers/user_provider.dart';
-import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/presentation/models/today_home_view_data.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
@@ -16,7 +16,9 @@ final todayHomeViewDataProvider =
       final items = await ref.watch(workoutListProvider.future);
       final user = ref.watch(userProvider);
       final connectivity = ref.watch(connectivityProvider).value;
-      final sessions = await ref.watch(sessionDaoProvider).getAllSessions();
+      final sessions = await ref
+          .watch(workoutPageRepositoryProvider)
+          .getAllSessions();
       final openSessions =
           sessions
               .where(
