@@ -5,12 +5,25 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_interceptor.g.dart';
 
-@riverpod
+/// Una sola istanza di Dio per la vita della app.
+///
+/// `keepAlive` perche' ricrearla butterebbe via il pool di connessioni, e
+/// perche' `authDio` le aggancia un interceptor: un Dio ricreato in silenzio
+/// significa un interceptor riagganciato in silenzio.
+@Riverpod(keepAlive: true)
 Dio dioClient(Ref ref) => Dio();
 
-@riverpod
+/// Il Dio con l'autenticazione agganciata.
+///
+/// `keepAlive` non e' un'ottimizzazione: [AuthInterceptor] tiene il refresh in
+/// corso per deduplicarlo, e un interceptor ricreato lo dimentica — dieci
+/// richieste scadute insieme tornerebbero a produrre dieci refresh.
+@Riverpod(keepAlive: true)
 Dio authDio(Ref ref) {
   final dio = ref.watch(dioClientProvider);
+  // Rimpiazza, non accumula: se questo provider viene ricostruito, aggiungere
+  // un secondo interceptor raddoppierebbe ogni header e ogni retry.
+  dio.interceptors.removeWhere((i) => i is AuthInterceptor);
   dio.interceptors.add(AuthInterceptor(ref.watch(sessionGatewayProvider), dio));
   return dio;
 }

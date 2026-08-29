@@ -68,12 +68,29 @@ Nessun cambiamento visibile all'utente. Sbloccano tutto il resto.
 |---|---|---|---|
 | 2.1 | Migrazione a Dio, conservando il refresh coalescente | 06 | ✅ |
 | 2.2 | Request coalescing centralizzato | 06 | ✅ |
-| 2.3 | `CancelToken` legato ai provider autoDispose | 06 | ⏳ il token e' reale, va agganciato ai provider |
+| 2.3 | `CancelToken` legato ai provider autoDispose | 06 | ⚠️ da rivalutare, vedi sotto |
 | 2.4 | Interceptor: auth, request-id, idempotency, log, metriche | 06 | ⏳ auth fatto |
 | 2.5 | Repository che ritornano `Result` | 07 | ⏳ parziale |
 
 Da qui in poi le chiamate multiple e gli overlay sovrapposti non sono più
 possibili, **anche prima** di toccare il database.
+
+**2.3 va rivalutata.** Quando è stata scritta, ogni schermata leggeva dalla
+rete e un provider `autoDispose` distrutto lasciava una GET in volo. Dopo la
+Fase 3 le letture arrivano da Drift: il traffico residuo è il fallback remoto
+del dettaglio esercizio e la sync del catalogo, e nessuno dei due è legato al
+ciclo di vita di una schermata. Il `CancelToken` ora interrompe davvero
+(ADR-006), ma infilarlo in venti firme di repository per due chiamate sarebbe
+cerimonia. Va agganciato quando servirà — al download del catalogo, quando
+esisterà.
+
+Nel frattempo è emerso il problema che 2.3 voleva risolvere, in un'altra
+forma: `apiClient`, `authDio` e `dioClient` erano `autoDispose`. Il
+`RequestCoalescer` e lo stato di deduplica del refresh vivono lì dentro, e si
+azzeravano ogni volta che nessuno osservava il provider — due schermate aperte
+in sequenza ripartivano da zero e le richieste identiche tornavano a
+duplicarsi. Sono `keepAlive` (fase 4.2, anticipata perché era un difetto
+attivo).
 
 ## Fase 3 — Database
 
@@ -100,10 +117,10 @@ che giustifica il backend.
 
 ## Fase 4 — Stato
 
-| # | Azione | Doc |
-|---|---|---|
+| # | Azione | Doc | Stato |
+|---|---|---|---|
 | 4.1 | Stream Drift al posto delle 12 `ref.invalidate` | 03 |
-| 4.2 | `keepAlive` esplicito su repository e stream globali | 03 |
+| 4.2 | `keepAlive` esplicito su repository e stream globali | 03 | ✅ per il layer di rete, resto ⏳ |
 | 4.3 | Rimozione dei side effect nel `build()` dei Notifier | 03 |
 | 4.4 | `select` nelle foglie delle schermate ad alta frequenza | 03, 15 |
 | 4.5 | Mutations per le azioni utente | 07 |

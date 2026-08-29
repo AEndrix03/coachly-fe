@@ -44,7 +44,14 @@ abstract final class NetworkTimeouts {
   static const Duration syncReceive = Duration(seconds: 60);
 }
 
-@riverpod
+/// `keepAlive`: il client tiene il [RequestCoalescer], e tramite `authDio` lo
+/// stato di deduplica del refresh.
+///
+/// Con `autoDispose` quelle mappe si azzeravano ogni volta che nessuno
+/// osservava il provider: due schermate aperte in sequenza ripartivano da zero
+/// e le richieste identiche tornavano a duplicarsi — cioe' esattamente il
+/// sintomo che il coalescer esiste per eliminare.
+@Riverpod(keepAlive: true)
 ApiClient apiClient(Ref ref) {
   return ApiClient(
     dio: ref.watch(authDioProvider),
