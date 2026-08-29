@@ -30,9 +30,9 @@ class ProfilePage extends ConsumerWidget {
         children: [
           PageHeader(
             badgeIcon: Icons.account_circle_outlined,
-            badgeLabel: context.tr('profile.profile'),
+            badgeLabel: context.l10n.profileProfile,
             title: fullName.isEmpty
-                ? context.tr('profile.your_profile')
+                ? context.l10n.profileYourProfile
                 : fullName,
             bottom: _buildAvatarInHeader(context, initials),
           ),
@@ -46,7 +46,7 @@ class ProfilePage extends ConsumerWidget {
                     context: context,
                     icon: Icons.settings_outlined,
                     color: scheme.primary,
-                    title: context.tr('profile.preferences'),
+                    title: context.l10n.profilePreferences,
                     child: _buildLanguageSetting(context, ref),
                   ),
                   const SizedBox(height: 16),
@@ -54,7 +54,7 @@ class ProfilePage extends ConsumerWidget {
                     context: context,
                     icon: Icons.info_outline,
                     color: scheme.secondary,
-                    title: context.tr('profile.app_section'),
+                    title: context.l10n.profileAppSection,
                     child: _buildAppInfo(context),
                   ),
                   const SizedBox(height: 16),
@@ -62,7 +62,7 @@ class ProfilePage extends ConsumerWidget {
                     context: context,
                     icon: Icons.fitness_center_outlined,
                     color: scheme.tertiary,
-                    title: context.tr('profile.workout_section'),
+                    title: context.l10n.profileWorkoutSection,
                     child: _buildPersonalExercisesEntry(context),
                   ),
                   const SizedBox(height: 32),
@@ -106,7 +106,7 @@ class ProfilePage extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            context.tr('profile.member'),
+            context.l10n.profileMember,
             style: context.scale.captionLoose.medium.copyWith(
               color: scheme.onPrimaryContainer.withValues(alpha: 0.80),
             ),
@@ -176,7 +176,7 @@ class ProfilePage extends ConsumerWidget {
         Icon(Icons.language_outlined, color: scheme.onSurfaceVariant, size: 18),
         const SizedBox(width: 12),
         Text(
-          context.tr('common.language'),
+          context.l10n.commonLanguage,
           style: context.scale.bodyTight.medium.copyWith(
             color: scheme.onSurface,
           ),
@@ -219,7 +219,7 @@ class ProfilePage extends ConsumerWidget {
       children: [
         _infoRow(
           context: context,
-          label: context.tr('common.version'),
+          label: context.l10n.commonVersion,
           value: '1.0.0 MVP',
         ),
         Divider(
@@ -228,7 +228,7 @@ class ProfilePage extends ConsumerWidget {
         ),
         _infoRow(
           context: context,
-          label: context.tr('common.build'),
+          label: context.l10n.commonBuild,
           value: 'alpha',
         ),
       ],
@@ -248,7 +248,7 @@ class ProfilePage extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                context.tr('profile.personal_exercises'),
+                context.l10n.profilePersonalExercises,
                 style: context.scale.bodyTight.medium.copyWith(
                   color: scheme.onSurface,
                 ),
@@ -290,7 +290,7 @@ class ProfilePage extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
     return Semantics(
       button: true,
-      label: context.tr('profile.logout'),
+      label: context.l10n.profileLogout,
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(14),
@@ -299,9 +299,9 @@ class ProfilePage extends ConsumerWidget {
           onTap: () async {
             final confirm = await showAppConfirmationDialog(
               context,
-              title: context.tr('profile.logout_title'),
-              content: context.tr('profile.logout_content'),
-              confirmLabel: context.tr('profile.logout_confirm'),
+              title: context.l10n.profileLogoutTitle,
+              content: context.l10n.profileLogoutContent,
+              confirmLabel: context.l10n.profileLogoutConfirm,
               destructive: true,
               icon: Icons.logout_outlined,
             );
@@ -318,12 +318,9 @@ class ProfilePage extends ConsumerWidget {
 
             final discard = await showAppConfirmationDialog(
               context,
-              title: context.tr('profile.logout_pending_title'),
-              content: context.tr(
-                'profile.logout_pending_content',
-                params: {'count': '$pending'},
-              ),
-              confirmLabel: context.tr('profile.logout_pending_confirm'),
+              title: context.l10n.profileLogoutPendingTitle,
+              content: context.l10n.profileLogoutPendingContent('$pending'),
+              confirmLabel: context.l10n.profileLogoutPendingConfirm,
               destructive: true,
               icon: Icons.cloud_off_outlined,
             );
@@ -348,7 +345,7 @@ class ProfilePage extends ConsumerWidget {
                 Icon(Icons.logout_outlined, color: scheme.error, size: 18),
                 const SizedBox(width: 10),
                 Text(
-                  context.tr('profile.logout'),
+                  context.l10n.profileLogout,
                   style: context.scale.bodyTight.semibold.copyWith(
                     color: scheme.error,
                   ),
