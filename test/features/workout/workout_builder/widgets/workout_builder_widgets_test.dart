@@ -1,5 +1,6 @@
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_builder/widgets/workout_builder_widgets.dart';
+import 'package:coachly/l10n/app_localizations.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,6 +13,7 @@ void main() {
         locale: const Locale('it'),
         supportedLocales: AppStrings.supportedLocales,
         localizationsDelegates: const [
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
@@ -63,6 +65,7 @@ void main() {
         locale: Locale('it'),
         supportedLocales: AppStrings.supportedLocales,
         localizationsDelegates: [
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
@@ -87,6 +90,7 @@ void main() {
         locale: const Locale('it'),
         supportedLocales: AppStrings.supportedLocales,
         localizationsDelegates: const [
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,

@@ -1,7 +1,19 @@
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_exercise_card.dart';
+import 'package:coachly/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// `AppLocalizations.delegate` deve essere qui: i widget in questa pagina
+/// stanno migrando a `context.l10n`, che a differenza di `context.tr` non ha
+/// un fallback quando manca il delegate nello scope di `Localizations`.
+const _delegates = <LocalizationsDelegate<Object?>>[
+  AppLocalizations.delegate,
+  GlobalMaterialLocalizations.delegate,
+  GlobalWidgetsLocalizations.delegate,
+  GlobalCupertinoLocalizations.delegate,
+];
 
 void main() {
   const exercise = WorkoutExerciseViewData(
@@ -34,6 +46,8 @@ void main() {
     var detailOpened = false;
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: _delegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: WorkoutExerciseCard(
             exercise: exercise,
@@ -70,6 +84,8 @@ void main() {
   testWidgets('remains readable at 150 percent text scale', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: _delegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: MediaQuery(
           data: const MediaQueryData(textScaler: TextScaler.linear(1.5)),
           child: Scaffold(
@@ -102,6 +118,8 @@ void main() {
     );
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: _delegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: WorkoutExerciseCard(
             exercise: unresolved,

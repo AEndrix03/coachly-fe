@@ -3,8 +3,10 @@ library;
 
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_content.dart';
+import 'package:coachly/l10n/app_localizations.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -61,6 +63,13 @@ Future<void> _pump(WidgetTester tester, WorkoutDetailViewData workout) async {
   await tester.pumpWidget(
     MaterialApp(
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark(useMaterial3: true).copyWith(
         scaffoldBackgroundColor: CoachlyAthleteTheme.background,
         colorScheme: ColorScheme.fromSeed(
