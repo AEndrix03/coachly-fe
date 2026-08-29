@@ -25,7 +25,7 @@ class LoadingPage extends StatelessWidget {
                   Image.asset(AppAssets.logoDark, height: 80),
                   const SizedBox(height: 16),
                   Text(
-                    context.tr('common.app_name'),
+                    context.l10n.commonAppName,
                     style: GoogleFonts.poppins(
                       textStyle: textTheme.displaySmall,
                       fontWeight: FontWeight.bold,
@@ -45,7 +45,7 @@ class LoadingPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    context.tr('common.loading'),
+                    context.l10n.commonLoading,
                     style: textTheme.bodyLarge?.copyWith(
                       color: context.colors.textSecondary,
                     ),
