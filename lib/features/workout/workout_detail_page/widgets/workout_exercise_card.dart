@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
@@ -118,10 +119,8 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
                     width: 34,
                     child: Text(
                       widget.indexLabel,
-                      style: const TextStyle(
+                      style: context.scale.caption.heavy.copyWith(
                         color: CoachlyAthleteTheme.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
                         letterSpacing: .6,
                       ),
                     ),
@@ -155,10 +154,8 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
                                 child: Text(
                                   displayName,
                                   maxLines: 2,
-                                  style: const TextStyle(
+                                  style: context.scale.bodyLoose.bold.copyWith(
                                     color: CoachlyAthleteTheme.textPrimary,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
                                     height: 1.22,
                                   ),
                                 ),
@@ -170,19 +167,16 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
                           const SizedBox(height: 4),
                           Text(
                             exercise.metadata!,
-                            style: const TextStyle(
+                            style: context.scale.caption.copyWith(
                               color: CoachlyAthleteTheme.textSecondary,
-                              fontSize: 12,
                             ),
                           ),
                         ],
                         const SizedBox(height: 12),
                         Text(
                           exercise.prescription.compactTarget,
-                          style: const TextStyle(
+                          style: context.scale.body.bold.copyWith(
                             color: CoachlyAthleteTheme.textPrimary,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         const SizedBox(height: 5),
@@ -192,9 +186,8 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
                             if (rest != null)
                               '${context.tr('workout.detail.rest')} ${_duration(rest)}',
                           ].join(' · '),
-                          style: const TextStyle(
+                          style: context.scale.captionLoose.copyWith(
                             color: CoachlyAthleteTheme.textSecondary,
-                            fontSize: 13,
                           ),
                         ),
                       ],
@@ -259,10 +252,8 @@ class WorkoutExerciseLoadingCard extends StatelessWidget {
                   width: 34,
                   child: Text(
                     indexLabel,
-                    style: const TextStyle(
+                    style: context.scale.caption.heavy.copyWith(
                       color: CoachlyAthleteTheme.primary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
@@ -435,9 +426,8 @@ class _ExerciseInfoRow extends StatelessWidget {
               Flexible(
                 child: Text(
                   row.label,
-                  style: const TextStyle(
+                  style: context.scale.captionLoose.copyWith(
                     color: CoachlyAthleteTheme.textSecondary,
-                    fontSize: 13,
                   ),
                 ),
               ),
@@ -473,10 +463,8 @@ class _ExerciseInfoRow extends StatelessWidget {
           child: Text(
             row.value,
             textAlign: TextAlign.end,
-            style: const TextStyle(
+            style: context.scale.captionLoose.semibold.copyWith(
               color: CoachlyAthleteTheme.textPrimary,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
             ),
           ),
         ),

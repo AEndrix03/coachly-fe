@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,7 @@ class WorkoutStartButton extends StatelessWidget {
         icon: const Icon(Icons.play_arrow_rounded),
         label: Text(
           context.tr('workout.start'),
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+          style: context.scale.bodyLoose.heavy,
         ),
       ),
     );

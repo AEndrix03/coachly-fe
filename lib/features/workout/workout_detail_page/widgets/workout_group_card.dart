@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
@@ -81,10 +82,8 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
                 Expanded(
                   child: Text(
                     '$typeLabel · $roundCount',
-                    style: const TextStyle(
+                    style: context.scale.captionLoose.heavy.copyWith(
                       color: CoachlyAthleteTheme.textPrimary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
                       letterSpacing: .45,
                     ),
                   ),
@@ -160,10 +159,8 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
                   '${context.tr('workout.detail.rest_after_round')} · ${_formatSeconds(group.restAfterRoundSeconds!)}',
-                  style: const TextStyle(
+                  style: context.scale.caption.semibold.copyWith(
                     color: CoachlyAthleteTheme.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -213,18 +210,15 @@ class _RestRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(
+            style: context.scale.caption.copyWith(
               color: CoachlyAthleteTheme.textSecondary,
-              fontSize: 12,
             ),
           ),
         ),
         Text(
           _formatSeconds(seconds),
-          style: const TextStyle(
+          style: context.scale.caption.bold.copyWith(
             color: CoachlyAthleteTheme.textPrimary,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -269,10 +263,8 @@ class _GroupExerciseRow extends StatelessWidget {
                 width: 30,
                 child: Text(
                   label,
-                  style: const TextStyle(
+                  style: context.scale.caption.heavy.copyWith(
                     color: CoachlyAthleteTheme.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
@@ -281,10 +273,8 @@ class _GroupExerciseRow extends StatelessWidget {
                   exercise.isMissing
                       ? context.tr('workout.detail.exercise_unavailable')
                       : exercise.name,
-                  style: const TextStyle(
+                  style: context.scale.body.bold.copyWith(
                     color: CoachlyAthleteTheme.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -296,10 +286,8 @@ class _GroupExerciseRow extends StatelessWidget {
                     Text(
                       target,
                       textAlign: TextAlign.end,
-                      style: const TextStyle(
+                      style: context.scale.captionLoose.semibold.copyWith(
                         color: CoachlyAthleteTheme.textSecondary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     if (targetLoad != null) ...[
@@ -307,10 +295,8 @@ class _GroupExerciseRow extends StatelessWidget {
                       Text(
                         targetLoad,
                         textAlign: TextAlign.end,
-                        style: const TextStyle(
+                        style: context.scale.caption.bold.copyWith(
                           color: CoachlyAthleteTheme.textPrimary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -343,10 +329,8 @@ class _GroupExerciseLoadingRow extends StatelessWidget {
                 width: 30,
                 child: Text(
                   label,
-                  style: const TextStyle(
+                  style: context.scale.caption.heavy.copyWith(
                     color: CoachlyAthleteTheme.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),

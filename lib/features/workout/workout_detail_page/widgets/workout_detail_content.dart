@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_exercise_card.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_group_card.dart';
@@ -28,11 +29,9 @@ class WorkoutIdentity extends StatelessWidget {
         children: [
           Text(
             workout.title,
-            style: const TextStyle(
+            style: context.scale.hero.heavy.copyWith(
               color: CoachlyAthleteTheme.textPrimary,
-              fontSize: 32,
               height: 1.12,
-              fontWeight: FontWeight.w800,
               letterSpacing: -.7,
             ),
           ),
@@ -49,10 +48,8 @@ class WorkoutIdentity extends StatelessWidget {
                   ),
                 Text(
                   metadata[index],
-                  style: const TextStyle(
+                  style: context.scale.bodyTight.semibold.copyWith(
                     color: CoachlyAthleteTheme.textSecondary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -85,10 +82,8 @@ class _WorkoutGoalSectionState extends State<WorkoutGoalSection> {
         children: [
           Text(
             context.tr('workout.detail.goal'),
-            style: const TextStyle(
+            style: context.scale.caption.bold.copyWith(
               color: CoachlyAthleteTheme.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
               letterSpacing: .5,
             ),
           ),
@@ -97,9 +92,8 @@ class _WorkoutGoalSectionState extends State<WorkoutGoalSection> {
             widget.goal,
             maxLines: expanded ? null : 3,
             overflow: expanded ? null : TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: context.scale.body.copyWith(
               color: CoachlyAthleteTheme.textPrimary,
-              fontSize: 15,
               height: 1.48,
             ),
           ),
@@ -169,19 +163,15 @@ class WorkoutStructure extends StatelessWidget {
             children: [
               Text(
                 section.title!.toUpperCase(),
-                style: const TextStyle(
+                style: context.scale.captionTight.heavy.copyWith(
                   color: CoachlyAthleteTheme.textSecondary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
                   letterSpacing: .75,
                 ),
               ),
               Text(
                 _exerciseCountLabel(context, section.exerciseCount),
-                style: const TextStyle(
+                style: context.scale.captionTight.semibold.copyWith(
                   color: CoachlyAthleteTheme.textSecondary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
@@ -233,19 +223,16 @@ class _EmptyWorkout extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             context.tr('workout.detail.no_exercises'),
-            style: const TextStyle(
+            style: context.scale.subtitle.bold.copyWith(
               color: CoachlyAthleteTheme.textPrimary,
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 7),
           Text(
             context.tr('workout.detail.empty_hint'),
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: context.scale.captionLoose.copyWith(
               color: CoachlyAthleteTheme.textSecondary,
-              fontSize: 13,
               height: 1.4,
             ),
           ),
@@ -341,9 +328,8 @@ class _OverviewItem extends StatelessWidget {
                     .map(
                       (value) => Text(
                         value,
-                        style: const TextStyle(
+                        style: context.scale.captionLoose.copyWith(
                           color: CoachlyAthleteTheme.textSecondary,
-                          fontSize: 13,
                         ),
                       ),
                     )

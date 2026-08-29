@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:math';
 
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
@@ -204,10 +205,8 @@ class WorkoutStructuralEdit extends ConsumerWidget {
               children: [
                 Text(
                   context.tr('workout.detail.add_section'),
-                  style: const TextStyle(
+                  style: context.scale.headline.heavy.copyWith(
                     color: CoachlyAthleteTheme.textPrimary,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -282,10 +281,8 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                 children: [
                   Text(
                     context.tr('workout.detail.create_group'),
-                    style: const TextStyle(
+                    style: context.scale.headline.heavy.copyWith(
                       color: CoachlyAthleteTheme.textPrimary,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   SegmentedButton<String>(
@@ -430,18 +427,15 @@ class _EditableBlock extends StatelessWidget {
                 if (group)
                   Text(
                     '${block.groupType!.toUpperCase()} · ${block.rounds ?? 1} round',
-                    style: const TextStyle(
+                    style: context.scale.captionTight.copyWith(
                       color: CoachlyAthleteTheme.textSecondary,
-                      fontSize: 11,
                     ),
                   ),
                 Text(
                   names,
                   maxLines: 2,
-                  style: const TextStyle(
+                  style: context.scale.bodyTight.bold.copyWith(
                     color: CoachlyAthleteTheme.textPrimary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -664,10 +658,8 @@ class _WorkoutExerciseQuickEditSheetState
                 children: [
                   Text(
                     context.tr('workout.detail.edit_exercise'),
-                    style: const TextStyle(
+                    style: context.scale.headlineTight.heavy.copyWith(
                       color: CoachlyAthleteTheme.textPrimary,
-                      fontSize: 21,
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   Text(
@@ -768,13 +760,7 @@ class _WorkoutExerciseQuickEditSheetState
           SizedBox(
             width: 64,
             child: Center(
-              child: Text(
-                '$sets',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+              child: Text('$sets', style: context.scale.display.heavy),
             ),
           ),
           IconButton(
@@ -899,10 +885,8 @@ class _WorkoutExerciseQuickEditSheetState
     controller: controller,
     textAlign: TextAlign.center,
     keyboardType: TextInputType.numberWithOptions(decimal: decimal),
-    style: const TextStyle(
+    style: context.scale.subtitleLoose.bold.copyWith(
       color: CoachlyAthleteTheme.textPrimary,
-      fontSize: 18,
-      fontWeight: FontWeight.w700,
     ),
   );
 }
@@ -915,10 +899,8 @@ class _EditorLabel extends StatelessWidget {
     padding: const EdgeInsets.only(bottom: 8),
     child: Text(
       text,
-      style: const TextStyle(
+      style: context.scale.caption.bold.copyWith(
         color: CoachlyAthleteTheme.textSecondary,
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
       ),
     ),
   );

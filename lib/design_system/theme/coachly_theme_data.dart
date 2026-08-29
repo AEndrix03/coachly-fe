@@ -1,6 +1,12 @@
 import 'package:coachly/design_system/tokens/coachly_colors.dart';
 import 'package:coachly/design_system/tokens/coachly_metrics.dart';
+import 'package:coachly/design_system/tokens/coachly_text_scale.dart';
 import 'package:coachly/design_system/tokens/coachly_typography.dart';
+
+/// `context.scale` non serve a niente senza i modificatori di peso, che sono
+/// un'extension e quindi non arrivano per transitivita': viaggiano insieme.
+export 'package:coachly/design_system/tokens/coachly_text_scale.dart'
+    show CoachlyTextScale, CoachlyTextWeight;
 import 'package:flutter/material.dart';
 
 /// I token Coachly agganciati a `ThemeData`.
@@ -24,6 +30,7 @@ class CoachlyThemeData extends ThemeExtension<CoachlyThemeData> {
   final CoachlySizes sizes;
   final CoachlyMotion motion;
   final CoachlyTypography typography;
+  final CoachlyTextScale textScale;
 
   const CoachlyThemeData({
     required this.colors,
@@ -32,6 +39,7 @@ class CoachlyThemeData extends ThemeExtension<CoachlyThemeData> {
     required this.sizes,
     required this.motion,
     required this.typography,
+    required this.textScale,
   });
 
   static const dark = CoachlyThemeData(
@@ -41,6 +49,7 @@ class CoachlyThemeData extends ThemeExtension<CoachlyThemeData> {
     sizes: CoachlySizes.standard,
     motion: CoachlyMotion.defaults,
     typography: CoachlyTypography.standard,
+    textScale: CoachlyTextScale.standard,
   );
 
   @override
@@ -51,6 +60,7 @@ class CoachlyThemeData extends ThemeExtension<CoachlyThemeData> {
     CoachlySizes? sizes,
     CoachlyMotion? motion,
     CoachlyTypography? typography,
+    CoachlyTextScale? textScale,
   }) {
     return CoachlyThemeData(
       colors: colors ?? this.colors,
@@ -59,6 +69,7 @@ class CoachlyThemeData extends ThemeExtension<CoachlyThemeData> {
       sizes: sizes ?? this.sizes,
       motion: motion ?? this.motion,
       typography: typography ?? this.typography,
+      textScale: textScale ?? this.textScale,
     );
   }
 
@@ -77,6 +88,7 @@ class CoachlyThemeData extends ThemeExtension<CoachlyThemeData> {
       sizes: other.sizes,
       motion: other.motion,
       typography: typography.lerp(other.typography, t),
+      textScale: textScale.lerp(other.textScale, t),
     );
   }
 }
@@ -96,4 +108,7 @@ extension CoachlyThemeContext on BuildContext {
   CoachlyMotion get motion => coachly.motion;
 
   CoachlyTypography get text => coachly.typography;
+
+  /// La scala misurata (`CoachlyTextScale`), non ancora quella semantica.
+  CoachlyTextScale get scale => coachly.textScale;
 }

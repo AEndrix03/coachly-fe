@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/foundation.dart';
@@ -35,10 +36,7 @@ class WorkoutDetailAppBar extends StatelessWidget {
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
       ),
       title: editing
-          ? Text(
-              title,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-            )
+          ? Text(title, style: context.scale.subtitle.bold)
           : ValueListenableBuilder<double>(
               valueListenable: scrollOffset,
               builder: (_, offset, _) {
@@ -49,10 +47,7 @@ class WorkoutDetailAppBar extends StatelessWidget {
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: context.scale.subtitle.semibold,
                   ),
                 );
               },
