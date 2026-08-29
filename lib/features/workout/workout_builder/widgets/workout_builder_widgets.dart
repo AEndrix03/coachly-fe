@@ -156,7 +156,7 @@ class WorkoutGoalSelector extends StatelessWidget {
       Row(
         children: [
           Text(
-            context.tr('workout.builder.goal_label'),
+            context.l10n.workoutBuilderGoalLabel,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: context.exerciseTheme.textSecondary,
               fontWeight: FontWeight.w700,
@@ -165,7 +165,7 @@ class WorkoutGoalSelector extends StatelessWidget {
           if (onInfo != null)
             IconButton(
               onPressed: onInfo,
-              tooltip: context.tr('workout.builder.goal_info_tooltip'),
+              tooltip: context.l10n.workoutBuilderGoalInfoTooltip,
               constraints: const BoxConstraints.tightFor(width: 44, height: 44),
               padding: EdgeInsets.zero,
               icon: const Icon(Icons.help_outline, size: 18),
@@ -304,9 +304,7 @@ class WorkoutBuilderSummary extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        draft.title.isEmpty
-            ? context.tr('workout.builder.untitled')
-            : draft.title,
+        draft.title.isEmpty ? context.l10n.workoutBuilderUntitled : draft.title,
         style: TextStyle(
           color: CoachlyAthleteTheme.textPrimary,
           fontSize: compact ? 22 : 30,
@@ -325,9 +323,8 @@ class WorkoutBuilderSummary extends StatelessWidget {
                 : 'workout.detail.exercise_count_other',
             params: {'count': '${draft.exerciseCount}'},
           ),
-          context.tr(
-            'workout.detail.estimated_minutes',
-            params: {'count': '${draft.estimatedDurationMinutes}'},
+          context.l10n.workoutDetailEstimatedMinutes(
+            '${draft.estimatedDurationMinutes}',
           ),
         ].join(' · '),
         style: const TextStyle(
@@ -356,7 +353,7 @@ class WorkoutStructureComposer extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     container: true,
-    label: context.tr('workout.builder.structure_actions'),
+    label: context.l10n.workoutBuilderStructureActions,
     child: Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Column(
@@ -367,7 +364,7 @@ class WorkoutStructureComposer extends StatelessWidget {
             registry: tourRegistry,
             child: CoachlyPressable(
               onTap: onAddExercise,
-              semanticLabel: context.tr('workout.builder.add_exercise'),
+              semanticLabel: context.l10n.workoutBuilderAddExercise,
               child: Container(
                 constraints: const BoxConstraints(minHeight: 72),
                 padding: const EdgeInsets.symmetric(
@@ -405,14 +402,14 @@ class WorkoutStructureComposer extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            context.tr('workout.builder.add_exercise'),
+                            context.l10n.workoutBuilderAddExercise,
                             style: context.scale.bodyLoose.heavy.copyWith(
                               color: context.exerciseTheme.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            context.tr('workout.builder.add_exercise_hint'),
+                            context.l10n.workoutBuilderAddExerciseHint,
                             style: context.scale.caption.copyWith(
                               color: context.exerciseTheme.textSecondary,
                               height: 1.3,
@@ -442,9 +439,9 @@ class WorkoutStructureComposer extends StatelessWidget {
                     registry: tourRegistry,
                     child: _StructureActionCard(
                       icon: Icons.view_agenda_outlined,
-                      title: context.tr('workout.builder.sections_hint_title'),
-                      body: context.tr('workout.builder.sections_hint_body'),
-                      actionLabel: context.tr('workout.builder.add_section'),
+                      title: context.l10n.workoutBuilderSectionsHintTitle,
+                      body: context.l10n.workoutBuilderSectionsHintBody,
+                      actionLabel: context.l10n.workoutBuilderAddSection,
                       onTap: onAddSection,
                     ),
                   ),
@@ -456,11 +453,9 @@ class WorkoutStructureComposer extends StatelessWidget {
                     registry: tourRegistry,
                     child: _StructureActionCard(
                       icon: Icons.link_rounded,
-                      title: context.tr('workout.builder.blocks_hint_title'),
-                      body: context.tr('workout.builder.blocks_hint_body'),
-                      actionLabel: context.tr(
-                        'workout.builder.create_block_short',
-                      ),
+                      title: context.l10n.workoutBuilderBlocksHintTitle,
+                      body: context.l10n.workoutBuilderBlocksHintBody,
+                      actionLabel: context.l10n.workoutBuilderCreateBlockShort,
                       onTap: onCreateBlock,
                     ),
                   ),
@@ -784,9 +779,8 @@ class _CollapsibleDraftSectionState extends State<_CollapsibleDraftSection> {
                                 onRemove: () =>
                                     widget.onRemoveSection?.call(section.id),
                               ),
-                              tooltip: context.tr(
-                                'workout.builder.section_actions',
-                              ),
+                              tooltip:
+                                  context.l10n.workoutBuilderSectionActions,
                               icon: const Icon(Icons.more_horiz_rounded),
                             ),
                           ),
@@ -867,7 +861,7 @@ class _CollapsibleDraftSectionState extends State<_CollapsibleDraftSection> {
 String workoutSectionLabel(BuildContext context, WorkoutSectionDraft section) =>
     section.name?.trim().isNotEmpty == true
     ? section.name!.trim()
-    : context.tr('workout.builder.section_main');
+    : context.l10n.workoutBuilderSectionMain;
 
 Future<String?> showWorkoutSectionPicker(
   BuildContext context,
@@ -893,7 +887,7 @@ Future<String?> showWorkoutSectionPicker(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            context.tr('workout.builder.choose_destination'),
+            context.l10n.workoutBuilderChooseDestination,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               color: context.exerciseTheme.textPrimary,
               fontWeight: FontWeight.w800,
@@ -901,7 +895,7 @@ Future<String?> showWorkoutSectionPicker(
           ),
           const SizedBox(height: 6),
           Text(
-            context.tr('workout.builder.choose_destination_hint'),
+            context.l10n.workoutBuilderChooseDestinationHint,
             style: TextStyle(color: context.exerciseTheme.textSecondary),
           ),
           const SizedBox(height: 14),
@@ -941,7 +935,7 @@ Future<String?> showWorkoutSectionPicker(
                             if (isDefault) ...[
                               const SizedBox(height: 2),
                               Text(
-                                context.tr('workout.builder.default_section'),
+                                context.l10n.workoutBuilderDefaultSection,
                                 style: context.scale.caption.copyWith(
                                   color: context.exerciseTheme.textSecondary,
                                 ),
@@ -976,7 +970,7 @@ class _SectionEmpty extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 10),
     child: Text(
-      context.tr('workout.builder.section_empty_hint'),
+      context.l10n.workoutBuilderSectionEmptyHint,
       style: context.scale.captionLoose.copyWith(
         color: context.exerciseTheme.textSecondary,
       ),
@@ -999,7 +993,7 @@ class _WorkoutEmptyState extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            context.tr('workout.builder.empty_title'),
+            context.l10n.workoutBuilderEmptyTitle,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: context.exerciseTheme.textPrimary,
               fontWeight: FontWeight.w800,
@@ -1007,7 +1001,7 @@ class _WorkoutEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            context.tr('workout.builder.empty_body'),
+            context.l10n.workoutBuilderEmptyBody,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: context.exerciseTheme.textSecondary,
               height: 1.45,
@@ -1097,7 +1091,7 @@ class _DraftItem extends StatelessWidget {
                               onUpdateBlock(group.copyWith(notes: notes)),
                           onRemove: () => onRemove(group.id),
                         ),
-                        tooltip: context.tr('workout.builder.item_actions'),
+                        tooltip: context.l10n.workoutBuilderItemActions,
                         icon: const Icon(Icons.more_horiz_rounded),
                       ),
                   ],
@@ -1152,11 +1146,8 @@ class _DraftItem extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 48, top: 6),
                 child: Text(
-                  context.tr(
-                    'workout.builder.rest_after_round',
-                    params: {
-                      'duration': formatDuration(group.roundRestSeconds),
-                    },
+                  context.l10n.workoutBuilderRestAfterRound(
+                    formatDuration(group.roundRestSeconds),
                   ),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.exerciseTheme.textSecondary,
@@ -1173,7 +1164,7 @@ class _DraftItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: Semantics(
         label:
-            '${exercise.name}, ${context.tr('workout.builder.position', params: {'position': '${index + 1}'})}',
+            '${exercise.name}, ${context.l10n.workoutBuilderPosition('${index + 1}')}',
         child: InkWell(
           onLongPress: editable
               ? () => _showItemActions(
@@ -1263,9 +1254,8 @@ class _ExerciseLine extends StatelessWidget {
               children: [
                 Semantics(
                   button: true,
-                  label: context.tr(
-                    'workout.builder.open_exercise_details',
-                    params: {'name': exercise.name},
+                  label: context.l10n.workoutBuilderOpenExerciseDetails(
+                    exercise.name,
                   ),
                   child: InkWell(
                     onTap: onOpen,
@@ -1308,15 +1298,14 @@ class _ExerciseLine extends StatelessWidget {
               height: CoachlyAthleteTheme.touchTarget,
               child: IconButton(
                 onPressed: onActions,
-                tooltip: context.tr('workout.builder.item_actions'),
+                tooltip: context.l10n.workoutBuilderItemActions,
                 icon: const Icon(Icons.more_horiz_rounded),
               ),
             ),
           Semantics(
             button: true,
-            label: context.tr(
-              'workout.builder.open_exercise_details',
-              params: {'name': exercise.name},
+            label: context.l10n.workoutBuilderOpenExerciseDetails(
+              exercise.name,
             ),
             child: InkWell(
               onTap: onOpen,
@@ -1377,12 +1366,12 @@ Future<void> _showItemActions(
         children: [
           _ActionTile(
             icon: Icons.notes_rounded,
-            label: context.tr('workout.builder.add_notes'),
+            label: context.l10n.workoutBuilderAddNotes,
             action: _ItemAction.addNotes,
           ),
           _ActionTile(
             icon: Icons.delete_outline_rounded,
-            label: context.tr('common.delete'),
+            label: context.l10n.commonDelete,
             action: _ItemAction.remove,
             destructive: true,
           ),
@@ -1454,7 +1443,7 @@ class _WorkoutNotesSheetState extends State<_WorkoutNotesSheet> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          context.tr('workout.builder.notes_title'),
+          context.l10n.workoutBuilderNotesTitle,
           style: context.scale.display.heavy.copyWith(
             color: context.exerciseTheme.textPrimary,
           ),
@@ -1464,9 +1453,9 @@ class _WorkoutNotesSheetState extends State<_WorkoutNotesSheet> {
           controller: controller,
           focusNode: focusNode,
           autofocus: true,
-          label: context.tr('workout.builder.notes_title'),
-          hint: context.tr('workout.builder.notes_hint'),
-          helper: context.tr('workout.builder.optional'),
+          label: context.l10n.workoutBuilderNotesTitle,
+          hint: context.l10n.workoutBuilderNotesHint,
+          helper: context.l10n.workoutBuilderOptional,
           minLines: 3,
           maxLines: 6,
           maxLength: 300,
@@ -1487,7 +1476,7 @@ class _WorkoutNotesSheetState extends State<_WorkoutNotesSheet> {
               ),
             ),
             onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: Text(context.tr('workout.builder.save_notes')),
+            child: Text(context.l10n.workoutBuilderSaveNotes),
           ),
         ),
       ],
@@ -1571,10 +1560,7 @@ class NumericStepper extends StatelessWidget {
             ),
             _StepperButton(
               icon: Icons.remove_rounded,
-              tooltip: context.tr(
-                'workout.builder.decrease',
-                params: {'label': label},
-              ),
+              tooltip: context.l10n.workoutBuilderDecrease(label),
               onPressed: value - step >= min
                   ? () {
                       unawaited(HapticFeedback.selectionClick());
@@ -1594,10 +1580,7 @@ class NumericStepper extends StatelessWidget {
             ),
             _StepperButton(
               icon: Icons.add_rounded,
-              tooltip: context.tr(
-                'workout.builder.increase',
-                params: {'label': label},
-              ),
+              tooltip: context.l10n.workoutBuilderIncrease(label),
               onPressed: value + step <= max
                   ? () {
                       unawaited(HapticFeedback.selectionClick());
@@ -1802,7 +1785,7 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
           ),
           const SizedBox(height: 6),
           Text(
-            context.tr('workout.builder.section_explanation'),
+            context.l10n.workoutBuilderSectionExplanation,
             style: context.scale.body.copyWith(
               color: CoachlyAthleteTheme.textSecondary,
               height: 1.4,
@@ -1842,7 +1825,7 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
                   );
                 }
               },
-              child: Text(context.tr('workout.builder.customize')),
+              child: Text(context.l10n.workoutBuilderCustomize),
             ),
           ),
           AnimatedSize(
@@ -1857,9 +1840,9 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
                     child: WorkoutBuilderUnderlineField(
                       controller: controller,
                       focusNode: nameFocus,
-                      label: context.tr('workout.builder.custom_name'),
-                      hint: context.tr('workout.builder.custom_section_hint'),
-                      helper: context.tr('workout.builder.optional'),
+                      label: context.l10n.workoutBuilderCustomName,
+                      hint: context.l10n.workoutBuilderCustomSectionHint,
+                      helper: context.l10n.workoutBuilderOptional,
                       autofocus: true,
                       maxLength: 30,
                       textInputAction: TextInputAction.done,
@@ -1869,7 +1852,7 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
                 : const SizedBox.shrink(),
           ),
           Text(
-            context.tr('workout.builder.preview'),
+            context.l10n.workoutBuilderPreview,
             style: context.scale.caption.bold.copyWith(
               color: CoachlyAthleteTheme.textSecondary,
               letterSpacing: .7,
@@ -1893,7 +1876,7 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
             ],
           ),
           const SizedBox(height: 14),
-          _SheetSectionLabel(context.tr('workout.builder.notes_title')),
+          _SheetSectionLabel(context.l10n.workoutBuilderNotesTitle),
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
@@ -1909,7 +1892,7 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
                 }
               },
               icon: const Icon(Icons.add_rounded),
-              label: Text(context.tr('workout.builder.add_notes')),
+              label: Text(context.l10n.workoutBuilderAddNotes),
             ),
           ),
           AnimatedSize(
@@ -1918,9 +1901,9 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
                 ? WorkoutBuilderUnderlineField(
                     controller: notesController,
                     focusNode: notesFocus,
-                    label: context.tr('workout.builder.notes_title'),
-                    hint: context.tr('workout.builder.notes_hint'),
-                    helper: context.tr('workout.builder.optional'),
+                    label: context.l10n.workoutBuilderNotesTitle,
+                    hint: context.l10n.workoutBuilderNotesHint,
+                    helper: context.l10n.workoutBuilderOptional,
                     minLines: 2,
                     maxLines: 4,
                     maxLength: 300,
@@ -2089,7 +2072,7 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
               ),
               const SizedBox(height: 6),
               Text(
-                context.tr('workout.builder.programming'),
+                context.l10n.workoutBuilderProgramming,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: CoachlyAthleteTheme.textSecondary,
                   fontWeight: FontWeight.w800,
@@ -2098,13 +2081,13 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
               ),
               const SizedBox(height: 12),
               NumericStepper(
-                label: context.tr('workout.sets'),
+                label: context.l10n.workoutSets,
                 value: sets,
                 min: 1,
                 onChanged: (v) => setState(() => sets = v),
               ),
               RepRangeControl(
-                label: context.tr('workout.builder.rep_range'),
+                label: context.l10n.workoutBuilderRepRange,
                 min: min,
                 max: max,
                 onChanged: (newMin, newMax) => setState(() {
@@ -2113,17 +2096,15 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
                 }),
               ),
               DurationStepper(
-                label: context.tr('workout.builder.rest'),
+                label: context.l10n.workoutBuilderRest,
                 seconds: recovery,
                 onChanged: (value) => setState(() => recovery = value),
               ),
               const SizedBox(height: 18),
-              _SheetSectionLabel(
-                context.tr('workout.builder.target_load_heading'),
-              ),
+              _SheetSectionLabel(context.l10n.workoutBuilderTargetLoadHeading),
               _OptionalFieldAction(
                 expanded: showTargetLoad,
-                label: context.tr('workout.builder.set_target_load'),
+                label: context.l10n.workoutBuilderSetTargetLoad,
                 onPressed: () {
                   setState(() => showTargetLoad = true);
                   WidgetsBinding.instance.addPostFrameCallback(
@@ -2138,9 +2119,9 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
                     ? WorkoutBuilderUnderlineField(
                         controller: load,
                         focusNode: loadFocus,
-                        label: context.tr('workout.detail.target_load'),
-                        hint: context.tr('workout.builder.from_history'),
-                        helper: context.tr('workout.builder.optional'),
+                        label: context.l10n.workoutDetailTargetLoad,
+                        hint: context.l10n.workoutBuilderFromHistory,
+                        helper: context.l10n.workoutBuilderOptional,
                         maxLength: 8,
                         textInputAction: TextInputAction.next,
                         keyboardType: const TextInputType.numberWithOptions(
@@ -2155,10 +2136,10 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
                     : const SizedBox.shrink(),
               ),
               const SizedBox(height: 22),
-              _SheetSectionLabel(context.tr('workout.builder.notes_title')),
+              _SheetSectionLabel(context.l10n.workoutBuilderNotesTitle),
               _OptionalFieldAction(
                 expanded: showNotes,
-                label: context.tr('workout.builder.add_notes'),
+                label: context.l10n.workoutBuilderAddNotes,
                 onPressed: () {
                   setState(() => showNotes = true);
                   WidgetsBinding.instance.addPostFrameCallback(
@@ -2173,9 +2154,9 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
                     ? WorkoutBuilderUnderlineField(
                         controller: notes,
                         focusNode: notesFocus,
-                        label: context.tr('workout.builder.notes_title'),
-                        hint: context.tr('workout.builder.notes_hint'),
-                        helper: context.tr('workout.builder.optional'),
+                        label: context.l10n.workoutBuilderNotesTitle,
+                        hint: context.l10n.workoutBuilderNotesHint,
+                        helper: context.l10n.workoutBuilderOptional,
                         minLines: 2,
                         maxLines: 4,
                         maxLength: 300,
@@ -2335,7 +2316,7 @@ class _WorkoutBlockEditorState extends State<_WorkoutBlockEditor> {
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
             children: [
               Text(
-                context.tr('workout.builder.configure_block'),
+                context.l10n.workoutBuilderConfigureBlock,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   color: context.exerciseTheme.textPrimary,
                   fontWeight: FontWeight.w800,
@@ -2343,14 +2324,14 @@ class _WorkoutBlockEditorState extends State<_WorkoutBlockEditor> {
               ),
               const SizedBox(height: 6),
               Text(
-                context.tr('workout.builder.block_edit_explanation'),
+                context.l10n.workoutBuilderBlockEditExplanation,
                 style: TextStyle(
                   color: context.exerciseTheme.textSecondary,
                   height: 1.4,
                 ),
               ),
               const SizedBox(height: 24),
-              _SheetSectionLabel(context.tr('workout.builder.step_exercises')),
+              _SheetSectionLabel(context.l10n.workoutBuilderStepExercises),
               const SizedBox(height: 10),
               CoachlySurface(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -2393,21 +2374,21 @@ class _WorkoutBlockEditorState extends State<_WorkoutBlockEditor> {
                 ),
               ),
               const SizedBox(height: 24),
-              _SheetSectionLabel(context.tr('workout.builder.step_setup')),
+              _SheetSectionLabel(context.l10n.workoutBuilderStepSetup),
               const SizedBox(height: 6),
               NumericStepper(
-                label: context.tr('workout.detail.rounds'),
+                label: context.l10n.workoutDetailRounds,
                 value: rounds,
                 min: 1,
                 onChanged: (value) => setState(() => rounds = value),
               ),
               DurationStepper(
-                label: context.tr('workout.builder.between_exercises'),
+                label: context.l10n.workoutBuilderBetweenExercises,
                 seconds: between,
                 onChanged: (value) => setState(() => between = value),
               ),
               DurationStepper(
-                label: context.tr('workout.builder.after_each_round'),
+                label: context.l10n.workoutBuilderAfterEachRound,
                 seconds: afterRound,
                 onChanged: (value) => setState(() => afterRound = value),
               ),
@@ -2415,9 +2396,9 @@ class _WorkoutBlockEditorState extends State<_WorkoutBlockEditor> {
               WorkoutBuilderUnderlineField(
                 controller: notesController,
                 focusNode: notesFocus,
-                label: context.tr('workout.builder.notes_title'),
-                hint: context.tr('workout.builder.notes_hint'),
-                helper: context.tr('workout.builder.optional'),
+                label: context.l10n.workoutBuilderNotesTitle,
+                hint: context.l10n.workoutBuilderNotesHint,
+                helper: context.l10n.workoutBuilderOptional,
                 minLines: 2,
                 maxLines: 4,
                 maxLength: 300,
@@ -2446,7 +2427,7 @@ class _WorkoutBlockEditorState extends State<_WorkoutBlockEditor> {
                       : notesController.text.trim(),
                 ),
               ),
-              child: Text(context.tr('workout.builder.save_changes')),
+              child: Text(context.l10n.workoutBuilderSaveChanges),
             ),
           ),
         ),
