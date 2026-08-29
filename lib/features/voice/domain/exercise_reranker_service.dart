@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:coachly/features/voice/models/voice_resolution_models.dart';
+import 'package:coachly/features/voice/domain/models/voice_resolution_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final exerciseRerankerServiceProvider = Provider<ExerciseRerankerService>((

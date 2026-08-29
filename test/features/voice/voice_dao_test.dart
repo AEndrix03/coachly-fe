@@ -1,6 +1,6 @@
 import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/time/clock.dart';
-import 'package:coachly/features/workout/workout_active_page/data/local/voice_dao.dart';
+import 'package:coachly/features/voice/data/local/voice_dao.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
