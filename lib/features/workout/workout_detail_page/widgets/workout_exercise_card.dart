@@ -84,15 +84,11 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
     final intensity = exercise.prescription.compactIntensity;
     final displayName = _displayName(context, exercise);
     final semantics = [
-      context.tr(
-        'workout.detail.exercise_semantics_position',
-        params: {'position': widget.indexLabel},
-      ),
+      context.l10n.workoutDetailExerciseSemanticsPosition(widget.indexLabel),
       displayName,
       exercise.prescription.compactTarget,
       if (intensity != null) intensity,
-      if (rest != null)
-        '${context.tr('workout.detail.rest')} ${_duration(rest)}',
+      if (rest != null) '${context.l10n.workoutDetailRest} ${_duration(rest)}',
       context.tr(
         _expanded
             ? 'workout.detail.collapse_details'
@@ -133,10 +129,8 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
                       children: [
                         Semantics(
                           button: !exercise.isMissing,
-                          label: context.tr(
-                            'workout.detail.open_exercise_semantics',
-                            params: {'name': displayName},
-                          ),
+                          label: context.l10n
+                              .workoutDetailOpenExerciseSemantics(displayName),
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: exercise.isMissing
@@ -184,7 +178,7 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
                           [
                             if (intensity != null) intensity,
                             if (rest != null)
-                              '${context.tr('workout.detail.rest')} ${_duration(rest)}',
+                              '${context.l10n.workoutDetailRest} ${_duration(rest)}',
                           ].join(' · '),
                           style: context.scale.captionLoose.copyWith(
                             color: CoachlyAthleteTheme.textSecondary,
@@ -238,7 +232,7 @@ class WorkoutExerciseLoadingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: context.tr('workout.detail.exercise_loading'),
+      label: context.l10n.workoutDetailExerciseLoading,
       child: ExcludeSemantics(
         child: CoachlySurface(
           padding: const EdgeInsets.all(CoachlyAthleteTheme.cardPadding),
@@ -330,40 +324,36 @@ class _ExpandedExercise extends StatelessWidget {
   Widget build(BuildContext context) {
     final rows = <_ExerciseDetailRow>[
       (
-        label: context.tr('workout.detail.working_sets'),
+        label: context.l10n.workoutDetailWorkingSets,
         value: '${exercise.prescription.workingSets}',
         infoKey: 'workout.detail.working_sets_definition',
       ),
       if (_repRange(exercise.prescription) case final value?)
         (
-          label: context.tr('workout.detail.rep_range'),
+          label: context.l10n.workoutDetailRepRange,
           value: value,
           infoKey: 'workout.detail.rep_range_definition',
         ),
       if (exercise.prescription.compactIntensity case final value?)
         (
-          label: context.tr('workout.detail.intensity'),
+          label: context.l10n.workoutDetailIntensity,
           value: value,
           infoKey: null,
         ),
       if (exercise.prescription.primaryRestSeconds case final value?)
         (
-          label: context.tr('workout.detail.recovery'),
+          label: context.l10n.workoutDetailRecovery,
           value: _duration(value),
           infoKey: 'workout.detail.recovery_definition',
         ),
       if (_targetLoad(exercise.prescription) case final value?)
         (
-          label: context.tr('workout.detail.target_load'),
+          label: context.l10n.workoutDetailTargetLoad,
           value: value,
           infoKey: null,
         ),
       if (exercise.prescription.note case final value?)
-        (
-          label: context.tr('workout.detail.notes'),
-          value: value,
-          infoKey: null,
-        ),
+        (label: context.l10n.workoutDetailNotes, value: value, infoKey: null),
     ];
     return Column(
       children: [
@@ -382,7 +372,7 @@ class _ExpandedExercise extends StatelessWidget {
                     foregroundColor: CoachlyAthleteTheme.textPrimary,
                     side: const BorderSide(color: CoachlyAthleteTheme.border),
                   ),
-                  child: Text(context.tr('common.edit')),
+                  child: Text(context.l10n.commonEdit),
                 ),
               ),
             if (onEdit != null) const SizedBox(width: 10),
@@ -396,7 +386,7 @@ class _ExpandedExercise extends StatelessWidget {
                   minimumSize: const Size.fromHeight(46),
                   foregroundColor: CoachlyAthleteTheme.primary,
                 ),
-                child: Text(context.tr('workout.detail.exercise_detail')),
+                child: Text(context.l10n.workoutDetailExerciseDetail),
               ),
             ),
           ],
@@ -438,14 +428,14 @@ class _ExerciseInfoRow extends StatelessWidget {
                     height: CoachlyAthleteTheme.touchTarget,
                   ),
                   padding: EdgeInsets.zero,
-                  tooltip: context.tr('workout.detail.explain_concept'),
+                  tooltip: context.l10n.workoutDetailExplainConcept,
                   onPressed: () => CoachlyInfoSheet.show(
                     context,
                     title: row.label,
-                    primaryActionLabel: context.tr('common.got_it'),
+                    primaryActionLabel: context.l10n.commonGotIt,
                     sections: [
                       CoachlyInfoSection(
-                        context.tr('workout.detail.what_is_it'),
+                        context.l10n.workoutDetailWhatIsIt,
                         context.tr(row.infoKey!),
                       ),
                     ],
@@ -513,10 +503,10 @@ class _ExerciseThumbnail extends StatelessWidget {
 
 String _displayName(BuildContext context, WorkoutExerciseViewData exercise) {
   if (exercise.isMissing) {
-    return context.tr('workout.detail.exercise_unavailable');
+    return context.l10n.workoutDetailExerciseUnavailable;
   }
   if (exercise.name.trim().isEmpty || exercise.name == 'Exercise') {
-    return context.tr('workout.detail.exercise_fallback');
+    return context.l10n.workoutDetailExerciseFallback;
   }
   return exercise.name;
 }
