@@ -1,4 +1,4 @@
-import 'package:coachly/core/text_filter/offensive_text_filter_service.dart';
+import 'package:coachly/features/workout/workout_edit_page/text_filter/offensive_text_filter_service.dart';
 import 'package:flutter/services.dart';
 
 class PoliteTextInputFormatter extends TextInputFormatter {

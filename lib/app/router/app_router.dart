@@ -1,4 +1,6 @@
 import 'package:coachly/app/router/routes.dart';
+import 'package:coachly/core/flags/feature_flags.dart';
+import 'package:coachly/core/observability/debug_screen.dart';
 import 'package:coachly/features/auth/pages/loading_page/loading_page.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
@@ -39,6 +41,10 @@ GoRouter router(Ref ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/loading',
     redirect: (context, state) {
+      // La diagnostica deve restare raggiungibile anche — soprattutto — quando
+      // e' l'autenticazione a non funzionare (`18-observability.md`).
+      if (state.matchedLocation == DebugScreen.routePath) return null;
+
       final isLoading = authState.isLoading;
       final canAccessApp = authState.value?.canAccessApp == true;
       final isOnLogin = state.matchedLocation == '/login';
@@ -64,6 +70,13 @@ GoRouter router(Ref ref) {
         builder: (context, state) => const LoadingPage(),
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      // Non compare in nessuna navigazione: si raggiunge digitando la rotta.
+      // Nelle build release il flag e' spento e la rotta non esiste.
+      if (FeatureFlags.isEnabled(FeatureFlag.debugScreen))
+        GoRoute(
+          path: DebugScreen.routePath,
+          builder: (context, state) => const DebugScreen(),
+        ),
       GoRoute(
         path: '/exercises/create',
         builder: (context, state) => const ExerciseCreatePage(),

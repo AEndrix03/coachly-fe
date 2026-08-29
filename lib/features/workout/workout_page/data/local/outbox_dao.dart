@@ -140,6 +140,36 @@ class OutboxDao extends DatabaseAccessor<AppDatabase> with _$OutboxDaoMixin {
     return earliest;
   }
 
+  /// Conteggio per stato, in una sola query.
+  ///
+  /// Contare in Dart caricando tutte le righe funzionerebbe finche' la coda e'
+  /// piccola: e' esattamente la scorciatoia che smette di funzionare quando
+  /// serve, cioe' quando la coda e' grande perche' la sync e' ferma.
+  Future<Map<String, int>> countsByStatus() async {
+    final count = outbox.id.count();
+    final query = selectOnly(outbox)
+      ..addColumns([outbox.status, count])
+      ..groupBy([outbox.status]);
+    final rows = await query.get();
+    return {for (final row in rows) row.read(outbox.status)!: row.read(count)!};
+  }
+
+  /// L'ultimo errore registrato dalla coda, se c'e'.
+  Future<String?> lastError() async {
+    final query = select(outbox)
+      ..where((row) => row.lastError.isNotNull())
+      ..orderBy([(row) => OrderingTerm.desc(row.updatedAt)])
+      ..limit(1);
+    final row = await query.getSingleOrNull();
+    return row?.lastError;
+  }
+
+  /// Da quando aspetta la riga piu' vecchia ancora da inviare.
+  Future<DateTime?> oldestPendingAt() async {
+    final rows = await pendingOrdered();
+    return rows.isEmpty ? null : rows.first.createdAt;
+  }
+
   Future<void> markSending(String id) => _write(id, OutboxStatus.sending);
 
   Future<void> markSent(String id) => _write(id, OutboxStatus.sent);
@@ -230,4 +260,12 @@ class OutboxSyncQueue implements SyncQueue {
 
   @override
   Future<int> pendingCount() async => (await _dao.pendingOrdered()).length;
+
+  @override
+  Future<SyncQueueDiagnostics> diagnostics() async => SyncQueueDiagnostics(
+    countsByStatus: await _dao.countsByStatus(),
+    lastError: await _dao.lastError(),
+    oldestPendingAt: await _dao.oldestPendingAt(),
+    nextAttemptAt: await _dao.earliestNextAttemptAt(),
+  );
 }

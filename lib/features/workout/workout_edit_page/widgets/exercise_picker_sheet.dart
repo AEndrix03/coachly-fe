@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
-import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
-import 'package:coachly/core/utils/debouncer.dart';
+import 'package:coachly/features/workout/workout_edit_page/text_filter/polite_text_input_formatter.dart';
+import 'package:coachly/features/workout/workout_edit_page/search/debouncer.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';

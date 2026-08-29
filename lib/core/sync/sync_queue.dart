@@ -11,6 +11,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 ///
 /// L'outbox è comunque un concetto trasversale: ci finiscono sessioni, schede
 /// ed esercizi personali (`docs/development/05-sync-and-offline.md`).
+/// Fotografia della coda per la schermata diagnostica.
+///
+/// `docs/development/05-sync-and-offline.md`: in un'app local-first i bug
+/// vivono nel database e nella coda sul telefono dell'utente, dove nessun
+/// crash reporter arriva. Senza questa fotografia l'unico modo di capire
+/// perche' un allenamento non sale e' collegare il telefono a un debugger.
+class SyncQueueDiagnostics {
+  const SyncQueueDiagnostics({
+    required this.countsByStatus,
+    this.lastError,
+    this.oldestPendingAt,
+    this.nextAttemptAt,
+  });
+
+  /// Righe per stato: `pending`, `sending`, `sent`, `failed_permanent`.
+  final Map<String, int> countsByStatus;
+
+  /// L'ultimo errore registrato, gia' privo di dati dell'utente.
+  final String? lastError;
+
+  /// Da quanto la riga piu' vecchia aspetta. Se e' di giorni, la sync non e'
+  /// lenta: e' ferma.
+  final DateTime? oldestPendingAt;
+
+  /// Quando il backoff riprovera'.
+  final DateTime? nextAttemptAt;
+
+  int get total => countsByStatus.values.fold(0, (a, b) => a + b);
+}
+
 abstract interface class SyncQueue {
   /// Quante scritture dell'utente non sono ancora state accettate dal backend.
   ///
@@ -18,6 +48,9 @@ abstract interface class SyncQueue {
   /// sono l'unica copia esistente
   /// (`docs/development/24-security-and-privacy.md`).
   Future<int> pendingCount();
+
+  /// Fotografia completa della coda, per `core/observability`.
+  Future<SyncQueueDiagnostics> diagnostics();
 }
 
 /// Va sovrascritto in `app/`: `core/` dichiara l'interfaccia, la feature la

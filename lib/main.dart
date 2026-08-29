@@ -1,4 +1,6 @@
 import 'package:coachly/app/bootstrap/provider_overrides.dart';
+import 'package:coachly/core/logging/app_logger.dart';
+import 'package:coachly/core/observability/crash_reporter.dart';
 import 'package:coachly/app/router/app_router.dart';
 import 'package:coachly/app/sync/app_data_sync_service.dart';
 import 'package:coachly/core/feedback/app_toast_service.dart';
@@ -14,6 +16,10 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Senza questo, un errore fuori dal frame di build finisce nella console del
+  // dispositivo e da nessun'altra parte (`docs/development/18-observability.md`).
+  installErrorHandlers(const LoggingCrashReporter(ConsoleAppLogger()));
 
   runApp(buildAppScope(child: const CoachlyApplication()));
 }
