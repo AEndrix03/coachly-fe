@@ -300,18 +300,14 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => onRestAdjust(-30),
-                          child: Text(
-                            context.tr('workout.active.rest_minus_30'),
-                          ),
+                          child: Text(context.l10n.workoutActiveRestMinus30),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => onRestAdjust(30),
-                          child: Text(
-                            context.tr('workout.active.rest_plus_30'),
-                          ),
+                          child: Text(context.l10n.workoutActiveRestPlus30),
                         ),
                       ),
                     ],
@@ -744,7 +740,7 @@ class _WorkoutHeader extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: onMenu,
-                  tooltip: context.tr('workout.active.finish'),
+                  tooltip: context.l10n.workoutActiveFinish,
                   icon: const Icon(Icons.flag_outlined),
                 ),
               ],
@@ -1244,13 +1240,13 @@ class _SetTable extends StatelessWidget {
               SizedBox(
                 width: 42,
                 child: Text(
-                  context.tr('workout.active.col_set'),
+                  context.l10n.workoutActiveColSet,
                   style: _labelStyle,
                 ),
               ),
               Expanded(
                 child: Text(
-                  context.tr('workout.active.col_previous'),
+                  context.l10n.workoutActiveColPrevious,
                   style: _labelStyle,
                 ),
               ),
@@ -1261,14 +1257,14 @@ class _SetTable extends StatelessWidget {
               SizedBox(
                 width: 50,
                 child: Text(
-                  context.tr('workout.active.col_reps'),
+                  context.l10n.workoutActiveColReps,
                   style: _labelStyle,
                 ),
               ),
               SizedBox(
                 width: 32,
                 child: Text(
-                  context.tr('workout.active.col_rir'),
+                  context.l10n.workoutActiveColRir,
                   style: _labelStyle,
                 ),
               ),
@@ -1515,7 +1511,7 @@ class _ActiveSetEditor extends StatelessWidget {
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            context.tr('workout.active.rir_explained'),
+            context.l10n.workoutActiveRirExplained,
             style: _labelStyle,
           ),
         ),
@@ -1922,14 +1918,14 @@ class _SetTechniqueActions extends StatelessWidget {
         ),
         const Spacer(),
         _TechniqueToggle(
-          label: context.tr('workout.active.cluster'),
+          label: context.l10n.workoutActiveCluster,
           color: scheme.tertiary,
           selected: selected == SetTechnique.cluster,
           onTap: () => onSelected(SetTechnique.cluster),
         ),
         const SizedBox(width: 6),
         _TechniqueToggle(
-          label: context.tr('workout.active.failure'),
+          label: context.l10n.workoutActiveFailure,
           color: scheme.error,
           selected: selected == SetTechnique.failure,
           onTap: () => onSelected(SetTechnique.failure),
@@ -2246,7 +2242,7 @@ class _DropEditor extends StatelessWidget {
                     ],
                   ),
                   _DropValueRow(
-                    label: context.tr('workout.active.weight'),
+                    label: context.l10n.workoutActiveWeight,
                     value: '${_number(displayedWeight)} $loadUnit',
                     onMinus: () => onWeight(
                       _storedWeight(
@@ -2271,7 +2267,7 @@ class _DropEditor extends StatelessWidget {
                   ),
                   Divider(height: 1, color: scheme.outlineVariant),
                   _DropValueRow(
-                    label: context.tr('workout.active.reps'),
+                    label: context.l10n.workoutActiveReps,
                     value: '${drop.reps}',
                     onMinus: () => onReps((drop.reps - 1).clamp(0, 999)),
                     onPlus: () => onReps((drop.reps + 1).clamp(0, 999)),
@@ -2515,7 +2511,7 @@ class _AddToWorkoutSheetState extends State<_AddToWorkoutSheet> {
                     duration: motion.resolve(context, motion.standard),
                     child: Text(
                       _blockType == null
-                          ? context.tr('workout.active.add_title')
+                          ? context.l10n.workoutActiveAddTitle
                           : _blockTitle(_blockType!),
                       key: ValueKey(_blockType),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -2590,28 +2586,28 @@ class _AddToWorkoutOverview extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            context.tr('workout.active.add_subtitle'),
+            context.l10n.workoutActiveAddSubtitle,
             style: context.text.bodyM.copyWith(color: scheme.onSurfaceVariant),
           ),
           SizedBox(height: context.spacing.md),
           _AddActionRow(
             icon: Icons.add_rounded,
-            title: context.tr('workout.active.add_set'),
-            subtitle: context.tr('workout.active.add_set_hint'),
+            title: context.l10n.workoutActiveAddSet,
+            subtitle: context.l10n.workoutActiveAddSetHint,
             onTap: onAddSet,
           ),
           SizedBox(height: context.spacing.xs),
           _AddActionRow(
             icon: Icons.fitness_center_rounded,
-            title: context.tr('workout.active.add_exercise'),
-            subtitle: context.tr('workout.active.add_movement'),
+            title: context.l10n.workoutActiveAddExercise,
+            subtitle: context.l10n.workoutActiveAddMovement,
             onTap: onAddExercise,
           ),
           SizedBox(height: context.spacing.lg),
-          Text(context.tr('workout.active.blocks'), style: _labelStyle),
+          Text(context.l10n.workoutActiveBlocks, style: _labelStyle),
           SizedBox(height: context.spacing.xxs),
           Text(
-            context.tr('workout.active.combine_hint'),
+            context.l10n.workoutActiveCombineHint,
             style: context.text.bodyS.copyWith(color: scheme.onSurfaceVariant),
           ),
           SizedBox(height: context.spacing.sm),
@@ -2901,7 +2897,7 @@ class _InlineBlockBuilderState extends State<_InlineBlockBuilder> {
         SizedBox(height: context.spacing.md),
         Row(
           children: [
-            Text(context.tr('workout.active.exercises'), style: _labelStyle),
+            Text(context.l10n.workoutActiveExercises, style: _labelStyle),
             const Spacer(),
             Text(
               '${_selected.length}${_maximum == null ? ' / $_minimum+' : ' / $_maximum'}',
@@ -2946,7 +2942,7 @@ class _InlineBlockBuilderState extends State<_InlineBlockBuilder> {
                     child: const CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.add_rounded),
-            label: Text(context.tr('workout.active.add_exercise')),
+            label: Text(context.l10n.workoutActiveAddExercise),
           ),
         ),
         SizedBox(height: context.spacing.xs),
@@ -2955,9 +2951,8 @@ class _InlineBlockBuilderState extends State<_InlineBlockBuilder> {
           child: FilledButton(
             onPressed: valid ? () => widget.onCreate(_selected.toList()) : null,
             child: Text(
-              context.tr(
-                'workout.builder.create_selected_block',
-                params: {'type': _blockTitle(widget.type)},
+              context.l10n.workoutBuilderCreateSelectedBlock(
+                _blockTitle(widget.type),
               ),
             ),
           ),
@@ -3208,7 +3203,7 @@ class _QuickNoteSheetState extends State<_QuickNoteSheet> {
               onChanged: _onTextChanged,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
-                hintText: context.tr('workout.active.note_hint'),
+                hintText: context.l10n.workoutActiveNoteHint,
                 filled: true,
                 fillColor: scheme.surfaceContainerHighest,
                 contentPadding: const EdgeInsets.all(16),
@@ -3223,7 +3218,7 @@ class _QuickNoteSheetState extends State<_QuickNoteSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            Text(context.tr('workout.active.quick_add'), style: _labelStyle),
+            Text(context.l10n.workoutActiveQuickAdd, style: _labelStyle),
             const SizedBox(height: 10),
             Wrap(
               spacing: 8,
@@ -3266,7 +3261,7 @@ class _QuickNoteSheetState extends State<_QuickNoteSheet> {
                 duration: const Duration(milliseconds: 180),
                 child: _saving
                     ? Text(
-                        context.tr('workout.active.saving'),
+                        context.l10n.workoutActiveSaving,
                         key: const ValueKey('saving'),
                         style: TextStyle(color: scheme.onSurfaceVariant),
                       )
@@ -3276,7 +3271,7 @@ class _QuickNoteSheetState extends State<_QuickNoteSheet> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            context.tr('workout.active.saved'),
+                            context.l10n.workoutActiveSaved,
                             style: TextStyle(color: scheme.onSurfaceVariant),
                           ),
                           const SizedBox(width: 4),
@@ -3717,7 +3712,7 @@ class _NumberInputSheetState extends State<_NumberInputSheet> {
             children: [
               _NumberStepButton(
                 icon: Icons.remove_rounded,
-                tooltip: context.tr('workout.builder.decrease'),
+                tooltip: context.l10n.workoutBuilderDecrease(''),
                 onPressed: () => _adjust(-widget.step),
               ),
               SizedBox(width: context.spacing.xs),
@@ -3744,7 +3739,7 @@ class _NumberInputSheetState extends State<_NumberInputSheet> {
               SizedBox(width: context.spacing.xs),
               _NumberStepButton(
                 icon: Icons.add_rounded,
-                tooltip: context.tr('workout.builder.increase'),
+                tooltip: context.l10n.workoutBuilderIncrease(''),
                 onPressed: () => _adjust(widget.step),
               ),
             ],
