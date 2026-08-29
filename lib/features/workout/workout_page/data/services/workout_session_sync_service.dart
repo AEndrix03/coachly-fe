@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
+import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/session_sync_job_model.dart';
@@ -13,7 +15,6 @@ import 'package:coachly/features/workout/workout_page/data/services/workout_sess
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final workoutSessionSyncServiceProvider = Provider<WorkoutSessionSyncService>((
@@ -23,6 +24,8 @@ final workoutSessionSyncServiceProvider = Provider<WorkoutSessionSyncService>((
     sessionHiveService: ref.watch(workoutSessionHiveServiceProvider),
     workoutPageService: ref.watch(workoutPageServiceProvider),
     workoutHiveService: ref.watch(workoutHiveServiceProvider),
+    clock: ref.watch(clockProvider),
+    logger: ref.watch(appLoggerProvider),
     isAuthenticatedReader: () {
       final authState = ref.read(authProvider).asData?.value;
       return authState?.isAuthenticated == true &&
@@ -63,6 +66,8 @@ class WorkoutSessionSyncService {
   final WorkoutSessionHiveService _sessionHiveService;
   final WorkoutPageService _workoutPageService;
   final WorkoutHiveService _workoutHiveService;
+  final Clock _clock;
+  final AppLogger _logger;
   final bool Function() _isAuthenticatedReader;
   final void Function() _invalidateWorkoutCaches;
   final Future<bool> Function()? _isOnlineOverride;
@@ -77,10 +82,14 @@ class WorkoutSessionSyncService {
     required WorkoutHiveService workoutHiveService,
     required bool Function() isAuthenticatedReader,
     required void Function() invalidateWorkoutCaches,
+    Clock clock = const SystemClock(),
+    AppLogger logger = const ConsoleAppLogger(),
     Future<bool> Function()? isOnlineOverride,
   }) : _sessionHiveService = sessionHiveService,
        _workoutPageService = workoutPageService,
        _workoutHiveService = workoutHiveService,
+       _clock = clock,
+       _logger = logger,
        _isAuthenticatedReader = isAuthenticatedReader,
        _invalidateWorkoutCaches = invalidateWorkoutCaches,
        _isOnlineOverride = isOnlineOverride;
@@ -91,12 +100,18 @@ class WorkoutSessionSyncService {
     }
 
     if (!_isAuthenticated()) {
-      debugPrint('Session sync skipped ($trigger): unauthenticated.');
+      _logger.debug(
+        'Session sync skipped: unauthenticated.',
+        context: {'trigger': trigger},
+      );
       return;
     }
 
     if (!await _isOnline()) {
-      debugPrint('Session sync skipped ($trigger): offline.');
+      _logger.debug(
+        'Session sync skipped: offline.',
+        context: {'trigger': trigger},
+      );
       await scheduleRetryIfNeeded();
       return;
     }
@@ -104,7 +119,7 @@ class WorkoutSessionSyncService {
     _isSyncing = true;
     try {
       final jobs = await _sessionHiveService.getPendingJobsOrdered();
-      final now = DateTime.now().toUtc();
+      final now = _clock.nowUtc();
 
       for (final job in jobs) {
         if (job.status == SessionSyncJobStatus.retryWait) {
@@ -135,7 +150,7 @@ class WorkoutSessionSyncService {
       return;
     }
 
-    final now = DateTime.now().toUtc();
+    final now = _clock.nowUtc();
     final dueIn = earliestRetryJob.nextRetryAt!.difference(now);
     if (dueIn <= Duration.zero) {
       unawaited(syncPendingSessions(trigger: 'retry_due_now'));
@@ -185,7 +200,7 @@ class WorkoutSessionSyncService {
       session: currentSession,
     );
     if (needsSessionUpload) {
-      final uploadingStateAt = DateTime.now().toUtc();
+      final uploadingStateAt = _clock.nowUtc();
       job = job.copyWith(
         status: SessionSyncJobStatus.uploading,
         updatedAt: uploadingStateAt,
@@ -209,7 +224,7 @@ class WorkoutSessionSyncService {
         );
       }
 
-      final uploadedAt = DateTime.now().toUtc();
+      final uploadedAt = _clock.nowUtc();
       job = job.copyWith(
         status: SessionSyncJobStatus.uploaded,
         updatedAt: uploadedAt,
@@ -225,7 +240,7 @@ class WorkoutSessionSyncService {
       await _persist(job: job, session: currentSession);
     }
 
-    final patchingAt = DateTime.now().toUtc();
+    final patchingAt = _clock.nowUtc();
     job = job.copyWith(
       status: SessionSyncJobStatus.patching,
       updatedAt: patchingAt,
@@ -250,7 +265,7 @@ class WorkoutSessionSyncService {
       );
     }
 
-    final syncedAt = DateTime.now().toUtc();
+    final syncedAt = _clock.nowUtc();
     job = job.copyWith(
       status: SessionSyncJobStatus.synced,
       updatedAt: syncedAt,
@@ -296,7 +311,7 @@ class WorkoutSessionSyncService {
     required ApiResponse<void> response,
     required _SyncFailurePhase failurePhase,
   }) async {
-    final now = DateTime.now().toUtc();
+    final now = _clock.nowUtc();
     final errorMessage = _buildErrorMessage(response);
     final statusCode = response.statusCode;
 
@@ -345,7 +360,7 @@ class WorkoutSessionSyncService {
     required SessionSyncJob job,
     required String errorMessage,
   }) async {
-    final now = DateTime.now().toUtc();
+    final now = _clock.nowUtc();
     final failedJob = job.copyWith(
       status: SessionSyncJobStatus.failedPermanent,
       lastError: errorMessage,
@@ -366,9 +381,12 @@ class WorkoutSessionSyncService {
   Future<void> _refreshWorkoutCacheFromRemote() async {
     final refreshResponse = await _workoutPageService.fetchWorkouts();
     if (!refreshResponse.success || refreshResponse.data == null) {
-      debugPrint(
-        'Session sync warning: remote refresh failed after successful sync. '
-        'status=${refreshResponse.statusCode} message=${refreshResponse.message}',
+      _logger.warn(
+        'Remote refresh failed after a successful session sync.',
+        context: {
+          'status': refreshResponse.statusCode,
+          'message': refreshResponse.message,
+        },
       );
       return;
     }
