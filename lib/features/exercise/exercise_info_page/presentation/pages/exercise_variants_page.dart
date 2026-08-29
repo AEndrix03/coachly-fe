@@ -61,7 +61,7 @@ class _ExerciseVariantsContentState extends State<ExerciseVariantsContent> {
     final filters = _filters;
     final variants = _variants;
     return ExerciseDetailScaffold(
-      title: context.tr('exercise.variants.title'),
+      title: context.l10n.exerciseVariantsTitle,
       exerciseName: widget.data.name,
       body: CustomScrollView(
         key: const Key('variants-page-scroll'),
