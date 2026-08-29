@@ -1,164 +1,71 @@
-import 'dart:ui';
-
+import 'package:coachly/app/router/routes.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ionicons/ionicons.dart';
 
-class AppNavigationBar extends StatefulWidget {
+/// Navbar di primo livello.
+///
+/// Le voci si generano da `AppTab.values`: nessuna lista duplicata rispetto al
+/// router. Il cambio tab passa da `goBranch`, che preserva lo stack di ogni
+/// branch. Vedi `docs/development/08-routing-navigation.md`.
+class AppNavigationBar extends StatelessWidget {
   const AppNavigationBar({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
-  @override
-  State<AppNavigationBar> createState() => _AppNavigationBarState();
-}
-
-class _AppNavigationBarState extends State<AppNavigationBar>
-    with TickerProviderStateMixin {
-  static const _tabs = [
-    _NavTab(
-      icon: Icons.people,
-      labelKey: 'nav.community',
-      location: '/community',
-    ),
-    _NavTab(
-      icon: Icons.fitness_center,
-      labelKey: 'nav.workouts',
-      location: '/workouts',
-    ),
-    _NavTab(
-      icon: Ionicons.person_circle_outline,
-      labelKey: 'nav.profile',
-      location: '/profile',
-    ),
-  ];
-
-  late final List<AnimationController> _bounceControllers;
-  late final List<Animation<double>> _bounceAnimations;
-
-  @override
-  void initState() {
-    super.initState();
-    _bounceControllers = List.generate(
-      _tabs.length,
-      (_) => AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 500),
-      ),
+  void _onTap(int index) {
+    navigationShell.goBranch(
+      index,
+      // Tap sul tab già attivo: torna alla root del branch.
+      initialLocation: index == navigationShell.currentIndex,
     );
-    _bounceAnimations = _bounceControllers.map((c) {
-      return TweenSequence<double>([
-        TweenSequenceItem(
-          tween: Tween(
-            begin: 1.0,
-            end: 0.72,
-          ).chain(CurveTween(curve: Curves.easeOut)),
-          weight: 30,
-        ),
-        TweenSequenceItem(
-          tween: Tween(
-            begin: 0.72,
-            end: 1.18,
-          ).chain(CurveTween(curve: Curves.easeOut)),
-          weight: 35,
-        ),
-        TweenSequenceItem(
-          tween: Tween(
-            begin: 1.18,
-            end: 1.0,
-          ).chain(CurveTween(curve: Curves.elasticOut)),
-          weight: 35,
-        ),
-      ]).animate(c);
-    }).toList();
-  }
-
-  @override
-  void dispose() {
-    for (final c in _bounceControllers) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  void _onTap(int index, int currentIndex) {
-    if (index == currentIndex) return;
-    _bounceControllers[index].forward(from: 0.0);
-    context.go(_tabs[index].location);
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentIndex = widget.navigationShell.currentIndex;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final spacing = context.spacing;
+    final colors = context.colors;
+    final bottomPadding = MediaQuery.paddingOf(context).bottom;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 10, 20, bottomPadding + 14),
-      child: SizedBox(height: 64, child: _buildBar(currentIndex)),
-    );
-  }
-
-  Widget _buildBar(int currentIndex) {
-    final scheme = Theme.of(context).colorScheme;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(32),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                scheme.surfaceContainerHigh.withValues(alpha: 0.88),
-                scheme.surface.withValues(alpha: 0.96),
-              ],
-            ),
-            border: Border.all(
-              color: scheme.outline.withValues(alpha: 0.35),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: scheme.primary.withValues(alpha: 0.20),
-                blurRadius: 28,
-                spreadRadius: -6,
-                offset: const Offset(0, 6),
-              ),
-              BoxShadow(
-                color: scheme.shadow.withValues(alpha: 0.45),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
+      padding: EdgeInsets.fromLTRB(
+        spacing.lg,
+        spacing.xs,
+        spacing.lg,
+        bottomPadding + spacing.sm,
+      ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          // Superficie opaca al posto del `BackdropFilter` permanente: il blur
+          // sotto uno stack animato ridisegna a ogni frame.
+          color: colors.surfaceOverlay,
+          borderRadius: BorderRadius.circular(context.radii.pill),
+          border: Border.all(color: colors.border),
+        ),
+        child: SizedBox(
+          height: context.sizes.touchTargetWorkout,
           child: LayoutBuilder(
             builder: (context, constraints) {
+              final itemWidth = constraints.maxWidth / AppTab.values.length;
               return Stack(
-                clipBehavior: Clip.none,
                 children: [
-                  _buildIndicator(constraints.maxWidth, currentIndex),
+                  _Indicator(
+                    itemWidth: itemWidth,
+                    currentIndex: navigationShell.currentIndex,
+                  ),
                   Row(
-                    children: List.generate(_tabs.length, (index) {
-                      return Expanded(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () => _onTap(index, currentIndex),
-                          child: AnimatedBuilder(
-                            animation: _bounceAnimations[index],
-                            builder: (_, __) => Transform.scale(
-                              scale: _bounceAnimations[index].value,
-                              child: _NavItem(
-                                tab: _tabs[index],
-                                isSelected: index == currentIndex,
-                              ),
-                            ),
+                    children: [
+                      for (final tab in AppTab.values)
+                        Expanded(
+                          child: _NavItem(
+                            tab: tab,
+                            isSelected:
+                                tab.index == navigationShell.currentIndex,
+                            onTap: () => _onTap(tab.index),
                           ),
                         ),
-                      );
-                    }),
+                    ],
                   ),
                 ],
               );
@@ -168,44 +75,30 @@ class _AppNavigationBarState extends State<AppNavigationBar>
       ),
     );
   }
+}
 
-  Widget _buildIndicator(double totalWidth, int currentIndex) {
-    final scheme = Theme.of(context).colorScheme;
-    const indicatorW = 46.0;
-    const indicatorH = 42.0;
-    const barH = 64.0;
+class _Indicator extends StatelessWidget {
+  const _Indicator({required this.itemWidth, required this.currentIndex});
 
-    final itemWidth = totalWidth / _tabs.length;
-    final left = currentIndex * itemWidth + (itemWidth - indicatorW) / 2;
+  final double itemWidth;
+  final int currentIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = context.sizes.touchTarget;
+    final motion = context.motion;
 
     return AnimatedPositioned(
-      duration: const Duration(milliseconds: 320),
-      curve: Curves.easeInOutCubic,
-      left: left,
-      top: (barH - indicatorH) / 2,
+      duration: motion.resolve(context, motion.standard),
+      curve: motion.standardCurve,
+      left: currentIndex * itemWidth + (itemWidth - size) / 2,
+      top: (context.sizes.touchTargetWorkout - size) / 2,
       child: Container(
-        width: indicatorW,
-        height: indicatorH,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [scheme.primary, scheme.primaryContainer],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: scheme.primary.withValues(alpha: 0.55),
-              blurRadius: 18,
-              spreadRadius: -3,
-              offset: const Offset(0, 3),
-            ),
-            BoxShadow(
-              color: scheme.primaryContainer.withValues(alpha: 0.3),
-              blurRadius: 12,
-              spreadRadius: -4,
-            ),
-          ],
+          color: context.colors.surfaceAccent,
+          borderRadius: BorderRadius.circular(context.radii.lg),
         ),
       ),
     );
@@ -213,38 +106,44 @@ class _AppNavigationBarState extends State<AppNavigationBar>
 }
 
 class _NavItem extends StatelessWidget {
-  final _NavTab tab;
-  final bool isSelected;
+  const _NavItem({
+    required this.tab,
+    required this.isSelected,
+    required this.onTap,
+  });
 
-  const _NavItem({required this.tab, required this.isSelected});
+  final AppTab tab;
+  final bool isSelected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Center(
-      child: AnimatedScale(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOut,
-        scale: isSelected ? 1.0 : 0.88,
-        child: Icon(
-          tab.icon,
-          semanticLabel: context.tr(tab.labelKey),
-          color: isSelected ? scheme.onPrimary : scheme.onSurfaceVariant,
-          size: isSelected ? 24 : 21,
+    final colors = context.colors;
+    final motion = context.motion;
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: context.tr(tab.labelKey),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: SizedBox(
+          height: context.sizes.touchTargetWorkout,
+          child: Center(
+            child: AnimatedScale(
+              duration: motion.resolve(context, motion.quick),
+              curve: motion.standardCurve,
+              scale: isSelected ? 1.0 : 0.9,
+              child: Icon(
+                isSelected ? tab.selectedIcon : tab.icon,
+                color: isSelected ? colors.textOnAccent : colors.textSecondary,
+                size: context.sizes.iconMd,
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
-}
-
-class _NavTab {
-  final IconData icon;
-  final String labelKey;
-  final String location;
-
-  const _NavTab({
-    required this.icon,
-    required this.labelKey,
-    required this.location,
-  });
 }

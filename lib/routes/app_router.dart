@@ -1,3 +1,4 @@
+import 'package:coachly/app/router/routes.dart';
 import 'package:coachly/features/auth/pages/loading_page/loading_page.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
@@ -52,7 +53,7 @@ GoRouter router(Ref ref) {
       }
 
       if (isOnLogin || isOnLoading) {
-        return '/workouts';
+        return AppTab.workouts.path;
       }
 
       return null;
@@ -113,128 +114,114 @@ GoRouter router(Ref ref) {
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);
         },
-        branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/community',
-                builder: (context, state) => const HomeScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/workouts',
-                builder: (context, state) => const WorkoutPage(),
-                routes: [
-                  GoRoute(
-                    path: 'organize',
-                    pageBuilder: (context, state) =>
-                        _fadeTransition(state, const WorkoutOrganizePage()),
-                  ),
-                  GoRoute(
-                    path: 'workout/:id',
-                    pageBuilder: (context, state) {
-                      final workout = state.extra as WorkoutModel?;
-                      if (workout == null) {
-                        return _fadeTransition(state, const WorkoutPage());
-                      }
-                      return _fadeTransition(
-                        state,
-                        WorkoutDetailPage(workout: workout),
-                      );
-                    },
-                    routes: [
-                      GoRoute(
-                        path: 'check',
-                        parentNavigatorKey: _rootNavigatorKey,
-                        pageBuilder: (context, state) {
-                          final draft = state.extra as WorkoutDraft?;
-                          if (draft == null) {
-                            return _fadeTransition(state, const WorkoutPage());
-                          }
-                          return _athleteTransition(
-                            state,
-                            WorkoutCheckPage(draft: draft),
-                          );
-                        },
-                      ),
-                      GoRoute(
-                        path: 'add-exercise',
-                        pageBuilder: (context, state) => _athleteTransition(
-                          state,
-                          AddExercisePage(
-                            workoutId: state.pathParameters['id']!,
-                          ),
-                        ),
-                      ),
-                      GoRoute(
-                        path: 'edit',
-                        parentNavigatorKey: _rootNavigatorKey,
-                        pageBuilder: (context, state) {
-                          if (state.pathParameters['id'] == 'new') {
-                            return _fadeTransition(
-                              state,
-                              const CreateWorkoutFlow(),
-                            );
-                          }
-                          final workout = state.extra as WorkoutModel?;
-                          return _fadeTransition(
-                            state,
-                            WorkoutEditPage(
-                              workoutId: state.pathParameters['id']!,
-                              workout: workout,
-                            ),
-                          );
-                        },
-                      ),
-                      GoRoute(
-                        path: 'active',
-                        parentNavigatorKey: _rootNavigatorKey,
-                        pageBuilder: (context, state) => _athleteTransition(
-                          state,
-                          WorkoutActivePage(
-                            workoutId: state.pathParameters['id']!,
-                          ),
-                        ),
-                      ),
-                      GoRoute(
-                        path: 'workout_exercise_page/:exerciseId',
-                        pageBuilder: (context, state) => _athleteTransition(
-                          state,
-                          ExercisePage(
-                            id: state.pathParameters['exerciseId']!,
-                            showAddButton: false,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => const ProfilePage(),
-                routes: [
-                  GoRoute(
-                    path: 'personal-exercises',
-                    pageBuilder: (context, state) =>
-                        _fadeTransition(state, const PersonalExercisesPage()),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+        branches: [for (final tab in AppTab.values) _branchFor(tab)],
       ),
     ],
   );
 }
+
+/// Genera il branch di un tab. La lista dei tab vive in `AppTab`: qui si
+/// descrivono solo la pagina root e le rotte figlie di ciascuno.
+StatefulShellBranch _branchFor(AppTab tab) {
+  return StatefulShellBranch(
+    routes: [
+      GoRoute(
+        path: tab.path,
+        builder: (context, state) => switch (tab) {
+          AppTab.community => const HomeScreen(),
+          AppTab.workouts => const WorkoutPage(),
+          AppTab.profile => const ProfilePage(),
+        },
+        routes: switch (tab) {
+          AppTab.community => const <RouteBase>[],
+          AppTab.workouts => _workoutRoutes,
+          AppTab.profile => _profileRoutes,
+        },
+      ),
+    ],
+  );
+}
+
+final List<RouteBase> _workoutRoutes = [
+  GoRoute(
+    path: 'organize',
+    pageBuilder: (context, state) =>
+        _fadeTransition(state, const WorkoutOrganizePage()),
+  ),
+  GoRoute(
+    path: 'workout/:id',
+    pageBuilder: (context, state) {
+      final workout = state.extra as WorkoutModel?;
+      if (workout == null) {
+        return _fadeTransition(state, const WorkoutPage());
+      }
+      return _fadeTransition(state, WorkoutDetailPage(workout: workout));
+    },
+    routes: [
+      GoRoute(
+        path: 'check',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final draft = state.extra as WorkoutDraft?;
+          if (draft == null) {
+            return _fadeTransition(state, const WorkoutPage());
+          }
+          return _athleteTransition(state, WorkoutCheckPage(draft: draft));
+        },
+      ),
+      GoRoute(
+        path: 'add-exercise',
+        pageBuilder: (context, state) => _athleteTransition(
+          state,
+          AddExercisePage(workoutId: state.pathParameters['id']!),
+        ),
+      ),
+      GoRoute(
+        path: 'edit',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          if (state.pathParameters['id'] == 'new') {
+            return _fadeTransition(state, const CreateWorkoutFlow());
+          }
+          final workout = state.extra as WorkoutModel?;
+          return _fadeTransition(
+            state,
+            WorkoutEditPage(
+              workoutId: state.pathParameters['id']!,
+              workout: workout,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: 'active',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => _athleteTransition(
+          state,
+          WorkoutActivePage(workoutId: state.pathParameters['id']!),
+        ),
+      ),
+      GoRoute(
+        path: 'workout_exercise_page/:exerciseId',
+        pageBuilder: (context, state) => _athleteTransition(
+          state,
+          ExercisePage(
+            id: state.pathParameters['exerciseId']!,
+            showAddButton: false,
+          ),
+        ),
+      ),
+    ],
+  ),
+];
+
+final List<RouteBase> _profileRoutes = [
+  GoRoute(
+    path: 'personal-exercises',
+    pageBuilder: (context, state) =>
+        _fadeTransition(state, const PersonalExercisesPage()),
+  ),
+];
 
 CustomTransitionPage<void> _fadeTransition(GoRouterState state, Widget child) {
   return CustomTransitionPage<void>(
