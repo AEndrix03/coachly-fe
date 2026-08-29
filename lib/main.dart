@@ -1,4 +1,6 @@
 import 'package:coachly/app/bootstrap/provider_overrides.dart';
+import 'package:coachly/core/analytics/analytics_event.dart';
+import 'package:coachly/core/analytics/analytics_tracker.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/observability/crash_reporter.dart';
 import 'package:coachly/app/router/app_router.dart';
@@ -101,6 +103,13 @@ class _AppSyncBootstrapState extends ConsumerState<_AppSyncBootstrap>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // Il primo evento del canale analytics. Non serve al prodotto: serve a
+    // tenere il canale **provato**. Un'interfaccia che nessuno chiama e' una
+    // promessa, e questo repository ha appena finito di rimuovere tre feature
+    // complete che nessuno poteva eseguire.
+    ref.read(analyticsTrackerProvider).track(AnalyticsEvent.appOpened);
+
     ref.listenManual(authProvider, (previous, next) {
       _handleAuthState(previous, next);
     });

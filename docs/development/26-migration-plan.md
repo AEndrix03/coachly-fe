@@ -122,8 +122,18 @@ che giustifica il backend.
 | 4.1 | Stream Drift al posto delle 12 `ref.invalidate` | 03 |
 | 4.2 | `keepAlive` esplicito su repository e stream globali | 03 | ✅ per il layer di rete, resto ⏳ |
 | 4.3 | Rimozione dei side effect nel `build()` dei Notifier | 03 |
-| 4.4 | `select` nelle foglie delle schermate ad alta frequenza | 03, 15 |
-| 4.5 | Mutations per le azioni utente | 07 |
+| 4.4 | `select` nelle foglie delle schermate ad alta frequenza | 03, 15 | ⏳ **a zero**, vedi sotto |
+| 4.5 | Mutations per le azioni utente | 07 | ⏳ |
+
+**Sulla 4.4.** `active_workout_selectors.dart` conteneva gia' i `.select()`
+pronti — `activeExerciseIdProvider`, `activeSetIdProvider`,
+`activeExerciseProvider` — scritti e **mai adottati** da nessun widget. Sono
+stati rimossi: tenerli faceva sembrare la fase a meta' quando era a zero.
+
+Si recuperano con `git log -- lib/features/workout/workout_active_page/providers/active_workout_selectors.dart`.
+Il lavoro vero non era scriverli, era adottarli dentro
+`adaptive_workout_workspace.dart`, 3.854 righe — ed e' quello il costo reale
+della 4.4.
 
 ## Fase 5 — Presentazione
 

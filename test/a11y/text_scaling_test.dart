@@ -1,5 +1,5 @@
 import 'package:coachly/design_system/theme/exercise_theme.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/fixtures/exercise_detail_mock_fixture.dart';
+import '../support/exercise_detail_mock_fixture.dart';
 import 'package:coachly/features/exercise/exercise_info_page/exercise_info_page.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_content.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_exercise_card.dart';
