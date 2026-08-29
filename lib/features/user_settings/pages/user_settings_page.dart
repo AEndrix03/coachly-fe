@@ -15,16 +15,16 @@ class UserSettingsPage extends ConsumerWidget {
         Localizations.maybeLocaleOf(context) ?? AppStrings.defaultLocale;
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.tr('common.settings'))),
+      appBar: AppBar(title: Text(context.l10n.commonSettings)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(context.tr('common.language'), style: theme.textTheme.h4),
+            Text(context.l10n.commonLanguage, style: theme.textTheme.h4),
             const SizedBox(height: 8),
             ShadSelect<Locale>(
-              placeholder: Text(context.tr('common.select_language')),
+              placeholder: Text(context.l10n.commonSelectLanguage),
               initialValue: language,
               options: AppStrings.languageOptions.map((locale) {
                 return ShadOption(
