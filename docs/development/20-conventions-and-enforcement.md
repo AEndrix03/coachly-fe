@@ -72,7 +72,7 @@ Implementati in `tool/coachly_lints/`, agganciati via
 | `no_data_source_outside_repository` | 0 | — | 01 D6 |
 | `no_non_material_icons` | 0 | 2 | 12, ADR-003 |
 | `no_manual_uuid` | 0 | 3 | 05 |
-| `no_literal_text_style` | 188 | 188 | 09 |
+| `no_literal_text_style` | 0 (4 con `ignore` motivato) | 188 | 09 |
 
 Come ci si è arrivati, in ordine di resa:
 
@@ -104,11 +104,14 @@ pacchetti di glifi e `CupertinoIcons`.
 compilata a mano con `Random.secure()` e un `'${micros}_${random}'` — mentre
 `core/ids` esisteva già.
 
-Il debito residuo è **`no_literal_text_style`, 188 occorrenze**, ed è l'unico.
-Non si chiude con una sostituzione meccanica: i token portano `height` e
-`fontWeight`, i letterali quasi mai, quindi rimappare cambierebbe
-l'interlinea di 188 punti dello schermo. Si assorbe schermata per schermata
-mentre la si tocca, che è esattamente il meccanismo di `check_changed.sh`.
+`no_literal_text_style` era il debito residuo, 188 occorrenze, e sembrava non
+chiudibile meccanicamente: i token portano `height` e `fontWeight`, i letterali
+quasi mai. Si è chiuso separando il problema in due — nominare le dimensioni
+esistenti (costo visivo zero, misurato sui golden) e stringere la scala
+(deliberato, un ruolo per volta). Vedi `09-design-tokens.md`.
+
+Restano quattro occorrenze con un `// ignore:` e la ragione scritta accanto.
+Un `ignore` motivato non è debito: è la regola che dichiara i propri limiti.
 
 Regole ancora da implementare, in ordine di valore:
 

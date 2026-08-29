@@ -144,27 +144,61 @@ non una scelta estetica.
 
 ### Lo stato di partenza, misurato
 
-**194 `fontSize` letterali su 14 dimensioni diverse.** Non è una scala, è un
-continuo in cui ogni schermata sceglie da sé:
+**186 `fontSize` letterali su 20 dimensioni diverse, in 70 forme distinte** di
+`(dimensione, peso, interlinea)`. Non è una scala: è un continuo in cui ogni
+schermata sceglie da sé.
 
-| px | occorrenze | token proposto |
+Due numeri spiegano perché la scala semantica qui sopra non poteva assorbirli:
+
+- l'**87%** dei letterali non imposta `height`, mentre ogni token semantico lo
+  impone;
+- il **31%** non imposta nemmeno `fontWeight`: eredita quello del contesto.
+
+Adottare i token su quei siti non è un rinominare, è cambiare interlinea e peso
+a quasi ogni riga della app.
+
+### La migrazione, in due passi separati
+
+Il primo tentativo è stato snappare tutto sui ruoli semantici. Misurato sui
+golden di workout detail: **dal 2,7% al 17,9% di pixel diversi**, con 16 siti su
+36 spostati di 1px. Quasi tutto riflusso verticale più che deformazione — ma
+resta una decisione di design, e una decisione di design non la prende un
+codemod mentre fa pulizia.
+
+Da qui la separazione, che è la ragione d'essere di
+`design_system/tokens/coachly_text_scale.dart`:
+
+| | Cosa fa | Costo visivo |
 |---|---|---|
-| 9, 10, 11 | 35 | `label` (12) |
-| 12 | 46 | `label` |
-| 13 | 28 | `bodyS` |
-| 14 | 17 | `bodyM` |
-| 15, 16 | 31 | `bodyL` (16) |
-| 17, 18 | 13 | `titleM` (18) |
-| 19, 20, 22 | 17 | `titleL` (22) |
-| 24 e oltre | 7 | `displayM` / `displayL` |
+| **Passo 1** — `CoachlyTextScale` | nomina le dimensioni **che la app ha già**: 8 ruoli più 12 gradini intermedi, ognuno con il valore esatto in uso | **zero**, verificato: i golden restano identici byte per byte |
+| **Passo 2** — stringere la scala | fondere i gradini nei ruoli, uno alla volta | misurabile, un ruolo per volta |
 
-**Questa migrazione non è meccanica.** Portare un 15 a 16 o un 11 a 12 cambia
-l'aspetto, e su 194 occorrenze significa ridisegnare mezza interfaccia. Va fatta
-schermata per schermata, con una decisione visiva, e con i golden test verdi a
-fare da rete — che oggi non lo sono.
+Il passo 1 è fatto: **186 letterali → 4**, e i quattro superstiti hanno un
+`// ignore:` con la ragione scritta — un `CustomPainter` (che un `BuildContext`
+non ce l'ha per definizione), una costante di primo livello, un `copyWith` su
+`textTheme` che parte da lì apposta, e un parametro di widget che si chiama
+`fontSize` senza essere un `TextStyle`.
 
-Il lint resta quindi in `warning` e blocca solo i file toccati: impedisce che il
-continuo cresca, senza forzare un ridisegno non pianificato.
+Il passo 2 costa **una riga per volta**:
+
+```dart
+captionTight: TextStyle(fontSize: 11),   // oggi
+captionTight: caption,                   // dopo la fusione
+```
+
+Fondere `captionTight` in `caption` sposta 19 testi da 11 a 12px, e i golden lo
+dicono subito: 1,6–3,6% sulle schermate di workout detail. Ogni fusione è un
+commit isolato, guardabile e reversibile.
+
+Il peso non è un ruolo ma un modificatore componibile — `context.scale.caption`,
+`.caption.semibold`, `.body.bold` — perché nominare ogni combinazione di
+dimensione e peso darebbe una trentina di token per undici ruoli reali. Un ruolo
+senza modificatore **non fissa il peso**, che è il comportamento dei 58 siti che
+oggi scrivono solo `fontSize`.
+
+`CoachlyTypography` resta la destinazione: la scala per ruolo semantico.
+`CoachlyTextScale` è il livello di alias della fase 5.1 del piano di migrazione,
+e la 5.10 lo rimuove.
 
 ## Elevazione
 

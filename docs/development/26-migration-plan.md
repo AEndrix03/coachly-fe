@@ -130,9 +130,9 @@ che giustifica il backend.
 Da qui in avanti si procede **opportunisticamente**, feature per feature, mentre
 si lavora ad altro. Il lint impedisce le regressioni.
 
-| # | Azione | Doc |
-|---|---|---|
-| 5.1 | Token e `ThemeExtension`; i vecchi sistemi diventano alias | 09 |
+| # | Azione | Doc | Stato |
+|---|---|---|---|
+| 5.1 | Token e `ThemeExtension`; i vecchi sistemi diventano alias | 09 | ✅ `CoachlyTextScale` |
 | 5.2 | Setup ARB + conversione automatica di `app_strings` | 13 |
 | 5.3 | Estrazione dei `_t(…)` inline, feature per feature | 13 |
 | 5.4 | Navbar: `goBranch`, enum `AppTab` | 08 |
