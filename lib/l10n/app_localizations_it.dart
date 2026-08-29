@@ -58,9 +58,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get workoutActiveSaved => 'Salvato';
 
   @override
-  String get workoutActivePlanGuard => 'PLAN GUARD';
-
-  @override
   String get workoutActiveFinish => 'Termina allenamento';
 
   @override

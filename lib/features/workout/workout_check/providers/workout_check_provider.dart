@@ -1,4 +1,4 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_hive_service.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_check/data/workout_check_repository.dart';
 import 'package:coachly/features/workout/workout_check/data/workout_check_service.dart';
@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final workoutCheckRepositoryProvider = Provider<WorkoutCheckRepository>((ref) {
   return LocalWorkoutCheckRepository(
-    WorkoutCheckService(ref.watch(exerciseHiveServiceProvider)),
+    WorkoutCheckService(ref.watch(exerciseCatalogDaoProvider)),
   );
 });
 

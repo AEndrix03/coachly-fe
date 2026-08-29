@@ -1,17 +1,17 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_hive_service.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final voiceExerciseCatalogRepositoryProvider =
     Provider<VoiceExerciseCatalogRepository>((ref) {
-      final exerciseHiveService = ref.watch(exerciseHiveServiceProvider);
-      return VoiceExerciseCatalogRepository(exerciseHiveService);
+      final exerciseCatalogDao = ref.watch(exerciseCatalogDaoProvider);
+      return VoiceExerciseCatalogRepository(exerciseCatalogDao);
     });
 
 class VoiceExerciseCatalogRepository {
-  VoiceExerciseCatalogRepository(this._exerciseHiveService);
+  VoiceExerciseCatalogRepository(this._exerciseCatalogDao);
 
-  final ExerciseHiveService _exerciseHiveService;
+  final ExerciseCatalogDao _exerciseCatalogDao;
 
   List<VoiceExerciseCatalogEntry>? _cache;
 
@@ -20,7 +20,7 @@ class VoiceExerciseCatalogRepository {
       return _cache!;
     }
 
-    final exercises = await _exerciseHiveService.getExercises();
+    final exercises = await _exerciseCatalogDao.getAllDetails();
     final catalog = exercises
         .map((exercise) {
           final exerciseId = exercise.id ?? '';

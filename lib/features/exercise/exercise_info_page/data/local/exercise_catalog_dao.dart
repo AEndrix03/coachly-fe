@@ -60,6 +60,18 @@ class ExerciseCatalogDao extends DatabaseAccessor<AppDatabase>
     return row == null ? null : rowToDetail(row);
   }
 
+  /// I dettagli effettivamente scaricati.
+  ///
+  /// Solo le righe con `payload` valorizzato: i dettagli restano pigri, uno
+  /// esercizio per volta, quindi il catalogo contiene molti riepiloghi e pochi
+  /// dettagli (`docs/development/04-data-layer.md`).
+  Future<List<ExerciseDetailModel>> getAllDetails() async {
+    final rows = await (select(
+      catalogExercises,
+    )..where((table) => table.payload.isNotNull())).get();
+    return rows.map(rowToDetail).whereType<ExerciseDetailModel>().toList();
+  }
+
   /// Il catalogo non è ancora stato popolato.
   Future<bool> isEmpty() async {
     final count = countAll();

@@ -46,14 +46,6 @@ const _activeWorkoutStrings = <String, Map<String, String>>{
   'ungroup': {'en': 'Ungroup', 'it': 'Separa gruppo'},
   'addDrop': {'en': 'Add drop', 'it': 'Aggiungi drop'},
   'structure': {'en': 'Structure', 'it': 'Struttura'},
-  'guard': {'en': 'Guard', 'it': 'Guard'},
-  'planGuard': {'en': 'Plan Guard', 'it': 'Plan Guard'},
-  'noSuggestions': {
-    'en': 'No suggestions right now.',
-    'it': 'Nessun suggerimento al momento.',
-  },
-  'details': {'en': 'Details', 'it': 'Dettagli'},
-  'dismiss': {'en': 'Dismiss', 'it': 'Ignora'},
   'confirm': {'en': 'Confirm', 'it': 'Conferma'},
   'finishEarlyTitle': {'en': 'Finish workout early?', 'it': 'Terminare prima?'},
   'finishEarlyBody': {
@@ -88,14 +80,6 @@ const _activeWorkoutStrings = <String, Map<String, String>>{
   'coach.data_quality.unusual_load_reason': {
     'en': 'The load is much higher than recent comparable entries.',
     'it': 'Il carico è molto più alto delle registrazioni comparabili recenti.',
-  },
-  'coach.guardian.pacing_title': {
-    'en': 'Review the remaining session',
-    'it': 'Rivedi la sessione rimanente',
-  },
-  'coach.guardian.pacing_reason': {
-    'en': 'The session is taking longer than expected.',
-    'it': 'La sessione sta richiedendo più tempo del previsto.',
   },
 };
 

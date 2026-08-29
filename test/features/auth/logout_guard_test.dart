@@ -1,83 +1,58 @@
-import 'dart:io';
-
+import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
-import 'package:coachly/features/workout/workout_page/data/models/session_sync_job_model.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_hive_service.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 
 /// Il logout cancella il database locale. Se la coda di sync non è vuota,
 /// quei dati sono l'unica copia esistente di allenamenti registrati in
-/// palestra: cancellarli senza conferma è una perdita irreversibile.
+/// palestra, spesso offline: cancellarli senza conferma è una perdita
+/// irreversibile.
 ///
 /// Vedi `docs/development/24-security-and-privacy.md`.
 void main() {
-  late Directory tempDir;
-  late Box<Map> sessionsBox;
-  late Box<Map> syncJobsBox;
+  late AppDatabase db;
 
-  setUp(() async {
-    tempDir = await Directory.systemTemp.createTemp('coachly_logout_guard');
-    Hive.init(tempDir.path);
-    sessionsBox = await Hive.openBox<Map>('sessions_test');
-    syncJobsBox = await Hive.openBox<Map>('sync_jobs_test');
-  });
-
-  tearDown(() async {
-    await Hive.close();
-    await tempDir.delete(recursive: true);
-  });
+  setUp(() => db = AppDatabase(NativeDatabase.memory()));
+  tearDown(() => db.close());
 
   ProviderContainer buildContainer() {
     final container = ProviderContainer(
       overrides: [
         authServiceProvider.overrideWithValue(_FakeAuthService()),
-        workoutSessionHiveServiceProvider.overrideWithValue(
-          WorkoutSessionHiveService.fromBoxes(
-            sessionsBox: sessionsBox,
-            syncJobsBox: syncJobsBox,
-          ),
-        ),
+        appDatabaseProvider.overrideWithValue(db),
       ],
     );
     addTearDown(container.dispose);
     return container;
   }
 
-  Future<void> enqueueJob(String jobId) async {
-    final now = DateTime.now().toUtc();
-    final job = SessionSyncJob(
-      jobId: jobId,
-      localSessionId: 'session-$jobId',
-      workoutId: 'workout-1',
-      sessionPayloadJson: '{}',
-      mergedWorkoutCommandJson: '{}',
-      status: SessionSyncJobStatus.queued,
-      retryCount: 0,
-      nextRetryAt: null,
-      lastError: null,
-      createdAt: now,
-      updatedAt: now,
-    );
-    await syncJobsBox.put(jobId, job.toJson());
-  }
+  Future<void> enqueue(String id) => db
+      .into(db.outbox)
+      .insert(
+        OutboxCompanion.insert(
+          id: id,
+          entityType: 'session',
+          entityId: 'session-$id',
+          operation: 'create',
+          payload: '{}',
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+        ),
+      );
 
   test('senza dati in coda il conteggio è zero', () async {
     final container = buildContainer();
 
-    final pending = await container
-        .read(authProvider.notifier)
-        .pendingSyncCount();
-
-    expect(pending, 0);
+    expect(await container.read(authProvider.notifier).pendingSyncCount(), 0);
   });
 
   test('con allenamenti non sincronizzati il logout viene rifiutato', () async {
-    await enqueueJob('job-1');
-    await enqueueJob('job-2');
+    await enqueue('job-1');
+    await enqueue('job-2');
     final container = buildContainer();
     final notifier = container.read(authProvider.notifier);
 
@@ -91,10 +66,24 @@ void main() {
       reason: 'il logout non deve procedere con dati non sincronizzati',
     );
     expect(
-      syncJobsBox.length,
-      2,
-      reason: 'i dati dell\'utente devono restare sul dispositivo',
+      await db.select(db.outbox).get(),
+      hasLength(2),
+      reason: "i dati dell'utente devono restare sul dispositivo",
     );
+  });
+
+  test('con force il logout procede e svuota il database', () async {
+    await enqueue('job-1');
+    final container = buildContainer();
+
+    final didLogout = await container
+        .read(authProvider.notifier)
+        .logout(force: true);
+
+    expect(didLogout, isTrue);
+    // `force` si passa solo dopo che l'utente ha confermato esplicitamente di
+    // voler uscire pur avendo dati non sincronizzati.
+    expect(await db.select(db.outbox).get(), isEmpty);
   });
 }
 

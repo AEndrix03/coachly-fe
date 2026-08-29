@@ -58,7 +58,7 @@ final class ActiveWorkoutProvider
   }
 }
 
-String _$activeWorkoutHash() => r'6b8a8db92c2d6a6efe7943e5fb484eac1d0f8e7b';
+String _$activeWorkoutHash() => r'7352ea523015ff76229a0e646c443b801cf4e8ec';
 
 final class ActiveWorkoutFamily extends $Family
     with

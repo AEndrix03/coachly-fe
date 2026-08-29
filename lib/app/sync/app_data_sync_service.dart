@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:coachly/core/config/app_config.dart';
-import 'package:coachly/app/sync/local_database_service.dart';
+import 'package:coachly/core/database/app_database.dart';
+import 'package:coachly/core/time/clock.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
@@ -24,7 +26,8 @@ final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
     ref.watch(workoutSessionSyncServiceProvider),
     ref.watch(exerciseInfoPageRepositoryProvider),
     ref.watch(authServiceProvider),
-    LocalDatabaseService(),
+    ref.watch(appDatabaseProvider),
+    ref.watch(clockProvider),
   );
 });
 
@@ -47,7 +50,13 @@ class AppDataSyncService {
   final WorkoutSessionSyncService _sessionSyncService;
   final IExerciseInfoPageRepository _exerciseRepository;
   final AuthService _authService;
-  final LocalDatabaseService _localDb;
+  final AppDatabase _database;
+  final Clock _clock;
+
+  /// Perdere l'istante dell'ultima sincronizzazione costa una sincronizzazione
+  /// in piu': e' quindi una preferenza, non un dato
+  /// (`docs/development/04-data-layer.md`).
+  static const _lastSyncKey = 'lastSyncTime';
 
   bool _hasSyncedCurrentSession = false;
   bool _hasAppliedColdStart = false;
@@ -59,20 +68,22 @@ class AppDataSyncService {
     this._sessionSyncService,
     this._exerciseRepository,
     this._authService,
-    this._localDb,
+    this._database,
+    this._clock,
   );
 
   /// Returns true if the last successful sync is older than [_cacheTtl].
-  bool get _isCacheStale {
-    final lastSync = _localDb.lastSyncTime;
+  Future<bool> get _isCacheStale async {
+    final raw = await SharedPreferencesAsync().getString(_lastSyncKey);
+    final lastSync = raw == null ? null : DateTime.tryParse(raw);
     if (lastSync == null) return true;
-    return DateTime.now().difference(lastSync) > _cacheTtl;
+    return _clock.now().difference(lastSync) > _cacheTtl;
   }
 
   Future<void> syncOnAuthenticatedAccess({bool force = false}) async {
     await _applyColdStartOnce();
     if (_isSyncing) return;
-    if (_hasSyncedCurrentSession && !force && !_isCacheStale) return;
+    if (_hasSyncedCurrentSession && !force && !await _isCacheStale) return;
 
     if (!await _canSync()) {
       return;
@@ -91,7 +102,10 @@ class AppDataSyncService {
 
       if (success) {
         _hasSyncedCurrentSession = true;
-        await _localDb.updateLastSyncTime();
+        await SharedPreferencesAsync().setString(
+          _lastSyncKey,
+          _clock.nowUtc().toIso8601String(),
+        );
         _ref.invalidate(workoutListProvider);
         _ref.invalidate(recentWorkoutsProvider);
         _ref.invalidate(exerciseInfoProvider);
@@ -137,7 +151,7 @@ class AppDataSyncService {
     if (_hasAppliedColdStart) return;
     _hasAppliedColdStart = true;
     if (AppConfig.cacheMode != CacheMode.cold) return;
-    await _localDb.clearAll();
+    await _database.wipe();
   }
 
   Future<bool> _canSync() async {

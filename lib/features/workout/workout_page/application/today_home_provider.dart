@@ -3,7 +3,7 @@ import 'dart:ui' show Locale;
 import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/features/auth/providers/user_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_hive_service.dart';
+import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
 import 'package:coachly/features/workout/workout_page/presentation/models/today_home_view_data.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
@@ -16,9 +16,7 @@ final todayHomeViewDataProvider =
       final items = await ref.watch(workoutListProvider.future);
       final user = ref.watch(userProvider);
       final connectivity = ref.watch(connectivityProvider).value;
-      final sessions = await ref
-          .watch(workoutSessionHiveServiceProvider)
-          .getAllSessions();
+      final sessions = await ref.watch(sessionDaoProvider).getAllSessions();
       final openSessions =
           sessions
               .where(

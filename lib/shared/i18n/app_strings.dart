@@ -48,7 +48,6 @@ class AppStrings {
     },
     'workout.active.saving': {'en': 'Saving…', 'it': 'Salvataggio…'},
     'workout.active.saved': {'en': 'Saved', 'it': 'Salvato'},
-    'workout.active.plan_guard': {'en': 'PLAN GUARD', 'it': 'PLAN GUARD'},
     'workout.active.finish': {
       'en': 'Finish workout',
       'it': 'Termina allenamento',
@@ -1785,8 +1784,6 @@ class AppStrings {
       'en': 'Continue with Keycloak',
       'it': 'Continua con Keycloak',
     },
-
-
 
     // Local AI settings (profile page)
 

@@ -1,7 +1,8 @@
 import 'dart:async';
 
-import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_decision.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/active_workout_strings.dart';
+import 'package:coachly/features/workout/workout_active_page/presentation/main_area_scroll_assist.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
@@ -35,7 +36,6 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
   final String title;
   final Duration elapsed;
   final RestTimerState rest;
-  final CoachDecision? decision;
   final VoidCallback onBack;
   final VoidCallback onMenu;
   final ValueChanged<String> onExercise;
@@ -62,7 +62,6 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
   final ValueChanged<int> onRestAdjust;
   final VoidCallback onRestTogglePause;
   final VoidCallback onRestToggleBell;
-  final VoidCallback onDismissGuard;
   final SetNoteChanged onNote;
 
   const AdaptiveWorkoutWorkspace({
@@ -71,7 +70,6 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
     required this.title,
     required this.elapsed,
     required this.rest,
-    required this.decision,
     required this.onBack,
     required this.onMenu,
     required this.onExercise,
@@ -98,7 +96,6 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
     required this.onRestAdjust,
     required this.onRestTogglePause,
     required this.onRestToggleBell,
-    required this.onDismissGuard,
     required this.onNote,
   });
 
@@ -129,25 +126,19 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
             onToggleBell: onRestToggleBell,
             onTimerTap: () => _showRestSheet(context),
           ),
-          _SessionNavigator(
-            exercises: state.exercises,
-            groups: state.groups,
-            activeExerciseId: activeId,
-            onTap: onExercise,
-          ),
           Expanded(
             child: allDone
                 ? _CompletedWorkspace(onComplete: onCompleteWorkout)
-                : CustomScrollView(
-                    key: const PageStorageKey('active-workout-content'),
-                    slivers: [
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 36),
-                        sliver: SliverMainAxisGroup(
-                          slivers: _buildSlivers(context, activeId),
-                        ),
-                      ),
-                    ],
+                : MainAreaScrollAssist(
+                    mainIdentity: activeId ?? '',
+                    leading: _SessionNavigator(
+                      exercises: state.exercises,
+                      groups: state.groups,
+                      activeExerciseId: activeId,
+                      onTap: onExercise,
+                    ),
+                    beforeMain: _buildStructuralContext(),
+                    main: _buildMainArea(context),
                   ),
           ),
           AnimatedSwitcher(
@@ -173,17 +164,11 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
                     onPlus: () => onRestAdjust(30),
                     onSkip: onSkipRest,
                   )
-                : decision == null
-                ? const SizedBox.shrink(key: ValueKey('live-area-empty'))
-                : _CoachInsightBar(
-                    key: const ValueKey('coach-insight-bar'),
-                    decision: decision!,
-                    onOpen: () => _showPlanGuardSheet(context),
-                  ),
+                : const SizedBox.shrink(key: ValueKey('live-area-empty')),
           ),
           _WorkoutActionDock(
             onStructure: () => _showStructureSheet(context),
-            onAdd: () => _showAddToWorkoutDialog(context),
+            onAdd: () => _showAddToWorkoutSheet(context),
             onNotes: () => _showQuickNoteSheet(context),
           ),
         ],
@@ -191,29 +176,28 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildSlivers(BuildContext context, String? activeId) {
+  Widget? _buildStructuralContext() {
     final exercise = state.currentExercise;
-    if (exercise == null) return const [];
-    final group = state.groups
-        .where((item) => item.exerciseIds.contains(exercise.exercise.id))
-        .firstOrNull;
+    if (exercise == null) return null;
     final block = state.workout?.programmingBlocks
         .where((item) => item.id == exercise.executionBlockId)
         .firstOrNull;
-    return [
-      if (block != null && block.sectionTitle != null)
-        SliverToBoxAdapter(
-          child: _StructuralContext(sectionTitle: block.sectionTitle!),
-        ),
-      SliverToBoxAdapter(
-        child: _exerciseCard(
-          context,
-          exercise,
-          true,
-          group == null ? null : _groupName(group.type),
-        ),
-      ),
-    ];
+    return block?.sectionTitle == null
+        ? null
+        : _StructuralContext(sectionTitle: block!.sectionTitle!);
+  }
+
+  Widget _buildMainArea(BuildContext context) {
+    final exercise = state.currentExercise!;
+    final group = state.groups
+        .where((item) => item.exerciseIds.contains(exercise.exercise.id))
+        .firstOrNull;
+    return _exerciseCard(
+      context,
+      exercise,
+      true,
+      group == null ? null : _groupName(group.type),
+    );
   }
 
   Widget _exerciseCard(
@@ -226,7 +210,6 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
     activeSetId: active ? state.currentSet?.id : null,
     groupLabel: groupLabel,
     active: active,
-    decision: active ? decision : null,
     onActivate: () => onExercise(exercise.exercise.id),
     onSet: onSet,
     onWeight: onWeight,
@@ -368,83 +351,39 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
     );
   }
 
-  void _showAddToWorkoutDialog(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    showGeneralDialog<void>(
+  void _showAddToWorkoutSheet(BuildContext context) {
+    showModalBottomSheet<void>(
       context: context,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: scheme.scrim.withValues(alpha: .5),
-      transitionDuration: const Duration(milliseconds: 210),
-      pageBuilder: (dialogContext, _, __) => _AddToWorkoutDialog(
-        onAddSet: () {
-          Navigator.pop(dialogContext);
-          final id = state.currentExercise?.exercise.id;
-          if (id != null) onAddSet(id);
-        },
-        onAddExercise: () {
-          Navigator.pop(dialogContext);
-          WidgetsBinding.instance.addPostFrameCallback((_) => onAddExercise());
-        },
-        onBlock: (type) {
-          Navigator.pop(dialogContext);
-          WidgetsBinding.instance.addPostFrameCallback(
-            (_) => _showCreateBlockDialog(context, type),
-          );
-        },
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(context.radii.xl),
+        ),
       ),
-      transitionBuilder: (context, animation, _, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
-        );
-        return FadeTransition(
-          opacity: curved,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: .97, end: 1).animate(curved),
-            child: child,
-          ),
-        );
-      },
-    );
-  }
-
-  void _showCreateBlockDialog(BuildContext context, ExerciseGroupType type) {
-    final scheme = Theme.of(context).colorScheme;
-    showGeneralDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: scheme.scrim.withValues(alpha: .5),
-      transitionDuration: const Duration(milliseconds: 210),
-      pageBuilder: (dialogContext, _, __) => _BlockBuilderDialog(
-        type: type,
+      builder: (sheetContext) => _AddToWorkoutSheet(
         exercises: [
           for (final exercise in state.exercises)
             (id: exercise.exercise.id, name: exercise.displayName),
         ],
         initiallySelectedId: state.currentExercise?.exercise.id,
-        onAddExercise: onAddBlockExercise,
-        onCreate: (ids) {
-          Navigator.pop(dialogContext);
+        onAddBlockExercise: onAddBlockExercise,
+        onAddSet: () {
+          Navigator.pop(sheetContext);
+          final id = state.currentExercise?.exercise.id;
+          if (id != null) onAddSet(id);
+        },
+        onAddExercise: () {
+          Navigator.pop(sheetContext);
+          WidgetsBinding.instance.addPostFrameCallback((_) => onAddExercise());
+        },
+        onCreateGroup: (ids, type) {
+          Navigator.pop(sheetContext);
           onCreateGroup(ids, type);
         },
       ),
-      transitionBuilder: (context, animation, _, child) {
-        final curved = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-          reverseCurve: Curves.easeInCubic,
-        );
-        return FadeTransition(
-          opacity: curved,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: .97, end: 1).animate(curved),
-            child: child,
-          ),
-        );
-      },
     );
   }
 
@@ -603,86 +542,6 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
       },
     );
   }
-
-  void _showPlanGuardSheet(BuildContext context) => showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    builder: (sheetContext) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(
-                  sheetContext,
-                ).colorScheme.secondary.withValues(alpha: .16),
-                Theme.of(sheetContext).colorScheme.surfaceContainerHigh,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.diamond_outlined,
-                    color: Theme.of(sheetContext).colorScheme.secondary,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    sheetContext.activeTr('planGuard').toUpperCase(),
-                    style: TextStyle(
-                      color: Theme.of(sheetContext).colorScheme.secondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              if (decision == null)
-                Text(sheetContext.activeTr('noSuggestions'))
-              else ...[
-                Text(
-                  sheetContext.activeTr(decision!.primary.titleKey),
-                  style: Theme.of(
-                    sheetContext,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 10),
-                Text(sheetContext.activeTr(decision!.primary.reasonKey)),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () => Navigator.pop(sheetContext),
-                    child: Text(sheetContext.activeTr('details')),
-                  ),
-                ),
-                Center(
-                  child: TextButton(
-                    onPressed: () {
-                      onDismissGuard();
-                      Navigator.pop(sheetContext);
-                    },
-                    child: Text(sheetContext.activeTr('dismiss')),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
 }
 
 class _StructureExerciseRow extends StatelessWidget {
@@ -1095,7 +954,6 @@ class _ExerciseCard extends StatelessWidget {
   final String? activeSetId;
   final String? groupLabel;
   final bool active;
-  final CoachDecision? decision;
   final VoidCallback onActivate;
   final ValueChanged<String> onSet;
   final SetValueChanged onWeight;
@@ -1116,7 +974,6 @@ class _ExerciseCard extends StatelessWidget {
     required this.activeSetId,
     required this.groupLabel,
     required this.active,
-    required this.decision,
     required this.onActivate,
     required this.onSet,
     required this.onWeight,
@@ -1241,7 +1098,7 @@ class _ExerciseCard extends StatelessWidget {
             ),
           ),
           if (activeSetId != null) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: context.spacing.sm),
             _ActiveSetEditor(
               set: exercise.sets.firstWhere((set) => set.id == activeSetId),
               onWeight: onWeight,
@@ -1582,7 +1439,7 @@ class _ActiveSetEditor extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.only(top: 20),
+    padding: EdgeInsets.only(top: context.spacing.sm),
     decoration: BoxDecoration(
       border: Border(
         top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
@@ -1620,6 +1477,7 @@ class _ActiveSetEditor extends StatelessWidget {
             (value) => onWeight(set, _storedWeight(value, loadUnit)),
             label: context.activeTr('weight'),
             unit: loadUnit,
+            step: loadUnit == 'lbs' ? 5 : 2.5,
           ),
         ),
         _Stepper(
@@ -1632,6 +1490,7 @@ class _ActiveSetEditor extends StatelessWidget {
             set.reps.toDouble(),
             (value) => onReps(set, value.round()),
             label: context.activeTr('reps'),
+            step: 1,
           ),
         ),
         if (set.technique == SetTechnique.dropSet) ...[
@@ -2068,6 +1927,9 @@ class _SetTechniqueActions extends StatelessWidget {
       children: [
         TextButton.icon(
           onPressed: onAddDrop,
+          style: TextButton.styleFrom(
+            backgroundColor: scheme.surface.withValues(alpha: 0),
+          ),
           icon: const Icon(Icons.add_rounded, size: 18),
           label: Text(context.activeTr('addDrop')),
         ),
@@ -2419,6 +2281,7 @@ class _DropEditor extends StatelessWidget {
                       (value) => onWeight(_storedWeight(value, loadUnit)),
                       label: 'Drop ${index + 1} weight',
                       unit: loadUnit,
+                      step: weightStep,
                     ),
                   ),
                   Divider(height: 1, color: scheme.outlineVariant),
@@ -2432,6 +2295,7 @@ class _DropEditor extends StatelessWidget {
                       drop.reps.toDouble(),
                       (value) => onReps(value.round()),
                       label: 'Drop ${index + 1} reps',
+                      step: 1,
                     ),
                   ),
                 ],
@@ -2609,29 +2473,47 @@ class _Stepper extends StatelessWidget {
   );
 }
 
-class _AddToWorkoutDialog extends StatelessWidget {
+class _AddToWorkoutSheet extends StatefulWidget {
   final VoidCallback onAddSet;
   final VoidCallback onAddExercise;
-  final ValueChanged<ExerciseGroupType> onBlock;
+  final List<({String id, String name})> exercises;
+  final String? initiallySelectedId;
+  final BlockExerciseAdd onAddBlockExercise;
+  final BlockCreate onCreateGroup;
 
-  const _AddToWorkoutDialog({
+  const _AddToWorkoutSheet({
     required this.onAddSet,
     required this.onAddExercise,
-    required this.onBlock,
+    required this.exercises,
+    required this.initiallySelectedId,
+    required this.onAddBlockExercise,
+    required this.onCreateGroup,
   });
 
   @override
+  State<_AddToWorkoutSheet> createState() => _AddToWorkoutSheetState();
+}
+
+class _AddToWorkoutSheetState extends State<_AddToWorkoutSheet> {
+  ExerciseGroupType? _blockType;
+
+  @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      backgroundColor: scheme.surfaceContainerHigh,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: scheme.outlineVariant),
+    final motion = context.motion;
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight:
+            MediaQuery.sizeOf(context).height -
+            MediaQuery.paddingOf(context).top -
+            context.spacing.xxl,
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+        padding: EdgeInsets.fromLTRB(
+          context.spacing.lg,
+          0,
+          context.spacing.lg,
+          context.spacing.lg,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2639,22 +2521,26 @@ class _AddToWorkoutDialog extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (_blockType != null)
+                  IconButton(
+                    onPressed: () => setState(() => _blockType = null),
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).backButtonTooltip,
+                    icon: const Icon(Icons.arrow_back_rounded),
+                  ),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        context.tr('workout.active.add_title'),
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
+                  child: AnimatedSwitcher(
+                    duration: motion.resolve(context, motion.standard),
+                    child: Text(
+                      _blockType == null
+                          ? context.tr('workout.active.add_title')
+                          : _blockTitle(_blockType!),
+                      key: ValueKey(_blockType),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
                       ),
-                      const SizedBox(height: 3),
-                      Text(
-                        context.tr('workout.active.add_subtitle'),
-                        style: TextStyle(color: scheme.onSurfaceVariant),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 IconButton(
@@ -2664,47 +2550,115 @@ class _AddToWorkoutDialog extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            _AddActionRow(
-              icon: Icons.add_rounded,
-              title: context.tr('workout.active.add_set'),
-              subtitle: context.tr('workout.active.add_set_hint'),
-              onTap: onAddSet,
-            ),
-            const SizedBox(height: 10),
-            _AddActionRow(
-              icon: Icons.fitness_center_rounded,
-              title: context.tr('workout.active.add_exercise'),
-              subtitle: context.tr('workout.active.add_movement'),
-              onTap: onAddExercise,
-            ),
-            const SizedBox(height: 20),
-            Text(context.tr('workout.active.blocks'), style: _labelStyle),
-            const SizedBox(height: 4),
-            Text(
-              context.tr('workout.active.combine_hint'),
-              style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13),
-            ),
-            const SizedBox(height: 12),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 1.65,
-              children: [
-                for (final type in const [
-                  ExerciseGroupType.superset,
-                  ExerciseGroupType.triset,
-                  ExerciseGroupType.giantSet,
-                  ExerciseGroupType.circuit,
-                ])
-                  _BlockTypeTile(type: type, onTap: () => onBlock(type)),
-              ],
+            SizedBox(height: context.spacing.sm),
+            Flexible(
+              child: AnimatedSwitcher(
+                duration: motion.resolve(context, motion.standard),
+                switchInCurve: motion.enter,
+                switchOutCurve: motion.exit,
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: SizeTransition(
+                    sizeFactor: animation,
+                    axisAlignment: -1,
+                    child: child,
+                  ),
+                ),
+                child: _blockType == null
+                    ? _AddToWorkoutOverview(
+                        key: const ValueKey('add-overview'),
+                        onAddSet: widget.onAddSet,
+                        onAddExercise: widget.onAddExercise,
+                        onBlock: (type) => setState(() => _blockType = type),
+                      )
+                    : _InlineBlockBuilder(
+                        key: ValueKey(_blockType),
+                        type: _blockType!,
+                        exercises: widget.exercises,
+                        initiallySelectedId: widget.initiallySelectedId,
+                        onAddExercise: widget.onAddBlockExercise,
+                        onCreate: (ids) =>
+                            widget.onCreateGroup(ids, _blockType!),
+                      ),
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _AddToWorkoutOverview extends StatelessWidget {
+  final VoidCallback onAddSet;
+  final VoidCallback onAddExercise;
+  final ValueChanged<ExerciseGroupType> onBlock;
+
+  const _AddToWorkoutOverview({
+    super.key,
+    required this.onAddSet,
+    required this.onAddExercise,
+    required this.onBlock,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.tr('workout.active.add_subtitle'),
+            style: context.text.bodyM.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          SizedBox(height: context.spacing.md),
+          _AddActionRow(
+            icon: Icons.add_rounded,
+            title: context.tr('workout.active.add_set'),
+            subtitle: context.tr('workout.active.add_set_hint'),
+            onTap: onAddSet,
+          ),
+          SizedBox(height: context.spacing.xs),
+          _AddActionRow(
+            icon: Icons.fitness_center_rounded,
+            title: context.tr('workout.active.add_exercise'),
+            subtitle: context.tr('workout.active.add_movement'),
+            onTap: onAddExercise,
+          ),
+          SizedBox(height: context.spacing.lg),
+          Text(context.tr('workout.active.blocks'), style: _labelStyle),
+          SizedBox(height: context.spacing.xxs),
+          Text(
+            context.tr('workout.active.combine_hint'),
+            style: context.text.bodyS.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          SizedBox(height: context.spacing.sm),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final tileWidth = (constraints.maxWidth - context.spacing.xs) / 2;
+              return Wrap(
+                spacing: context.spacing.xs,
+                runSpacing: context.spacing.xs,
+                children: [
+                  for (final type in const [
+                    ExerciseGroupType.superset,
+                    ExerciseGroupType.triset,
+                    ExerciseGroupType.giantSet,
+                    ExerciseGroupType.circuit,
+                  ])
+                    SizedBox(
+                      width: tileWidth,
+                      child: _BlockTypeTile(
+                        type: type,
+                        onTap: () => onBlock(type),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -2728,28 +2682,37 @@ class _AddActionRow extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(context.radii.lg),
       child: Container(
-        constraints: const BoxConstraints(minHeight: 66),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        constraints: BoxConstraints(
+          minHeight: context.sizes.touchTargetWorkout,
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.spacing.sm,
+          vertical: context.spacing.xs,
+        ),
         decoration: BoxDecoration(
           color: scheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(context.radii.lg),
           border: Border.all(color: scheme.outlineVariant),
         ),
         child: Row(
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: context.sizes.touchTarget,
+              height: context.sizes.touchTarget,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: scheme.primary.withValues(alpha: .1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(context.radii.md),
               ),
-              child: Icon(icon, size: 20, color: scheme.primary),
+              child: Icon(
+                icon,
+                size: context.sizes.iconSm,
+                color: scheme.primary,
+              ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: context.spacing.sm),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -2758,12 +2721,11 @@ class _AddActionRow extends StatelessWidget {
                     title,
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: context.spacing.xxs),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: context.text.bodyS.copyWith(
                       color: scheme.onSurfaceVariant,
-                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -2788,31 +2750,37 @@ class _BlockTypeTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(context.radii.lg),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 10),
+        constraints: BoxConstraints(
+          minHeight: context.sizes.touchTargetWorkout,
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.spacing.xs,
+          vertical: context.spacing.sm,
+        ),
         decoration: BoxDecoration(
           color: scheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(context.radii.lg),
           border: Border.all(color: scheme.outlineVariant),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _BlockGlyph(type: type),
-            const SizedBox(height: 8),
+            SizedBox(height: context.spacing.xs),
             Text(
               _blockTitle(type),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
+              textAlign: TextAlign.center,
+              style: context.text.labelStrong,
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: context.spacing.xxs),
             Text(
               _blockSubtitle(type),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 9, color: scheme.onSurfaceVariant),
+              textAlign: TextAlign.center,
+              style: context.text.bodyS.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -2827,9 +2795,12 @@ class _BlockGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final extent = context.sizes.iconXl + context.spacing.md;
+    final cacheExtent = (extent * MediaQuery.devicePixelRatioOf(context))
+        .round();
     return SizedBox(
-      width: CoachlyAthleteTheme.touchTarget,
-      height: CoachlyAthleteTheme.touchTarget,
+      width: extent,
+      height: extent,
       child: Image.asset(
         switch (type) {
           ExerciseGroupType.superset => 'assets/images/sets/Superset.png',
@@ -2841,20 +2812,23 @@ class _BlockGlyph extends StatelessWidget {
         },
         fit: BoxFit.contain,
         alignment: Alignment.center,
+        cacheWidth: cacheExtent,
+        cacheHeight: cacheExtent,
         excludeFromSemantics: true,
       ),
     );
   }
 }
 
-class _BlockBuilderDialog extends StatefulWidget {
+class _InlineBlockBuilder extends StatefulWidget {
   final ExerciseGroupType type;
   final List<({String id, String name})> exercises;
   final String? initiallySelectedId;
   final BlockExerciseAdd onAddExercise;
   final ValueChanged<List<String>> onCreate;
 
-  const _BlockBuilderDialog({
+  const _InlineBlockBuilder({
+    super.key,
     required this.type,
     required this.exercises,
     required this.initiallySelectedId,
@@ -2863,10 +2837,10 @@ class _BlockBuilderDialog extends StatefulWidget {
   });
 
   @override
-  State<_BlockBuilderDialog> createState() => _BlockBuilderDialogState();
+  State<_InlineBlockBuilder> createState() => _InlineBlockBuilderState();
 }
 
-class _BlockBuilderDialogState extends State<_BlockBuilderDialog> {
+class _InlineBlockBuilderState extends State<_InlineBlockBuilder> {
   late final List<({String id, String name})> _exercises;
   late final Set<String> _selected;
   bool _addingExercise = false;
@@ -2924,123 +2898,90 @@ class _BlockBuilderDialogState extends State<_BlockBuilderDialog> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final valid = _selected.length >= _minimum;
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      backgroundColor: scheme.surfaceContainerHigh,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: scheme.outlineVariant),
-      ),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.sizeOf(context).height * .78,
+    return Column(
+      key: ValueKey(widget.type),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _BlockGlyph(type: widget.type),
+            SizedBox(width: context.spacing.sm),
+            Expanded(
+              child: Text(
+                _blockBuilderInstruction(widget.type),
+                style: context.text.bodyM.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _BlockGlyph(type: widget.type),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Create ${_blockTitle(widget.type)}',
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.w800),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          _blockBuilderInstruction(widget.type),
-                          style: TextStyle(color: scheme.onSurfaceVariant),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).closeButtonTooltip,
-                    icon: const Icon(Icons.close_rounded),
-                  ),
-                ],
+        SizedBox(height: context.spacing.md),
+        Row(
+          children: [
+            Text(context.tr('workout.active.exercises'), style: _labelStyle),
+            const Spacer(),
+            Text(
+              '${_selected.length}${_maximum == null ? ' / $_minimum+' : ' / $_maximum'}',
+              style: TextStyle(
+                color: valid ? scheme.primary : scheme.onSurfaceVariant,
+                fontWeight: FontWeight.w800,
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Text(
-                    context.tr('workout.active.exercises'),
-                    style: _labelStyle,
-                  ),
-                  const Spacer(),
-                  Text(
-                    '${_selected.length}${_maximum == null ? ' / $_minimum+' : ' / $_maximum'}',
-                    style: TextStyle(
-                      color: valid ? scheme.primary : scheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w800,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Flexible(
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: _exercises.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 6),
-                  itemBuilder: (context, index) {
-                    final exercise = _exercises[index];
-                    final selected = _selected.contains(exercise.id);
-                    final disabled =
-                        !selected &&
-                        _maximum != null &&
-                        _selected.length >= _maximum!;
-                    return _BlockExerciseChoice(
-                      index: index + 1,
-                      name: exercise.name,
-                      selected: selected,
-                      enabled: !disabled,
-                      onTap: () => _toggle(exercise.id),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: _addingExercise ? null : _addExercise,
-                  icon: _addingExercise
-                      ? const SizedBox.square(
-                          dimension: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.add_rounded),
-                  label: Text(context.tr('workout.active.add_exercise')),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: valid
-                      ? () => widget.onCreate(_selected.toList())
-                      : null,
-                  child: Text('Create ${_blockTitle(widget.type)}'),
-                ),
-              ),
-            ],
+            ),
+          ],
+        ),
+        SizedBox(height: context.spacing.xs),
+        Expanded(
+          child: ListView.separated(
+            itemCount: _exercises.length,
+            separatorBuilder: (_, __) => SizedBox(height: context.spacing.xxs),
+            itemBuilder: (context, index) {
+              final exercise = _exercises[index];
+              final selected = _selected.contains(exercise.id);
+              final disabled =
+                  !selected &&
+                  _maximum != null &&
+                  _selected.length >= _maximum!;
+              return _BlockExerciseChoice(
+                index: index + 1,
+                name: exercise.name,
+                selected: selected,
+                enabled: !disabled,
+                onTap: () => _toggle(exercise.id),
+              );
+            },
           ),
         ),
-      ),
+        SizedBox(height: context.spacing.sm),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _addingExercise ? null : _addExercise,
+            icon: _addingExercise
+                ? SizedBox.square(
+                    dimension: context.sizes.iconXs,
+                    child: const CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.add_rounded),
+            label: Text(context.tr('workout.active.add_exercise')),
+          ),
+        ),
+        SizedBox(height: context.spacing.xs),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: valid ? () => widget.onCreate(_selected.toList()) : null,
+            child: Text(
+              context.tr(
+                'workout.builder.create_selected_block',
+                params: {'type': _blockTitle(widget.type)},
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -3063,21 +3004,27 @@ class _BlockExerciseChoice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final motion = context.motion;
     return AnimatedOpacity(
-      duration: const Duration(milliseconds: 160),
+      duration: motion.resolve(context, motion.quick),
       opacity: enabled || selected ? 1 : .42,
       child: InkWell(
         onTap: enabled || selected ? onTap : null,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(context.radii.md),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          constraints: const BoxConstraints(minHeight: 54),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          duration: motion.resolve(context, motion.quick),
+          constraints: BoxConstraints(
+            minHeight: context.sizes.touchTargetWorkout,
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.spacing.sm,
+            vertical: context.spacing.xs,
+          ),
           decoration: BoxDecoration(
             color: selected
                 ? scheme.primary.withValues(alpha: .1)
                 : scheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(context.radii.md),
             border: Border.all(
               color: selected ? scheme.primary : scheme.outlineVariant,
             ),
@@ -3085,7 +3032,7 @@ class _BlockExerciseChoice extends StatelessWidget {
           child: Row(
             children: [
               SizedBox(
-                width: 28,
+                width: context.sizes.iconMd,
                 child: Text(
                   index.toString().padLeft(2, '0'),
                   style: TextStyle(
@@ -3104,7 +3051,7 @@ class _BlockExerciseChoice extends StatelessWidget {
                 ),
               ),
               AnimatedSwitcher(
-                duration: const Duration(milliseconds: 160),
+                duration: motion.resolve(context, motion.quick),
                 child: selected
                     ? Icon(
                         Icons.check_circle_rounded,
@@ -3275,7 +3222,6 @@ class _QuickNoteSheetState extends State<_QuickNoteSheet> {
             const SizedBox(height: 16),
             TextField(
               controller: _textController,
-              autofocus: true,
               minLines: 4,
               maxLines: 6,
               onChanged: _onTextChanged,
@@ -3554,55 +3500,6 @@ class _LiveBarAction extends StatelessWidget {
   );
 }
 
-class _CoachInsightBar extends StatelessWidget {
-  final CoachDecision decision;
-  final VoidCallback onOpen;
-
-  const _CoachInsightBar({
-    super.key,
-    required this.decision,
-    required this.onOpen,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            scheme.secondary.withValues(alpha: .16),
-            scheme.surfaceContainerHigh,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: scheme.secondary.withValues(alpha: .28)),
-      ),
-      child: ListTile(
-        minTileHeight: 58,
-        onTap: onOpen,
-        leading: Icon(Icons.diamond_outlined, color: scheme.secondary),
-        title: Text(
-          context.tr('workout.active.plan_guard'),
-          style: TextStyle(
-            color: scheme.secondary,
-            fontSize: 10,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1,
-          ),
-        ),
-        subtitle: Text(
-          context.activeTr(decision.primary.titleKey),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: const Icon(Icons.arrow_forward_rounded),
-      ),
-    );
-  }
-}
-
 String _clock(int seconds) =>
     '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
 
@@ -3737,82 +3634,168 @@ class _CompletedWorkspace extends StatelessWidget {
 void _showNumberInput(
   BuildContext context,
   double initial,
-  ValueChanged<double> onSubmit, {
+  ValueChanged<double> onChanged, {
   required String label,
+  required double step,
   String? unit,
 }) {
-  final controller = TextEditingController(text: _number(initial));
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (sheetContext) => Padding(
+    builder: (_) => _NumberInputSheet(
+      initial: initial,
+      label: label,
+      unit: unit,
+      step: step,
+      onChanged: onChanged,
+    ),
+  );
+}
+
+class _NumberInputSheet extends StatefulWidget {
+  final double initial;
+  final String label;
+  final String? unit;
+  final double step;
+  final ValueChanged<double> onChanged;
+
+  const _NumberInputSheet({
+    required this.initial,
+    required this.label,
+    required this.unit,
+    required this.step,
+    required this.onChanged,
+  });
+
+  @override
+  State<_NumberInputSheet> createState() => _NumberInputSheetState();
+}
+
+class _NumberInputSheetState extends State<_NumberInputSheet> {
+  late final TextEditingController _controller;
+  late final FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: _number(widget.initial));
+    _focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  double? _parsedValue() =>
+      double.tryParse(_controller.text.replaceAll(',', '.'));
+
+  void _saveText(String _) {
+    final value = _parsedValue();
+    if (value != null) widget.onChanged(value);
+  }
+
+  void _adjust(double delta) {
+    final value = ((_parsedValue() ?? widget.initial) + delta)
+        .clamp(0, double.infinity)
+        .toDouble();
+    final text = _number(value);
+    _controller.value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+    widget.onChanged(value);
+    _focusNode.requestFocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return AnimatedPadding(
+      duration: context.motion.resolve(context, context.motion.quick),
+      curve: context.motion.enter,
       padding: EdgeInsets.fromLTRB(
-        20,
+        context.spacing.lg,
         0,
-        20,
-        MediaQuery.viewInsetsOf(sheetContext).bottom + 20,
+        context.spacing.lg,
+        MediaQuery.viewInsetsOf(context).bottom + context.spacing.lg,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            label.toUpperCase(),
-            style: Theme.of(sheetContext).textTheme.labelLarge?.copyWith(
-              color: Theme.of(sheetContext).colorScheme.onSurfaceVariant,
-              letterSpacing: 1.2,
+            widget.label.toUpperCase(),
+            style: context.text.labelStrong.copyWith(
+              color: scheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: controller,
-            autofocus: true,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 38,
-              fontWeight: FontWeight.w700,
-              fontFeatures: [FontFeature.tabularFigures()],
-            ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              suffixText: unit,
-              suffixStyle: Theme.of(sheetContext).textTheme.titleMedium,
-            ),
-            onSubmitted: (value) {
-              final number = double.tryParse(value.replaceAll(',', '.'));
-              if (number != null) onSubmit(number);
-              Navigator.pop(sheetContext);
-            },
-          ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.spacing.xs),
           Row(
             children: [
+              _NumberStepButton(
+                icon: Icons.remove_rounded,
+                tooltip: context.tr('workout.builder.decrease'),
+                onPressed: () => _adjust(-widget.step),
+              ),
+              SizedBox(width: context.spacing.xs),
               Expanded(
-                child: TextButton(
-                  onPressed: () => Navigator.pop(sheetContext),
-                  child: Text(
-                    MaterialLocalizations.of(sheetContext).cancelButtonLabel,
+                child: TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  autofocus: true,
+                  textAlign: TextAlign.center,
+                  style: context.text.displayM.copyWith(
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    suffixText: widget.unit,
+                    suffixStyle: context.text.titleM,
+                  ),
+                  onChanged: _saveText,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton(
-                  onPressed: () {
-                    final number = double.tryParse(
-                      controller.text.replaceAll(',', '.'),
-                    );
-                    if (number != null) onSubmit(number);
-                    Navigator.pop(sheetContext);
-                  },
-                  child: Text(sheetContext.activeTr('confirm')),
-                ),
+              SizedBox(width: context.spacing.xs),
+              _NumberStepButton(
+                icon: Icons.add_rounded,
+                tooltip: context.tr('workout.builder.increase'),
+                onPressed: () => _adjust(widget.step),
               ),
             ],
           ),
         ],
       ),
+    );
+  }
+}
+
+class _NumberStepButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  const _NumberStepButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) => SizedBox.square(
+    dimension: context.sizes.touchTargetWorkout,
+    child: IconButton.filledTonal(
+      onPressed: onPressed,
+      tooltip: tooltip,
+      icon: Icon(icon),
     ),
   );
 }

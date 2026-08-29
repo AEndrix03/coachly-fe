@@ -6,7 +6,6 @@ import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_
 import 'package:coachly/features/workout/workout_active_page/coach/domain/performance_comparator.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/evaluators/comparability_evaluator.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/evaluators/data_quality_evaluator.dart';
-import 'package:coachly/features/workout/workout_active_page/coach/evaluators/plan_guardian_evaluator.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/evaluators/progression_evaluator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -41,7 +40,6 @@ class WorkoutCoachController extends Notifier<WorkoutCoachState> {
         DataQualityEvaluator(),
         ComparabilityEvaluator(PerformanceComparator()),
         ProgressionEvaluator(),
-        PlanGuardianEvaluator(),
       ],
       resolver: CoachDecisionResolver(),
     );

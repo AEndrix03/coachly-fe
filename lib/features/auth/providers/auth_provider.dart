@@ -1,5 +1,5 @@
+import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/logging/app_logger.dart';
-import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/models/auth_state/auth_state.dart';
 import 'package:coachly/features/auth/data/repositories/auth_repository.dart';
@@ -8,7 +8,7 @@ import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service_impl.dart';
 import 'package:coachly/features/auth/data/services/token_manager.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_hive_service.dart';
+import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -62,10 +62,8 @@ class Auth extends _$Auth {
   /// Vedi `docs/development/24-security-and-privacy.md`.
   Future<int> pendingSyncCount() async {
     try {
-      final jobs = await ref
-          .read(workoutSessionHiveServiceProvider)
-          .getPendingJobsOrdered();
-      return jobs.length;
+      final pending = await ref.read(outboxDaoProvider).pendingOrdered();
+      return pending.length;
     } catch (error) {
       ref
           .read(appLoggerProvider)
@@ -92,7 +90,7 @@ class Auth extends _$Auth {
     final authService = ref.read(authServiceProvider);
     await authService.endSession();
     await authService.clearTokens();
-    await LocalDatabaseService().clearAll();
+    await ref.read(appDatabaseProvider).wipe();
     state = const AsyncData(_unauthenticated);
     return true;
   }

@@ -64,10 +64,6 @@
   "@workoutActiveSaved": {
     "description": "Migrated from workout.active.saved"
   },
-  "workoutActivePlanGuard": "PLAN GUARD",
-  "@workoutActivePlanGuard": {
-    "description": "Migrated from workout.active.plan_guard"
-  },
   "workoutActiveFinish": "Finish workout",
   "@workoutActiveFinish": {
     "description": "Migrated from workout.active.finish"

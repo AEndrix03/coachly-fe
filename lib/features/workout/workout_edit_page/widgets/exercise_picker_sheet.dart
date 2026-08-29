@@ -1,4 +1,5 @@
-import 'package:coachly/app/sync/local_database_service.dart';
+import 'dart:async';
+import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
 import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
 import 'package:coachly/core/result/result.dart';
@@ -59,6 +60,13 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   ExerciseFilterModel _filter = const ExerciseFilterModel(scope: 'community');
 
+  /// Sessioni caricate una volta all'apertura del foglio.
+  ///
+  /// La lettura da Drift e' asincrona, mentre i default di serie e carico
+  /// servono durante la costruzione di una riga: si carica in anticipo invece
+  /// di rendere asincrono tutto il percorso di rendering.
+  List<LocalWorkoutSession> _sessions = const [];
+
   // ── lifecycle ─────────────────────────────────────────────────────────────
 
   @override
@@ -66,6 +74,13 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     super.initState();
     _searchCtrl.addListener(_onSearch);
     _listScrollController.addListener(_onListScroll);
+    unawaited(_loadSessions());
+  }
+
+  Future<void> _loadSessions() async {
+    final sessions = await ref.read(sessionDaoProvider).getAllSessions();
+    if (!mounted) return;
+    setState(() => _sessions = sessions);
   }
 
   @override
@@ -1156,14 +1171,10 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   /// Falls back to generic defaults if no session data is found.
   ({String sets, String weight}) _lastSessionDefaults(String exerciseId) {
     try {
-      final db = ref.read(localDatabaseServiceProvider);
       LocalWorkoutSessionEntry? bestEntry;
       DateTime? bestDate;
 
-      for (final raw in db.workoutSessions.values) {
-        final session = LocalWorkoutSession.fromJson(
-          raw.map((k, v) => MapEntry(k.toString(), v)),
-        );
+      for (final session in _sessions) {
         final date = session.completedAt ?? session.updatedAt;
         for (final entry in session.entries) {
           if (entry.exerciseId != exerciseId) continue;
@@ -1186,7 +1197,6 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       final weightStr = (load != null && load > 0) ? '$load' : '';
       return (sets: setsStr, weight: weightStr);
     } catch (_) {
-      // TODO: failed to read Hive session data for exercise $exerciseId
       return (sets: '3', weight: '');
     }
   }

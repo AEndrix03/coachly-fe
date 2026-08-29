@@ -9,7 +9,8 @@ typedef ArbResolver =
 final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'common.app_name': (l10n, _) => l10n.commonAppName,
   'exercise.create.save_failed': (l10n, _) => l10n.exerciseCreateSaveFailed,
-  'workout.active.search_exercises': (l10n, _) => l10n.workoutActiveSearchExercises,
+  'workout.active.search_exercises': (l10n, _) =>
+      l10n.workoutActiveSearchExercises,
   'workout.active.cluster': (l10n, _) => l10n.workoutActiveCluster,
   'workout.active.failure': (l10n, _) => l10n.workoutActiveFailure,
   'workout.active.weight': (l10n, _) => l10n.workoutActiveWeight,
@@ -23,14 +24,18 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'workout.active.note_hint': (l10n, _) => l10n.workoutActiveNoteHint,
   'workout.active.saving': (l10n, _) => l10n.workoutActiveSaving,
   'workout.active.saved': (l10n, _) => l10n.workoutActiveSaved,
-  'workout.active.plan_guard': (l10n, _) => l10n.workoutActivePlanGuard,
   'workout.active.finish': (l10n, _) => l10n.workoutActiveFinish,
   'exercise.biomechanics.title': (l10n, _) => l10n.exerciseBiomechanicsTitle,
-  'exercise.biomechanics.main_pattern': (l10n, _) => l10n.exerciseBiomechanicsMainPattern,
-  'exercise.biomechanics.updating': (l10n, _) => l10n.exerciseBiomechanicsUpdating,
-  'exercise.biomechanics.resistance': (l10n, _) => l10n.exerciseBiomechanicsResistance,
-  'exercise.biomechanics.no_profile': (l10n, _) => l10n.exerciseBiomechanicsNoProfile,
-  'exercise.biomechanics.how_read': (l10n, _) => l10n.exerciseBiomechanicsHowRead,
+  'exercise.biomechanics.main_pattern': (l10n, _) =>
+      l10n.exerciseBiomechanicsMainPattern,
+  'exercise.biomechanics.updating': (l10n, _) =>
+      l10n.exerciseBiomechanicsUpdating,
+  'exercise.biomechanics.resistance': (l10n, _) =>
+      l10n.exerciseBiomechanicsResistance,
+  'exercise.biomechanics.no_profile': (l10n, _) =>
+      l10n.exerciseBiomechanicsNoProfile,
+  'exercise.biomechanics.how_read': (l10n, _) =>
+      l10n.exerciseBiomechanicsHowRead,
   'exercise.create.hint': (l10n, _) => l10n.exerciseCreateHint,
   'exercise.create.upload_soon': (l10n, _) => l10n.exerciseCreateUploadSoon,
   'exercise.play_media': (l10n, _) => l10n.exercisePlayMedia,
@@ -43,7 +48,8 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'exercise.pattern': (l10n, _) => l10n.exercisePattern,
   'exercise.stability': (l10n, _) => l10n.exerciseStability,
   'exercise.spinal_load': (l10n, _) => l10n.exerciseSpinalLoad,
-  'exercise.explore_biomechanics': (l10n, _) => l10n.exerciseExploreBiomechanics,
+  'exercise.explore_biomechanics': (l10n, _) =>
+      l10n.exerciseExploreBiomechanics,
   'exercise.required': (l10n, _) => l10n.exerciseRequired,
   'exercise.remember': (l10n, _) => l10n.exerciseRemember,
   'common.more_actions': (l10n, _) => l10n.commonMoreActions,
@@ -51,8 +57,10 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'exercise.muscles.back': (l10n, _) => l10n.exerciseMusclesBack,
   'exercise.muscles.view_mode': (l10n, _) => l10n.exerciseMusclesViewMode,
   'exercise.muscles.role_primary': (l10n, _) => l10n.exerciseMusclesRolePrimary,
-  'exercise.muscles.role_secondary': (l10n, _) => l10n.exerciseMusclesRoleSecondary,
-  'exercise.muscles.role_stabilizer': (l10n, _) => l10n.exerciseMusclesRoleStabilizer,
+  'exercise.muscles.role_secondary': (l10n, _) =>
+      l10n.exerciseMusclesRoleSecondary,
+  'exercise.muscles.role_stabilizer': (l10n, _) =>
+      l10n.exerciseMusclesRoleStabilizer,
   'exercise.muscles.lengthened': (l10n, _) => l10n.exerciseMusclesLengthened,
   'exercise.muscles.midrange': (l10n, _) => l10n.exerciseMusclesMidrange,
   'exercise.muscles.mid': (l10n, _) => l10n.exerciseMusclesMid,
@@ -132,7 +140,8 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'workout.recent': (l10n, _) => l10n.workoutRecent,
   'workout.resume': (l10n, _) => l10n.workoutResume,
   'workout.all': (l10n, _) => l10n.workoutAll,
-  'workout.my_workouts_count': (l10n, params) => l10n.workoutMyWorkoutsCount(params['count'] ?? ''),
+  'workout.my_workouts_count': (l10n, params) =>
+      l10n.workoutMyWorkoutsCount(params['count'] ?? ''),
   'workout.search_hint': (l10n, _) => l10n.workoutSearchHint,
   'workout.clear_search': (l10n, _) => l10n.workoutClearSearch,
   'workout.no_search_results': (l10n, _) => l10n.workoutNoSearchResults,
@@ -141,10 +150,12 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'workout.sort_name': (l10n, _) => l10n.workoutSortName,
   'workout.sort_progress': (l10n, _) => l10n.workoutSortProgress,
   'workout.progress_overview': (l10n, _) => l10n.workoutProgressOverview,
-  'workout.progress_overview_hint': (l10n, _) => l10n.workoutProgressOverviewHint,
+  'workout.progress_overview_hint': (l10n, _) =>
+      l10n.workoutProgressOverviewHint,
   'workout.actions': (l10n, _) => l10n.workoutActions,
   'workout.no_active': (l10n, _) => l10n.workoutNoActive,
-  'workout.archived_count': (l10n, params) => l10n.workoutArchivedCount(params['count'] ?? ''),
+  'workout.archived_count': (l10n, params) =>
+      l10n.workoutArchivedCount(params['count'] ?? ''),
   'workout.archived_hint': (l10n, _) => l10n.workoutArchivedHint,
   'workout.notifications': (l10n, _) => l10n.workoutNotifications,
   'workout.notifications_soon': (l10n, _) => l10n.workoutNotificationsSoon,
@@ -154,7 +165,8 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'workout.load': (l10n, _) => l10n.workoutLoad,
   'workout.rest': (l10n, _) => l10n.workoutRest,
   'workout.start': (l10n, _) => l10n.workoutStart,
-  'workout.last_used': (l10n, params) => l10n.workoutLastUsed(params['date'] ?? ''),
+  'workout.last_used': (l10n, params) =>
+      l10n.workoutLastUsed(params['date'] ?? ''),
   'workout.duration': (l10n, _) => l10n.workoutDuration,
   'workout.duration_minutes': (l10n, _) => l10n.workoutDurationMinutes,
   'workout.focus': (l10n, _) => l10n.workoutFocus,
@@ -162,199 +174,333 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'workout.hypertrophy': (l10n, _) => l10n.workoutHypertrophy,
   'workout.builder.create_title': (l10n, _) => l10n.workoutBuilderCreateTitle,
   'workout.builder.edit_title': (l10n, _) => l10n.workoutBuilderEditTitle,
-  'workout.builder.structure_title': (l10n, _) => l10n.workoutBuilderStructureTitle,
+  'workout.builder.structure_title': (l10n, _) =>
+      l10n.workoutBuilderStructureTitle,
   'workout.builder.review_title': (l10n, _) => l10n.workoutBuilderReviewTitle,
-  'workout.builder.identity_heading': (l10n, _) => l10n.workoutBuilderIdentityHeading,
-  'workout.builder.identity_subtitle': (l10n, _) => l10n.workoutBuilderIdentitySubtitle,
+  'workout.builder.identity_heading': (l10n, _) =>
+      l10n.workoutBuilderIdentityHeading,
+  'workout.builder.identity_subtitle': (l10n, _) =>
+      l10n.workoutBuilderIdentitySubtitle,
   'workout.builder.title_label': (l10n, _) => l10n.workoutBuilderTitleLabel,
   'workout.builder.title_hint': (l10n, _) => l10n.workoutBuilderTitleHint,
   'workout.builder.goal_label': (l10n, _) => l10n.workoutBuilderGoalLabel,
   'workout.builder.focus_label': (l10n, _) => l10n.workoutBuilderFocusLabel,
   'workout.builder.focus_hint': (l10n, _) => l10n.workoutBuilderFocusHint,
-  'workout.builder.goal_hypertrophy': (l10n, _) => l10n.workoutBuilderGoalHypertrophy,
+  'workout.builder.goal_hypertrophy': (l10n, _) =>
+      l10n.workoutBuilderGoalHypertrophy,
   'workout.builder.goal_strength': (l10n, _) => l10n.workoutBuilderGoalStrength,
   'workout.builder.goal_general': (l10n, _) => l10n.workoutBuilderGoalGeneral,
-  'workout.builder.goal_hypertrophy_description': (l10n, _) => l10n.workoutBuilderGoalHypertrophyDescription,
-  'workout.builder.goal_strength_description': (l10n, _) => l10n.workoutBuilderGoalStrengthDescription,
-  'workout.builder.goal_general_description': (l10n, _) => l10n.workoutBuilderGoalGeneralDescription,
-  'workout.builder.goal_info_tooltip': (l10n, _) => l10n.workoutBuilderGoalInfoTooltip,
-  'workout.builder.add_session_note': (l10n, _) => l10n.workoutBuilderAddSessionNote,
+  'workout.builder.goal_hypertrophy_description': (l10n, _) =>
+      l10n.workoutBuilderGoalHypertrophyDescription,
+  'workout.builder.goal_strength_description': (l10n, _) =>
+      l10n.workoutBuilderGoalStrengthDescription,
+  'workout.builder.goal_general_description': (l10n, _) =>
+      l10n.workoutBuilderGoalGeneralDescription,
+  'workout.builder.goal_info_tooltip': (l10n, _) =>
+      l10n.workoutBuilderGoalInfoTooltip,
+  'workout.builder.add_session_note': (l10n, _) =>
+      l10n.workoutBuilderAddSessionNote,
   'workout.builder.session_note': (l10n, _) => l10n.workoutBuilderSessionNote,
   'workout.builder.optional': (l10n, _) => l10n.workoutBuilderOptional,
-  'workout.builder.goal_info_title': (l10n, _) => l10n.workoutBuilderGoalInfoTitle,
-  'workout.builder.goal_info_body': (l10n, _) => l10n.workoutBuilderGoalInfoBody,
-  'workout.builder.continue_action': (l10n, _) => l10n.workoutBuilderContinueAction,
+  'workout.builder.goal_info_title': (l10n, _) =>
+      l10n.workoutBuilderGoalInfoTitle,
+  'workout.builder.goal_info_body': (l10n, _) =>
+      l10n.workoutBuilderGoalInfoBody,
+  'workout.builder.continue_action': (l10n, _) =>
+      l10n.workoutBuilderContinueAction,
   'workout.builder.review_action': (l10n, _) => l10n.workoutBuilderReviewAction,
   'workout.builder.create_action': (l10n, _) => l10n.workoutBuilderCreateAction,
   'workout.builder.untitled': (l10n, _) => l10n.workoutBuilderUntitled,
   'workout.builder.empty': (l10n, _) => l10n.workoutBuilderEmpty,
   'workout.builder.empty_title': (l10n, _) => l10n.workoutBuilderEmptyTitle,
   'workout.builder.empty_body': (l10n, _) => l10n.workoutBuilderEmptyBody,
-  'workout.builder.add_first_exercise': (l10n, _) => l10n.workoutBuilderAddFirstExercise,
+  'workout.builder.add_first_exercise': (l10n, _) =>
+      l10n.workoutBuilderAddFirstExercise,
   'workout.builder.add': (l10n, _) => l10n.workoutBuilderAdd,
   'workout.builder.section': (l10n, _) => l10n.workoutBuilderSection,
   'workout.builder.block': (l10n, _) => l10n.workoutBuilderBlock,
   'workout.builder.section_empty': (l10n, _) => l10n.workoutBuilderSectionEmpty,
-  'workout.builder.position': (l10n, params) => l10n.workoutBuilderPosition(params['position'] ?? ''),
+  'workout.builder.position': (l10n, params) =>
+      l10n.workoutBuilderPosition(params['position'] ?? ''),
   'workout.builder.programming': (l10n, _) => l10n.workoutBuilderProgramming,
   'workout.builder.rep_range': (l10n, _) => l10n.workoutBuilderRepRange,
   'workout.builder.rest': (l10n, _) => l10n.workoutBuilderRest,
-  'workout.builder.target_load_heading': (l10n, _) => l10n.workoutBuilderTargetLoadHeading,
-  'workout.builder.set_target_load': (l10n, _) => l10n.workoutBuilderSetTargetLoad,
+  'workout.builder.target_load_heading': (l10n, _) =>
+      l10n.workoutBuilderTargetLoadHeading,
+  'workout.builder.set_target_load': (l10n, _) =>
+      l10n.workoutBuilderSetTargetLoad,
   'workout.builder.from_history': (l10n, _) => l10n.workoutBuilderFromHistory,
   'workout.builder.intensity': (l10n, _) => l10n.workoutBuilderIntensity,
   'workout.builder.progression': (l10n, _) => l10n.workoutBuilderProgression,
   'workout.builder.advanced': (l10n, _) => l10n.workoutBuilderAdvanced,
-  'workout.builder.not_configured': (l10n, _) => l10n.workoutBuilderNotConfigured,
+  'workout.builder.not_configured': (l10n, _) =>
+      l10n.workoutBuilderNotConfigured,
   'workout.builder.manual': (l10n, _) => l10n.workoutBuilderManual,
-  'workout.builder.advanced_summary': (l10n, _) => l10n.workoutBuilderAdvancedSummary,
+  'workout.builder.advanced_summary': (l10n, _) =>
+      l10n.workoutBuilderAdvancedSummary,
   'workout.builder.reps_min': (l10n, _) => l10n.workoutBuilderRepsMin,
   'workout.builder.reps_max': (l10n, _) => l10n.workoutBuilderRepsMax,
-  'workout.builder.decrease': (l10n, params) => l10n.workoutBuilderDecrease(params['label'] ?? ''),
-  'workout.builder.increase': (l10n, params) => l10n.workoutBuilderIncrease(params['label'] ?? ''),
+  'workout.builder.decrease': (l10n, params) =>
+      l10n.workoutBuilderDecrease(params['label'] ?? ''),
+  'workout.builder.increase': (l10n, params) =>
+      l10n.workoutBuilderIncrease(params['label'] ?? ''),
   'workout.builder.add_exercise': (l10n, _) => l10n.workoutBuilderAddExercise,
-  'workout.builder.add_exercise_hint': (l10n, _) => l10n.workoutBuilderAddExerciseHint,
+  'workout.builder.add_exercise_hint': (l10n, _) =>
+      l10n.workoutBuilderAddExerciseHint,
   'workout.builder.discover': (l10n, _) => l10n.workoutBuilderDiscover,
-  'workout.builder.tour_step': (l10n, params) => l10n.workoutBuilderTourStep(params['current'] ?? '', params['total'] ?? ''),
+  'workout.builder.tour_step': (l10n, params) => l10n.workoutBuilderTourStep(
+    params['current'] ?? '',
+    params['total'] ?? '',
+  ),
   'workout.builder.tour_next': (l10n, _) => l10n.workoutBuilderTourNext,
   'workout.builder.tour_done': (l10n, _) => l10n.workoutBuilderTourDone,
-  'workout.builder.tour_dont_show_again': (l10n, _) => l10n.workoutBuilderTourDontShowAgain,
-  'workout.builder.tour_intro_title': (l10n, _) => l10n.workoutBuilderTourIntroTitle,
-  'workout.builder.tour_intro_body': (l10n, _) => l10n.workoutBuilderTourIntroBody,
-  'workout.builder.tour_exercise_title': (l10n, _) => l10n.workoutBuilderTourExerciseTitle,
-  'workout.builder.tour_exercise_body': (l10n, _) => l10n.workoutBuilderTourExerciseBody,
-  'workout.builder.tour_sections_title': (l10n, _) => l10n.workoutBuilderTourSectionsTitle,
-  'workout.builder.tour_sections_body': (l10n, _) => l10n.workoutBuilderTourSectionsBody,
-  'workout.builder.tour_notes_title': (l10n, _) => l10n.workoutBuilderTourNotesTitle,
-  'workout.builder.tour_notes_body': (l10n, _) => l10n.workoutBuilderTourNotesBody,
-  'workout.builder.tour_notes_secondary': (l10n, _) => l10n.workoutBuilderTourNotesSecondary,
-  'workout.builder.tour_blocks_title': (l10n, _) => l10n.workoutBuilderTourBlocksTitle,
-  'workout.builder.tour_blocks_body': (l10n, _) => l10n.workoutBuilderTourBlocksBody,
-  'workout.builder.tour_blocks_secondary': (l10n, _) => l10n.workoutBuilderTourBlocksSecondary,
-  'workout.builder.tour_check_title': (l10n, _) => l10n.workoutBuilderTourCheckTitle,
-  'workout.builder.tour_check_body': (l10n, _) => l10n.workoutBuilderTourCheckBody,
-  'workout.builder.tour_check_secondary': (l10n, _) => l10n.workoutBuilderTourCheckSecondary,
-  'workout.builder.tour_review_title': (l10n, _) => l10n.workoutBuilderTourReviewTitle,
-  'workout.builder.tour_review_body': (l10n, _) => l10n.workoutBuilderTourReviewBody,
-  'workout.builder.tour_replay_hint': (l10n, _) => l10n.workoutBuilderTourReplayHint,
+  'workout.builder.tour_dont_show_again': (l10n, _) =>
+      l10n.workoutBuilderTourDontShowAgain,
+  'workout.builder.tour_intro_title': (l10n, _) =>
+      l10n.workoutBuilderTourIntroTitle,
+  'workout.builder.tour_intro_body': (l10n, _) =>
+      l10n.workoutBuilderTourIntroBody,
+  'workout.builder.tour_exercise_title': (l10n, _) =>
+      l10n.workoutBuilderTourExerciseTitle,
+  'workout.builder.tour_exercise_body': (l10n, _) =>
+      l10n.workoutBuilderTourExerciseBody,
+  'workout.builder.tour_sections_title': (l10n, _) =>
+      l10n.workoutBuilderTourSectionsTitle,
+  'workout.builder.tour_sections_body': (l10n, _) =>
+      l10n.workoutBuilderTourSectionsBody,
+  'workout.builder.tour_notes_title': (l10n, _) =>
+      l10n.workoutBuilderTourNotesTitle,
+  'workout.builder.tour_notes_body': (l10n, _) =>
+      l10n.workoutBuilderTourNotesBody,
+  'workout.builder.tour_notes_secondary': (l10n, _) =>
+      l10n.workoutBuilderTourNotesSecondary,
+  'workout.builder.tour_blocks_title': (l10n, _) =>
+      l10n.workoutBuilderTourBlocksTitle,
+  'workout.builder.tour_blocks_body': (l10n, _) =>
+      l10n.workoutBuilderTourBlocksBody,
+  'workout.builder.tour_blocks_secondary': (l10n, _) =>
+      l10n.workoutBuilderTourBlocksSecondary,
+  'workout.builder.tour_check_title': (l10n, _) =>
+      l10n.workoutBuilderTourCheckTitle,
+  'workout.builder.tour_check_body': (l10n, _) =>
+      l10n.workoutBuilderTourCheckBody,
+  'workout.builder.tour_check_secondary': (l10n, _) =>
+      l10n.workoutBuilderTourCheckSecondary,
+  'workout.builder.tour_review_title': (l10n, _) =>
+      l10n.workoutBuilderTourReviewTitle,
+  'workout.builder.tour_review_body': (l10n, _) =>
+      l10n.workoutBuilderTourReviewBody,
+  'workout.builder.tour_replay_hint': (l10n, _) =>
+      l10n.workoutBuilderTourReplayHint,
   'workout.check.open': (l10n, _) => l10n.workoutCheckOpen,
   'workout.check.title': (l10n, _) => l10n.workoutCheckTitle,
   'workout.check.empty_title': (l10n, _) => l10n.workoutCheckEmptyTitle,
   'workout.check.empty_body': (l10n, _) => l10n.workoutCheckEmptyBody,
-  'workout.check.capability_muscles': (l10n, _) => l10n.workoutCheckCapabilityMuscles,
-  'workout.check.capability_patterns': (l10n, _) => l10n.workoutCheckCapabilityPatterns,
-  'workout.check.capability_overlap': (l10n, _) => l10n.workoutCheckCapabilityOverlap,
-  'workout.check.capability_structure': (l10n, _) => l10n.workoutCheckCapabilityStructure,
+  'workout.check.capability_muscles': (l10n, _) =>
+      l10n.workoutCheckCapabilityMuscles,
+  'workout.check.capability_patterns': (l10n, _) =>
+      l10n.workoutCheckCapabilityPatterns,
+  'workout.check.capability_overlap': (l10n, _) =>
+      l10n.workoutCheckCapabilityOverlap,
+  'workout.check.capability_structure': (l10n, _) =>
+      l10n.workoutCheckCapabilityStructure,
   'workout.check.capability_goal': (l10n, _) => l10n.workoutCheckCapabilityGoal,
-  'workout.check.mode_bodybuilding': (l10n, _) => l10n.workoutCheckModeBodybuilding,
-  'workout.check.summary': (l10n, params) => l10n.workoutCheckSummary(params['passed'] ?? '', params['review'] ?? '', params['missing'] ?? ''),
+  'workout.check.mode_bodybuilding': (l10n, _) =>
+      l10n.workoutCheckModeBodybuilding,
+  'workout.check.summary': (l10n, params) => l10n.workoutCheckSummary(
+    params['passed'] ?? '',
+    params['review'] ?? '',
+    params['missing'] ?? '',
+  ),
   'workout.check.data_partial': (l10n, _) => l10n.workoutCheckDataPartial,
-  'workout.check.data_insufficient': (l10n, _) => l10n.workoutCheckDataInsufficient,
+  'workout.check.data_insufficient': (l10n, _) =>
+      l10n.workoutCheckDataInsufficient,
   'workout.check.muscle_coverage': (l10n, _) => l10n.workoutCheckMuscleCoverage,
   'workout.check.coverage_title': (l10n, _) => l10n.workoutCheckCoverageTitle,
-  'workout.check.coverage_body': (l10n, params) => l10n.workoutCheckCoverageBody(params['muscles'] ?? ''),
+  'workout.check.coverage_body': (l10n, params) =>
+      l10n.workoutCheckCoverageBody(params['muscles'] ?? ''),
   'workout.check.movement_title': (l10n, _) => l10n.workoutCheckMovementTitle,
-  'workout.check.movement_body': (l10n, params) => l10n.workoutCheckMovementBody(params['count'] ?? ''),
-  'workout.check.set_exposure': (l10n, params) => l10n.workoutCheckSetExposure(params['count'] ?? ''),
+  'workout.check.movement_body': (l10n, params) =>
+      l10n.workoutCheckMovementBody(params['count'] ?? ''),
+  'workout.check.set_exposure': (l10n, params) =>
+      l10n.workoutCheckSetExposure(params['count'] ?? ''),
   'workout.check.structure_title': (l10n, _) => l10n.workoutCheckStructureTitle,
-  'workout.check.structure_body': (l10n, params) => l10n.workoutCheckStructureBody(params['sections'] ?? '', params['blocks'] ?? ''),
-  'workout.check.duration_title': (l10n, params) => l10n.workoutCheckDurationTitle(params['minutes'] ?? ''),
+  'workout.check.structure_body': (l10n, params) =>
+      l10n.workoutCheckStructureBody(
+        params['sections'] ?? '',
+        params['blocks'] ?? '',
+      ),
+  'workout.check.duration_title': (l10n, params) =>
+      l10n.workoutCheckDurationTitle(params['minutes'] ?? ''),
   'workout.check.duration_body': (l10n, _) => l10n.workoutCheckDurationBody,
   'workout.check.goal_title': (l10n, _) => l10n.workoutCheckGoalTitle,
-  'workout.check.goal_body': (l10n, params) => l10n.workoutCheckGoalBody(params['goal'] ?? ''),
-  'workout.check.goal_missing_title': (l10n, _) => l10n.workoutCheckGoalMissingTitle,
-  'workout.check.goal_missing_body': (l10n, _) => l10n.workoutCheckGoalMissingBody,
+  'workout.check.goal_body': (l10n, params) =>
+      l10n.workoutCheckGoalBody(params['goal'] ?? ''),
+  'workout.check.goal_missing_title': (l10n, _) =>
+      l10n.workoutCheckGoalMissingTitle,
+  'workout.check.goal_missing_body': (l10n, _) =>
+      l10n.workoutCheckGoalMissingBody,
   'workout.check.overlap_title': (l10n, _) => l10n.workoutCheckOverlapTitle,
-  'workout.check.overlap_body': (l10n, params) => l10n.workoutCheckOverlapBody(params['count'] ?? ''),
-  'workout.check.overlap_clear_title': (l10n, _) => l10n.workoutCheckOverlapClearTitle,
-  'workout.check.overlap_clear_body': (l10n, _) => l10n.workoutCheckOverlapClearBody,
+  'workout.check.overlap_body': (l10n, params) =>
+      l10n.workoutCheckOverlapBody(params['count'] ?? ''),
+  'workout.check.overlap_clear_title': (l10n, _) =>
+      l10n.workoutCheckOverlapClearTitle,
+  'workout.check.overlap_clear_body': (l10n, _) =>
+      l10n.workoutCheckOverlapClearBody,
   'workout.check.why': (l10n, _) => l10n.workoutCheckWhy,
   'workout.check.used_data': (l10n, _) => l10n.workoutCheckUsedData,
-  'workout.check.evidence_sections': (l10n, params) => l10n.workoutCheckEvidenceSections(params['count'] ?? ''),
-  'workout.check.evidence_blocks': (l10n, params) => l10n.workoutCheckEvidenceBlocks(params['count'] ?? ''),
-  'workout.check.evidence_exercises': (l10n, params) => l10n.workoutCheckEvidenceExercises(params['count'] ?? ''),
-  'workout.check.evidence_sets': (l10n, params) => l10n.workoutCheckEvidenceSets(params['count'] ?? ''),
+  'workout.check.evidence_sections': (l10n, params) =>
+      l10n.workoutCheckEvidenceSections(params['count'] ?? ''),
+  'workout.check.evidence_blocks': (l10n, params) =>
+      l10n.workoutCheckEvidenceBlocks(params['count'] ?? ''),
+  'workout.check.evidence_exercises': (l10n, params) =>
+      l10n.workoutCheckEvidenceExercises(params['count'] ?? ''),
+  'workout.check.evidence_sets': (l10n, params) =>
+      l10n.workoutCheckEvidenceSets(params['count'] ?? ''),
   'workout.check.evidence_rest': (l10n, _) => l10n.workoutCheckEvidenceRest,
-  'workout.check.evidence_execution': (l10n, _) => l10n.workoutCheckEvidenceExecution,
-  'workout.check.evidence_goal': (l10n, params) => l10n.workoutCheckEvidenceGoal(params['goal'] ?? ''),
-  'workout.check.evidence_movement': (l10n, params) => l10n.workoutCheckEvidenceMovement(params['movement'] ?? ''),
-  'workout.check.evidence_muscles': (l10n, params) => l10n.workoutCheckEvidenceMuscles(params['count'] ?? ''),
-  'workout.check.evidence_peak_muscle': (l10n, params) => l10n.workoutCheckEvidencePeakMuscle(params['muscle'] ?? '', params['count'] ?? ''),
-  'workout.check.evidence_catalogue': (l10n, _) => l10n.workoutCheckEvidenceCatalogue,
-  'workout.check.evidence_pattern': (l10n, params) => l10n.workoutCheckEvidencePattern(params['pattern'] ?? ''),
+  'workout.check.evidence_execution': (l10n, _) =>
+      l10n.workoutCheckEvidenceExecution,
+  'workout.check.evidence_goal': (l10n, params) =>
+      l10n.workoutCheckEvidenceGoal(params['goal'] ?? ''),
+  'workout.check.evidence_movement': (l10n, params) =>
+      l10n.workoutCheckEvidenceMovement(params['movement'] ?? ''),
+  'workout.check.evidence_muscles': (l10n, params) =>
+      l10n.workoutCheckEvidenceMuscles(params['count'] ?? ''),
+  'workout.check.evidence_peak_muscle': (l10n, params) =>
+      l10n.workoutCheckEvidencePeakMuscle(
+        params['muscle'] ?? '',
+        params['count'] ?? '',
+      ),
+  'workout.check.evidence_catalogue': (l10n, _) =>
+      l10n.workoutCheckEvidenceCatalogue,
+  'workout.check.evidence_pattern': (l10n, params) =>
+      l10n.workoutCheckEvidencePattern(params['pattern'] ?? ''),
   'workout.check.unavailable': (l10n, _) => l10n.workoutCheckUnavailable,
-  'workout.builder.exercise_library_hint': (l10n, _) => l10n.workoutBuilderExerciseLibraryHint,
-  'workout.builder.choose_destination': (l10n, _) => l10n.workoutBuilderChooseDestination,
-  'workout.builder.choose_destination_hint': (l10n, _) => l10n.workoutBuilderChooseDestinationHint,
-  'workout.builder.default_section': (l10n, _) => l10n.workoutBuilderDefaultSection,
-  'workout.builder.collapse_section': (l10n, _) => l10n.workoutBuilderCollapseSection,
-  'workout.builder.expand_section': (l10n, _) => l10n.workoutBuilderExpandSection,
-  'workout.builder.add_exercise_to_section': (l10n, params) => l10n.workoutBuilderAddExerciseToSection(params['section'] ?? ''),
-  'workout.builder.section_empty_hint': (l10n, _) => l10n.workoutBuilderSectionEmptyHint,
-  'workout.builder.sections_hint_title': (l10n, _) => l10n.workoutBuilderSectionsHintTitle,
-  'workout.builder.sections_hint_body': (l10n, _) => l10n.workoutBuilderSectionsHintBody,
-  'workout.builder.blocks_hint_title': (l10n, _) => l10n.workoutBuilderBlocksHintTitle,
-  'workout.builder.blocks_hint_body': (l10n, _) => l10n.workoutBuilderBlocksHintBody,
-  'workout.builder.create_superset_short': (l10n, _) => l10n.workoutBuilderCreateSupersetShort,
-  'workout.builder.structure_actions': (l10n, _) => l10n.workoutBuilderStructureActions,
+  'workout.builder.exercise_library_hint': (l10n, _) =>
+      l10n.workoutBuilderExerciseLibraryHint,
+  'workout.builder.choose_destination': (l10n, _) =>
+      l10n.workoutBuilderChooseDestination,
+  'workout.builder.choose_destination_hint': (l10n, _) =>
+      l10n.workoutBuilderChooseDestinationHint,
+  'workout.builder.default_section': (l10n, _) =>
+      l10n.workoutBuilderDefaultSection,
+  'workout.builder.collapse_section': (l10n, _) =>
+      l10n.workoutBuilderCollapseSection,
+  'workout.builder.expand_section': (l10n, _) =>
+      l10n.workoutBuilderExpandSection,
+  'workout.builder.add_exercise_to_section': (l10n, params) =>
+      l10n.workoutBuilderAddExerciseToSection(params['section'] ?? ''),
+  'workout.builder.section_empty_hint': (l10n, _) =>
+      l10n.workoutBuilderSectionEmptyHint,
+  'workout.builder.sections_hint_title': (l10n, _) =>
+      l10n.workoutBuilderSectionsHintTitle,
+  'workout.builder.sections_hint_body': (l10n, _) =>
+      l10n.workoutBuilderSectionsHintBody,
+  'workout.builder.blocks_hint_title': (l10n, _) =>
+      l10n.workoutBuilderBlocksHintTitle,
+  'workout.builder.blocks_hint_body': (l10n, _) =>
+      l10n.workoutBuilderBlocksHintBody,
+  'workout.builder.create_superset_short': (l10n, _) =>
+      l10n.workoutBuilderCreateSupersetShort,
+  'workout.builder.structure_actions': (l10n, _) =>
+      l10n.workoutBuilderStructureActions,
   'workout.builder.exercise': (l10n, _) => l10n.workoutBuilderExercise,
   'workout.builder.save_changes': (l10n, _) => l10n.workoutBuilderSaveChanges,
   'workout.builder.new_section': (l10n, _) => l10n.workoutBuilderNewSection,
   'workout.builder.edit_section': (l10n, _) => l10n.workoutBuilderEditSection,
-  'workout.builder.section_preparation': (l10n, _) => l10n.workoutBuilderSectionPreparation,
+  'workout.builder.section_preparation': (l10n, _) =>
+      l10n.workoutBuilderSectionPreparation,
   'workout.builder.section_main': (l10n, _) => l10n.workoutBuilderSectionMain,
-  'workout.builder.section_accessories': (l10n, _) => l10n.workoutBuilderSectionAccessories,
-  'workout.builder.section_finisher': (l10n, _) => l10n.workoutBuilderSectionFinisher,
-  'workout.builder.section_cooldown': (l10n, _) => l10n.workoutBuilderSectionCooldown,
-  'workout.builder.section_explanation': (l10n, _) => l10n.workoutBuilderSectionExplanation,
+  'workout.builder.section_accessories': (l10n, _) =>
+      l10n.workoutBuilderSectionAccessories,
+  'workout.builder.section_finisher': (l10n, _) =>
+      l10n.workoutBuilderSectionFinisher,
+  'workout.builder.section_cooldown': (l10n, _) =>
+      l10n.workoutBuilderSectionCooldown,
+  'workout.builder.section_explanation': (l10n, _) =>
+      l10n.workoutBuilderSectionExplanation,
   'workout.builder.customize': (l10n, _) => l10n.workoutBuilderCustomize,
-  'workout.builder.custom_section_hint': (l10n, _) => l10n.workoutBuilderCustomSectionHint,
+  'workout.builder.custom_section_hint': (l10n, _) =>
+      l10n.workoutBuilderCustomSectionHint,
   'workout.builder.preview': (l10n, _) => l10n.workoutBuilderPreview,
   'workout.builder.custom_name': (l10n, _) => l10n.workoutBuilderCustomName,
   'workout.builder.add_section': (l10n, _) => l10n.workoutBuilderAddSection,
-  'workout.builder.choose_section_type': (l10n, _) => l10n.workoutBuilderChooseSectionType,
-  'workout.builder.open_exercise_details': (l10n, params) => l10n.workoutBuilderOpenExerciseDetails(params['name'] ?? ''),
+  'workout.builder.choose_section_type': (l10n, _) =>
+      l10n.workoutBuilderChooseSectionType,
+  'workout.builder.open_exercise_details': (l10n, params) =>
+      l10n.workoutBuilderOpenExerciseDetails(params['name'] ?? ''),
   'workout.builder.item_actions': (l10n, _) => l10n.workoutBuilderItemActions,
   'workout.builder.move': (l10n, _) => l10n.workoutBuilderMove,
-  'workout.builder.move_to_section': (l10n, _) => l10n.workoutBuilderMoveToSection,
+  'workout.builder.move_to_section': (l10n, _) =>
+      l10n.workoutBuilderMoveToSection,
   'workout.builder.main_section': (l10n, _) => l10n.workoutBuilderMainSection,
   'workout.builder.more_actions': (l10n, _) => l10n.workoutBuilderMoreActions,
   'workout.builder.create_block': (l10n, _) => l10n.workoutBuilderCreateBlock,
-  'workout.builder.create_block_short': (l10n, _) => l10n.workoutBuilderCreateBlockShort,
-  'workout.builder.configure_block': (l10n, _) => l10n.workoutBuilderConfigureBlock,
-  'workout.builder.block_edit_explanation': (l10n, _) => l10n.workoutBuilderBlockEditExplanation,
-  'workout.builder.rest_after_round': (l10n, params) => l10n.workoutBuilderRestAfterRound(params['duration'] ?? ''),
-  'workout.builder.selected_exercises': (l10n, _) => l10n.workoutBuilderSelectedExercises,
-  'workout.builder.between_exercises': (l10n, _) => l10n.workoutBuilderBetweenExercises,
-  'workout.builder.after_each_round': (l10n, _) => l10n.workoutBuilderAfterEachRound,
-  'workout.builder.review_summary': (l10n, params) => l10n.workoutBuilderReviewSummary(params['exercises'] ?? '', params['minutes'] ?? ''),
-  'workout.builder.create_superset': (l10n, _) => l10n.workoutBuilderCreateSuperset,
-  'workout.builder.connect_exercises': (l10n, _) => l10n.workoutBuilderConnectExercises,
-  'workout.builder.create_block_title': (l10n, _) => l10n.workoutBuilderCreateBlockTitle,
-  'workout.builder.create_block_explanation': (l10n, _) => l10n.workoutBuilderCreateBlockExplanation,
+  'workout.builder.create_block_short': (l10n, _) =>
+      l10n.workoutBuilderCreateBlockShort,
+  'workout.builder.configure_block': (l10n, _) =>
+      l10n.workoutBuilderConfigureBlock,
+  'workout.builder.block_edit_explanation': (l10n, _) =>
+      l10n.workoutBuilderBlockEditExplanation,
+  'workout.builder.rest_after_round': (l10n, params) =>
+      l10n.workoutBuilderRestAfterRound(params['duration'] ?? ''),
+  'workout.builder.selected_exercises': (l10n, _) =>
+      l10n.workoutBuilderSelectedExercises,
+  'workout.builder.between_exercises': (l10n, _) =>
+      l10n.workoutBuilderBetweenExercises,
+  'workout.builder.after_each_round': (l10n, _) =>
+      l10n.workoutBuilderAfterEachRound,
+  'workout.builder.review_summary': (l10n, params) =>
+      l10n.workoutBuilderReviewSummary(
+        params['exercises'] ?? '',
+        params['minutes'] ?? '',
+      ),
+  'workout.builder.create_superset': (l10n, _) =>
+      l10n.workoutBuilderCreateSuperset,
+  'workout.builder.connect_exercises': (l10n, _) =>
+      l10n.workoutBuilderConnectExercises,
+  'workout.builder.create_block_title': (l10n, _) =>
+      l10n.workoutBuilderCreateBlockTitle,
+  'workout.builder.create_block_explanation': (l10n, _) =>
+      l10n.workoutBuilderCreateBlockExplanation,
   'workout.builder.step_type': (l10n, _) => l10n.workoutBuilderStepType,
-  'workout.builder.step_exercises': (l10n, _) => l10n.workoutBuilderStepExercises,
+  'workout.builder.step_exercises': (l10n, _) =>
+      l10n.workoutBuilderStepExercises,
   'workout.builder.step_setup': (l10n, _) => l10n.workoutBuilderStepSetup,
-  'workout.builder.choose_exercises': (l10n, params) => l10n.workoutBuilderChooseExercises(params['count'] ?? ''),
-  'workout.builder.select_more_exercises': (l10n, params) => l10n.workoutBuilderSelectMoreExercises(params['count'] ?? ''),
-  'workout.builder.add_another_exercise': (l10n, _) => l10n.workoutBuilderAddAnotherExercise,
+  'workout.builder.choose_exercises': (l10n, params) =>
+      l10n.workoutBuilderChooseExercises(params['count'] ?? ''),
+  'workout.builder.select_more_exercises': (l10n, params) =>
+      l10n.workoutBuilderSelectMoreExercises(params['count'] ?? ''),
+  'workout.builder.add_another_exercise': (l10n, _) =>
+      l10n.workoutBuilderAddAnotherExercise,
   'workout.builder.add_notes': (l10n, _) => l10n.workoutBuilderAddNotes,
   'workout.builder.notes_title': (l10n, _) => l10n.workoutBuilderNotesTitle,
   'workout.builder.notes_hint': (l10n, _) => l10n.workoutBuilderNotesHint,
   'workout.builder.save_notes': (l10n, _) => l10n.workoutBuilderSaveNotes,
-  'workout.builder.workout_actions': (l10n, _) => l10n.workoutBuilderWorkoutActions,
-  'workout.builder.section_actions': (l10n, _) => l10n.workoutBuilderSectionActions,
-  'workout.builder.block_setup_title': (l10n, params) => l10n.workoutBuilderBlockSetupTitle(params['type'] ?? ''),
-  'workout.builder.block_setup_hint': (l10n, _) => l10n.workoutBuilderBlockSetupHint,
-  'workout.builder.create_selected_block': (l10n, params) => l10n.workoutBuilderCreateSelectedBlock(params['type'] ?? ''),
-  'workout.builder.block_type_superset': (l10n, _) => l10n.workoutBuilderBlockTypeSuperset,
-  'workout.builder.block_type_triset': (l10n, _) => l10n.workoutBuilderBlockTypeTriset,
-  'workout.builder.block_type_giantSet': (l10n, _) => l10n.workoutBuilderBlockTypeGiantSet,
-  'workout.builder.block_type_circuit': (l10n, _) => l10n.workoutBuilderBlockTypeCircuit,
+  'workout.builder.workout_actions': (l10n, _) =>
+      l10n.workoutBuilderWorkoutActions,
+  'workout.builder.section_actions': (l10n, _) =>
+      l10n.workoutBuilderSectionActions,
+  'workout.builder.block_setup_title': (l10n, params) =>
+      l10n.workoutBuilderBlockSetupTitle(params['type'] ?? ''),
+  'workout.builder.block_setup_hint': (l10n, _) =>
+      l10n.workoutBuilderBlockSetupHint,
+  'workout.builder.create_selected_block': (l10n, params) =>
+      l10n.workoutBuilderCreateSelectedBlock(params['type'] ?? ''),
+  'workout.builder.block_type_superset': (l10n, _) =>
+      l10n.workoutBuilderBlockTypeSuperset,
+  'workout.builder.block_type_triset': (l10n, _) =>
+      l10n.workoutBuilderBlockTypeTriset,
+  'workout.builder.block_type_giantSet': (l10n, _) =>
+      l10n.workoutBuilderBlockTypeGiantSet,
+  'workout.builder.block_type_circuit': (l10n, _) =>
+      l10n.workoutBuilderBlockTypeCircuit,
   'workout.builder.add_block': (l10n, _) => l10n.workoutBuilderAddBlock,
   'workout.builder.add_superset': (l10n, _) => l10n.workoutBuilderAddSuperset,
-  'workout.builder.learn_structure': (l10n, _) => l10n.workoutBuilderLearnStructure,
-  'workout.builder.organize_title': (l10n, _) => l10n.workoutBuilderOrganizeTitle,
+  'workout.builder.learn_structure': (l10n, _) =>
+      l10n.workoutBuilderLearnStructure,
+  'workout.builder.organize_title': (l10n, _) =>
+      l10n.workoutBuilderOrganizeTitle,
   'workout.builder.section_info': (l10n, _) => l10n.workoutBuilderSectionInfo,
   'workout.builder.block_info': (l10n, _) => l10n.workoutBuilderBlockInfo,
   'workout.builder.info_title': (l10n, _) => l10n.workoutBuilderInfoTitle,
@@ -371,18 +517,26 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'workout.active_short': (l10n, _) => l10n.workoutActiveShort,
   'workout.completed': (l10n, _) => l10n.workoutCompleted,
   'workout.detail.exercises': (l10n, _) => l10n.workoutDetailExercises,
-  'workout.detail.exercise_count_one': (l10n, params) => l10n.workoutDetailExerciseCountOne(params['count'] ?? ''),
-  'workout.detail.exercise_count_other': (l10n, params) => l10n.workoutDetailExerciseCountOther(params['count'] ?? ''),
-  'workout.detail.set_count_one': (l10n, params) => l10n.workoutDetailSetCountOne(params['count'] ?? ''),
-  'workout.detail.set_count_other': (l10n, params) => l10n.workoutDetailSetCountOther(params['count'] ?? ''),
-  'workout.detail.estimated_minutes': (l10n, params) => l10n.workoutDetailEstimatedMinutes(params['count'] ?? ''),
+  'workout.detail.exercise_count_one': (l10n, params) =>
+      l10n.workoutDetailExerciseCountOne(params['count'] ?? ''),
+  'workout.detail.exercise_count_other': (l10n, params) =>
+      l10n.workoutDetailExerciseCountOther(params['count'] ?? ''),
+  'workout.detail.set_count_one': (l10n, params) =>
+      l10n.workoutDetailSetCountOne(params['count'] ?? ''),
+  'workout.detail.set_count_other': (l10n, params) =>
+      l10n.workoutDetailSetCountOther(params['count'] ?? ''),
+  'workout.detail.estimated_minutes': (l10n, params) =>
+      l10n.workoutDetailEstimatedMinutes(params['count'] ?? ''),
   'workout.detail.overview': (l10n, _) => l10n.workoutDetailOverview,
   'workout.detail.muscle_focus': (l10n, _) => l10n.workoutDetailMuscleFocus,
   'workout.detail.equipment': (l10n, _) => l10n.workoutDetailEquipment,
   'workout.detail.working_sets': (l10n, _) => l10n.workoutDetailWorkingSets,
-  'workout.detail.working_sets_definition': (l10n, _) => l10n.workoutDetailWorkingSetsDefinition,
-  'workout.detail.rep_range_definition': (l10n, _) => l10n.workoutDetailRepRangeDefinition,
-  'workout.detail.recovery_definition': (l10n, _) => l10n.workoutDetailRecoveryDefinition,
+  'workout.detail.working_sets_definition': (l10n, _) =>
+      l10n.workoutDetailWorkingSetsDefinition,
+  'workout.detail.rep_range_definition': (l10n, _) =>
+      l10n.workoutDetailRepRangeDefinition,
+  'workout.detail.recovery_definition': (l10n, _) =>
+      l10n.workoutDetailRecoveryDefinition,
   'workout.detail.goal': (l10n, _) => l10n.workoutDetailGoal,
   'workout.detail.show_more': (l10n, _) => l10n.workoutDetailShowMore,
   'workout.detail.show_less': (l10n, _) => l10n.workoutDetailShowLess,
@@ -393,47 +547,67 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'workout.detail.recovery': (l10n, _) => l10n.workoutDetailRecovery,
   'workout.detail.target_load': (l10n, _) => l10n.workoutDetailTargetLoad,
   'workout.detail.notes': (l10n, _) => l10n.workoutDetailNotes,
-  'workout.detail.exercise_detail': (l10n, _) => l10n.workoutDetailExerciseDetail,
-  'workout.detail.exercise_unavailable': (l10n, _) => l10n.workoutDetailExerciseUnavailable,
-  'workout.detail.exercise_fallback': (l10n, _) => l10n.workoutDetailExerciseFallback,
-  'workout.detail.exercise_loading': (l10n, _) => l10n.workoutDetailExerciseLoading,
-  'workout.detail.open_exercise_semantics': (l10n, params) => l10n.workoutDetailOpenExerciseSemantics(params['name'] ?? ''),
-  'workout.detail.exercise_semantics_position': (l10n, params) => l10n.workoutDetailExerciseSemanticsPosition(params['position'] ?? ''),
+  'workout.detail.exercise_detail': (l10n, _) =>
+      l10n.workoutDetailExerciseDetail,
+  'workout.detail.exercise_unavailable': (l10n, _) =>
+      l10n.workoutDetailExerciseUnavailable,
+  'workout.detail.exercise_fallback': (l10n, _) =>
+      l10n.workoutDetailExerciseFallback,
+  'workout.detail.exercise_loading': (l10n, _) =>
+      l10n.workoutDetailExerciseLoading,
+  'workout.detail.open_exercise_semantics': (l10n, params) =>
+      l10n.workoutDetailOpenExerciseSemantics(params['name'] ?? ''),
+  'workout.detail.exercise_semantics_position': (l10n, params) =>
+      l10n.workoutDetailExerciseSemanticsPosition(params['position'] ?? ''),
   'workout.detail.expand_details': (l10n, _) => l10n.workoutDetailExpandDetails,
-  'workout.detail.collapse_details': (l10n, _) => l10n.workoutDetailCollapseDetails,
+  'workout.detail.collapse_details': (l10n, _) =>
+      l10n.workoutDetailCollapseDetails,
   'workout.detail.superset': (l10n, _) => l10n.workoutDetailSuperset,
   'workout.detail.triset': (l10n, _) => l10n.workoutDetailTriset,
   'workout.detail.giant_set': (l10n, _) => l10n.workoutDetailGiantSet,
   'workout.detail.circuit': (l10n, _) => l10n.workoutDetailCircuit,
   'workout.detail.rounds': (l10n, _) => l10n.workoutDetailRounds,
-  'workout.detail.round_count_one': (l10n, params) => l10n.workoutDetailRoundCountOne(params['count'] ?? ''),
-  'workout.detail.round_count_other': (l10n, params) => l10n.workoutDetailRoundCountOther(params['count'] ?? ''),
-  'workout.detail.rest_after_round': (l10n, _) => l10n.workoutDetailRestAfterRound,
-  'workout.detail.rest_between_exercises': (l10n, _) => l10n.workoutDetailRestBetweenExercises,
+  'workout.detail.round_count_one': (l10n, params) =>
+      l10n.workoutDetailRoundCountOne(params['count'] ?? ''),
+  'workout.detail.round_count_other': (l10n, params) =>
+      l10n.workoutDetailRoundCountOther(params['count'] ?? ''),
+  'workout.detail.rest_after_round': (l10n, _) =>
+      l10n.workoutDetailRestAfterRound,
+  'workout.detail.rest_between_exercises': (l10n, _) =>
+      l10n.workoutDetailRestBetweenExercises,
   'workout.detail.expand_group': (l10n, _) => l10n.workoutDetailExpandGroup,
   'workout.detail.collapse_group': (l10n, _) => l10n.workoutDetailCollapseGroup,
-  'workout.detail.explain_concept': (l10n, _) => l10n.workoutDetailExplainConcept,
+  'workout.detail.explain_concept': (l10n, _) =>
+      l10n.workoutDetailExplainConcept,
   'workout.detail.what_is_it': (l10n, _) => l10n.workoutDetailWhatIsIt,
   'workout.detail.how_to_read': (l10n, _) => l10n.workoutDetailHowToRead,
-  'workout.detail.superset_definition': (l10n, _) => l10n.workoutDetailSupersetDefinition,
-  'workout.detail.triset_definition': (l10n, _) => l10n.workoutDetailTrisetDefinition,
-  'workout.detail.giant_set_definition': (l10n, _) => l10n.workoutDetailGiantSetDefinition,
-  'workout.detail.circuit_definition': (l10n, _) => l10n.workoutDetailCircuitDefinition,
+  'workout.detail.superset_definition': (l10n, _) =>
+      l10n.workoutDetailSupersetDefinition,
+  'workout.detail.triset_definition': (l10n, _) =>
+      l10n.workoutDetailTrisetDefinition,
+  'workout.detail.giant_set_definition': (l10n, _) =>
+      l10n.workoutDetailGiantSetDefinition,
+  'workout.detail.circuit_definition': (l10n, _) =>
+      l10n.workoutDetailCircuitDefinition,
   'workout.detail.no_exercises': (l10n, _) => l10n.workoutDetailNoExercises,
   'workout.detail.empty_hint': (l10n, _) => l10n.workoutDetailEmptyHint,
   'workout.detail.add_exercise': (l10n, _) => l10n.workoutDetailAddExercise,
-  'workout.detail.programming_details': (l10n, _) => l10n.workoutDetailProgrammingDetails,
+  'workout.detail.programming_details': (l10n, _) =>
+      l10n.workoutDetailProgrammingDetails,
   'workout.detail.rep_range': (l10n, _) => l10n.workoutDetailRepRange,
   'workout.detail.concepts_used': (l10n, _) => l10n.workoutDetailConceptsUsed,
   'workout.detail.sync_pending': (l10n, _) => l10n.workoutDetailSyncPending,
   'workout.detail.edit_session': (l10n, _) => l10n.workoutDetailEditSession,
   'workout.detail.done': (l10n, _) => l10n.workoutDetailDone,
-  'workout.detail.exercise_removed': (l10n, _) => l10n.workoutDetailExerciseRemoved,
+  'workout.detail.exercise_removed': (l10n, _) =>
+      l10n.workoutDetailExerciseRemoved,
   'workout.detail.add_section': (l10n, _) => l10n.workoutDetailAddSection,
   'workout.detail.create_group': (l10n, _) => l10n.workoutDetailCreateGroup,
-  'workout.detail.section_preparation': (l10n, _) => l10n.workoutDetailSectionPreparation,
+  'workout.detail.section_preparation': (l10n, _) =>
+      l10n.workoutDetailSectionPreparation,
   'workout.detail.section_main': (l10n, _) => l10n.workoutDetailSectionMain,
-  'workout.detail.section_accessory': (l10n, _) => l10n.workoutDetailSectionAccessory,
+  'workout.detail.section_accessory': (l10n, _) =>
+      l10n.workoutDetailSectionAccessory,
   'workout.detail.section_custom': (l10n, _) => l10n.workoutDetailSectionCustom,
   'workout.detail.section_name': (l10n, _) => l10n.workoutDetailSectionName,
   'workout.detail.ungroup': (l10n, _) => l10n.workoutDetailUngroup,
@@ -446,62 +620,97 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'workout.detail.tempo': (l10n, _) => l10n.workoutDetailTempo,
   'workout.detail.pause_seconds': (l10n, _) => l10n.workoutDetailPauseSeconds,
   'workout.detail.exercise_note': (l10n, _) => l10n.workoutDetailExerciseNote,
-  'workout.detail.advanced_progressive': (l10n, _) => l10n.workoutDetailAdvancedProgressive,
+  'workout.detail.advanced_progressive': (l10n, _) =>
+      l10n.workoutDetailAdvancedProgressive,
   'workout.detail.none': (l10n, _) => l10n.workoutDetailNone,
   'workout.detail.saved_offline': (l10n, _) => l10n.workoutDetailSavedOffline,
   'workout.detail.unsaved_title': (l10n, _) => l10n.workoutDetailUnsavedTitle,
   'workout.detail.unsaved_body': (l10n, _) => l10n.workoutDetailUnsavedBody,
-  'workout.detail.continue_editing': (l10n, _) => l10n.workoutDetailContinueEditing,
+  'workout.detail.continue_editing': (l10n, _) =>
+      l10n.workoutDetailContinueEditing,
   'workout.detail.discard': (l10n, _) => l10n.workoutDetailDiscard,
   'workout.detail.save_exit': (l10n, _) => l10n.workoutDetailSaveExit,
   'workout.add_exercise.title': (l10n, _) => l10n.workoutAddExerciseTitle,
-  'workout.add_exercise.search_hint': (l10n, _) => l10n.workoutAddExerciseSearchHint,
+  'workout.add_exercise.search_hint': (l10n, _) =>
+      l10n.workoutAddExerciseSearchHint,
   'workout.add_exercise.all': (l10n, _) => l10n.workoutAddExerciseAll,
   'workout.add_exercise.verified': (l10n, _) => l10n.workoutAddExerciseVerified,
   'workout.add_exercise.mine': (l10n, _) => l10n.workoutAddExerciseMine,
   'workout.add_exercise.muscle': (l10n, _) => l10n.workoutAddExerciseMuscle,
   'workout.add_exercise.movement': (l10n, _) => l10n.workoutAddExerciseMovement,
-  'workout.add_exercise.equipment': (l10n, _) => l10n.workoutAddExerciseEquipment,
+  'workout.add_exercise.equipment': (l10n, _) =>
+      l10n.workoutAddExerciseEquipment,
   'workout.add_exercise.tracking': (l10n, _) => l10n.workoutAddExerciseTracking,
   'workout.add_exercise.recent': (l10n, _) => l10n.workoutAddExerciseRecent,
   'workout.add_exercise.results': (l10n, _) => l10n.workoutAddExerciseResults,
-  'workout.add_exercise.no_results': (l10n, _) => l10n.workoutAddExerciseNoResults,
-  'workout.add_exercise.clear_filter': (l10n, _) => l10n.workoutAddExerciseClearFilter,
-  'workout.add_exercise.create_personal': (l10n, _) => l10n.workoutAddExerciseCreatePersonal,
-  'workout.add_exercise.last_configuration': (l10n, _) => l10n.workoutAddExerciseLastConfiguration,
+  'workout.add_exercise.no_results': (l10n, _) =>
+      l10n.workoutAddExerciseNoResults,
+  'workout.add_exercise.clear_filter': (l10n, _) =>
+      l10n.workoutAddExerciseClearFilter,
+  'workout.add_exercise.create_personal': (l10n, _) =>
+      l10n.workoutAddExerciseCreatePersonal,
+  'workout.add_exercise.last_configuration': (l10n, _) =>
+      l10n.workoutAddExerciseLastConfiguration,
   'workout.add_exercise.reps_min': (l10n, _) => l10n.workoutAddExerciseRepsMin,
   'workout.add_exercise.reps_max': (l10n, _) => l10n.workoutAddExerciseRepsMax,
   'workout.add_exercise.add_to': (l10n, _) => l10n.workoutAddExerciseAddTo,
-  'workout.add_exercise.no_section': (l10n, _) => l10n.workoutAddExerciseNoSection,
-  'workout.add_exercise.load_error': (l10n, _) => l10n.workoutAddExerciseLoadError,
-  'workout.detail.concept_rir_definition': (l10n, _) => l10n.workoutDetailConceptRirDefinition,
-  'workout.detail.concept_rir_example': (l10n, _) => l10n.workoutDetailConceptRirExample,
-  'workout.detail.concept_rpe_definition': (l10n, _) => l10n.workoutDetailConceptRpeDefinition,
-  'workout.detail.concept_rpe_example': (l10n, _) => l10n.workoutDetailConceptRpeExample,
-  'workout.detail.concept_percentage1RM_definition': (l10n, _) => l10n.workoutDetailConceptPercentage1RMDefinition,
-  'workout.detail.concept_percentage1RM_example': (l10n, _) => l10n.workoutDetailConceptPercentage1RMExample,
-  'workout.detail.concept_superset_definition': (l10n, _) => l10n.workoutDetailConceptSupersetDefinition,
-  'workout.detail.concept_superset_example': (l10n, _) => l10n.workoutDetailConceptSupersetExample,
-  'workout.detail.concept_circuit_definition': (l10n, _) => l10n.workoutDetailConceptCircuitDefinition,
-  'workout.detail.concept_circuit_example': (l10n, _) => l10n.workoutDetailConceptCircuitExample,
-  'workout.detail.concept_topSet_definition': (l10n, _) => l10n.workoutDetailConceptTopSetDefinition,
-  'workout.detail.concept_topSet_example': (l10n, _) => l10n.workoutDetailConceptTopSetExample,
-  'workout.detail.concept_backoff_definition': (l10n, _) => l10n.workoutDetailConceptBackoffDefinition,
-  'workout.detail.concept_backoff_example': (l10n, _) => l10n.workoutDetailConceptBackoffExample,
-  'workout.detail.concept_amrap_definition': (l10n, _) => l10n.workoutDetailConceptAmrapDefinition,
-  'workout.detail.concept_amrap_example': (l10n, _) => l10n.workoutDetailConceptAmrapExample,
+  'workout.add_exercise.no_section': (l10n, _) =>
+      l10n.workoutAddExerciseNoSection,
+  'workout.add_exercise.load_error': (l10n, _) =>
+      l10n.workoutAddExerciseLoadError,
+  'workout.detail.concept_rir_definition': (l10n, _) =>
+      l10n.workoutDetailConceptRirDefinition,
+  'workout.detail.concept_rir_example': (l10n, _) =>
+      l10n.workoutDetailConceptRirExample,
+  'workout.detail.concept_rpe_definition': (l10n, _) =>
+      l10n.workoutDetailConceptRpeDefinition,
+  'workout.detail.concept_rpe_example': (l10n, _) =>
+      l10n.workoutDetailConceptRpeExample,
+  'workout.detail.concept_percentage1RM_definition': (l10n, _) =>
+      l10n.workoutDetailConceptPercentage1RMDefinition,
+  'workout.detail.concept_percentage1RM_example': (l10n, _) =>
+      l10n.workoutDetailConceptPercentage1RMExample,
+  'workout.detail.concept_superset_definition': (l10n, _) =>
+      l10n.workoutDetailConceptSupersetDefinition,
+  'workout.detail.concept_superset_example': (l10n, _) =>
+      l10n.workoutDetailConceptSupersetExample,
+  'workout.detail.concept_circuit_definition': (l10n, _) =>
+      l10n.workoutDetailConceptCircuitDefinition,
+  'workout.detail.concept_circuit_example': (l10n, _) =>
+      l10n.workoutDetailConceptCircuitExample,
+  'workout.detail.concept_topSet_definition': (l10n, _) =>
+      l10n.workoutDetailConceptTopSetDefinition,
+  'workout.detail.concept_topSet_example': (l10n, _) =>
+      l10n.workoutDetailConceptTopSetExample,
+  'workout.detail.concept_backoff_definition': (l10n, _) =>
+      l10n.workoutDetailConceptBackoffDefinition,
+  'workout.detail.concept_backoff_example': (l10n, _) =>
+      l10n.workoutDetailConceptBackoffExample,
+  'workout.detail.concept_amrap_definition': (l10n, _) =>
+      l10n.workoutDetailConceptAmrapDefinition,
+  'workout.detail.concept_amrap_example': (l10n, _) =>
+      l10n.workoutDetailConceptAmrapExample,
   'workout.organize.title': (l10n, _) => l10n.workoutOrganizeTitle,
   'workout.organize.active': (l10n, _) => l10n.workoutOrganizeActive,
   'workout.organize.inactive': (l10n, _) => l10n.workoutOrganizeInactive,
   'workout.organize.empty': (l10n, _) => l10n.workoutOrganizeEmpty,
   'workout.organize.delete_title': (l10n, _) => l10n.workoutOrganizeDeleteTitle,
-  'workout.organize.delete_content': (l10n, params) => l10n.workoutOrganizeDeleteContent(params['name'] ?? ''),
+  'workout.organize.delete_content': (l10n, params) =>
+      l10n.workoutOrganizeDeleteContent(params['name'] ?? ''),
   'workout.organize.status_title': (l10n, _) => l10n.workoutOrganizeStatusTitle,
-  'workout.organize.status_content': (l10n, params) => l10n.workoutOrganizeStatusContent(params['action'] ?? '', params['name'] ?? ''),
-  'workout.organize.action_activate': (l10n, _) => l10n.workoutOrganizeActionActivate,
-  'workout.organize.action_deactivate': (l10n, _) => l10n.workoutOrganizeActionDeactivate,
-  'workout.organize.exercises_count': (l10n, params) => l10n.workoutOrganizeExercisesCount(params['count'] ?? ''),
-  'workout.organize.coach': (l10n, params) => l10n.workoutOrganizeCoach(params['name'] ?? ''),
+  'workout.organize.status_content': (l10n, params) =>
+      l10n.workoutOrganizeStatusContent(
+        params['action'] ?? '',
+        params['name'] ?? '',
+      ),
+  'workout.organize.action_activate': (l10n, _) =>
+      l10n.workoutOrganizeActionActivate,
+  'workout.organize.action_deactivate': (l10n, _) =>
+      l10n.workoutOrganizeActionDeactivate,
+  'workout.organize.exercises_count': (l10n, params) =>
+      l10n.workoutOrganizeExercisesCount(params['count'] ?? ''),
+  'workout.organize.coach': (l10n, params) =>
+      l10n.workoutOrganizeCoach(params['name'] ?? ''),
   'workout.load_error': (l10n, _) => l10n.workoutLoadError,
   'workout.complete_title': (l10n, _) => l10n.workoutCompleteTitle,
   'workout.complete_content': (l10n, _) => l10n.workoutCompleteContent,
@@ -520,7 +729,8 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'exercise.no_technical_data': (l10n, _) => l10n.exerciseNoTechnicalData,
   'exercise.required_equipment': (l10n, _) => l10n.exerciseRequiredEquipment,
   'exercise.no_muscle_data': (l10n, _) => l10n.exerciseNoMuscleData,
-  'exercise.activation': (l10n, params) => l10n.exerciseActivation(params['value'] ?? ''),
+  'exercise.activation': (l10n, params) =>
+      l10n.exerciseActivation(params['value'] ?? ''),
   'session.exit_title': (l10n, _) => l10n.sessionExitTitle,
   'session.exit_content': (l10n, _) => l10n.sessionExitContent,
   'session.stay': (l10n, _) => l10n.sessionStay,
@@ -537,13 +747,15 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'session.notes': (l10n, _) => l10n.sessionNotes,
   'session.history': (l10n, _) => l10n.sessionHistory,
   'session.finish_discard': (l10n, _) => l10n.sessionFinishDiscard,
-  'session.exercise_count': (l10n, params) => l10n.sessionExerciseCount(params['count'] ?? ''),
+  'session.exercise_count': (l10n, params) =>
+      l10n.sessionExerciseCount(params['count'] ?? ''),
   'session.voice.title': (l10n, _) => l10n.sessionVoiceTitle,
   'session.voice.tooltip': (l10n, _) => l10n.sessionVoiceTooltip,
   'session.voice.listening': (l10n, _) => l10n.sessionVoiceListening,
   'session.voice.tap_stop_hint': (l10n, _) => l10n.sessionVoiceTapStopHint,
   'session.voice.live_transcript': (l10n, _) => l10n.sessionVoiceLiveTranscript,
-  'session.voice.waiting_transcript': (l10n, _) => l10n.sessionVoiceWaitingTranscript,
+  'session.voice.waiting_transcript': (l10n, _) =>
+      l10n.sessionVoiceWaitingTranscript,
   'session.voice.stop': (l10n, _) => l10n.sessionVoiceStop,
   'session.voice.reactivate_hint': (l10n, _) => l10n.sessionVoiceReactivateHint,
   'session.voice.capture_error': (l10n, _) => l10n.sessionVoiceCaptureError,
@@ -554,13 +766,20 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'session.voice.apply_failed': (l10n, _) => l10n.sessionVoiceApplyFailed,
   'session.voice.choose_title': (l10n, _) => l10n.sessionVoiceChooseTitle,
   'session.voice.confidence': (l10n, _) => l10n.sessionVoiceConfidence,
-  'session.voice.applied': (l10n, params) => l10n.sessionVoiceApplied(params['exercise'] ?? '', params['sets'] ?? '', params['reps'] ?? '', params['kg'] ?? ''),
+  'session.voice.applied': (l10n, params) => l10n.sessionVoiceApplied(
+    params['exercise'] ?? '',
+    params['sets'] ?? '',
+    params['reps'] ?? '',
+    params['kg'] ?? '',
+  ),
   'workout.edit.description': (l10n, _) => l10n.workoutEditDescription,
   'workout.edit.add_exercise': (l10n, _) => l10n.workoutEditAddExercise,
-  'workout.edit.exercises_count': (l10n, params) => l10n.workoutEditExercisesCount(params['count'] ?? ''),
+  'workout.edit.exercises_count': (l10n, params) =>
+      l10n.workoutEditExercisesCount(params['count'] ?? ''),
   'workout.edit.exercises_hint': (l10n, _) => l10n.workoutEditExercisesHint,
   'workout.edit.no_exercise': (l10n, _) => l10n.workoutEditNoExercise,
-  'workout.edit.add_first_exercise': (l10n, _) => l10n.workoutEditAddFirstExercise,
+  'workout.edit.add_first_exercise': (l10n, _) =>
+      l10n.workoutEditAddFirstExercise,
   'workout.edit.remove_title': (l10n, _) => l10n.workoutEditRemoveTitle,
   'workout.edit.remove_content': (l10n, _) => l10n.workoutEditRemoveContent,
   'workout.edit.remove_confirm': (l10n, _) => l10n.workoutEditRemoveConfirm,
@@ -608,12 +827,15 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'exercise.personal.edit': (l10n, _) => l10n.exercisePersonalEdit,
   'exercise.personal.created': (l10n, _) => l10n.exercisePersonalCreated,
   'exercise.personal.name': (l10n, _) => l10n.exercisePersonalName,
-  'exercise.personal.description': (l10n, _) => l10n.exercisePersonalDescription,
+  'exercise.personal.description': (l10n, _) =>
+      l10n.exercisePersonalDescription,
   'exercise.personal.delete': (l10n, _) => l10n.exercisePersonalDelete,
-  'exercise.personal.delete_confirm': (l10n, _) => l10n.exercisePersonalDeleteConfirm,
+  'exercise.personal.delete_confirm': (l10n, _) =>
+      l10n.exercisePersonalDeleteConfirm,
   'exercise.personal.empty': (l10n, _) => l10n.exercisePersonalEmpty,
   'exercise.difficulty.beginner': (l10n, _) => l10n.exerciseDifficultyBeginner,
-  'exercise.difficulty.intermediate': (l10n, _) => l10n.exerciseDifficultyIntermediate,
+  'exercise.difficulty.intermediate': (l10n, _) =>
+      l10n.exerciseDifficultyIntermediate,
   'exercise.difficulty.advanced': (l10n, _) => l10n.exerciseDifficultyAdvanced,
   'exercise.mechanics.compound': (l10n, _) => l10n.exerciseMechanicsCompound,
   'exercise.mechanics.isolation': (l10n, _) => l10n.exerciseMechanicsIsolation,
@@ -626,7 +848,8 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'auth.login.description': (l10n, _) => l10n.authLoginDescription,
   'auth.login.configuration_hint': (l10n, _) => l10n.authLoginConfigurationHint,
   'auth.login.cta': (l10n, _) => l10n.authLoginCta,
-  'home.header.greeting': (l10n, params) => l10n.homeHeaderGreeting(params['name'] ?? ''),
+  'home.header.greeting': (l10n, params) =>
+      l10n.homeHeaderGreeting(params['name'] ?? ''),
   'home.header.greeting_generic': (l10n, _) => l10n.homeHeaderGreetingGeneric,
   'home.header.subtitle': (l10n, _) => l10n.homeHeaderSubtitle,
   'home.sync.offline': (l10n, _) => l10n.homeSyncOffline,
@@ -638,17 +861,30 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'home.today.recovery_day': (l10n, _) => l10n.homeTodayRecoveryDay,
   'home.today.start_workout': (l10n, _) => l10n.homeTodayStartWorkout,
   'home.today.resume_workout': (l10n, _) => l10n.homeTodayResumeWorkout,
-  'home.today.training_metadata': (l10n, params) => l10n.homeTodayTrainingMetadata(params['minutes'] ?? '', params['sets'] ?? ''),
-  'home.today.progress_metadata': (l10n, params) => l10n.homeTodayProgressMetadata(params['minutes'] ?? '', params['done'] ?? '', params['total'] ?? ''),
-  'home.today.next_session': (l10n, params) => l10n.homeTodayNextSession(params['workout'] ?? '', params['date'] ?? ''),
+  'home.today.training_metadata': (l10n, params) => l10n
+      .homeTodayTrainingMetadata(params['minutes'] ?? '', params['sets'] ?? ''),
+  'home.today.progress_metadata': (l10n, params) =>
+      l10n.homeTodayProgressMetadata(
+        params['minutes'] ?? '',
+        params['done'] ?? '',
+        params['total'] ?? '',
+      ),
+  'home.today.next_session': (l10n, params) =>
+      l10n.homeTodayNextSession(params['workout'] ?? '', params['date'] ?? ''),
   'home.empty.title': (l10n, _) => l10n.homeEmptyTitle,
   'home.empty.body': (l10n, _) => l10n.homeEmptyBody,
-  'home.cycle.position': (l10n, params) => l10n.homeCyclePosition(params['position'] ?? '', params['length'] ?? ''),
-  'home.cycle.semantics': (l10n, params) => l10n.homeCycleSemantics(params['position'] ?? '', params['length'] ?? '', params['percent'] ?? ''),
+  'home.cycle.position': (l10n, params) =>
+      l10n.homeCyclePosition(params['position'] ?? '', params['length'] ?? ''),
+  'home.cycle.semantics': (l10n, params) => l10n.homeCycleSemantics(
+    params['position'] ?? '',
+    params['length'] ?? '',
+    params['percent'] ?? '',
+  ),
   'home.calendar.title': (l10n, _) => l10n.homeCalendarTitle,
   'home.calendar.next': (l10n, _) => l10n.homeCalendarNext,
   'home.calendar.today': (l10n, _) => l10n.homeCalendarToday,
-  'home.calendar.cycle': (l10n, params) => l10n.homeCalendarCycle(params['position'] ?? '', params['length'] ?? ''),
+  'home.calendar.cycle': (l10n, params) =>
+      l10n.homeCalendarCycle(params['position'] ?? '', params['length'] ?? ''),
   'home.goal.title': (l10n, _) => l10n.homeGoalTitle,
   'home.goal.baseline': (l10n, _) => l10n.homeGoalBaseline,
   'home.goal.empty_title': (l10n, _) => l10n.homeGoalEmptyTitle,
@@ -656,10 +892,13 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'home.insights.title': (l10n, _) => l10n.homeInsightsTitle,
   'home.insights.learning_title': (l10n, _) => l10n.homeInsightsLearningTitle,
   'home.insights.learning_body': (l10n, _) => l10n.homeInsightsLearningBody,
-  'home.insight.progression_title': (l10n, _) => l10n.homeInsightProgressionTitle,
+  'home.insight.progression_title': (l10n, _) =>
+      l10n.homeInsightProgressionTitle,
   'home.insight.progression_body': (l10n, _) => l10n.homeInsightProgressionBody,
-  'home.insight.progression_specific': (l10n, _) => l10n.homeInsightProgressionSpecific,
-  'home.insight.consistency_title': (l10n, _) => l10n.homeInsightConsistencyTitle,
+  'home.insight.progression_specific': (l10n, _) =>
+      l10n.homeInsightProgressionSpecific,
+  'home.insight.consistency_title': (l10n, _) =>
+      l10n.homeInsightConsistencyTitle,
   'home.insight.consistency_body': (l10n, _) => l10n.homeInsightConsistencyBody,
   'home.actions.title': (l10n, _) => l10n.homeActionsTitle,
   'home.action.create_workout': (l10n, _) => l10n.homeActionCreateWorkout,
@@ -674,9 +913,13 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'home.guide.intermediate': (l10n, _) => l10n.homeGuideIntermediate,
   'home.guide.all_levels': (l10n, _) => l10n.homeGuideAllLevels,
   'home.routines.title': (l10n, _) => l10n.homeRoutinesTitle,
-  'home.routines.metadata': (l10n, params) => l10n.homeRoutinesMetadata(params['exercises'] ?? '', params['minutes'] ?? ''),
+  'home.routines.metadata': (l10n, params) => l10n.homeRoutinesMetadata(
+    params['exercises'] ?? '',
+    params['minutes'] ?? '',
+  ),
   'home.routines.last_yesterday': (l10n, _) => l10n.homeRoutinesLastYesterday,
-  'home.routines.last_days': (l10n, params) => l10n.homeRoutinesLastDays(params['days'] ?? ''),
+  'home.routines.last_days': (l10n, params) =>
+      l10n.homeRoutinesLastDays(params['days'] ?? ''),
   'home.routines.empty_title': (l10n, _) => l10n.homeRoutinesEmptyTitle,
   'home.routines.empty_body': (l10n, _) => l10n.homeRoutinesEmptyBody,
   'home.error.title': (l10n, _) => l10n.homeErrorTitle,

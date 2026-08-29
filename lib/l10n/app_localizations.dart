@@ -194,12 +194,6 @@ abstract class AppLocalizations {
   /// **'Saved'**
   String get workoutActiveSaved;
 
-  /// Migrated from workout.active.plan_guard
-  ///
-  /// In en, this message translates to:
-  /// **'PLAN GUARD'**
-  String get workoutActivePlanGuard;
-
   /// Migrated from workout.active.finish
   ///
   /// In en, this message translates to:

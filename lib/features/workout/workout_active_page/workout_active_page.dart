@@ -7,7 +7,7 @@ import 'package:coachly/features/workout/workout_active_page/providers/active_wo
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_hive_service.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -80,15 +80,11 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   }
 
   Widget _workspace(BuildContext context, ActiveWorkoutState state) {
-    final decision = state.sessionId.isEmpty
-        ? null
-        : ref.watch(workoutCoachProvider(state.sessionId)).decision;
     return AdaptiveWorkoutWorkspace(
       state: state,
       title: _title(state),
       elapsed: _elapsed,
       rest: ref.watch(restTimerProvider),
-      decision: decision,
       onBack: context.pop,
       onMenu: _completeWorkout,
       onExercise: _controller.goToExercise,
@@ -156,11 +152,6 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
       onRestTogglePause: () =>
           ref.read(restTimerProvider.notifier).togglePause(),
       onRestToggleBell: () => ref.read(restTimerProvider.notifier).toggleBell(),
-      onDismissGuard: () {
-        if (state.sessionId.isNotEmpty) {
-          ref.read(workoutCoachProvider(state.sessionId).notifier).dismiss();
-        }
-      },
       loadUnit: _loadUnit,
       onNote: _controller.updateSetNote,
     );
@@ -209,7 +200,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   }
 
   Future<void> _showAddExerciseSheet() async {
-    final catalog = await ref.read(exerciseHiveServiceProvider).getExercises();
+    final catalog = await ref.read(exerciseCatalogDaoProvider).getAllDetails();
     if (!mounted) return;
     await showModalBottomSheet<void>(
       context: context,
@@ -226,7 +217,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   }
 
   Future<({String id, String name})?> _addExerciseForBlock() async {
-    final catalog = await ref.read(exerciseHiveServiceProvider).getExercises();
+    final catalog = await ref.read(exerciseCatalogDaoProvider).getAllDetails();
     if (!mounted) return null;
     final exercise = await showModalBottomSheet<ExerciseDetailModel>(
       context: context,

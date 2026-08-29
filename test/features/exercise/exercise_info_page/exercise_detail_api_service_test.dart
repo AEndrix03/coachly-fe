@@ -15,10 +15,10 @@ void main() {
       final client = MockClient((request) async {
         expect(request.url.path, '/api/exercises/exercise-id/details');
         return http.Response.bytes(
-        utf8.encode(jsonEncode(_exerciseDetailJson)),
-        200,
-        headers: _jsonHeaders,
-      );
+          utf8.encode(jsonEncode(_exerciseDetailJson)),
+          200,
+          headers: _jsonHeaders,
+        );
       });
       final service = ApiExerciseDetailViewService(
         ApiClient(client: client, baseUrl: 'https://coachly.test/api'),
@@ -56,15 +56,17 @@ void main() {
     final client = MockClient((request) async {
       expect(request.url.path, '/api/exercises/filtered');
       return http.Response.bytes(
-        utf8.encode(jsonEncode([
-          _exerciseDetailJson,
-          {
-            ..._exerciseDetailJson,
-            'id': 'squat-id',
-            'code': 'BACK_SQUAT',
-            'nameI18n': {'it': 'Back Squat'},
-          },
-        ])),
+        utf8.encode(
+          jsonEncode([
+            _exerciseDetailJson,
+            {
+              ..._exerciseDetailJson,
+              'id': 'squat-id',
+              'code': 'BACK_SQUAT',
+              'nameI18n': {'it': 'Back Squat'},
+            },
+          ]),
+        ),
         200,
         headers: _jsonHeaders,
       );
