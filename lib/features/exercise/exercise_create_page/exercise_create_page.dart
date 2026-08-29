@@ -1,3 +1,4 @@
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
@@ -60,9 +61,9 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
     setState(() => _saving = true);
     final names = <String, String>{'it': _nameIt.text.trim()};
     if (_nameEn.text.trim().isNotEmpty) names['en'] = _nameEn.text.trim();
-    final response = await ref
+    final result = await ref
         .read(exerciseInfoPageRepositoryProvider)
-        .createPersonalExercise(
+        .createPersonalExerciseResult(
           nameI18n: names,
           descriptionI18n: _descriptionIt.text.trim().isEmpty
               ? null
@@ -77,15 +78,16 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
         );
     if (!mounted) return;
     setState(() => _saving = false);
-    if (!response.success || response.data == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response.message ?? 'Impossibile salvare l’esercizio'),
-        ),
-      );
-      return;
+    switch (result) {
+      // Il messaggio del Failure e' diagnostico: all'utente si mostra un testo
+      // tradotto (docs/development/07-errors-and-feedback.md).
+      case Err():
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tr('exercise.create.save_failed'))),
+        );
+      case Ok(:final value):
+        context.pop<ExerciseDetailModel>(value);
     }
-    context.pop<ExerciseDetailModel>(response.data);
   }
 
   @override

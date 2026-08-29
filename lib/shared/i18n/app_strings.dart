@@ -9,6 +9,10 @@ class AppStrings {
 
   static const Map<String, Map<String, String>> _values = {
     'common.app_name': {'en': 'Coachly', 'it': 'Coachly'},
+    'exercise.create.save_failed': {
+      'en': 'Could not save the exercise',
+      'it': 'Impossibile salvare l’esercizio',
+    },
     'workout.active.search_exercises': {
       'en': 'Search local exercises',
       'it': 'Cerca fra gli esercizi locali',
@@ -1664,28 +1668,6 @@ class AppStrings {
       'en': 'No variants available.',
       'it': 'Nessuna variante disponibile.',
     },
-    'ai.create_workout': {'en': 'Create Workout', 'it': 'Crea Scheda'},
-    'ai.analyze_progress': {
-      'en': 'Analyze progress',
-      'it': 'Analizza Progressi',
-    },
-    'ai.goal_tips': {'en': 'Goal tips', 'it': 'Consigli Obiettivi'},
-    'ai.greeting': {
-      'en':
-          'Hi! I am your AI Coach. I can help with workout plans, progress analysis, nutrition tips, and more. How can I help today? 💪',
-      'it':
-          'Ciao! Sono il tuo AI Coach. Posso aiutarti con schede di allenamento, analisi progressi, consigli nutrizionali e molto altro. Come posso aiutarti oggi? 💪',
-    },
-    'ai.sample_question': {
-      'en': 'I am doing bench press and feel tired. Should I continue?',
-      'it': 'Sto facendo la panca piana, mi sento stanco. Devo continuare?',
-    },
-    'ai.sample_answer': {
-      'en':
-          'Great question! If you feel normal muscle fatigue, continue. If you feel pain or joint instability, stop. Consider reducing the load by 5-10% in the remaining sets to keep proper form. 🎯',
-      'it':
-          'Ottima domanda! Se senti fatica muscolare normale, continua pure. Se invece percepisci dolore o instabilità articolare, fermati. Considera di ridurre leggermente il carico del 5-10% nelle serie rimanenti per mantenere la forma corretta. 🎯',
-    },
     'workout.empty.create_first': {
       'en': 'Create your\nfirst workout!',
       'it': 'Crea la tua\nprima scheda!',
@@ -1804,227 +1786,13 @@ class AppStrings {
       'it': 'Continua con Keycloak',
     },
 
-    'ai.header_ready': {
-      'en': 'Always ready to help',
-      'it': 'Sempre pronto ad aiutarti',
-    },
-    'ai.plan_week': {'en': 'Plan week', 'it': 'Pianifica settimana'},
-    'ai.write_message': {
-      'en': 'Write your message...',
-      'it': 'Scrivi il tuo messaggio...',
-    },
-    'ai.loading': {
-      'en': 'Loading AI Coach...',
-      'it': 'Caricamento AI Coach...',
-    },
-    'ai.monitor_workout': {
-      'en': 'Monitoring your workout',
-      'it': 'Monitora il tuo workout',
-    },
-    'ai.listening': {'en': 'LISTENING...', 'it': 'IN ASCOLTO...'},
-    'ai.speak_now': {'en': 'Speak now...', 'it': 'Parla adesso...'},
-    'ai.send': {'en': 'Send', 'it': 'Invia'},
-    'ai.write_or_speak': {'en': 'Write or speak...', 'it': 'Scrivi o parla...'},
-    'ai.live': {'en': 'LIVE', 'it': 'LIVE'},
-    'ai.now': {'en': 'now', 'it': 'adesso'},
-    'ai.minutes_ago': {'en': '{value}m ago', 'it': '{value}m fa'},
-    'ai.context_line': {
-      'en': '{exercise} · Set {current}/{total} · {weight} kg · {time}',
-      'it': '{exercise} · Set {current}/{total} · {weight} kg · {time}',
-    },
-    'ai.quick.adjust': {'en': 'ADJUST', 'it': 'AGGIUSTA'},
-    'ai.quick.progress': {'en': 'PROGRESS', 'it': 'PROGRESSI'},
-    'ai.quick.fatigue': {'en': 'FATIGUE', 'it': 'FATICA'},
-    'ai.quick.next': {'en': 'NEXT', 'it': 'PROSSIMO'},
-    'ai.quick.nutrition': {'en': 'NUTRITION', 'it': 'NUTRIZIONE'},
-    'ai.default_opening': {
-      'en':
-          'I am ready. Tell me how you feel in this set and I will guide you.',
-      'it': 'Sono pronto. Dimmi come ti senti in questo set e ti guido subito.',
-    },
-    'ai.model_unavailable': {
-      'en': 'Model not available now. I will use simplified offline answers.',
-      'it':
-          'Modello non disponibile ora. Uso risposte locali semplificate offline.',
-    },
-    'ai.model_loading_retry': {
-      'en': 'AI model is still warming up. Retry in a few seconds.',
-      'it': 'Il modello AI sta ancora caricando. Riprova tra pochi secondi.',
-    },
-    'ai.retry_short': {
-      'en': 'I did not complete the answer. Try again with a shorter request.',
-      'it':
-          'Non ho completato la risposta. Riprova con una richiesta piu breve.',
-    },
-    'ai.json_fallback': {
-      'en': 'Rephrase briefly: I can give you a practical tip right now.',
-      'it': 'Riformula in breve: posso darti un consiglio pratico adesso.',
-    },
-    'ai.message_fallback': {
-      'en': 'I am tracking in real time: keep control and technical quality.',
-      'it': 'Ti seguo in tempo reale: mantieni controllo e qualita tecnica.',
-    },
-    'ai.context_loading_exercise': {
-      'en': 'Loading exercise',
-      'it': 'Esercizio in caricamento',
-    },
-    'ai.prompt.system.en': {
-      'en':
-          'You are Coachly AI Coach, an on-device fitness assistant with real-time workout context.\nReply ONLY with a single valid JSON object. No text before or after. No markdown.\nWhen an insight is useful: {"message":"<reply in English, 1-2 sentences>","insight_card":{"icon":"<emoji>","label":"<UPPERCASE 1-3 WORDS>","body":"<max 12 words>"}}\nWhen no insight is needed: {"message":"<reply in English, 1-2 sentences>","insight_card":null}\nBe concise, direct, motivating.',
-      'it':
-          'Sei AI Coach di Coachly, assistente fitness on-device con accesso al contesto workout in tempo reale.\nRispondi SOLO con un singolo oggetto JSON valido. Nessun testo prima o dopo. Nessun markdown.\nQuando un insight è utile: {"message":"<risposta in italiano, 1-2 frasi>","insight_card":{"icon":"<emoji>","label":"<UPPERCASE 1-3 PAROLE>","body":"<max 12 parole>"}}\nQuando non serve un insight: {"message":"<risposta in italiano, 1-2 frasi>","insight_card":null}\nSii conciso, diretto, motivante.',
-    },
-    'ai.prompt.context_title': {
-      'en': '[WORKOUT CONTEXT]',
-      'it': '[CONTESTO WORKOUT]',
-    },
-    'ai.prompt.user_title': {
-      'en': '[USER MESSAGE]',
-      'it': '[MESSAGGIO UTENTE]',
-    },
-    'ai.prompt.exercise_line': {
-      'en': 'Exercise: {name} | Set: {current}/{total}',
-      'it': 'Esercizio: {name} | Set: {current}/{total}',
-    },
-    'ai.prompt.weight_line': {
-      'en': 'Weight: {weight}kg x {reps} target reps',
-      'it': 'Peso: {weight}kg x {reps} reps target',
-    },
-    'ai.prompt.fatigue_line': {
-      'en': 'Fatigue index: {value}',
-      'it': 'Indice fatica: {value}',
-    },
-    'ai.prompt.recent_weights_line': {
-      'en': 'Recent weight history: {value}',
-      'it': 'Storico pesi recenti: {value}',
-    },
-    'ai.prompt.minutes_line': {
-      'en': 'Session minutes: {value}',
-      'it': 'Minuti sessione: {value}',
-    },
-    'ai.offline.body': {
-      'en': 'Fatigue {value}% on {exercise}',
-      'it': 'Fatica {value}% su {exercise}',
-    },
-    'ai.offline.body_default': {
-      'en': 'Keep clean technique and regular recovery',
-      'it': 'Mantieni tecnica pulita e recupero regolare',
-    },
-    'ai.offline.message': {
-      'en': 'I read: {message}. Keep controlled pace and stable form now.',
-      'it':
-          'Ho letto: {message}. Ora mantieni ritmo controllato e forma stabile.',
-    },
-    'ai.offline.label': {'en': 'QUICK CHECK', 'it': 'CHECK RAPIDO'},
 
-    'ai.download.title': {
-      'en': 'AI Model Required',
-      'it': 'Modello AI Richiesto',
-    },
-    'ai.download.subtitle': {
-      'en': 'Qwen2.5 1.5B · 1.5 GB · runs fully offline',
-      'it': 'Qwen2.5 1.5B · 1.5 GB · gira completamente offline',
-    },
-    'ai.download.description': {
-      'en':
-          'The AI coach needs to download a model once. After that it runs entirely on your device with no internet required.',
-      'it':
-          "Il coach AI deve scaricare un modello una volta. Dopodichè gira completamente sul tuo dispositivo senza connessione.",
-    },
-    'ai.download.button': {'en': 'Download', 'it': 'Scarica'},
-    'ai.download.progress': {
-      'en': 'Downloading... {progress}%',
-      'it': 'Download... {progress}%',
-    },
-    'ai.download.error': {
-      'en': 'Download failed. Tap to retry.',
-      'it': 'Download fallito. Tocca per riprovare.',
-    },
 
     // Local AI settings (profile page)
-    'settings.local_ai.section': {'en': 'AI Coach', 'it': 'AI Coach'},
-    'settings.local_ai.toggle': {
-      'en': 'Use local AI',
-      'it': 'Usa AI in locale',
-    },
-    'settings.local_ai.toggle_subtitle': {
-      'en': 'Run AI entirely on your device, offline',
-      'it': 'Esegui l\'AI interamente sul dispositivo, offline',
-    },
-    'settings.local_ai.model_quality': {
-      'en': 'Model quality',
-      'it': 'Qualità modello',
-    },
-    'settings.local_ai.model_minimal': {'en': 'Minimal', 'it': 'Minima'},
-    'settings.local_ai.model_good': {'en': 'Good', 'it': 'Buona'},
-    'settings.local_ai.model_best': {'en': 'Best', 'it': 'Ottima'},
-    'settings.local_ai.uninstall_all': {
-      'en': 'Uninstall downloaded models',
-      'it': 'Disinstalla modelli scaricati',
-    },
-    'settings.local_ai.uninstall_title': {
-      'en': 'Uninstall models?',
-      'it': 'Disinstallare i modelli?',
-    },
-    'settings.local_ai.uninstall_body': {
-      'en': 'All downloaded AI models will be removed from your device.',
-      'it': 'Tutti i modelli AI scaricati verranno rimossi dal dispositivo.',
-    },
-    'settings.local_ai.uninstall_confirm': {
-      'en': 'Uninstall',
-      'it': 'Disinstalla',
-    },
-    'settings.local_ai.enable_title': {
-      'en': 'Enable local AI?',
-      'it': 'Abilitare AI in locale?',
-    },
-    'settings.local_ai.storage_info': {
-      'en': 'Storage required: {size}',
-      'it': 'Spazio archiviazione necessario: {size}',
-    },
-    'settings.local_ai.no_cost': {
-      'en': 'No additional costs',
-      'it': 'Nessun costo aggiuntivo',
-    },
-    'settings.local_ai.modern_device': {
-      'en': 'Designed for modern devices',
-      'it': 'Pensato per dispositivi moderni',
-    },
-    'settings.local_ai.can_disable': {
-      'en': 'You can disable it at any time',
-      'it': 'Puoi disabilitare l\'opzione in qualsiasi momento',
-    },
-    'settings.local_ai.enable_confirm': {'en': 'Enable', 'it': 'Abilita'},
-    'settings.local_ai.hf_token': {
-      'en': 'HuggingFace Token (optional)',
-      'it': 'Token HuggingFace (opzionale)',
-    },
-    'settings.local_ai.hf_token_hint': {'en': 'hf_...', 'it': 'hf_...'},
-    'settings.local_ai.hf_token_subtitle': {
-      'en': 'Required to download gated models from HuggingFace',
-      'it': 'Necessario per scaricare i modelli protetti da HuggingFace',
-    },
 
     // AI coach panel — disabled state
-    'ai.disabled.title': {
-      'en': 'Local AI disabled',
-      'it': 'AI locale disabilitata',
-    },
-    'ai.disabled.subtitle': {
-      'en':
-          'Enable local AI in your profile settings to use the AI coach during workouts.',
-      'it':
-          'Abilita l\'AI in locale dalle impostazioni del profilo per usare il coach AI durante l\'allenamento.',
-    },
 
     // AI coach panel — insufficient memory
-    'ai.oom.title': {'en': 'Not enough memory', 'it': 'RAM insufficiente'},
-    'ai.oom.subtitle': {
-      'en':
-          'This model is too large for your device\'s available memory. Choose a lighter model in the profile settings.',
-      'it':
-          'Questo modello è troppo grande per la RAM disponibile sul tuo dispositivo. Scegli un modello meno potente dalle impostazioni del profilo.',
-    },
     'home.header.greeting': {'en': 'Hi, {name}', 'it': 'Ciao, {name}'},
     'home.header.greeting_generic': {'en': 'Hi', 'it': 'Ciao'},
     'home.header.subtitle': {

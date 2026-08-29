@@ -12,6 +12,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get commonAppName => 'Coachly';
 
   @override
+  String get exerciseCreateSaveFailed => 'Impossibile salvare l’esercizio';
+
+  @override
   String get workoutActiveSearchExercises => 'Cerca fra gli esercizi locali';
 
   @override

@@ -1,3 +1,4 @@
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
@@ -31,16 +32,19 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
       _error = null;
     });
     final repository = ref.read(exerciseInfoPageRepositoryProvider);
-    final response = await repository.getMyExercises();
+    final result = await repository.getMyExercisesResult();
     if (!mounted) {
       return;
     }
     setState(() {
       _isLoading = false;
-      if (response.success) {
-        _exercises = response.data ?? const [];
-      } else {
-        _error = response.message ?? context.tr('common.error');
+      switch (result) {
+        case Ok(:final value):
+          _exercises = value;
+        // Il messaggio del Failure e' diagnostico: all'utente si mostra un
+        // testo tradotto (docs/development/07-errors-and-feedback.md).
+        case Err():
+          _error = context.tr('common.error');
       }
     });
   }
@@ -107,7 +111,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
     }
 
     if (editing == null) {
-      await repository.createPersonalExercise(
+      await repository.createPersonalExerciseResult(
         nameI18n: {locale: name},
         descriptionI18n: description.isNotEmpty ? {locale: description} : null,
         tipsI18n: const {},
@@ -117,7 +121,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
         isUnilateral: false,
       );
     } else {
-      await repository.updatePersonalExercise(
+      await repository.updatePersonalExerciseResult(
         editing.id!,
         nameI18n: {locale: name},
         descriptionI18n: description.isNotEmpty ? {locale: description} : null,
@@ -156,7 +160,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
     }
     await ref
         .read(exerciseInfoPageRepositoryProvider)
-        .deletePersonalExercise(exercise.id!);
+        .deletePersonalExerciseResult(exercise.id!);
     await _loadExercises();
   }
 

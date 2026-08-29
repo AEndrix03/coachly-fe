@@ -1,6 +1,7 @@
 import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/core/text_filter/polite_text_input_formatter.dart';
 import 'package:coachly/core/utils/debouncer.dart';
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
@@ -227,7 +228,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     }
 
     final repository = ref.read(exerciseInfoPageRepositoryProvider);
-    final response = await repository.createPersonalExercise(
+    final response = await repository.createPersonalExerciseResult(
       nameI18n: {lang: name},
       descriptionI18n: description.isNotEmpty ? {lang: description} : null,
       tipsI18n: const {},
@@ -1104,15 +1105,18 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     final id = exercise.id;
     if (id == null || id.isEmpty) return;
     final repository = ref.read(exerciseInfoPageRepositoryProvider);
-    final response = await repository.getExerciseDetail(id);
+    final result = await repository.getExerciseDetailResult(id);
     if (!mounted) return;
-    if (!response.success || response.data == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response.message ?? context.tr('common.error'))),
-      );
-      return;
+    switch (result) {
+      // Il messaggio del Failure e' diagnostico: all'utente si mostra un testo
+      // tradotto (docs/development/07-errors-and-feedback.md).
+      case Err():
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.tr('common.error'))));
+      case Ok(:final value):
+        _addExercise(value, name, locale, notAvailable);
     }
-    _addExercise(response.data!, name, locale, notAvailable);
   }
 
   void _addExercise(

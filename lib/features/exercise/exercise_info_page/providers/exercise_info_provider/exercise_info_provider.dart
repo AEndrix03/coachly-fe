@@ -1,4 +1,5 @@
 import 'package:coachly/core/network/api_client.dart';
+import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository.dart';
@@ -85,17 +86,18 @@ class ExerciseInfoNotifier extends _$ExerciseInfoNotifier {
 
     try {
       final repository = ref.read(exerciseInfoPageRepositoryProvider);
-      final response = await repository.getAllExercises();
+      final result = await repository.getAllExercisesResult();
 
       if (!ref.mounted) return;
 
-      if (response.success && response.data != null) {
-        state = state.copyWith(exercises: response.data!, isLoading: false);
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: response.message ?? 'Error loading exercises',
-        );
+      switch (result) {
+        case Ok(:final value):
+          state = state.copyWith(exercises: value, isLoading: false);
+        case Err(:final failure):
+          state = state.copyWith(
+            isLoading: false,
+            errorMessage: failure.message,
+          );
       }
     } catch (e) {
       if (!ref.mounted) return;
@@ -108,20 +110,21 @@ class ExerciseInfoNotifier extends _$ExerciseInfoNotifier {
 
     try {
       final repository = ref.read(exerciseInfoPageRepositoryProvider);
-      final response = await repository.getExerciseDetail(exerciseId);
+      final result = await repository.getExerciseDetailResult(exerciseId);
 
       if (!ref.mounted) return;
 
-      if (response.success && response.data != null) {
-        state = state.copyWith(
-          selectedExercise: response.data!,
-          isLoadingDetail: false,
-        );
-      } else {
-        state = state.copyWith(
-          isLoadingDetail: false,
-          errorMessage: response.message ?? 'Error loading exercise detail',
-        );
+      switch (result) {
+        case Ok(:final value):
+          state = state.copyWith(
+            selectedExercise: value,
+            isLoadingDetail: false,
+          );
+        case Err(:final failure):
+          state = state.copyWith(
+            isLoadingDetail: false,
+            errorMessage: failure.message,
+          );
       }
     } catch (e) {
       if (!ref.mounted) return;

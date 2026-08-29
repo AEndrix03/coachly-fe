@@ -141,8 +141,9 @@ class ActiveWorkout extends _$ActiveWorkout {
           return exercise;
         }
 
-        final response = await repository.getExerciseDetail(exerciseId);
-        final resolvedExercise = response.data;
+        final resolvedExercise = (await repository.getExerciseDetailResult(
+          exerciseId,
+        )).valueOrNull;
         if (resolvedExercise == null) {
           return exercise;
         }

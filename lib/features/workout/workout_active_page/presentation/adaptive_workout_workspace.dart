@@ -5,7 +5,6 @@ import 'package:coachly/features/workout/workout_active_page/presentation/active
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
@@ -1687,18 +1686,146 @@ class _ActiveSetEditor extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          height: CoachlyAthleteTheme.primaryActionHeight,
-          child: FilledButton.icon(
-            onPressed: () => onComplete(set.id),
-            icon: const Icon(Icons.check_rounded),
-            label: Text(context.activeTr('completeSet')),
-          ),
+        _CompleteSetButton(
+          label: context.activeTr('completeSet'),
+          onPressed: () => onComplete(set.id),
         ),
       ],
     ),
   );
+}
+
+class _CompleteSetButton extends StatefulWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const _CompleteSetButton({required this.label, required this.onPressed});
+
+  @override
+  State<_CompleteSetButton> createState() => _CompleteSetButtonState();
+}
+
+class _CompleteSetButtonState extends State<_CompleteSetButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final deepGreen = Color.lerp(scheme.primary, scheme.surface, .22)!;
+    final brightGreen = Color.lerp(scheme.primary, scheme.onSurface, .08)!;
+    final foreground = scheme.onPrimary;
+    return Semantics(
+      button: true,
+      label: widget.label,
+      child: AnimatedScale(
+        scale: _pressed ? .985 : 1,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          width: double.infinity,
+          height: CoachlyAthleteTheme.primaryActionHeight,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: _pressed
+                  ? [deepGreen, scheme.primary]
+                  : [brightGreen, scheme.primary, deepGreen],
+              stops: _pressed ? const [0, 1] : const [0, .5, 1],
+            ),
+            borderRadius: BorderRadius.circular(
+              CoachlyAthleteTheme.actionRadius,
+            ),
+            border: Border.all(color: scheme.onSurface.withValues(alpha: .1)),
+            boxShadow: [
+              BoxShadow(
+                color: scheme.primary.withValues(alpha: _pressed ? .1 : .2),
+                blurRadius: _pressed ? 9 : 18,
+                offset: Offset(0, _pressed ? 3 : 8),
+              ),
+            ],
+          ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      CoachlyAthleteTheme.actionRadius,
+                    ),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.center,
+                      colors: [
+                        scheme.onSurface.withValues(alpha: .12),
+                        scheme.onSurface.withValues(alpha: 0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Material(
+                color: scheme.onSurface.withValues(alpha: 0),
+                borderRadius: BorderRadius.circular(
+                  CoachlyAthleteTheme.actionRadius,
+                ),
+                child: InkWell(
+                  onTap: widget.onPressed,
+                  onHighlightChanged: (pressed) {
+                    if (_pressed != pressed) {
+                      setState(() => _pressed = pressed);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(
+                    CoachlyAthleteTheme.actionRadius,
+                  ),
+                  splashColor: foreground.withValues(alpha: .1),
+                  highlightColor: foreground.withValues(alpha: .05),
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: foreground.withValues(alpha: .1),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: foreground.withValues(alpha: .16),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.check_rounded,
+                            size: 18,
+                            color: foreground,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          widget.label.toUpperCase(),
+                          style: TextStyle(
+                            color: foreground,
+                            fontSize: 13,
+                            height: 1,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: .85,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _SetRolePicker extends StatefulWidget {
@@ -1963,7 +2090,7 @@ class _SetTechniqueActions extends StatelessWidget {
   }
 }
 
-class _TechniqueToggle extends StatelessWidget {
+class _TechniqueToggle extends StatefulWidget {
   final String label;
   final Color color;
   final bool selected;
@@ -1977,62 +2104,231 @@ class _TechniqueToggle extends StatelessWidget {
   });
 
   @override
+  State<_TechniqueToggle> createState() => _TechniqueToggleState();
+}
+
+class _TechniqueToggleState extends State<_TechniqueToggle>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _trailController;
+  late final Animation<double> _activationScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _trailController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 680),
+    );
+    _activationScale = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween<double>(begin: 1, end: .96), weight: 16),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: .96,
+          end: 1.055,
+        ).chain(CurveTween(curve: Curves.easeOutCubic)),
+        weight: 34,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(
+          begin: 1.055,
+          end: 1,
+        ).chain(CurveTween(curve: Curves.easeOutBack)),
+        weight: 50,
+      ),
+    ]).animate(_trailController);
+  }
+
+  @override
+  void didUpdateWidget(covariant _TechniqueToggle oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.selected && widget.selected) {
+      _trailController.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _trailController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Semantics(
       button: true,
-      selected: selected,
-      label: label,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          constraints: const BoxConstraints(minWidth: 62, minHeight: 44),
-          padding: const EdgeInsets.symmetric(horizontal: 9),
-          decoration: BoxDecoration(
-            color: selected
-                ? color.withValues(alpha: .14)
-                : scheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: selected ? color : scheme.outlineVariant),
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              AnimatedScale(
-                scale: selected ? 1.03 : 1,
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutBack,
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: selected ? color : scheme.onSurfaceVariant,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 4,
+      selected: widget.selected,
+      label: widget.label,
+      child: RepaintBoundary(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            ScaleTransition(
+              scale: _activationScale,
+              child: InkWell(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  widget.onTap();
+                },
+                borderRadius: BorderRadius.circular(10),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 220),
                   curve: Curves.easeOutCubic,
-                  width: selected ? 18 : 0,
-                  height: 2,
+                  constraints: const BoxConstraints(
+                    minWidth: 62,
+                    minHeight: 44,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 9),
                   decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(999),
+                    color: widget.selected
+                        ? widget.color.withValues(alpha: .14)
+                        : scheme.surfaceContainerHigh,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: widget.selected
+                          ? widget.color
+                          : scheme.outlineVariant,
+                    ),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      AnimatedScale(
+                        scale: widget.selected ? 1.03 : 1,
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeOutBack,
+                        child: Text(
+                          widget.label,
+                          style: TextStyle(
+                            color: widget.selected
+                                ? widget.color
+                                : scheme.onSurfaceVariant,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 4,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                          width: widget.selected ? 18 : 0,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            color: widget.color,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedBuilder(
+                  animation: _trailController,
+                  builder: (context, _) => CustomPaint(
+                    painter: _TechniqueTrailPainter(
+                      progress: _trailController.value,
+                      color: widget.color,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
+
+class _TechniqueTrailPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+
+  const _TechniqueTrailPainter({required this.progress, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (progress <= 0 || progress >= 1) return;
+    final rightUpper = Path()
+      ..moveTo(size.width - 5, size.height * .42)
+      ..quadraticBezierTo(
+        size.width + 8,
+        size.height * .2,
+        size.width + 18,
+        size.height * .13,
+      );
+    final rightLower = Path()
+      ..moveTo(size.width - 4, size.height * .62)
+      ..quadraticBezierTo(
+        size.width + 9,
+        size.height * .78,
+        size.width + 16,
+        size.height * .9,
+      );
+    final leftUpper = Path()
+      ..moveTo(5, size.height * .39)
+      ..quadraticBezierTo(-7, size.height * .22, -15, size.height * .18);
+    final leftLower = Path()
+      ..moveTo(4, size.height * .65)
+      ..quadraticBezierTo(-8, size.height * .8, -14, size.height * .86);
+
+    _paintTrail(canvas, rightUpper, progress, delay: 0, strength: 1);
+    _paintTrail(canvas, leftLower, progress, delay: .04, strength: .82);
+    _paintTrail(canvas, rightLower, progress, delay: .1, strength: .62);
+    _paintTrail(canvas, leftUpper, progress, delay: .15, strength: .5);
+  }
+
+  void _paintTrail(
+    Canvas canvas,
+    Path path,
+    double globalProgress, {
+    required double delay,
+    required double strength,
+  }) {
+    final local = ((globalProgress - delay) / (1 - delay)).clamp(0.0, 1.0);
+    if (local <= 0 || local >= 1) return;
+    final head = Curves.easeOutCubic.transform(local);
+    final fade = local < .58 ? 1.0 : (1 - local) / .42;
+    final metric = path.computeMetrics().first;
+    final end = metric.length * head;
+    final start = (end - metric.length * (.3 - local * .08)).clamp(
+      0.0,
+      metric.length,
+    );
+    final opacity = (.82 * fade * strength).clamp(0.0, 1.0);
+    final trail = metric.extractPath(start, end);
+    final softPaint = Paint()
+      ..color = color.withValues(alpha: opacity * .18)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+    final trailPaint = Paint()
+      ..color = color.withValues(alpha: opacity)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.45
+      ..strokeCap = StrokeCap.round;
+    canvas
+      ..drawPath(trail, softPaint)
+      ..drawPath(trail, trailPaint);
+    final tangent = metric.getTangentForOffset(end);
+    if (tangent != null) {
+      canvas.drawCircle(
+        tangent.position,
+        1.35,
+        Paint()..color = color.withValues(alpha: opacity),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _TechniqueTrailPainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.color != color;
 }
 
 class _DropEditor extends StatelessWidget {
@@ -2531,30 +2827,21 @@ class _BlockGlyph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.primary;
-    if (type == ExerciseGroupType.circuit) {
-      return Icon(Icons.sync_rounded, size: 27, color: color);
-    }
-    final count = switch (type) {
-      ExerciseGroupType.superset => 2,
-      ExerciseGroupType.triset => 3,
-      _ => 4,
-    };
     return SizedBox(
-      height: 27,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          for (var index = 0; index < count; index++) ...[
-            Container(
-              width: 7,
-              height: 7,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            ),
-            if (index < count - 1)
-              Container(width: 7, height: 1.5, color: color),
-          ],
-        ],
+      width: CoachlyAthleteTheme.touchTarget,
+      height: CoachlyAthleteTheme.touchTarget,
+      child: Image.asset(
+        switch (type) {
+          ExerciseGroupType.superset => 'assets/images/sets/Superset.png',
+          ExerciseGroupType.triset => 'assets/images/sets/Triset.png',
+          ExerciseGroupType.giantSet => 'assets/images/sets/Giantset.png',
+          ExerciseGroupType.circuit => 'assets/images/sets/Circuit.png',
+          ExerciseGroupType.preparation || ExerciseGroupType.mobility =>
+            throw StateError('Unsupported block type: $type'),
+        },
+        fit: BoxFit.contain,
+        alignment: Alignment.center,
+        excludeFromSemantics: true,
       ),
     );
   }

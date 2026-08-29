@@ -372,8 +372,8 @@ final _exerciseNameProvider = FutureProvider.autoDispose
       final repository = ref.watch(exerciseInfoPageRepositoryProvider);
       final parts = argument.split('|');
       final locale = parts.first;
-      final response = await repository.getExerciseDetail(parts.last);
-      final translations = response.data?.nameI18n;
+      final result = await repository.getExerciseDetailResult(parts.last);
+      final translations = result.valueOrNull?.nameI18n;
       return translations?[locale] ??
           translations?.values.firstWhere(
             (value) => value.trim().isNotEmpty,

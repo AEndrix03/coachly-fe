@@ -179,7 +179,7 @@ void main() {
       expect(result, isA<Err<ExerciseDetailModel, Failure>>());
     });
 
-    test('due richieste concorrenti condividono la stessa chiamata', () async {
+    test('due richieste concorrenti riescono entrambe', () async {
       service.detailResponse = ApiResponse.success(data: detail);
 
       final results = await Future.wait([
@@ -187,8 +187,14 @@ void main() {
         repository.getExerciseDetailResult('squat'),
       ]);
 
-      expect(service.detailCalls, 1);
       expect(results.every((result) => result.isOk), isTrue);
+      // La deduplica NON e' piu' qui: sta nel RequestCoalescer di ApiClient
+      // (docs/development/06-networking.md), quindi con un service finto le
+      // chiamate arrivano entrambe. Sul percorso reale producono una sola
+      // richiesta HTTP; il comportamento e' verificato in
+      // test/core/network/request_coalescer_test.dart.
+      // Le due scritture in cache sono idempotenti.
+      expect(service.detailCalls, 2);
     });
   });
 
@@ -225,31 +231,6 @@ void main() {
       final result = await repository.refreshFromRemoteResult();
 
       expect(result.failureOrNull, isA<NetworkFailure>());
-    });
-  });
-
-  group('ponti di compatibilita', () {
-    test('il ponte traduce il Failure in ApiResponse', () async {
-      service.detailResponse = ApiResponse.error(
-        message: 'missing',
-        statusCode: 404,
-      );
-
-      // ignore: deprecated_member_use_from_same_package
-      final response = await repository.getExerciseDetail('squat');
-
-      expect(response.success, isFalse);
-      expect(response.statusCode, 404);
-    });
-
-    test('il ponte traduce il successo in ApiResponse', () async {
-      hive.details['squat'] = detail;
-
-      // ignore: deprecated_member_use_from_same_package
-      final response = await repository.getExerciseDetail('squat');
-
-      expect(response.success, isTrue);
-      expect(response.data, detail);
     });
   });
 }

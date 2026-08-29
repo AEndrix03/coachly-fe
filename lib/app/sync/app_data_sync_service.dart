@@ -85,8 +85,9 @@ class AppDataSyncService {
     _isSyncing = true;
     try {
       final workoutResult = await _workoutRepository.refreshFromRemote();
-      final exerciseResult = await _exerciseRepository.refreshFromRemote();
-      final success = workoutResult.success && exerciseResult.success;
+      final exerciseResult = await _exerciseRepository
+          .refreshFromRemoteResult();
+      final success = workoutResult.success && exerciseResult.isOk;
 
       if (success) {
         _hasSyncedCurrentSession = true;
@@ -112,8 +113,8 @@ class AppDataSyncService {
 
     _isSyncing = true;
     try {
-      final result = await _exerciseRepository.refreshFromRemote();
-      if (result.success) {
+      final result = await _exerciseRepository.refreshFromRemoteResult();
+      if (result.isOk) {
         _ref.invalidate(exerciseInfoProvider);
         _ref.invalidate(exerciseDetailCatalogProvider);
         _ref.invalidate(exerciseListProvider);

@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'Coachly'**
   String get commonAppName;
 
+  /// Migrated from exercise.create.save_failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the exercise'**
+  String get exerciseCreateSaveFailed;
+
   /// Migrated from workout.active.search_exercises
   ///
   /// In en, this message translates to:

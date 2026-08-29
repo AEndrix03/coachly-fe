@@ -40,8 +40,6 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   final WorkoutStructuredHiveService _structuredHiveService;
   final WorkoutSessionSyncService _sessionSyncService;
 
-  Future<ApiResponse<List<WorkoutModel>>>? _ongoingRefresh;
-
   WorkoutPageRepositoryImpl(
     this._apiService,
     this._hiveService,
@@ -56,34 +54,20 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
     if (localWorkouts.isNotEmpty) {
       return ApiResponse.success(data: localWorkouts);
     }
-    return _refreshFromRemoteDeduplicated();
+    return _performRefreshFromRemote();
   }
 
   @override
   Future<ApiResponse<List<WorkoutModel>>> refreshFromRemote() async {
-    final response = await _refreshFromRemoteDeduplicated();
+    final response = await _performRefreshFromRemote();
     unawaited(
       _sessionSyncService.syncPendingSessions(trigger: 'refresh_remote'),
     );
     return response;
   }
 
-  Future<ApiResponse<List<WorkoutModel>>> _refreshFromRemoteDeduplicated() {
-    final ongoingRefresh = _ongoingRefresh;
-    if (ongoingRefresh != null) {
-      return ongoingRefresh;
-    }
-
-    final refreshFuture = _performRefreshFromRemote();
-    _ongoingRefresh = refreshFuture;
-    refreshFuture.whenComplete(() {
-      if (identical(_ongoingRefresh, refreshFuture)) {
-        _ongoingRefresh = null;
-      }
-    });
-    return refreshFuture;
-  }
-
+  /// La deduplica delle richieste concorrenti sta nel `RequestCoalescer` di
+  /// `ApiClient` (`docs/development/06-networking.md`), non piu' qui.
   Future<ApiResponse<List<WorkoutModel>>> _performRefreshFromRemote() async {
     List<WorkoutModel>? remoteWorkouts;
     try {
