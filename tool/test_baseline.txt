@@ -1,24 +1,14 @@
 # Test rossi accettati come baseline nota della CI.
 #
-# Provenienza: residuo della Fase 0 del piano di migrazione — deriva fra UI e
-# asserzioni su schermate in corso di riscrittura. Vedi
-# `docs/development/26-migration-plan.md`.
+# Formato: <percorso del file> :: <nome del test>
 #
 # Regole d'uso:
 #   - non si aggiunge una riga per far passare la CI su un test che hai rotto tu;
 #   - ogni test riparato esce da questo file nello stesso PR che lo ripara
 #     (`tool/check_tests.sh` fallisce se un test in baseline torna verde).
 #
-# Formato: <percorso del file> :: <nome del test>
-test/features/exercise/exercise_info_page/exercise_detail_redesign_test.dart :: biomechanics explains grouped and resistance concepts
-test/features/exercise/exercise_info_page/exercise_detail_redesign_test.dart :: expands execution and common mistakes inline
-test/features/exercise/exercise_info_page/exercise_detail_redesign_test.dart :: morph navigation exposes floating bubbles after scroll
-test/features/exercise/exercise_info_page/exercise_detail_redesign_test.dart :: opens the Coachly information sheet
-test/features/exercise/exercise_info_page/exercise_detail_redesign_test.dart :: quick navigation opens each detail and supports back
-test/features/exercise/exercise_info_page/exercise_detail_redesign_test.dart :: variants filters by relation axis
-test/features/workout/workout_builder/widgets/workout_builder_widgets_test.dart :: section sheet owns its controller and fits a compact viewport
-test/features/workout/workout_detail_page/goldens/workout_detail_golden_test.dart :: Workout Detail empty golden
-test/features/workout/workout_detail_page/goldens/workout_detail_golden_test.dart :: Workout Detail expanded exercise golden
-test/features/workout/workout_detail_page/goldens/workout_detail_golden_test.dart :: Workout Detail simple golden
-test/features/workout/workout_detail_page/goldens/workout_detail_golden_test.dart :: Workout Detail superset golden
-test/features/workout/workout_detail_page/widgets/workout_exercise_card_test.dart :: expands, collapses and opens exercise detail callback
+# Stato: **vuota**. Il residuo della Fase 0 (12 test rossi per deriva fra UI e
+# asserzioni, `docs/development/26-migration-plan.md`) e' stato riassorbito:
+# in ogni caso aveva ragione la UI, e le asserzioni sono state riportate sul
+# comportamento reale. I quattro golden sono stati rigenerati; uno di essi
+# registrava lo stato collassato ed era byte per byte identico a un altro.

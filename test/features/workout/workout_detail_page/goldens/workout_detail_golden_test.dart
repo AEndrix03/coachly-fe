@@ -1,3 +1,6 @@
+@Tags(['golden'])
+library;
+
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/widgets/workout_detail_content.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
@@ -17,7 +20,10 @@ void main() {
 
   testWidgets('Workout Detail expanded exercise golden', (tester) async {
     await _pump(tester, _simpleWorkout());
-    await tester.tap(find.text('Incline Dumbbell Press'));
+    // Toccare il nome apre il dettaglio dell'esercizio: la scheda si espande
+    // dal chevron. Con il tap sul nome questo golden registrava lo stato
+    // collassato, byte per byte identico a quello "simple".
+    await tester.tap(find.byIcon(Icons.keyboard_arrow_down_rounded).first);
     await tester.pumpAndSettle();
     await expectLater(
       find.byType(MaterialApp),

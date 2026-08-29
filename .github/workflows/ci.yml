@@ -58,10 +58,10 @@ jobs:
           bash tool/check_changed.sh origin/${{ github.base_ref || 'master' }}
 
       - name: Test (fallisce solo sulle regressioni)
-        # I golden sono sensibili al font rendering della piattaforma: su
-        # runner Linux divergono da quelli generati in locale. Sono in
-        # `tool/test_baseline.txt` insieme al residuo della Fase 0.
-        run: bash tool/check_tests.sh
+        # I golden restano fuori: le immagini di riferimento sono generate su
+        # Windows e su un runner Linux divergono per il font rendering, non per
+        # il codice. Vedi `dart_test.yaml`.
+        run: bash tool/check_tests.sh --exclude-tags golden
 
   debt:
     # Non blocca: misura. `docs/development/20` distingue il gate (bloccante,

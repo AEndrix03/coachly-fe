@@ -104,7 +104,18 @@ void main() {
 
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
+
+    // Il foglio parte dai preset: il campo libero compare solo dopo
+    // "Personalizza". Prima di quel tocco un TextField non esiste, ed e' il
+    // comportamento voluto — la sezione ha un nome standard nel 90% dei casi.
+    expect(find.byType(TextField), findsNothing);
+    await tester.tap(find.text('Personalizza'));
+    await tester.pumpAndSettle();
+
     await tester.enterText(find.byType(TextField), 'Principali');
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Aggiungi sezione'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Aggiungi sezione'));
     await tester.pumpAndSettle();
 

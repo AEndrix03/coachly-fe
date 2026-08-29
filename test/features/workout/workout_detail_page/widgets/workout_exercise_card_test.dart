@@ -46,11 +46,13 @@ void main() {
 
     expect(find.text('3 × 6–10'), findsOneWidget);
     expect(find.text('RIR 1–2 · Rest 3:00'), findsOneWidget);
-    expect(find.text('Exercise details'), findsNothing);
+    expect(find.text('Working sets'), findsNothing);
 
-    await tester.tap(find.text('Incline Dumbbell Press'));
+    // La scheda si apre dalla riga, non dal nome: toccare il nome apre il
+    // dettaglio dell'esercizio, ed e' una destinazione diversa.
+    await tester.tap(find.byIcon(Icons.keyboard_arrow_down_rounded));
     await tester.pumpAndSettle();
-    expect(find.text('Exercise details'), findsOneWidget);
+    expect(find.text('Working sets'), findsOneWidget);
     expect(find.text('Control the eccentric.'), findsOneWidget);
     expect(
       tester.widget<SizeTransition>(find.byType(SizeTransition)).axis,
@@ -60,9 +62,9 @@ void main() {
     await tester.tap(find.text('Exercise details'));
     expect(detailOpened, isTrue);
 
-    await tester.tap(find.text('Incline Dumbbell Press'));
+    await tester.tap(find.byIcon(Icons.keyboard_arrow_down_rounded));
     await tester.pumpAndSettle();
-    expect(find.text('Exercise details'), findsNothing);
+    expect(find.text('Working sets'), findsNothing);
   });
 
   testWidgets('remains readable at 150 percent text scale', (tester) async {

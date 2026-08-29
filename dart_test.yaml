@@ -1,0 +1,12 @@
+# I golden confrontano pixel, e i pixel dipendono dal font rendering della
+# piattaforma: le immagini di riferimento sono generate sulle macchine di
+# sviluppo (Windows) e su un runner Linux divergono per motivi che non hanno
+# niente a che vedere con il codice.
+#
+# Restano quindi fuori dalla CI (`.github/workflows/ci.yml` esclude il tag)
+# e valgono in locale, dove sono il guardrail del design system chiesto da
+# `docs/development/10-components.md`. Per riattivarli in CI vanno rigenerati
+# sulla stessa immagine che li esegue.
+tags:
+  golden:
+    description: Confronto pixel, dipendente dalla piattaforma.

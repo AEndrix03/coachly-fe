@@ -6,12 +6,27 @@ import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_muscles_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_variants_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
+import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+/// Le schermate sono passate da stringhe italiane inline a `context.tr`: senza
+/// locale il fallback e' l'inglese e le asserzioni italiane non trovano nulla.
+/// L'harness dichiara la lingua invece di far dipendere il test dal default.
+const _locale = Locale('it');
+const _delegates = <LocalizationsDelegate<Object?>>[
+  GlobalMaterialLocalizations.delegate,
+  GlobalWidgetsLocalizations.delegate,
+  GlobalCupertinoLocalizations.delegate,
+];
+
 void main() {
   Widget overview({VoidCallback? onAdd}) => MaterialApp(
+    locale: _locale,
+    supportedLocales: AppStrings.supportedLocales,
+    localizationsDelegates: _delegates,
     theme: exerciseDetailTheme(ThemeData.dark()),
     home: ExerciseOverviewContent(
       data: latPulldownExerciseFixture,
@@ -26,6 +41,10 @@ void main() {
       find.text('Fermati quando la barra raggiunge la parte alta del petto.'),
       findsNothing,
     );
+    // La pagina e' una lista pigra: il blocco esecuzione non e' costruito
+    // finche' non entra nel viewport.
+    await tester.scrollUntilVisible(find.text('Vedi tutti i passaggi'), 400);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Vedi tutti i passaggi'));
     await tester.pumpAndSettle();
     expect(
@@ -33,6 +52,8 @@ void main() {
       findsOneWidget,
     );
 
+    await tester.scrollUntilVisible(find.text('Mostra altri 2'), 400);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Mostra altri 2'));
     await tester.pumpAndSettle();
     expect(
@@ -50,16 +71,16 @@ void main() {
     await tester.scrollUntilVisible(biomechanicsTitle, 520);
     await tester.pumpAndSettle();
 
-    final section = find.ancestor(
+    // Il bottone info vive dentro `ExerciseSectionTitle`, non in una Row che
+    // lo avvolge: cercarlo fra gli antenati dipendeva da un dettaglio di
+    // layout che nel frattempo e' cambiato.
+    final infoButton = find.descendant(
       of: biomechanicsTitle,
-      matching: find.byType(Row),
+      matching: find.byType(IconButton),
     );
-    await tester.tap(
-      find.descendant(
-        of: section.first,
-        matching: find.byTooltip('Informazioni'),
-      ),
-    );
+    await tester.ensureVisible(infoButton);
+    await tester.pumpAndSettle();
+    await tester.tap(infoButton);
     await tester.pumpAndSettle();
     expect(find.text('Perché conta?'), findsOneWidget);
     expect(find.text('Ho capito'), findsOneWidget);
@@ -70,6 +91,9 @@ void main() {
   ) async {
     await tester.pumpWidget(
       MaterialApp(
+        locale: _locale,
+        supportedLocales: AppStrings.supportedLocales,
+        localizationsDelegates: _delegates,
         theme: exerciseDetailTheme(ThemeData.dark()),
         home: const ExerciseBiomechanicsContent(
           data: latPulldownExerciseFixture,
@@ -84,18 +108,22 @@ void main() {
       await tester.scrollUntilVisible(
         sectionTitle,
         320,
-        scrollable: find.byKey(const Key('biomechanics-page-scroll')),
-      );
-      final section = find.ancestor(
-        of: sectionTitle,
-        matching: find.byType(Row),
-      );
-      await tester.tap(
-        find.descendant(
-          of: section.first,
-          matching: find.byTooltip('Informazioni'),
+        // La chiave sta sul CustomScrollView, non sullo Scrollable interno:
+        // `scrollable:` vuole il secondo.
+        scrollable: find.descendant(
+          of: find.byKey(const Key('biomechanics-page-scroll')),
+          matching: find.byType(Scrollable),
         ),
       );
+      // Il bottone, non il RawTooltip che lo avvolge: quest'ultimo ha un
+      // surrogate box fuori dal viewport e il tap non lo colpisce.
+      final infoButton = find.descendant(
+        of: sectionTitle,
+        matching: find.byType(IconButton),
+      );
+      await tester.ensureVisible(infoButton);
+      await tester.pumpAndSettle();
+      await tester.tap(infoButton);
       await tester.pumpAndSettle();
     }
 
@@ -126,6 +154,9 @@ void main() {
     for (final topic in CoachlyGuideTopic.values) {
       await tester.pumpWidget(
         MaterialApp(
+          locale: _locale,
+          supportedLocales: AppStrings.supportedLocales,
+          localizationsDelegates: _delegates,
           theme: exerciseDetailTheme(ThemeData.dark()),
           home: CoachlyConceptGuidePage(topic: topic),
         ),
@@ -149,6 +180,9 @@ void main() {
   ) async {
     await tester.pumpWidget(
       MaterialApp(
+        locale: _locale,
+        supportedLocales: AppStrings.supportedLocales,
+        localizationsDelegates: _delegates,
         theme: exerciseDetailTheme(ThemeData.dark()),
         home: const ExerciseMusclesContent(data: latPulldownExerciseFixture),
       ),
@@ -164,8 +198,19 @@ void main() {
   });
 
   testWidgets('variants filters by relation axis', (tester) async {
+    // La lista e' pigra: su un viewport da 600px solo quattro tile vengono
+    // costruite e il conteggio misurerebbe l'altezza dello schermo, non il
+    // filtro. Il viewport alto rende l'asserzione deterministica.
+    tester.view.physicalSize = const Size(800, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(
       MaterialApp(
+        locale: _locale,
+        supportedLocales: AppStrings.supportedLocales,
+        localizationsDelegates: _delegates,
         theme: exerciseDetailTheme(ThemeData.dark()),
         home: const ExerciseVariantsContent(data: latPulldownExerciseFixture),
       ),
@@ -212,15 +257,28 @@ void main() {
     addTearDown(router.dispose);
     await tester.pumpWidget(
       MaterialApp.router(
+        locale: _locale,
+        supportedLocales: AppStrings.supportedLocales,
+        localizationsDelegates: _delegates,
         theme: exerciseDetailTheme(ThemeData.dark()),
         routerConfig: router,
       ),
     );
 
+    // La barra di quick nav e' dentro la lista pigra: va portata nel viewport
+    // prima di poterla toccare.
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('quick-nav-muscles')),
+      300,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('quick-nav-muscles')));
     await tester.pumpAndSettle();
     expect(find.text('Muscoli'), findsWidgets);
-    await tester.pageBack();
+    // Le pagine di dettaglio non hanno l'AppBar di sistema: `pageBack()`
+    // cerca un pulsante che questo design non usa. Il ritorno passa dal
+    // router, che e' il meccanismo reale.
+    router.pop();
     await tester.pumpAndSettle();
     expect(find.text('Lat Pulldown'), findsOneWidget);
   });
@@ -230,6 +288,17 @@ void main() {
   ) async {
     await tester.pumpWidget(overview());
     expect(find.byKey(const Key('floating-quick-nav-muscles')), findsNothing);
+
+    // La sezione che porta il gutter e' costruita pigramente: a offset 0 non
+    // esiste ancora. Uno scroll breve la costruisce restando sotto la soglia
+    // di deploy del rail (0.82 del viewport), cosi' lo stato "prima" resta
+    // osservabile.
+    await tester.drag(
+      find.byKey(const Key('exercise-overview-scroll')),
+      const Offset(0, -400),
+    );
+    await tester.pumpAndSettle();
+
     expect(
       (tester
                   .widget<Padding>(
@@ -265,14 +334,16 @@ void main() {
           .right,
       closeTo(54, 0.1),
     );
-    expect(
-      tester
-          .widget<Opacity>(
-            find.byKey(const Key('quick-nav-static-source-opacity')),
-          )
-          .opacity,
-      0,
+
+    // Dopo il deploy la sorgente statica e' fuori dal viewport, quindi la
+    // lista pigra puo' averla gia' smontata. Se e' ancora costruita deve pero'
+    // essere invisibile: e' la meta' del morph che il test verifica.
+    final staticSource = find.byKey(
+      const Key('quick-nav-static-source-opacity'),
     );
+    if (staticSource.evaluate().isNotEmpty) {
+      expect(tester.widget<Opacity>(staticSource).opacity, 0);
+    }
 
     await tester.scrollUntilVisible(find.text('Da ricordare'), 650);
     await tester.pumpAndSettle();
