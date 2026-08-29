@@ -1,9 +1,9 @@
 import 'dart:ui' show Locale;
-
+import 'package:coachly/core/assets/app_assets.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/features/auth/providers/user_provider.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/presentation/models/today_home_view_data.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
@@ -193,7 +193,7 @@ const _guides = [
     titleKey: 'home.guide.double_progression',
     duration: Duration(minutes: 4, seconds: 20),
     levelKey: 'home.guide.beginner',
-    assetPath: 'assets/images/guide-double-progression.png',
+    assetPath: AppAssets.guideDoubleProgression,
     contextTag: 'progression',
   ),
   HomeGuideViewData(
@@ -201,7 +201,7 @@ const _guides = [
     titleKey: 'home.guide.rir',
     duration: Duration(minutes: 3, seconds: 45),
     levelKey: 'home.guide.beginner',
-    assetPath: 'assets/images/guide-rir.png',
+    assetPath: AppAssets.guideRir,
     contextTag: 'intensity',
   ),
   HomeGuideViewData(
@@ -209,7 +209,7 @@ const _guides = [
     titleKey: 'home.guide.machines',
     duration: Duration(minutes: 3, seconds: 45),
     levelKey: 'home.guide.all_levels',
-    assetPath: 'assets/images/guide-machine-comparability.png',
+    assetPath: AppAssets.guideMachineComparability,
     contextTag: 'new_gym',
   ),
   HomeGuideViewData(
@@ -217,7 +217,7 @@ const _guides = [
     titleKey: 'home.guide.nine_day_cycle',
     duration: Duration(minutes: 5, seconds: 10),
     levelKey: 'home.guide.intermediate',
-    assetPath: 'assets/images/guide-nine-day-cycle.png',
+    assetPath: AppAssets.guideNineDayCycle,
     contextTag: 'programming',
   ),
 ];

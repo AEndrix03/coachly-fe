@@ -1,6 +1,7 @@
+import 'package:coachly/core/assets/app_assets.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
-import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,10 +22,7 @@ class LoginPage extends ConsumerWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            'assets/images/auth_page_background.jpg',
-            fit: BoxFit.cover,
-          ),
+          Image.asset(AppAssets.gymDarkBackground, fit: BoxFit.cover),
           Container(color: context.colors.surface.withValues(alpha: 0.5)),
           SafeArea(
             child: SingleChildScrollView(
@@ -36,7 +34,7 @@ class LoginPage extends ConsumerWidget {
                   children: [
                     SizedBox(height: MediaQuery.of(context).size.height * 0.18),
                     Image.asset(
-                      'assets/logos/app_logo_no_bg_dark.png',
+                      AppAssets.logoDark,
                       height: 80,
                     ).animate().fade(duration: 900.ms).slideY(begin: -0.5),
                     const SizedBox(height: 16),

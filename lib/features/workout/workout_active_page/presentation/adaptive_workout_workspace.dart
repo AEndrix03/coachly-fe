@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:coachly/core/assets/app_assets.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/active_workout_strings.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/main_area_scroll_assist.dart';
@@ -2803,10 +2803,10 @@ class _BlockGlyph extends StatelessWidget {
       height: extent,
       child: Image.asset(
         switch (type) {
-          ExerciseGroupType.superset => 'assets/images/sets/Superset.png',
-          ExerciseGroupType.triset => 'assets/images/sets/Triset.png',
-          ExerciseGroupType.giantSet => 'assets/images/sets/Giantset.png',
-          ExerciseGroupType.circuit => 'assets/images/sets/Circuit.png',
+          ExerciseGroupType.superset => AppAssets.setTypeSuperset,
+          ExerciseGroupType.triset => AppAssets.setTypeTriset,
+          ExerciseGroupType.giantSet => AppAssets.setTypeGiantSet,
+          ExerciseGroupType.circuit => AppAssets.setTypeCircuit,
           ExerciseGroupType.preparation || ExerciseGroupType.mobility =>
             throw StateError('Unsupported block type: $type'),
         },

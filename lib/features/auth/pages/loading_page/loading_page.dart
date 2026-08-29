@@ -1,3 +1,4 @@
+import 'package:coachly/core/assets/app_assets.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -14,20 +15,14 @@ class LoadingPage extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            'assets/images/auth_page_background.jpg',
-            fit: BoxFit.cover,
-          ),
+          Image.asset(AppAssets.gymDarkBackground, fit: BoxFit.cover),
           Container(color: context.colors.surface.withValues(alpha: 0.5)),
           SafeArea(
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/logos/app_logo_no_bg_dark.png',
-                    height: 80,
-                  ),
+                  Image.asset(AppAssets.logoDark, height: 80),
                   const SizedBox(height: 16),
                   Text(
                     context.tr('common.app_name'),

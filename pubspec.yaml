@@ -82,11 +82,13 @@ flutter:
   generate: true
 
   # ==================== ASSETS ====================
-  # Decommentare quando aggiungi assets
+  # Le cartelle NON sono ricorsive: ogni sottocartella va elencata a mano.
+  # Struttura e naming: docs/development/16-media.md
   assets:
-    - assets/images/
-    - assets/images/sets/
-    - assets/logos/
+    - assets/brand/
+    - assets/photos/
+    - assets/illustrations/guides/
+    - assets/illustrations/set_type/
   #  - assets/animations/
   #  - assets/icons/
 
