@@ -2,6 +2,23 @@ import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+abstract final class MainAreaScrollPolicy {
+  static const approachingViewportFraction = .25;
+
+  static bool shouldAssist({
+    required double currentOffset,
+    required double targetOffset,
+    required double viewportExtent,
+    required double settleTolerance,
+  }) {
+    final delta = targetOffset - currentOffset;
+    if (delta.abs() <= settleTolerance) return false;
+    if (delta.isNegative) return false;
+    final proximity = viewportExtent * approachingViewportFraction;
+    return delta <= proximity;
+  }
+}
+
 class MainAreaScrollAssist extends StatefulWidget {
   final String mainIdentity;
   final Widget leading;
@@ -23,6 +40,7 @@ class MainAreaScrollAssist extends StatefulWidget {
 class _MainAreaScrollAssistState extends State<MainAreaScrollAssist> {
   final _controller = ScrollController();
   final _mainKey = GlobalKey();
+  bool _settling = false;
 
   @override
   void initState() {
@@ -75,31 +93,69 @@ class _MainAreaScrollAssistState extends State<MainAreaScrollAssist> {
     );
   }
 
+  Future<void> _assistIfNear() async {
+    if (_settling || !_controller.hasClients) return;
+    final target = _targetOffset();
+    if (target == null) return;
+    final position = _controller.position;
+    if (!MainAreaScrollPolicy.shouldAssist(
+      currentOffset: position.pixels,
+      targetOffset: target,
+      viewportExtent: position.viewportDimension,
+      settleTolerance: context.spacing.xs,
+    )) {
+      return;
+    }
+
+    final duration = context.motion.resolve(context, context.motion.quick);
+    if (duration == Duration.zero) {
+      _controller.jumpTo(target);
+      return;
+    }
+
+    _settling = true;
+    try {
+      await _controller.animateTo(
+        target,
+        duration: duration,
+        curve: context.motion.standardCurve,
+      );
+    } finally {
+      _settling = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      key: const PageStorageKey('active-workout-content'),
-      controller: _controller,
-      slivers: [
-        SliverToBoxAdapter(child: widget.leading),
-        SliverPadding(
-          padding: EdgeInsets.fromLTRB(
-            context.spacing.pageHorizontal,
-            context.spacing.xl,
-            context.spacing.pageHorizontal,
-            context.spacing.xxl,
+    return NotificationListener<ScrollEndNotification>(
+      onNotification: (notification) {
+        if (notification.depth == 0) _assistIfNear();
+        return false;
+      },
+      child: CustomScrollView(
+        key: const PageStorageKey('active-workout-content'),
+        controller: _controller,
+        slivers: [
+          SliverToBoxAdapter(child: widget.leading),
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              context.spacing.pageHorizontal,
+              context.spacing.xl,
+              context.spacing.pageHorizontal,
+              context.spacing.xxl,
+            ),
+            sliver: SliverMainAxisGroup(
+              slivers: [
+                if (widget.beforeMain case final beforeMain?)
+                  SliverToBoxAdapter(child: beforeMain),
+                SliverToBoxAdapter(
+                  child: KeyedSubtree(key: _mainKey, child: widget.main),
+                ),
+              ],
+            ),
           ),
-          sliver: SliverMainAxisGroup(
-            slivers: [
-              if (widget.beforeMain case final beforeMain?)
-                SliverToBoxAdapter(child: beforeMain),
-              SliverToBoxAdapter(
-                child: KeyedSubtree(key: _mainKey, child: widget.main),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
