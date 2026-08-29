@@ -74,18 +74,18 @@ class WorkoutDetailAppBar extends StatelessWidget {
         ),
         if (!editing) ...[
           PopupMenuButton<String>(
-            tooltip: context.tr('workout.actions'),
+            tooltip: context.l10n.workoutActions,
             icon: const Icon(Icons.more_horiz_rounded),
             color: CoachlyAthleteTheme.surfaceElevated,
             itemBuilder: (_) => [
               PopupMenuItem(
                 value: 'duplicate',
-                child: Text(context.tr('common.duplicate')),
+                child: Text(context.l10n.commonDuplicate),
               ),
               PopupMenuItem(
                 value: 'delete',
                 child: Text(
-                  context.tr('common.delete'),
+                  context.l10n.commonDelete,
                   style: const TextStyle(color: CoachlyAthleteTheme.danger),
                 ),
               ),

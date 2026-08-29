@@ -49,7 +49,7 @@ class WorkoutPage extends ConsumerWidget {
                 onNotifications: () =>
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(context.tr('workout.notifications_soon')),
+                        content: Text(context.l10n.workoutNotificationsSoon),
                       ),
                     ),
                 onSettings: () => context.go('/profile'),
@@ -178,12 +178,12 @@ class _HomeContent extends StatelessWidget {
         ),
         _section(
           context,
-          title: context.tr('home.insights.title'),
+          title: context.l10n.homeInsightsTitle,
           child: InsightsRail(items: data.insights),
         ),
         _section(
           context,
-          title: context.tr('home.actions.title'),
+          title: context.l10n.homeActionsTitle,
           child: QuickActionsRail(
             items: data.quickActions,
             onTap: onQuickAction,
@@ -191,12 +191,12 @@ class _HomeContent extends StatelessWidget {
         ),
         _section(
           context,
-          title: context.tr('home.guides.title'),
+          title: context.l10n.homeGuidesTitle,
           child: GuidesRail(items: data.guides),
         ),
         _section(
           context,
-          title: context.tr('home.routines.title'),
+          title: context.l10n.homeRoutinesTitle,
           child: RoutinesRail(
             items: data.routines,
             onTap: (routine) => onRoutine(routine.id),
@@ -243,7 +243,7 @@ class _HomeError extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            context.tr('home.error.title'),
+            context.l10n.homeErrorTitle,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: context.exerciseTheme.textPrimary,
@@ -252,14 +252,14 @@ class _HomeError extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            context.tr('home.error.body'),
+            context.l10n.homeErrorBody,
             textAlign: TextAlign.center,
             style: TextStyle(color: context.exerciseTheme.textSecondary),
           ),
           const SizedBox(height: 18),
           OutlinedButton(
             onPressed: onRetry,
-            child: Text(context.tr('common.retry')),
+            child: Text(context.l10n.commonRetry),
           ),
         ],
       ),

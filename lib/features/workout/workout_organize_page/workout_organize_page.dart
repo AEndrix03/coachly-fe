@@ -50,8 +50,8 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
           TabBar(
             controller: _tabController,
             tabs: [
-              Tab(text: context.tr('workout.organize.active')),
-              Tab(text: context.tr('workout.organize.inactive')),
+              Tab(text: context.l10n.workoutOrganizeActive),
+              Tab(text: context.l10n.workoutOrganizeInactive),
             ],
           ),
           Expanded(
@@ -131,7 +131,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
               child: Text(
-                context.tr('workout.organize.title'),
+                context.l10n.workoutOrganizeTitle,
                 style: context.text.displayM.copyWith(
                   color: context.colors.textOnAccent,
                 ),
@@ -154,7 +154,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Text(
-            context.tr('workout.organize.empty'),
+            context.l10n.workoutOrganizeEmpty,
             style: context.text.bodyM.copyWith(
               color: context.colors.textSecondary,
             ),
@@ -172,10 +172,9 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
           onDelete: () async {
             final confirmed = await _showConfirmationDialog(
               context,
-              context.tr('workout.organize.delete_title'),
-              context.tr(
-                'workout.organize.delete_content',
-                params: {'name': workout.titleI18n?.fromI18n(locale) ?? ''},
+              context.l10n.workoutOrganizeDeleteTitle,
+              context.l10n.workoutOrganizeDeleteContent(
+                workout.titleI18n?.fromI18n(locale) ?? '',
               ),
               destructive: true,
             );
@@ -193,13 +192,10 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
             );
             final confirmed = await _showConfirmationDialog(
               context,
-              context.tr('workout.organize.status_title'),
-              context.tr(
-                'workout.organize.status_content',
-                params: {
-                  'action': action,
-                  'name': workout.titleI18n?.fromI18n(locale) ?? '',
-                },
+              context.l10n.workoutOrganizeStatusTitle,
+              context.l10n.workoutOrganizeStatusContent(
+                action,
+                workout.titleI18n?.fromI18n(locale) ?? '',
               ),
             );
             if (confirmed) {
@@ -250,7 +246,7 @@ class _WorkoutOrganizePageState extends ConsumerState<WorkoutOrganizePage>
   Widget _buildError(Object err) {
     return Center(
       child: ShadAlert(
-        title: Text(context.tr('common.error')),
+        title: Text(context.l10n.commonError),
         description: Text(err.toString()),
       ),
     );
@@ -267,7 +263,7 @@ Future<bool> _showConfirmationDialog(
     context,
     title: title,
     content: content,
-    confirmLabel: context.tr('common.confirm'),
+    confirmLabel: context.l10n.commonConfirm,
     destructive: destructive,
     icon: destructive
         ? Icons.delete_outline_rounded

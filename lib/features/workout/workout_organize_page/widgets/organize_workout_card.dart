@@ -129,23 +129,15 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                           children: [
                             _buildInfoChip(
                               Icons.fitness_center,
-                              context.tr(
-                                'workout.organize.exercises_count',
-                                params: {
-                                  'count':
-                                      '${widget.workout.workoutExercises.length}',
-                                },
+                              context.l10n.workoutOrganizeExercisesCount(
+                                '${widget.workout.workoutExercises.length}',
                               ),
                             ),
                             _buildInfoChip(
                               Icons.person_outline,
-                              context.tr(
-                                'workout.organize.coach',
-                                params: {
-                                  'name':
-                                      widget.workout.coachName ??
-                                      context.tr('common.na'),
-                                },
+                              context.l10n.workoutOrganizeCoach(
+                                widget.workout.coachName ??
+                                    context.l10n.commonNa,
                               ),
                             ),
                           ],
@@ -176,17 +168,17 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                             value: 'toggleActive',
                             child: Text(
                               _isActive
-                                  ? context.tr('common.deactivate')
-                                  : context.tr('common.activate'),
+                                  ? context.l10n.commonDeactivate
+                                  : context.l10n.commonActivate,
                             ),
                           ),
                           PopupMenuItem<String>(
                             value: 'edit',
-                            child: Text(context.tr('common.edit')),
+                            child: Text(context.l10n.commonEdit),
                           ),
                           PopupMenuItem<String>(
                             value: 'delete',
-                            child: Text(context.tr('common.delete')),
+                            child: Text(context.l10n.commonDelete),
                           ),
                         ],
                   ),

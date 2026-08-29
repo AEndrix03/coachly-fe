@@ -144,7 +144,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
                 slivers: [
                   WorkoutDetailAppBar(
                     title: _editing
-                        ? context.tr('workout.detail.edit_session')
+                        ? context.l10n.workoutDetailEditSession
                         : viewData.title,
                     editing: _editing,
                     saving: draft.isSaving,
@@ -299,23 +299,23 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: CoachlyAthleteTheme.surfaceElevated,
-        title: Text(context.tr('workout.detail.unsaved_title')),
-        content: Text(context.tr('workout.detail.unsaved_body')),
+        title: Text(context.l10n.workoutDetailUnsavedTitle),
+        content: Text(context.l10n.workoutDetailUnsavedBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, 'continue'),
-            child: Text(context.tr('workout.detail.continue_editing')),
+            child: Text(context.l10n.workoutDetailContinueEditing),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, 'discard'),
             child: Text(
-              context.tr('workout.detail.discard'),
+              context.l10n.workoutDetailDiscard,
               style: const TextStyle(color: CoachlyAthleteTheme.danger),
             ),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, 'save'),
-            child: Text(context.tr('workout.detail.save_exit')),
+            child: Text(context.l10n.workoutDetailSaveExit),
           ),
         ],
       ),
