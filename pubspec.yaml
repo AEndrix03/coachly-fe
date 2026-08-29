@@ -33,7 +33,6 @@ dependencies:
   shadcn_ui: ^0.39.14
   shared_preferences: ^2.5.5
   shimmer: ^3.0.0
-  speech_to_text: ^7.4.0
   uuid: ^4.6.0
 
 dev_dependencies:

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
@@ -10,7 +9,6 @@ import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_
 import 'package:coachly/features/workout/workout_active_page/coach/providers/workout_coach_provider.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
-import 'package:coachly/features/voice/domain/models/voice_resolution_models.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
@@ -609,63 +607,6 @@ class ActiveWorkout extends _$ActiveWorkout {
 
   void updateSetRole(String setId, SetRole role) {
     _mutateSetById(setId, (set) => set.copyWith(role: role));
-  }
-
-  VoiceApplyOutcome? applyVoiceEntry({
-    required String exerciseId,
-    required int? sets,
-    required int? reps,
-    required double? weightKg,
-  }) {
-    if (sets == null && reps == null && weightKg == null) {
-      return null;
-    }
-
-    final exerciseIndex = state.exercises.indexWhere(
-      (exercise) => exercise.exercise.exercise.id == exerciseId,
-    );
-    if (exerciseIndex == -1) {
-      return null;
-    }
-
-    final exercises = [...state.exercises];
-    final exercise = exercises[exerciseIndex];
-    final existingSets = exercise.sets;
-    final firstSet = existingSets.isNotEmpty ? existingSets.first : null;
-
-    final resolvedSetCount = (sets != null && sets > 0)
-        ? sets
-        : max(1, existingSets.length);
-    final resolvedReps = (reps != null && reps > 0)
-        ? reps
-        : (firstSet?.reps ?? 0);
-    final resolvedWeight = (weightKg != null && weightKg >= 0)
-        ? weightKg
-        : (firstSet?.weight ?? 0);
-
-    final updatedSets = List.generate(resolvedSetCount, (index) {
-      final previous = index < existingSets.length ? existingSets[index] : null;
-      return ActiveSetState(
-        id: previous?.id ?? '${exercise.exercise.id}:set:$index',
-        position: index,
-        setType: previous?.setType ?? firstSet?.setType ?? 'Normale',
-        weight: resolvedWeight,
-        reps: resolvedReps,
-        completed: previous?.completed ?? false,
-      );
-    });
-
-    exercises[exerciseIndex] = exercise.copyWith(sets: updatedSets);
-    state = state.copyWith(exercises: exercises);
-    _persistDraft();
-
-    return VoiceApplyOutcome(
-      exerciseId: exerciseId,
-      exerciseName: exercise.displayName,
-      sets: resolvedSetCount,
-      reps: resolvedReps,
-      weightKg: resolvedWeight,
-    );
   }
 
   void addSet(int exerciseIdx) {

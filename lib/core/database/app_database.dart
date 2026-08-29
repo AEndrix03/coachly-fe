@@ -1,6 +1,5 @@
 import 'package:coachly/core/database/tables/catalog_tables.dart';
 import 'package:coachly/core/database/tables/user_tables.dart';
-import 'package:coachly/core/database/tables/voice_tables.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +14,7 @@ part 'app_database.g.dart';
 /// - **catalogo** (`CatalogExercises`, `ExerciseMuscles`, …): scritto da
 ///   Coachly, sostituibile in blocco, perderlo non è un danno;
 /// - **dati utente** (`Workouts`, `Sessions`, `Outbox`, `CustomExercises`,
-///   `VoiceAliases`): nascono sul dispositivo, spesso offline, e sono
+///   `ActiveWorkoutDrafts`): nascono sul dispositivo, spesso offline, e sono
 ///   **insostituibili**;
 /// - **dati assegnati** (`Workouts` con `origin = 'assigned'`): oggi vuoti, il
 ///   confine esiste già per quando arriveranno le schede dei coach.
@@ -35,9 +34,6 @@ part 'app_database.g.dart';
     ActiveWorkoutDrafts,
     Sessions,
     Outbox,
-    // Voce
-    VoiceAliases,
-    VoiceResolutionLogs,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -45,7 +41,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'coachly'));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -61,6 +57,13 @@ class AppDatabase extends _$AppDatabase {
       // quando servira'.
       if (from < 2) {
         await m.createTable(exerciseCategories);
+      }
+      if (from < 3) {
+        // Il sottosistema vocale non e' mai stato cablato ed e' stato rimosso.
+        // Le tabelle vanno con lui: dati che nessun codice legge non sono
+        // dati, sono uno schema che mente su cosa fa la app.
+        await m.deleteTable('voice_aliases');
+        await m.deleteTable('voice_resolution_logs');
       }
     },
     beforeOpen: (details) async {

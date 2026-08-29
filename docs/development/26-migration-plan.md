@@ -104,7 +104,7 @@ Il cuore. Fatta per aggregati, non in blocco.
 | 3.4 | Migrazione di **workout e blocchi** | medio |
 | 3.5 | Migrazione di **sessioni** verso l'event log append-only | alto, ridisegno |
 | 3.6 | Migrazione di **outbox** | alto |
-| 3.7 | Migrazione di **alias e log vocali** | basso |
+| 3.7 | ~~Migrazione di alias e log vocali~~ | rimossi con il sottosistema (doc 23) |
 | 3.8 | Rimozione di Hive e `LocalDatabaseService` | — |
 | 3.9 | SQLCipher | 24 |
 

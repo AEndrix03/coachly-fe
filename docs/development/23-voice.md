@@ -1,16 +1,32 @@
 ---
 livello: Riferimento
-stato: active
+stato: rimosso dal codice, conservato come progetto
 ---
 
 # 23 — Sottosistema vocale
 
-1248 righe fra servizi, repository e modelli. È una pipeline di dominio vera, e
-finora non aveva una collocazione architetturale: sta sotto
-`workout_active_page/voice/` come se fosse un dettaglio di una schermata.
+> **Il codice non c'è più.** Le 1248 righe descritte qui sono state rimosse:
+> nessun percorso di navigazione le raggiungeva. `applyVoiceEntry()` non era
+> chiamato da nessuno, `speech_to_text` esisteva solo per questa pipeline, e le
+> tabelle `voice_aliases` e `voice_resolution_logs` non venivano mai lette.
+> Rimosse anche quelle, con la migrazione allo `schemaVersion` 3.
+>
+> Questo documento resta perché il **progetto** resta: voice deve diventare il
+> trascrittore audio dell'allenamento. Quando si rifarà, si riparte da qui e da
+> `git log -- lib/features/voice`, non da zero.
+>
+> La lezione va scritta, perché è più generale del sottosistema: una feature
+> completa, testata e mai cablata è indistinguibile dal codice morto per
+> chiunque non fosse presente quando è stata scritta. Il collegamento alla UI
+> non è l'ultimo passo, è quello che rende reale tutto il resto.
 
-Non lo è. È il caso da manuale di feature che **merita un domain layer**
-(`01-principles.md`).
+Quello che segue descrive il disegno originale, ed è tuttora la direzione.
+
+## Perché meritava un domain layer
+
+Era il caso da manuale di feature che **merita un domain layer**
+(`01-principles.md`): sette moduli su otto erano logica pura, testabile senza
+Flutter. Solo il riconoscimento vocale toccava la piattaforma.
 
 ## Cosa fa
 
