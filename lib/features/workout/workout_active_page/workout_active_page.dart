@@ -9,7 +9,6 @@ import 'package:coachly/features/workout/workout_active_page/providers/rest_time
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_hive_service.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
-import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -356,7 +355,7 @@ class _LocalExercisePickerState extends State<_LocalExercisePicker> {
                 autofocus: true,
                 onChanged: (value) => setState(() => _query = value),
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search_rounded),
+                  prefixIcon: const Icon(Icons.search_rounded),
                   hintText: context.tr('workout.active.search_exercises'),
                 ),
               ),

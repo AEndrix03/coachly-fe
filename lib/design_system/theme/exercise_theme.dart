@@ -107,7 +107,7 @@ ThemeData exerciseDetailTheme(ThemeData base) {
       surface: CoachlyExerciseTheme.dark.surface,
       onSurface: CoachlyExerciseTheme.dark.textPrimary,
       outline: CoachlyExerciseTheme.dark.border,
-      error: CoachlyExerciseTheme.dark.warning,
+      error: base.colorScheme.error,
     ),
     scaffoldBackgroundColor: CoachlyExerciseTheme.dark.background,
     // Keep this list concretely typed. Some Flutter/Dart combinations infer
