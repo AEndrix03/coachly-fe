@@ -39,7 +39,7 @@ class LoginPage extends ConsumerWidget {
                     ).animate().fade(duration: 900.ms).slideY(begin: -0.5),
                     const SizedBox(height: 16),
                     Text(
-                          context.tr('common.app_name'),
+                          context.l10n.commonAppName,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                             textStyle: textTheme.displaySmall,
@@ -62,7 +62,7 @@ class LoginPage extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            context.tr('auth.login.title'),
+                            context.l10n.authLoginTitle,
                             style: textTheme.titleLarge?.copyWith(
                               color: context.colors.textPrimary,
                               fontWeight: FontWeight.w700,
@@ -71,7 +71,7 @@ class LoginPage extends ConsumerWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            context.tr('auth.login.description'),
+                            context.l10n.authLoginDescription,
                             style: textTheme.bodyMedium?.copyWith(
                               color: context.colors.textSecondary,
                               height: 1.5,
@@ -91,7 +91,7 @@ class LoginPage extends ConsumerWidget {
                               ),
                             ),
                             child: Text(
-                              context.tr('auth.login.configuration_hint'),
+                              context.l10n.authLoginConfigurationHint,
                               style: textTheme.bodyMedium?.copyWith(
                                 color: context.colors.textSecondary,
                                 height: 1.45,
@@ -130,7 +130,7 @@ class LoginPage extends ConsumerWidget {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : Text(context.tr('auth.login.cta')),
+                                : Text(context.l10n.authLoginCta),
                           ),
                         ],
                       ),
