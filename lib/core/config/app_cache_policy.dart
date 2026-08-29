@@ -1,11 +1,12 @@
-/// Controls use of local read caches.
+import 'package:coachly/core/config/app_config.dart';
+
+/// Alias di compatibilita' verso [AppConfig.cacheMode].
 ///
-/// Offline-first remains the default in every build. Development can opt into
-/// network-first behaviour at build time with:
-/// `--dart-define=ENABLE_LOCAL_CACHE=true|false`.
+/// `ENABLE_LOCAL_CACHE` disattivava il layer locale in modo permanente. E'
+/// stato sostituito da `CACHE_MODE` (`docs/development/05-sync-and-offline.md`):
+/// il layer locale resta sempre attivo. Questa classe esiste solo finche' i
+/// call-site residui non sono migrati e va rimossa con essi.
+@Deprecated('Usa AppConfig.cacheMode. Rimosso a migrazione completata.')
 abstract final class AppCachePolicy {
-  static const bool isEnabled = bool.fromEnvironment(
-    'ENABLE_LOCAL_CACHE',
-    defaultValue: true,
-  );
+  static bool get isEnabled => AppConfig.cacheMode == CacheMode.warm;
 }

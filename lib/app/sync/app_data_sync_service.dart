@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:coachly/core/config/app_cache_policy.dart';
+import 'package:coachly/core/config/app_config.dart';
 import 'package:coachly/app/sync/local_database_service.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
@@ -50,6 +50,7 @@ class AppDataSyncService {
   final LocalDatabaseService _localDb;
 
   bool _hasSyncedCurrentSession = false;
+  bool _hasAppliedColdStart = false;
   bool _isSyncing = false;
 
   AppDataSyncService(
@@ -63,14 +64,13 @@ class AppDataSyncService {
 
   /// Returns true if the last successful sync is older than [_cacheTtl].
   bool get _isCacheStale {
-    if (!AppCachePolicy.isEnabled) return true;
-
     final lastSync = _localDb.lastSyncTime;
     if (lastSync == null) return true;
     return DateTime.now().difference(lastSync) > _cacheTtl;
   }
 
   Future<void> syncOnAuthenticatedAccess({bool force = false}) async {
+    await _applyColdStartOnce();
     if (_isSyncing) return;
     if (_hasSyncedCurrentSession && !force && !_isCacheStale) return;
 
@@ -81,13 +81,6 @@ class AppDataSyncService {
     unawaited(
       _sessionSyncService.syncPendingSessions(trigger: 'authenticated_access'),
     );
-
-    // Network-only debugging deliberately bypasses local reads and writes.
-    // A background catalogue refresh would therefore discard its response and
-    // force the visible page to issue the same request again.
-    if (!AppCachePolicy.isEnabled) {
-      return;
-    }
 
     _isSyncing = true;
     try {
@@ -115,7 +108,6 @@ class AppDataSyncService {
   /// been saved. A running full sync already refreshes exercises, so concurrent
   /// resume events do not issue duplicate requests.
   Future<void> refreshExercisesOnAppResume() async {
-    if (!AppCachePolicy.isEnabled) return;
     if (_isSyncing || !await _canSync()) return;
 
     _isSyncing = true;
@@ -129,6 +121,22 @@ class AppDataSyncService {
     } finally {
       _isSyncing = false;
     }
+  }
+
+  /// Applica [CacheMode.cold] svuotando il database locale una sola volta per
+  /// processo.
+  ///
+  /// Vive qui e non nel bootstrap perche' e' il primo punto del ciclo di vita
+  /// che possiede il database locale. In release [AppConfig.cacheMode] non vale
+  /// mai `cold`, quindi il metodo e' inerte.
+  ///
+  /// [CacheMode.noSeed] non ha ancora effetto: il catalogo pre-installato non
+  /// esiste (`docs/development/17-config-and-flags.md`).
+  Future<void> _applyColdStartOnce() async {
+    if (_hasAppliedColdStart) return;
+    _hasAppliedColdStart = true;
+    if (AppConfig.cacheMode != CacheMode.cold) return;
+    await _localDb.clearAll();
   }
 
   Future<bool> _canSync() async {
