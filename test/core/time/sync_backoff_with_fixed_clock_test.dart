@@ -1,144 +1,124 @@
-import 'dart:io';
+import 'dart:math';
 
-import 'package:coachly/app/sync/adapters/workout_adapter.dart';
+import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/time/clock.dart';
+import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/local/workout_dao.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
-import 'package:coachly/features/workout/workout_page/data/models/session_sync_job_model.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_hive_service.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_hive_service.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 /// Il backoff del sync diventa verificabile solo con un Clock iniettato:
-/// nextRetryAt e' un istante calcolato a partire da "adesso".
+/// `nextAttemptAt` e' un istante calcolato a partire da "adesso".
 void main() {
   group('backoff del sync con FixedClock', () {
-    late Directory tempDir;
-    late Box<Map> sessionsBox;
-    late Box<Map> jobsBox;
-    late Box<WorkoutModel> workoutsBox;
-    late WorkoutSessionHiveService sessionHiveService;
-    late WorkoutHiveService workoutHiveService;
-    late _FailingWorkoutPageService workoutPageService;
+    late AppDatabase db;
     late FixedClock clock;
+    late WorkoutDao workoutDao;
+    late SessionDao sessionDao;
+    late OutboxDao outboxDao;
+    late _FailingWorkoutPageService workoutPageService;
 
     final frozenNow = DateTime.utc(2026, 3, 28, 23, 55);
 
     setUp(() async {
-      await Hive.close();
-      tempDir = await Directory.systemTemp.createTemp('coachly_backoff_test_');
-      Hive.init(tempDir.path);
-      if (!Hive.isAdapterRegistered(0)) {
-        Hive.registerAdapter(WorkoutAdapter());
-      }
-      sessionsBox = await Hive.openBox<Map>('backoff_sessions_box');
-      jobsBox = await Hive.openBox<Map>('backoff_jobs_box');
-      workoutsBox = await Hive.openBox<WorkoutModel>('backoff_workouts_box');
-      sessionHiveService = WorkoutSessionHiveService.fromBoxes(
-        sessionsBox: sessionsBox,
-        syncJobsBox: jobsBox,
-      );
-      workoutHiveService = WorkoutHiveService.fromBox(workoutsBox);
-      workoutPageService = _FailingWorkoutPageService();
+      db = AppDatabase(NativeDatabase.memory());
       clock = FixedClock(frozenNow);
+      workoutDao = WorkoutDao(db);
+      sessionDao = SessionDao(db);
+      outboxDao = OutboxDao(db, clock: clock, random: Random(5));
+      workoutPageService = _FailingWorkoutPageService();
     });
 
-    tearDown(() async {
-      await Hive.close();
-      if (tempDir.existsSync()) {
-        await tempDir.delete(recursive: true);
-      }
-    });
+    tearDown(() => db.close());
 
     WorkoutSessionSyncService buildService() {
       return WorkoutSessionSyncService(
-        sessionHiveService: sessionHiveService,
+        sessionDao: sessionDao,
+        workoutDao: workoutDao,
+        outboxDao: outboxDao,
         workoutPageService: workoutPageService,
-        workoutHiveService: workoutHiveService,
         isAuthenticatedReader: () => true,
-        invalidateWorkoutCaches: () {},
         clock: clock,
         isOnlineOverride: () async => true,
       );
     }
 
+    Future<void> seed() async {
+      await sessionDao.upsert(
+        _buildLocalSession(
+          localSessionId: 'backoff-session',
+          now: clock.nowUtc(),
+        ),
+      );
+      await outboxDao.enqueue(
+        id: 'o1',
+        entityType: 'session',
+        entityId: 'backoff-session',
+        operation: 'create',
+        payload: '{"entries":[]}',
+        secondaryPayload: '{"name":"Workout","blocks":[]}',
+      );
+    }
+
     test('il primo errore transiente programma il retry dal clock', () async {
       final service = buildService();
-      await _seedQueuedJob(
-        sessionHiveService: sessionHiveService,
-        localSessionId: 'backoff-session',
-        now: frozenNow,
-      );
+      await seed();
 
       await service.syncPendingSessions(trigger: 'test_backoff');
 
-      final job = await sessionHiveService.getSyncJobBySessionId(
-        'backoff-session',
-      );
-      expect(job, isNotNull);
-      expect(job!.status, SessionSyncJobStatus.retryWait);
-      expect(job.retryCount, 1);
-      expect(job.updatedAt, frozenNow);
+      final row = await outboxDao.getById('o1');
+      expect(OutboxStatus.fromValue(row!.status), OutboxStatus.pending);
+      expect(row.attempts, 1);
+      expect(row.updatedAt.toUtc(), frozenNow);
 
       // base 5s piu' jitter fino al 20%.
-      final delay = job.nextRetryAt!.difference(frozenNow);
+      final delay = row.nextAttemptAt!.difference(frozenNow);
       expect(delay, greaterThanOrEqualTo(const Duration(seconds: 5)));
       expect(delay, lessThanOrEqualTo(const Duration(seconds: 6)));
 
       service.dispose();
     });
 
-    test('il retry attende che il clock raggiunga nextRetryAt', () async {
+    test('il retry attende che il clock raggiunga nextAttemptAt', () async {
       final service = buildService();
-      await _seedQueuedJob(
-        sessionHiveService: sessionHiveService,
-        localSessionId: 'backoff-session',
-        now: frozenNow,
-      );
+      await seed();
 
       await service.syncPendingSessions(trigger: 'first_attempt');
       final callsAfterFirst = workoutPageService.uploadCalls;
 
-      // Il tempo non e' avanzato: il job in retry_wait viene saltato.
+      // Il tempo non e' avanzato: la riga in attesa viene saltata.
       await service.syncPendingSessions(trigger: 'too_early');
       expect(workoutPageService.uploadCalls, callsAfterFirst);
 
-      // Oltre la mezzanotte e oltre il ritardo: il job viene ritentato.
+      // Oltre la mezzanotte e oltre il ritardo: la riga viene ritentata.
       clock.advance(const Duration(minutes: 10));
       await service.syncPendingSessions(trigger: 'after_delay');
       expect(workoutPageService.uploadCalls, callsAfterFirst + 1);
 
-      final job = await sessionHiveService.getSyncJobBySessionId(
-        'backoff-session',
-      );
-      expect(job!.retryCount, 2);
-      expect(job.updatedAt, frozenNow.add(const Duration(minutes: 10)));
-      expect(job.updatedAt.day, 29);
+      final row = await outboxDao.getById('o1');
+      expect(row!.attempts, 2);
+      expect(row.updatedAt.toUtc(), frozenNow.add(const Duration(minutes: 10)));
+      expect(row.updatedAt.toUtc().day, 29);
 
       service.dispose();
     });
 
     test('il backoff cresce e resta limitato a 15 minuti', () async {
       final service = buildService();
-      await _seedQueuedJob(
-        sessionHiveService: sessionHiveService,
-        localSessionId: 'backoff-session',
-        now: frozenNow,
-      );
+      await seed();
 
       final delays = <Duration>[];
       for (var attempt = 0; attempt < 10; attempt++) {
         await service.syncPendingSessions(trigger: 'attempt');
-        final job = await sessionHiveService.getSyncJobBySessionId(
-          'backoff-session',
-        );
-        delays.add(job!.nextRetryAt!.difference(clock.nowUtc()));
+        final row = await outboxDao.getById('o1');
+        delays.add(row!.nextAttemptAt!.difference(clock.nowUtc()));
         clock.advance(const Duration(hours: 1));
       }
 
@@ -151,12 +131,11 @@ void main() {
   });
 }
 
-Future<void> _seedQueuedJob({
-  required WorkoutSessionHiveService sessionHiveService,
+LocalWorkoutSession _buildLocalSession({
   required String localSessionId,
   required DateTime now,
-}) async {
-  final session = LocalWorkoutSession(
+}) {
+  return LocalWorkoutSession(
     localSessionId: localSessionId,
     workoutId: 'workout-1',
     startedAt: now.subtract(const Duration(minutes: 30)),
@@ -188,22 +167,6 @@ Future<void> _seedQueuedJob({
     createdAt: now,
     updatedAt: now,
   );
-  await sessionHiveService.saveSession(session);
-
-  final job = SessionSyncJob(
-    jobId: 'job-$localSessionId',
-    localSessionId: localSessionId,
-    workoutId: 'workout-1',
-    sessionPayloadJson: '{"entries":[]}',
-    mergedWorkoutCommandJson: '{"name":"Workout","blocks":[]}',
-    status: SessionSyncJobStatus.queued,
-    retryCount: 0,
-    nextRetryAt: null,
-    lastError: null,
-    createdAt: now,
-    updatedAt: now,
-  );
-  await sessionHiveService.enqueueSyncJob(job);
 }
 
 class _FailingWorkoutPageService extends WorkoutPageService {
@@ -228,6 +191,6 @@ class _FailingWorkoutPageService extends WorkoutPageService {
 class _NoopHttpClient extends http.BaseClient {
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) {
-    throw UnimplementedError('No real HTTP calls are expected in sync tests.');
+    throw UnimplementedError('No real HTTP calls are expected in this test.');
   }
 }

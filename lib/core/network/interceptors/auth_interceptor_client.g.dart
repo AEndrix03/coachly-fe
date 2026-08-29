@@ -89,4 +89,4 @@ final class AuthHttpClientProvider
   }
 }
 
-String _$authHttpClientHash() => r'1658477d8d707e21100de7059ce0ee7373bbf5e5';
+String _$authHttpClientHash() => r'ff2f5771007b16e4966b17bb96dde33b88b0e450';

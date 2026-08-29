@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
+import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/local/workout_dao.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
-import 'package:coachly/features/workout/workout_page/data/models/session_sync_job_model.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_hive_service.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_hive_service.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -21,9 +21,10 @@ final workoutSessionSyncServiceProvider = Provider<WorkoutSessionSyncService>((
   ref,
 ) {
   final service = WorkoutSessionSyncService(
-    sessionHiveService: ref.watch(workoutSessionHiveServiceProvider),
+    sessionDao: ref.watch(sessionDaoProvider),
+    workoutDao: ref.watch(workoutDaoProvider),
+    outboxDao: ref.watch(outboxDaoProvider),
     workoutPageService: ref.watch(workoutPageServiceProvider),
-    workoutHiveService: ref.watch(workoutHiveServiceProvider),
     clock: ref.watch(clockProvider),
     logger: ref.watch(appLoggerProvider),
     isAuthenticatedReader: () {
@@ -59,47 +60,56 @@ final workoutSessionSyncServiceProvider = Provider<WorkoutSessionSyncService>((
   return service;
 });
 
+/// Svuota l'outbox verso il backend.
+///
+/// La coda e' append-only e client-authored: il server riceve cio' che il
+/// client ha prodotto e non lo corregge (`docs/development/05-sync-and-offline.md`).
+/// Nessun esito di sync cancella mai il dato locale.
 class WorkoutSessionSyncService {
-  static const Duration _retryBaseDelay = Duration(seconds: 5);
-  static const Duration _retryMaxDelay = Duration(minutes: 15);
+  /// Tipo di entita' che questo servizio sa spedire.
+  static const String sessionEntityType = 'session';
 
-  final WorkoutSessionHiveService _sessionHiveService;
+  final SessionDao _sessionDao;
+  final WorkoutDao _workoutDao;
+  final OutboxDao _outboxDao;
   final WorkoutPageService _workoutPageService;
-  final WorkoutHiveService _workoutHiveService;
   final Clock _clock;
   final AppLogger _logger;
   final bool Function() _isAuthenticatedReader;
   final void Function() _invalidateWorkoutCaches;
   final Future<bool> Function()? _isOnlineOverride;
-  final Random _random = Random();
 
   bool _isSyncing = false;
   Timer? _retryTimer;
 
   WorkoutSessionSyncService({
-    required WorkoutSessionHiveService sessionHiveService,
+    required SessionDao sessionDao,
+    required WorkoutDao workoutDao,
+    required OutboxDao outboxDao,
     required WorkoutPageService workoutPageService,
-    required WorkoutHiveService workoutHiveService,
     required bool Function() isAuthenticatedReader,
-    required void Function() invalidateWorkoutCaches,
+    void Function()? invalidateWorkoutCaches,
     Clock clock = const SystemClock(),
     AppLogger logger = const ConsoleAppLogger(),
     Future<bool> Function()? isOnlineOverride,
-  }) : _sessionHiveService = sessionHiveService,
+  }) : _sessionDao = sessionDao,
+       _workoutDao = workoutDao,
+       _outboxDao = outboxDao,
        _workoutPageService = workoutPageService,
-       _workoutHiveService = workoutHiveService,
        _clock = clock,
        _logger = logger,
        _isAuthenticatedReader = isAuthenticatedReader,
-       _invalidateWorkoutCaches = invalidateWorkoutCaches,
+       _invalidateWorkoutCaches = (invalidateWorkoutCaches ?? _noop),
        _isOnlineOverride = isOnlineOverride;
+
+  static void _noop() {}
 
   Future<void> syncPendingSessions({String trigger = 'manual'}) async {
     if (_isSyncing) {
       return;
     }
 
-    if (!_isAuthenticated()) {
+    if (!_isAuthenticatedReader()) {
       _logger.debug(
         'Session sync skipped: unauthenticated.',
         context: {'trigger': trigger},
@@ -118,19 +128,20 @@ class WorkoutSessionSyncService {
 
     _isSyncing = true;
     try {
-      final jobs = await _sessionHiveService.getPendingJobsOrdered();
+      // FIFO: l'ordine di creazione e' l'ordine di invio.
+      final rows = await _outboxDao.pendingOrdered(
+        entityType: sessionEntityType,
+      );
       final now = _clock.nowUtc();
 
-      for (final job in jobs) {
-        if (job.status == SessionSyncJobStatus.retryWait) {
-          final nextRetryAt = job.nextRetryAt;
-          if (nextRetryAt != null && nextRetryAt.isAfter(now)) {
-            continue;
-          }
+      for (final row in rows) {
+        final nextAttemptAt = row.nextAttemptAt;
+        if (nextAttemptAt != null && nextAttemptAt.isAfter(now)) {
+          continue;
         }
 
-        final outcome = await _syncSingleJob(job);
-        if (outcome == _SyncJobOutcome.transientFailure) {
+        final outcome = await _syncRow(row);
+        if (outcome == _SyncOutcome.transientFailure) {
           // FIFO semantics: stop and retry later.
           break;
         }
@@ -145,13 +156,12 @@ class WorkoutSessionSyncService {
     _retryTimer?.cancel();
     _retryTimer = null;
 
-    final earliestRetryJob = await _sessionHiveService.getEarliestRetryJob();
-    if (earliestRetryJob == null || earliestRetryJob.nextRetryAt == null) {
+    final earliest = await _outboxDao.earliestNextAttemptAt();
+    if (earliest == null) {
       return;
     }
 
-    final now = _clock.nowUtc();
-    final dueIn = earliestRetryJob.nextRetryAt!.difference(now);
+    final dueIn = earliest.difference(_clock.nowUtc());
     if (dueIn <= Duration.zero) {
       unawaited(syncPendingSessions(trigger: 'retry_due_now'));
       return;
@@ -167,215 +177,152 @@ class WorkoutSessionSyncService {
     _retryTimer = null;
   }
 
-  bool _isAuthenticated() {
-    return _isAuthenticatedReader();
-  }
-
   Future<bool> _isOnline() async {
     final override = _isOnlineOverride;
     if (override != null) {
       return override();
     }
+    // `connectivity_plus` e' un segnale per tentare, mai un'autorita' su cosa
+    // sia possibile: l'autorita' sono timeout ed esiti HTTP.
     final connectivityResults = await Connectivity().checkConnectivity();
     return connectivityResults.any((r) => r != ConnectivityResult.none);
   }
 
-  Future<_SyncJobOutcome> _syncSingleJob(SessionSyncJob initialJob) async {
-    final session = await _sessionHiveService.getSession(
-      initialJob.localSessionId,
-    );
+  Future<_SyncOutcome> _syncRow(OutboxRow row) async {
+    final session = await _sessionDao.getSession(row.entityId);
     if (session == null) {
-      await _markJobFailedPermanent(
-        job: initialJob,
-        errorMessage: 'Local session not found for sync.',
+      await _outboxDao.markFailedPermanent(
+        row.id,
+        error: 'Local session not found for sync.',
       );
-      return _SyncJobOutcome.permanentFailure;
+      return _SyncOutcome.permanentFailure;
     }
 
-    var job = initialJob;
+    await _outboxDao.markSending(row.id);
+
     var currentSession = session;
-
-    final needsSessionUpload = _needsSessionUpload(
-      job: job,
-      session: currentSession,
-    );
-    if (needsSessionUpload) {
-      final uploadingStateAt = _clock.nowUtc();
-      job = job.copyWith(
-        status: SessionSyncJobStatus.uploading,
-        updatedAt: uploadingStateAt,
+    if (_needsSessionUpload(currentSession)) {
+      currentSession = await _setSessionState(
+        currentSession,
+        LocalWorkoutSessionSyncState.uploading,
       );
-      currentSession = currentSession.copyWith(
-        syncState: LocalWorkoutSessionSyncState.uploading,
-        updatedAt: uploadingStateAt,
-      );
-      await _persist(job: job, session: currentSession);
 
-      final sessionPayload = _decodeJsonMap(job.sessionPayloadJson);
-      sessionPayload['clientSessionId'] = job.localSessionId;
+      final sessionPayload = _decodeJsonMap(row.payload);
+      sessionPayload['clientSessionId'] = row.entityId;
       final uploadResponse = await _workoutPageService
-          .saveWorkoutSessionPayload(job.workoutId, sessionPayload);
+          .saveWorkoutSessionPayload(currentSession.workoutId, sessionPayload);
       if (!uploadResponse.success) {
         return _handleFailure(
-          job: job,
+          row: row,
           session: currentSession,
           response: uploadResponse,
           failurePhase: _SyncFailurePhase.uploadSession,
         );
       }
 
-      final uploadedAt = _clock.nowUtc();
-      job = job.copyWith(
-        status: SessionSyncJobStatus.uploaded,
-        updatedAt: uploadedAt,
-        clearLastError: true,
-        clearNextRetryAt: true,
+      currentSession = await _setSessionState(
+        currentSession,
+        LocalWorkoutSessionSyncState.uploaded,
       );
-      currentSession = currentSession.copyWith(
-        syncState: LocalWorkoutSessionSyncState.uploaded,
-        updatedAt: uploadedAt,
-        clearLastError: true,
-        clearNextRetryAt: true,
-      );
-      await _persist(job: job, session: currentSession);
     }
 
-    final patchingAt = _clock.nowUtc();
-    job = job.copyWith(
-      status: SessionSyncJobStatus.patching,
-      updatedAt: patchingAt,
+    currentSession = await _setSessionState(
+      currentSession,
+      LocalWorkoutSessionSyncState.patching,
     );
-    currentSession = currentSession.copyWith(
-      syncState: LocalWorkoutSessionSyncState.patching,
-      updatedAt: patchingAt,
-    );
-    await _persist(job: job, session: currentSession);
 
-    final workoutPayload = _decodeJsonMap(job.mergedWorkoutCommandJson);
+    final workoutPayload = _decodeJsonMap(row.secondaryPayload ?? '{}');
     final patchResponse = await _workoutPageService.patchWorkoutPayload(
-      job.workoutId,
+      currentSession.workoutId,
       workoutPayload,
     );
     if (!patchResponse.success) {
       return _handleFailure(
-        job: job,
+        row: row,
         session: currentSession,
         response: patchResponse,
         failurePhase: _SyncFailurePhase.patchWorkout,
       );
     }
 
-    final syncedAt = _clock.nowUtc();
-    job = job.copyWith(
-      status: SessionSyncJobStatus.synced,
-      updatedAt: syncedAt,
-      clearLastError: true,
-      clearNextRetryAt: true,
+    await _setSessionState(currentSession, LocalWorkoutSessionSyncState.synced);
+    await _outboxDao.markSent(row.id);
+    await _workoutDao.markSynced(
+      currentSession.workoutId,
+      updatedAt: _clock.nowUtc(),
     );
-    currentSession = currentSession.copyWith(
-      syncState: LocalWorkoutSessionSyncState.synced,
-      updatedAt: syncedAt,
-      clearLastError: true,
-      clearNextRetryAt: true,
-    );
-    await _persist(job: job, session: currentSession);
-
-    await _workoutHiveService.markWorkoutSynced(job.workoutId);
     await _refreshWorkoutCacheFromRemote();
-    return _SyncJobOutcome.success;
+    return _SyncOutcome.success;
   }
 
-  bool _needsSessionUpload({
-    required SessionSyncJob job,
-    required LocalWorkoutSession session,
-  }) {
-    final sessionState = session.syncState;
-    if (sessionState == LocalWorkoutSessionSyncState.uploaded ||
-        sessionState == LocalWorkoutSessionSyncState.patching ||
-        sessionState == LocalWorkoutSessionSyncState.synced) {
-      return false;
-    }
-
-    if (job.status == SessionSyncJobStatus.uploaded ||
-        job.status == SessionSyncJobStatus.patching ||
-        job.status == SessionSyncJobStatus.synced) {
-      return false;
-    }
-
-    return true;
+  bool _needsSessionUpload(LocalWorkoutSession session) {
+    return switch (session.syncState) {
+      LocalWorkoutSessionSyncState.uploaded ||
+      LocalWorkoutSessionSyncState.patching ||
+      LocalWorkoutSessionSyncState.synced => false,
+      _ => true,
+    };
   }
 
-  Future<_SyncJobOutcome> _handleFailure({
-    required SessionSyncJob job,
+  Future<LocalWorkoutSession> _setSessionState(
+    LocalWorkoutSession session,
+    LocalWorkoutSessionSyncState state, {
+    String? lastError,
+  }) async {
+    final updated = session.copyWith(
+      syncState: state,
+      lastError: lastError,
+      clearLastError: lastError == null,
+      updatedAt: _clock.nowUtc(),
+    );
+    await _sessionDao.upsert(updated);
+    return updated;
+  }
+
+  Future<_SyncOutcome> _handleFailure({
+    required OutboxRow row,
     required LocalWorkoutSession session,
     required ApiResponse<void> response,
     required _SyncFailurePhase failurePhase,
   }) async {
-    final now = _clock.nowUtc();
     final errorMessage = _buildErrorMessage(response);
-    final statusCode = response.statusCode;
 
-    if (_isTransientStatus(statusCode)) {
-      final nextRetryCount = job.retryCount + 1;
-      final nextRetryAt = _computeNextRetryAt(
-        now: now,
-        retryCount: nextRetryCount,
+    if (_isTransientStatus(response.statusCode)) {
+      // Backoff esponenziale con jitter, calcolato dall'outbox sul `Clock`.
+      final nextAttemptAt = await _outboxDao.markFailed(
+        row.id,
+        error: errorMessage,
       );
-
-      final retryJob = job.copyWith(
-        status: SessionSyncJobStatus.retryWait,
-        retryCount: nextRetryCount,
-        nextRetryAt: nextRetryAt,
-        lastError: errorMessage,
-        updatedAt: now,
-      );
-      await _sessionHiveService.updateSyncJob(retryJob);
-
-      final retrySessionState = failurePhase == _SyncFailurePhase.patchWorkout
+      final retryState = failurePhase == _SyncFailurePhase.patchWorkout
           ? LocalWorkoutSessionSyncState.uploaded
           : LocalWorkoutSessionSyncState.retryWait;
-      final retrySession = session.copyWith(
-        syncState: retrySessionState,
-        retryCount: nextRetryCount,
-        nextRetryAt: nextRetryAt,
-        lastError: errorMessage,
-        updatedAt: now,
+      await _sessionDao.upsert(
+        session.copyWith(
+          syncState: retryState,
+          retryCount: session.retryCount + 1,
+          nextRetryAt: nextAttemptAt,
+          lastError: errorMessage,
+          updatedAt: _clock.nowUtc(),
+        ),
       );
-      await _sessionHiveService.updateSession(retrySession);
-
-      return _SyncJobOutcome.transientFailure;
+      return _SyncOutcome.transientFailure;
     }
 
-    await _markJobFailedPermanent(job: job, errorMessage: errorMessage);
-    final failedSession = session.copyWith(
-      syncState: LocalWorkoutSessionSyncState.failedPermanent,
-      lastError: errorMessage,
-      updatedAt: now,
+    // `failed_permanent` non cancella mai il dato locale: il fallimento
+    // riguarda la telemetria, non l'utente.
+    await _outboxDao.markFailedPermanent(row.id, error: errorMessage);
+    await _sessionDao.upsert(
+      session.copyWith(
+        syncState: LocalWorkoutSessionSyncState.failedPermanent,
+        lastError: errorMessage,
+        updatedAt: _clock.nowUtc(),
+      ),
     );
-    await _sessionHiveService.updateSession(failedSession);
-    return _SyncJobOutcome.permanentFailure;
-  }
-
-  Future<void> _markJobFailedPermanent({
-    required SessionSyncJob job,
-    required String errorMessage,
-  }) async {
-    final now = _clock.nowUtc();
-    final failedJob = job.copyWith(
-      status: SessionSyncJobStatus.failedPermanent,
-      lastError: errorMessage,
-      updatedAt: now,
-      clearNextRetryAt: true,
+    _logger.warn(
+      'Session upload failed permanently; local data kept.',
+      context: {'outboxId': row.id, 'sessionId': row.entityId},
     );
-    await _sessionHiveService.updateSyncJob(failedJob);
-  }
-
-  Future<void> _persist({
-    required SessionSyncJob job,
-    required LocalWorkoutSession session,
-  }) async {
-    await _sessionHiveService.updateSyncJob(job);
-    await _sessionHiveService.updateSession(session);
+    return _SyncOutcome.permanentFailure;
   }
 
   Future<void> _refreshWorkoutCacheFromRemote() async {
@@ -391,7 +338,10 @@ class WorkoutSessionSyncService {
       return;
     }
 
-    await _workoutHiveService.patchWorkouts(refreshResponse.data!);
+    await _workoutDao.patchWorkouts(
+      refreshResponse.data!,
+      updatedAt: _clock.nowUtc(),
+    );
     _invalidateWorkoutCaches();
   }
 
@@ -406,30 +356,10 @@ class WorkoutSessionSyncService {
       return true;
     }
 
-    if (statusCode == 0 ||
+    return statusCode == 0 ||
         statusCode == 408 ||
         statusCode == 429 ||
-        statusCode >= 500) {
-      return true;
-    }
-
-    return false;
-  }
-
-  DateTime _computeNextRetryAt({
-    required DateTime now,
-    required int retryCount,
-  }) {
-    final boundedRetryCount = retryCount < 0 ? 0 : retryCount;
-    final baseSeconds =
-        _retryBaseDelay.inSeconds * pow(2, boundedRetryCount - 1);
-    final clampedSeconds = min(baseSeconds.toInt(), _retryMaxDelay.inSeconds);
-    final jitterRatio = _random.nextDouble() * 0.2;
-    final jitterMillis = (clampedSeconds * 1000 * jitterRatio).round();
-    final totalDelay =
-        Duration(seconds: clampedSeconds) +
-        Duration(milliseconds: jitterMillis);
-    return now.add(totalDelay);
+        statusCode >= 500;
   }
 
   Map<String, dynamic> _decodeJsonMap(String rawJson) {
@@ -441,6 +371,6 @@ class WorkoutSessionSyncService {
   }
 }
 
-enum _SyncJobOutcome { success, transientFailure, permanentFailure }
+enum _SyncOutcome { success, transientFailure, permanentFailure }
 
 enum _SyncFailurePhase { uploadSession, patchWorkout }

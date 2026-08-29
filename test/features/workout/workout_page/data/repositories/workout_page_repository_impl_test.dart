@@ -1,116 +1,199 @@
-import 'dart:io';
+import 'dart:math';
 
+import 'package:coachly/core/database/app_database.dart';
+import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
-import 'package:coachly/app/sync/adapters/workout_adapter.dart';
+import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
+import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/local/workout_dao.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
-import 'package:coachly/features/workout/workout_page/data/models/session_sync_job_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_hive_service.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_hive_service.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_structured_hive_service.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 const _exerciseId = '11111111-1111-4111-8111-111111111111';
 
+/// Il repository non ha piu' bisogno di filesystem ne' di mock: il database
+/// sta in memoria (`docs/development/19-testing.md`).
 void main() {
-  group('WorkoutPageRepositoryImpl.getWorkoutStats', () {
-    late Directory tempDir;
-    late Box<WorkoutModel> workoutsBox;
-    late Box<Map> sessionsBox;
-    late Box<Map> jobsBox;
-    late Box<Map> structuredBox;
-    late WorkoutHiveService workoutHiveService;
-    late WorkoutSessionHiveService sessionHiveService;
-    late WorkoutStructuredHiveService structuredHiveService;
-    late _FakeWorkoutPageService fakeWorkoutPageService;
-    late WorkoutSessionSyncService syncService;
-    late WorkoutPageRepositoryImpl repository;
+  late AppDatabase db;
+  late WorkoutDao workoutDao;
+  late SessionDao sessionDao;
+  late OutboxDao outboxDao;
+  late FixedClock clock;
+  late _FakeWorkoutPageService fakeWorkoutPageService;
+  late WorkoutSessionSyncService syncService;
+  late WorkoutPageRepositoryImpl repository;
 
-    setUp(() async {
-      await Hive.close();
-      tempDir = await Directory.systemTemp.createTemp(
-        'coachly_workout_stats_repository_test_',
-      );
-      Hive.init(tempDir.path);
+  setUp(() async {
+    db = AppDatabase(NativeDatabase.memory());
+    clock = FixedClock(DateTime.utc(2026, 3, 18, 11));
+    workoutDao = WorkoutDao(db);
+    sessionDao = SessionDao(db);
+    outboxDao = OutboxDao(db, clock: clock, random: Random(7));
+    fakeWorkoutPageService = _FakeWorkoutPageService();
+    syncService = WorkoutSessionSyncService(
+      sessionDao: sessionDao,
+      workoutDao: workoutDao,
+      outboxDao: outboxDao,
+      workoutPageService: fakeWorkoutPageService,
+      isAuthenticatedReader: () => true,
+      isOnlineOverride: () async => false,
+      clock: clock,
+    );
+    repository = WorkoutPageRepositoryImpl(
+      apiService: fakeWorkoutPageService,
+      workoutDao: workoutDao,
+      sessionDao: sessionDao,
+      outboxDao: outboxDao,
+      database: db,
+      sessionSyncService: syncService,
+      clock: clock,
+      idGenerator: SequentialIdGenerator(),
+    );
 
-      if (!Hive.isAdapterRegistered(0)) {
-        Hive.registerAdapter(WorkoutAdapter());
-      }
+    await workoutDao.upsert(_buildWorkout());
+  });
 
-      workoutsBox = await Hive.openBox<WorkoutModel>('stats_workouts_box');
-      sessionsBox = await Hive.openBox<Map>('stats_sessions_box');
-      jobsBox = await Hive.openBox<Map>('stats_jobs_box');
-      structuredBox = await Hive.openBox<Map>('stats_structured_box');
+  tearDown(() async {
+    syncService.dispose();
+    await db.close();
+  });
 
-      workoutHiveService = WorkoutHiveService.fromBox(workoutsBox);
-      sessionHiveService = WorkoutSessionHiveService.fromBoxes(
-        sessionsBox: sessionsBox,
-        syncJobsBox: jobsBox,
-      );
-      structuredHiveService = WorkoutStructuredHiveService.fromBox(
-        structuredBox,
-      );
-      fakeWorkoutPageService = _FakeWorkoutPageService();
-      syncService = WorkoutSessionSyncService(
-        sessionHiveService: sessionHiveService,
-        workoutPageService: fakeWorkoutPageService,
-        workoutHiveService: workoutHiveService,
-        isAuthenticatedReader: () => true,
-        isOnlineOverride: () async => false,
-        invalidateWorkoutCaches: () {},
-      );
-
-      repository = WorkoutPageRepositoryImpl(
-        fakeWorkoutPageService,
-        workoutHiveService,
-        sessionHiveService,
-        structuredHiveService,
-        syncService,
+  group('saveSession', () {
+    test('scrive sessione e riga di outbox nella stessa transazione', () async {
+      final response = await repository.saveSession(
+        'workout-1',
+        _buildSession(),
       );
 
-      await workoutsBox.put('workout-1', _buildWorkout());
+      expect(response.success, isTrue);
+      expect(response.message, contains('queued'));
+
+      final sessions = await sessionDao.getSessionsForWorkout('workout-1');
+      expect(sessions, hasLength(1));
+      expect(sessions.first.syncState, LocalWorkoutSessionSyncState.queued);
+
+      final pending = await outboxDao.pendingOrdered();
+      expect(pending, hasLength(1));
+      expect(pending.first.entityType, 'session');
+      expect(pending.first.entityId, sessions.first.localSessionId);
+      expect(
+        OutboxStatus.fromValue(pending.first.status),
+        OutboxStatus.pending,
+      );
     });
 
-    tearDown(() async {
-      syncService.dispose();
-      await Hive.close();
-      if (tempDir.existsSync()) {
-        await tempDir.delete(recursive: true);
-      }
+    test('se la riga di outbox non entra, la sessione non resta', () async {
+      // `SequentialIdGenerator` rende prevedibile la chiave: occupandola si
+      // fa fallire l'INSERT in outbox. Se la sessione sopravvivesse,
+      // l'allenamento resterebbe sul dispositivo e non salirebbe mai.
+      await outboxDao.enqueue(
+        id: 'idem-1',
+        entityType: 'session',
+        entityId: 'other-session',
+        operation: 'create',
+        payload: '{}',
+      );
+
+      final response = await repository.saveSession(
+        'workout-1',
+        _buildSession(),
+      );
+
+      expect(response.success, isFalse);
+      expect(await sessionDao.getAllSessions(), isEmpty);
+      expect(await outboxDao.pendingOrdered(), hasLength(1));
     });
 
-    test('excludes failed-permanent sessions from weekly/completed stats', () async {
-      final now = DateTime.now();
-      final monday = DateTime(
-        now.year,
-        now.month,
-        now.day,
-      ).subtract(Duration(days: now.weekday - 1));
+    test('aggiorna la scheda locale prima di qualsiasi rete', () async {
+      await repository.saveSession('workout-1', _buildSession());
 
-      await sessionHiveService.saveSession(
+      final updatedWorkout = await workoutDao.getWorkout('workout-1');
+      expect(updatedWorkout, isNotNull);
+      expect(updatedWorkout!.dirty, isTrue);
+      expect(updatedWorkout.workoutExercises.first.sets, '2x10');
+      expect(updatedWorkout.workoutExercises.first.weight, '85kg');
+      expect(fakeWorkoutPageService.uploadCalls, 0);
+      expect(fakeWorkoutPageService.patchCalls, 0);
+    });
+
+    test('un failed_permanent non cancella il dato locale', () async {
+      await repository.saveSession('workout-1', _buildSession());
+      final row = (await outboxDao.pendingOrdered()).single;
+
+      await outboxDao.markFailedPermanent(row.id, error: '[400] rejected');
+
+      expect(await sessionDao.getAllSessions(), hasLength(1));
+      expect(await workoutDao.getWorkout('workout-1'), isNotNull);
+      expect(await outboxDao.pendingOrdered(), isEmpty);
+      final failed = await outboxDao.getById(row.id);
+      expect(
+        OutboxStatus.fromValue(failed!.status),
+        OutboxStatus.failedPermanent,
+      );
+    });
+  });
+
+  group('letture reattive', () {
+    test('watchWorkouts emette dopo una scrittura', () async {
+      final counts = <int>[];
+      final subscription = repository.watchWorkouts().listen(
+        (workouts) => counts.add(workouts.length),
+      );
+      await pumpEventQueue();
+
+      await workoutDao.upsert(_buildWorkout().copyWith(id: 'workout-2'));
+      await pumpEventQueue();
+      await subscription.cancel();
+
+      // E' cio' che sostituisce le `ref.invalidate` dopo ogni mutazione.
+      expect(counts, containsAllInOrder([1, 2]));
+    });
+
+    test('watchSessions emette dopo il salvataggio di una sessione', () async {
+      final counts = <int>[];
+      final subscription = repository.watchSessions().listen(
+        (sessions) => counts.add(sessions.length),
+      );
+      await pumpEventQueue();
+
+      await repository.saveSession('workout-1', _buildSession());
+      await pumpEventQueue();
+      await subscription.cancel();
+
+      expect(counts, containsAllInOrder([0, 1]));
+    });
+  });
+
+  group('getWorkoutStats', () {
+    test('esclude le sessioni failed_permanent dai conteggi', () async {
+      final monday = _startOfWeek(clock.now());
+
+      await sessionDao.upsert(
         _buildLocalSession(
           localSessionId: 'ok-1',
           completedAt: monday.add(const Duration(hours: 8)),
           syncState: LocalWorkoutSessionSyncState.synced,
         ),
       );
-      await sessionHiveService.saveSession(
+      await sessionDao.upsert(
         _buildLocalSession(
           localSessionId: 'ok-2',
           completedAt: monday.add(const Duration(days: 1, hours: 9)),
           syncState: LocalWorkoutSessionSyncState.queued,
         ),
       );
-      await sessionHiveService.saveSession(
+      await sessionDao.upsert(
         _buildLocalSession(
           localSessionId: 'bad-1',
           completedAt: monday.add(const Duration(days: 2, hours: 10)),
@@ -121,148 +204,59 @@ void main() {
       final stats = await repository.getWorkoutStats();
 
       expect(stats.success, isTrue);
-      expect(stats.data, isNotNull);
       expect(stats.data!.weeklyWorkouts, 2);
       expect(stats.data!.completedWorkouts, 2);
     });
 
-    test('computes streak as consecutive local days with at least one session', () async {
-      final today = DateTime.now();
+    test('lo streak conta i giorni locali consecutivi', () async {
+      final today = clock.now();
       final d0 = DateTime(today.year, today.month, today.day, 10);
       final d1 = d0.subtract(const Duration(days: 1));
       final d2 = d0.subtract(const Duration(days: 3));
 
-      await sessionHiveService.saveSession(
-        _buildLocalSession(
-          localSessionId: 'streak-1',
-          completedAt: d0,
-          syncState: LocalWorkoutSessionSyncState.synced,
-        ),
-      );
-      await sessionHiveService.saveSession(
-        _buildLocalSession(
-          localSessionId: 'streak-2',
-          completedAt: d1,
-          syncState: LocalWorkoutSessionSyncState.synced,
-        ),
-      );
-      await sessionHiveService.saveSession(
-        _buildLocalSession(
-          localSessionId: 'gap',
-          completedAt: d2,
-          syncState: LocalWorkoutSessionSyncState.synced,
-        ),
-      );
+      for (final entry in {'streak-1': d0, 'streak-2': d1, 'gap': d2}.entries) {
+        await sessionDao.upsert(
+          _buildLocalSession(
+            localSessionId: entry.key,
+            completedAt: entry.value,
+            syncState: LocalWorkoutSessionSyncState.synced,
+          ),
+        );
+      }
 
       final stats = await repository.getWorkoutStats();
 
       expect(stats.success, isTrue);
-      expect(stats.data, isNotNull);
       expect(stats.data!.currentStreak, 2);
     });
   });
 
-  group('WorkoutPageRepositoryImpl.saveSession', () {
-    late Directory tempDir;
-    late Box<WorkoutModel> workoutsBox;
-    late Box<Map> sessionsBox;
-    late Box<Map> jobsBox;
-    late Box<Map> structuredBox;
-    late WorkoutHiveService workoutHiveService;
-    late WorkoutSessionHiveService sessionHiveService;
-    late WorkoutStructuredHiveService structuredHiveService;
-    late _FakeWorkoutPageService fakeWorkoutPageService;
-    late WorkoutSessionSyncService syncService;
-    late WorkoutPageRepositoryImpl repository;
+  group('scritture locali', () {
+    test('disableWorkout marca la scheda dirty', () async {
+      await repository.disableWorkout('workout-1');
 
-    setUp(() async {
-      await Hive.close();
-      tempDir = await Directory.systemTemp.createTemp(
-        'coachly_workout_repository_test_',
-      );
-      Hive.init(tempDir.path);
-
-      if (!Hive.isAdapterRegistered(0)) {
-        Hive.registerAdapter(WorkoutAdapter());
-      }
-
-      workoutsBox = await Hive.openBox<WorkoutModel>('repository_workouts_box');
-      sessionsBox = await Hive.openBox<Map>('repository_sessions_box');
-      jobsBox = await Hive.openBox<Map>('repository_jobs_box');
-      structuredBox = await Hive.openBox<Map>('repository_structured_box');
-
-      workoutHiveService = WorkoutHiveService.fromBox(workoutsBox);
-      sessionHiveService = WorkoutSessionHiveService.fromBoxes(
-        sessionsBox: sessionsBox,
-        syncJobsBox: jobsBox,
-      );
-      structuredHiveService = WorkoutStructuredHiveService.fromBox(
-        structuredBox,
-      );
-      fakeWorkoutPageService = _FakeWorkoutPageService();
-      syncService = WorkoutSessionSyncService(
-        sessionHiveService: sessionHiveService,
-        workoutPageService: fakeWorkoutPageService,
-        workoutHiveService: workoutHiveService,
-        isAuthenticatedReader: () => true,
-        isOnlineOverride: () async => false,
-        invalidateWorkoutCaches: () {},
-      );
-
-      repository = WorkoutPageRepositoryImpl(
-        fakeWorkoutPageService,
-        workoutHiveService,
-        sessionHiveService,
-        structuredHiveService,
-        syncService,
-      );
-
-      await workoutsBox.put('workout-1', _buildWorkout());
+      final workout = await workoutDao.getWorkout('workout-1');
+      expect(workout!.active, isFalse);
+      expect(workout.dirty, isTrue);
     });
 
-    tearDown(() async {
-      syncService.dispose();
-      await Hive.close();
-      if (tempDir.existsSync()) {
-        await tempDir.delete(recursive: true);
-      }
-    });
+    test('patchWorkouts non calpesta una scheda dirty', () async {
+      await repository.disableWorkout('workout-1');
 
-    test(
-      'returns local success immediately and enqueues persistent sync job',
-      () async {
-        final response = await repository.saveSession(
-          'workout-1',
-          _buildSession(),
-        );
+      await workoutDao.patchWorkouts([
+        _buildWorkout().copyWith(active: true),
+      ], updatedAt: clock.nowUtc());
 
-        expect(response.success, isTrue);
-        expect(response.message, contains('queued'));
-
-        final sessions = await sessionHiveService.getSessionsForWorkout(
-          'workout-1',
-        );
-        expect(sessions, hasLength(1));
-        expect(sessions.first.syncState, LocalWorkoutSessionSyncState.queued);
-
-        final jobs = await sessionHiveService.getPendingJobsOrdered();
-        expect(jobs, hasLength(1));
-        expect(jobs.first.status, SessionSyncJobStatus.queued);
-      },
-    );
-
-    test('updates local workout values before remote sync attempt', () async {
-      await repository.saveSession('workout-1', _buildSession());
-
-      final updatedWorkout = workoutsBox.get('workout-1');
-      expect(updatedWorkout, isNotNull);
-      expect(updatedWorkout!.dirty, isTrue);
-      expect(updatedWorkout.workoutExercises.first.sets, '2x10');
-      expect(updatedWorkout.workoutExercises.first.weight, '85kg');
-      expect(fakeWorkoutPageService.uploadCalls, 0);
-      expect(fakeWorkoutPageService.patchCalls, 0);
+      // Il client e' l'autore: il remoto non corregge cio' che non e' salito.
+      final workout = await workoutDao.getWorkout('workout-1');
+      expect(workout!.active, isFalse);
     });
   });
+}
+
+DateTime _startOfWeek(DateTime instant) {
+  final day = DateTime(instant.year, instant.month, instant.day);
+  return day.subtract(Duration(days: day.weekday - 1));
 }
 
 LocalWorkoutSession _buildLocalSession({

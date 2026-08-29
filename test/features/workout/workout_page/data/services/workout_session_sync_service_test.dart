@@ -1,195 +1,169 @@
-import 'dart:io';
+import 'dart:math';
 
+import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
-import 'package:coachly/app/sync/adapters/workout_adapter.dart';
+import 'package:coachly/core/time/clock.dart';
+import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
+import 'package:coachly/features/workout/workout_page/data/local/workout_dao.dart';
 import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
-import 'package:coachly/features/workout/workout_page/data/models/session_sync_job_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_hive_service.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_hive_service.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  group('WorkoutSessionSyncService', () {
-    late Directory tempDir;
-    late Box<Map> sessionsBox;
-    late Box<Map> jobsBox;
-    late Box<WorkoutModel> workoutsBox;
-    late WorkoutSessionHiveService sessionHiveService;
-    late WorkoutHiveService workoutHiveService;
-    late _FakeWorkoutPageService fakeWorkoutPageService;
+  late AppDatabase db;
+  late FixedClock clock;
+  late WorkoutDao workoutDao;
+  late SessionDao sessionDao;
+  late OutboxDao outboxDao;
+  late _FakeWorkoutPageService fakeWorkoutPageService;
 
-    setUp(() async {
-      await Hive.close();
-      tempDir = await Directory.systemTemp.createTemp(
-        'coachly_workout_session_sync_test_',
-      );
-      Hive.init(tempDir.path);
+  final frozenNow = DateTime.utc(2026, 3, 18, 11);
 
-      if (!Hive.isAdapterRegistered(0)) {
-        Hive.registerAdapter(WorkoutAdapter());
-      }
+  setUp(() async {
+    db = AppDatabase(NativeDatabase.memory());
+    clock = FixedClock(frozenNow);
+    workoutDao = WorkoutDao(db);
+    sessionDao = SessionDao(db);
+    outboxDao = OutboxDao(db, clock: clock, random: Random(11));
+    fakeWorkoutPageService = _FakeWorkoutPageService();
+  });
 
-      sessionsBox = await Hive.openBox<Map>('sync_sessions_test_box');
-      jobsBox = await Hive.openBox<Map>('sync_jobs_test_box');
-      workoutsBox = await Hive.openBox<WorkoutModel>('sync_workouts_test_box');
+  tearDown(() => db.close());
 
-      sessionHiveService = WorkoutSessionHiveService.fromBoxes(
-        sessionsBox: sessionsBox,
-        syncJobsBox: jobsBox,
-      );
-      workoutHiveService = WorkoutHiveService.fromBox(workoutsBox);
-      fakeWorkoutPageService = _FakeWorkoutPageService();
-    });
-
-    tearDown(() async {
-      await Hive.close();
-      if (tempDir.existsSync()) {
-        await tempDir.delete(recursive: true);
-      }
-    });
-
-    test('offline: no BE calls, queued job remains queued', () async {
-      final service = WorkoutSessionSyncService(
-        sessionHiveService: sessionHiveService,
-        workoutPageService: fakeWorkoutPageService,
-        workoutHiveService: workoutHiveService,
-        isAuthenticatedReader: () => true,
-        isOnlineOverride: () async => false,
-        invalidateWorkoutCaches: () {},
-      );
-
-      await _seedQueuedJob(
-        sessionHiveService: sessionHiveService,
-        localSessionId: 'offline-session',
-      );
-
-      await service.syncPendingSessions(trigger: 'test_offline');
-
-      final job = await sessionHiveService.getSyncJobBySessionId(
-        'offline-session',
-      );
-      expect(fakeWorkoutPageService.uploadCalls, 0);
-      expect(fakeWorkoutPageService.patchCalls, 0);
-      expect(job, isNotNull);
-      expect(job!.status, SessionSyncJobStatus.queued);
-
-      service.dispose();
-    });
-
-    test('online: executes POST session then PUT workout in order', () async {
-      final service = WorkoutSessionSyncService(
-        sessionHiveService: sessionHiveService,
-        workoutPageService: fakeWorkoutPageService,
-        workoutHiveService: workoutHiveService,
-        isAuthenticatedReader: () => true,
-        isOnlineOverride: () async => true,
-        invalidateWorkoutCaches: () {},
-      );
-
-      await workoutsBox.put(
-        'workout-1',
-        _buildWorkout(id: 'workout-1', dirty: true),
-      );
-      await _seedQueuedJob(
-        sessionHiveService: sessionHiveService,
-        localSessionId: 'online-session',
-      );
-
-      await service.syncPendingSessions(trigger: 'test_online');
-
-      final job = await sessionHiveService.getSyncJobBySessionId(
-        'online-session',
-      );
-      expect(fakeWorkoutPageService.callSequence, ['post', 'put', 'fetch']);
-      expect(job, isNotNull);
-      expect(job!.status, SessionSyncJobStatus.synced);
-
-      service.dispose();
-    });
-
-    test('transient error: sets retry_wait with nextRetryAt', () async {
-      fakeWorkoutPageService.uploadResponse = ApiResponse.error(
-        message: 'Temporary server issue',
-        statusCode: 500,
-      );
-
-      final service = WorkoutSessionSyncService(
-        sessionHiveService: sessionHiveService,
-        workoutPageService: fakeWorkoutPageService,
-        workoutHiveService: workoutHiveService,
-        isAuthenticatedReader: () => true,
-        isOnlineOverride: () async => true,
-        invalidateWorkoutCaches: () {},
-      );
-
-      await _seedQueuedJob(
-        sessionHiveService: sessionHiveService,
-        localSessionId: 'retry-session',
-      );
-
-      await service.syncPendingSessions(trigger: 'test_transient');
-
-      final job = await sessionHiveService.getSyncJobBySessionId(
-        'retry-session',
-      );
-      expect(job, isNotNull);
-      expect(job!.status, SessionSyncJobStatus.retryWait);
-      expect(job.retryCount, 1);
-      expect(job.nextRetryAt, isNotNull);
-
-      service.dispose();
-    });
-
-    test(
-      'permanent error: marks failed_permanent and stops retrying',
-      () async {
-        fakeWorkoutPageService.uploadResponse = ApiResponse.error(
-          message: 'Validation failed',
-          statusCode: 400,
-        );
-
-        final service = WorkoutSessionSyncService(
-          sessionHiveService: sessionHiveService,
-          workoutPageService: fakeWorkoutPageService,
-          workoutHiveService: workoutHiveService,
-          isAuthenticatedReader: () => true,
-          isOnlineOverride: () async => true,
-          invalidateWorkoutCaches: () {},
-        );
-
-        await _seedQueuedJob(
-          sessionHiveService: sessionHiveService,
-          localSessionId: 'permanent-session',
-        );
-
-        await service.syncPendingSessions(trigger: 'test_permanent');
-
-        final job = await sessionHiveService.getSyncJobBySessionId(
-          'permanent-session',
-        );
-        expect(job, isNotNull);
-        expect(job!.status, SessionSyncJobStatus.failedPermanent);
-        expect(job.nextRetryAt, isNull);
-
-        service.dispose();
-      },
+  WorkoutSessionSyncService buildService({required bool online}) {
+    return WorkoutSessionSyncService(
+      sessionDao: sessionDao,
+      workoutDao: workoutDao,
+      outboxDao: outboxDao,
+      workoutPageService: fakeWorkoutPageService,
+      isAuthenticatedReader: () => true,
+      isOnlineOverride: () async => online,
+      clock: clock,
     );
+  }
+
+  Future<void> seed({
+    required String sessionId,
+    required String outboxId,
+  }) async {
+    await sessionDao.upsert(
+      _buildLocalSession(localSessionId: sessionId, now: clock.nowUtc()),
+    );
+    await outboxDao.enqueue(
+      id: outboxId,
+      entityType: 'session',
+      entityId: sessionId,
+      operation: 'create',
+      payload:
+          '{"entries":[{"exerciseId":"exercise-1","position":0,"sets":[]}]}',
+      secondaryPayload: '{"name":"Workout","blocks":[]}',
+    );
+  }
+
+  test('offline: nessuna chiamata, la riga resta pending', () async {
+    final service = buildService(online: false);
+    await seed(sessionId: 'offline-session', outboxId: 'o1');
+
+    await service.syncPendingSessions(trigger: 'test_offline');
+
+    expect(fakeWorkoutPageService.uploadCalls, 0);
+    expect(fakeWorkoutPageService.patchCalls, 0);
+    final row = await outboxDao.getById('o1');
+    expect(OutboxStatus.fromValue(row!.status), OutboxStatus.pending);
+
+    service.dispose();
+  });
+
+  test('online: POST sessione, poi PUT workout, poi sent', () async {
+    final service = buildService(online: true);
+    await workoutDao.upsert(_buildWorkout(id: 'workout-1', dirty: true));
+    await seed(sessionId: 'online-session', outboxId: 'o1');
+
+    await service.syncPendingSessions(trigger: 'test_online');
+
+    expect(fakeWorkoutPageService.callSequence, ['post', 'put', 'fetch']);
+    final row = await outboxDao.getById('o1');
+    expect(OutboxStatus.fromValue(row!.status), OutboxStatus.sent);
+    final session = await sessionDao.getSession('online-session');
+    expect(session!.syncState, LocalWorkoutSessionSyncState.synced);
+    expect((await workoutDao.getWorkout('workout-1'))!.dirty, isFalse);
+
+    service.dispose();
+  });
+
+  test('errore transiente: torna pending con nextAttemptAt', () async {
+    fakeWorkoutPageService.uploadResponse = ApiResponse.error(
+      message: 'Temporary server issue',
+      statusCode: 500,
+    );
+    final service = buildService(online: true);
+    await seed(sessionId: 'retry-session', outboxId: 'o1');
+
+    await service.syncPendingSessions(trigger: 'test_transient');
+
+    final row = await outboxDao.getById('o1');
+    expect(OutboxStatus.fromValue(row!.status), OutboxStatus.pending);
+    expect(row.attempts, 1);
+    expect(row.nextAttemptAt, isNotNull);
+    expect(row.nextAttemptAt!.isAfter(frozenNow), isTrue);
+
+    service.dispose();
+  });
+
+  test('errore permanente: failed_permanent e il dato resta', () async {
+    fakeWorkoutPageService.uploadResponse = ApiResponse.error(
+      message: 'Validation failed',
+      statusCode: 400,
+    );
+    final service = buildService(online: true);
+    await seed(sessionId: 'permanent-session', outboxId: 'o1');
+
+    await service.syncPendingSessions(trigger: 'test_permanent');
+
+    final row = await outboxDao.getById('o1');
+    expect(OutboxStatus.fromValue(row!.status), OutboxStatus.failedPermanent);
+    expect(row.nextAttemptAt, isNull);
+
+    // Il fallimento riguarda la telemetria, non l'utente.
+    final session = await sessionDao.getSession('permanent-session');
+    expect(session, isNotNull);
+    expect(session!.syncState, LocalWorkoutSessionSyncState.failedPermanent);
+    expect(session.entries, isNotEmpty);
+
+    service.dispose();
+  });
+
+  test('FIFO: un fallimento transiente ferma la coda', () async {
+    fakeWorkoutPageService.uploadResponse = ApiResponse.error(
+      message: 'Temporary server issue',
+      statusCode: 503,
+    );
+    final service = buildService(online: true);
+    await seed(sessionId: 'first-session', outboxId: 'o1');
+    clock.advance(const Duration(minutes: 1));
+    await seed(sessionId: 'second-session', outboxId: 'o2');
+
+    await service.syncPendingSessions(trigger: 'test_fifo');
+
+    expect(fakeWorkoutPageService.uploadCalls, 1);
+    final second = await outboxDao.getById('o2');
+    expect(second!.attempts, 0);
+
+    service.dispose();
   });
 }
 
-Future<void> _seedQueuedJob({
-  required WorkoutSessionHiveService sessionHiveService,
+LocalWorkoutSession _buildLocalSession({
   required String localSessionId,
-}) async {
-  final now = DateTime.now().toUtc();
-
-  final session = LocalWorkoutSession(
+  required DateTime now,
+}) {
+  return LocalWorkoutSession(
     localSessionId: localSessionId,
     workoutId: 'workout-1',
     startedAt: now.subtract(const Duration(minutes: 30)),
@@ -221,24 +195,6 @@ Future<void> _seedQueuedJob({
     createdAt: now,
     updatedAt: now,
   );
-  await sessionHiveService.saveSession(session);
-
-  final job = SessionSyncJob(
-    jobId: 'job-$localSessionId',
-    localSessionId: localSessionId,
-    workoutId: 'workout-1',
-    sessionPayloadJson:
-        '{"entries":[{"exerciseId":"exercise-1","position":0,"sets":[{"position":0,"reps":10,"load":80,"loadUnit":"kg"}]}]}',
-    mergedWorkoutCommandJson:
-        '{"name":"Workout","translations":{"it":{"title":"Workout"}},"status":"active","blocks":[]}',
-    status: SessionSyncJobStatus.queued,
-    retryCount: 0,
-    nextRetryAt: null,
-    lastError: null,
-    createdAt: now,
-    updatedAt: now,
-  );
-  await sessionHiveService.enqueueSyncJob(job);
 }
 
 WorkoutModel _buildWorkout({required String id, required bool dirty}) {
@@ -247,7 +203,7 @@ WorkoutModel _buildWorkout({required String id, required bool dirty}) {
     titleI18n: const {'it': 'Workout'},
     descriptionI18n: const {'it': 'Desc'},
     goal: 'active',
-    lastUsed: DateTime.now().toUtc(),
+    lastUsed: DateTime.utc(2026, 3, 18, 10),
     type: 'Strength',
     dirty: dirty,
   );
