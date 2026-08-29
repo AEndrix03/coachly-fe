@@ -1,12 +1,12 @@
-import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/repositories/user_voice_alias_repository.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/repositories/voice_exercise_catalog_repository.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/repositories/voice_resolution_log_repository.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/services/exercise_candidate_retriever_service.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/services/exercise_reranker_service.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/services/match_confidence_decider_service.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/services/voice_entry_parser_service.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/services/voice_text_normalization_service.dart';
+import 'package:coachly/features/voice/models/voice_resolution_models.dart';
+import 'package:coachly/features/voice/repositories/user_voice_alias_repository.dart';
+import 'package:coachly/features/voice/repositories/voice_exercise_catalog_repository.dart';
+import 'package:coachly/features/voice/repositories/voice_resolution_log_repository.dart';
+import 'package:coachly/features/voice/services/exercise_candidate_retriever_service.dart';
+import 'package:coachly/features/voice/services/exercise_reranker_service.dart';
+import 'package:coachly/features/voice/services/match_confidence_decider_service.dart';
+import 'package:coachly/features/voice/services/voice_entry_parser_service.dart';
+import 'package:coachly/features/voice/services/voice_text_normalization_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final voiceResolutionServiceProvider = Provider<VoiceResolutionService>((ref) {

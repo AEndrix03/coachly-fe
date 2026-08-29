@@ -1,5 +1,5 @@
-import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/services/match_confidence_decider_service.dart';
+import 'package:coachly/features/voice/models/voice_resolution_models.dart';
+import 'package:coachly/features/voice/services/match_confidence_decider_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

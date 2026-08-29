@@ -1,4 +1,4 @@
-import 'package:coachly/features/workout/workout_active_page/voice/services/voice_text_normalization_service.dart';
+import 'package:coachly/features/voice/services/voice_text_normalization_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

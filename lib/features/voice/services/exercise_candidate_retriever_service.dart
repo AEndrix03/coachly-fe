@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
-import 'package:coachly/features/workout/workout_active_page/voice/services/voice_text_normalization_service.dart';
+import 'package:coachly/features/voice/models/voice_resolution_models.dart';
+import 'package:coachly/features/voice/services/voice_text_normalization_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final exerciseCandidateRetrieverServiceProvider =
