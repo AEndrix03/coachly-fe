@@ -188,7 +188,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         return AlertDialog(
           backgroundColor: const Color(0xFF151524),
           title: Text(
-            context.tr('exercise.personal.create'),
+            context.l10n.exercisePersonalCreate,
             style: const TextStyle(color: Colors.white),
           ),
           content: Column(
@@ -200,7 +200,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                 inputFormatters: [PoliteTextInputFormatter()],
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  labelText: context.tr('exercise.personal.name'),
+                  labelText: context.l10n.exercisePersonalName,
                   labelStyle: TextStyle(
                     color: Colors.white.withValues(alpha: 0.7),
                   ),
@@ -212,7 +212,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                 inputFormatters: [PoliteTextInputFormatter()],
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  labelText: context.tr('exercise.personal.description'),
+                  labelText: context.l10n.exercisePersonalDescription,
                   labelStyle: TextStyle(
                     color: Colors.white.withValues(alpha: 0.7),
                   ),
@@ -223,11 +223,11 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(context.tr('common.cancel')),
+              child: Text(context.l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(context.tr('common.confirm')),
+              child: Text(context.l10n.commonConfirm),
             ),
           ],
         );
@@ -261,7 +261,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
     if (!response.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response.message ?? context.tr('common.error'))),
+        SnackBar(content: Text(response.message ?? context.l10n.commonError)),
       );
       return;
     }
@@ -270,7 +270,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     _applyFilters();
     ref.invalidate(exerciseListProvider);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.tr('exercise.personal.created'))),
+      SnackBar(content: Text(context.l10n.exercisePersonalCreated)),
     );
     */
   }
@@ -338,7 +338,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      context.tr('workout.edit.add_exercise'),
+                      context.l10n.workoutEditAddExercise,
                       overflow: TextOverflow.ellipsis,
                       style: context.scale.display.heavy.copyWith(
                         color: context.exerciseTheme.textPrimary,
@@ -347,7 +347,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      context.tr('workout.builder.exercise_library_hint'),
+                      context.l10n.workoutBuilderExerciseLibraryHint,
                       style: context.scale.captionLoose.copyWith(
                         color: context.exerciseTheme.textSecondary,
                       ),
@@ -360,7 +360,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           const SizedBox(height: 14),
           CoachlyPressable(
             onTap: _showCreateExerciseDialog,
-            semanticLabel: context.tr('exercise.personal.create'),
+            semanticLabel: context.l10n.exercisePersonalCreate,
             child: Container(
               constraints: const BoxConstraints(minHeight: 48),
               padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -381,7 +381,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      context.tr('exercise.personal.create'),
+                      context.l10n.exercisePersonalCreate,
                       style: TextStyle(
                         color: context.exerciseTheme.textPrimary,
                         fontWeight: FontWeight.w700,
@@ -419,7 +419,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             color: context.exerciseTheme.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText: context.tr('workout.search_exercise_hint'),
+            hintText: context.l10n.workoutSearchExerciseHint,
             hintStyle: context.scale.body.copyWith(
               color: context.exerciseTheme.textSecondary,
             ),
@@ -457,19 +457,16 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         child: Row(
           children: [
             _sourceChip(
-              label: context.tr('exercise.scope.community'),
+              label: context.l10n.exerciseScopeCommunity,
               value: 'community',
             ),
             const SizedBox(width: 8),
             _sourceChip(
-              label: context.tr('exercise.scope.default'),
+              label: context.l10n.exerciseScopeDefault,
               value: 'default',
             ),
             const SizedBox(width: 8),
-            _sourceChip(
-              label: context.tr('exercise.scope.mine'),
-              value: 'mine',
-            ),
+            _sourceChip(label: context.l10n.exerciseScopeMine, value: 'mine'),
           ],
         ),
       ),
@@ -634,7 +631,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (muscles.isNotEmpty) ...[
-            _buildFilterLabel(context.tr('exercise.muscle')),
+            _buildFilterLabel(context.l10n.exerciseMuscle),
             _buildHorizontalChips<_Option>(
               items: muscles,
               selected: _muscleId,
@@ -647,7 +644,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             ),
           ],
           if (mechanics.isNotEmpty) ...[
-            _buildFilterLabel(context.tr('exercise.mechanics')),
+            _buildFilterLabel(context.l10n.exerciseMechanics),
             _buildHorizontalChips<String>(
               items: mechanics,
               selected: _mechanics,
@@ -660,7 +657,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             ),
           ],
           if (forceTypes.isNotEmpty) ...[
-            _buildFilterLabel(context.tr('exercise.force_type')),
+            _buildFilterLabel(context.l10n.exerciseForceType),
             _buildHorizontalChips<String>(
               items: forceTypes,
               selected: _forceType,
@@ -680,7 +677,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               runSpacing: 8,
               children: [
                 _buildToggleChip(
-                  label: context.tr('exercise.bodyweight_only'),
+                  label: context.l10n.exerciseBodyweightOnly,
                   icon: Icons.self_improvement_rounded,
                   active: _bodyweight == true,
                   onTap: () {
@@ -691,7 +688,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                   },
                 ),
                 _buildToggleChip(
-                  label: context.tr('exercise.with_equipment'),
+                  label: context.l10n.exerciseWithEquipment,
                   icon: Icons.fitness_center_rounded,
                   active: _bodyweight == false,
                   onTap: () {
@@ -702,7 +699,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                   },
                 ),
                 _buildToggleChip(
-                  label: context.tr('exercise.unilateral'),
+                  label: context.l10n.exerciseUnilateral,
                   icon: Icons.swap_horiz_rounded,
                   active: _unilateral == true,
                   onTap: () {
@@ -888,7 +885,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                       duration: const Duration(milliseconds: 180),
                       opacity: _showScrollToTop ? 1 : 0,
                       child: Tooltip(
-                        message: context.tr('common.back_to_top'),
+                        message: context.l10n.commonBackToTop,
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
@@ -949,7 +946,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           ),
           const SizedBox(height: 12),
           Text(
-            context.tr('workout.no_exercise_found'),
+            context.l10n.workoutNoExerciseFound,
             style: context.scale.body.copyWith(
               color: context.exerciseTheme.textSecondary,
             ),
@@ -959,7 +956,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             GestureDetector(
               onTap: _clearFilters,
               child: Text(
-                context.tr('exercise.clear_filters'),
+                context.l10n.exerciseClearFilters,
                 style: context.scale.bodyTight.semibold.copyWith(
                   color: context.exerciseTheme.primary,
                 ),
@@ -975,7 +972,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
 
   Widget _buildCard(ExerciseModel exercise) {
     final locale = ref.watch(languageProvider);
-    final na = context.tr('common.na');
+    final na = context.l10n.commonNa;
     final name = exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? na;
     final isBodyweight = exercise.isBodyweight ?? false;
 
@@ -1058,7 +1055,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                 const SizedBox(width: 12),
                 Semantics(
                   button: true,
-                  label: context.tr('workout.edit.add_exercise'),
+                  label: context.l10n.workoutEditAddExercise,
                   child: SizedBox(
                     width: 48,
                     height: 48,
@@ -1066,7 +1063,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                       color: Colors.transparent,
                       shape: const CircleBorder(),
                       child: IconButton(
-                        tooltip: context.tr('workout.edit.add_exercise'),
+                        tooltip: context.l10n.workoutEditAddExercise,
                         onPressed: () =>
                             _addExerciseFromSummary(exercise, name, locale, na),
                         padding: EdgeInsets.zero,
@@ -1112,7 +1109,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       case Err():
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(context.tr('common.error'))));
+        ).showSnackBar(SnackBar(content: Text(context.l10n.commonError)));
       case Ok(:final value):
         _addExercise(value, name, locale, notAvailable);
     }
@@ -1202,17 +1199,17 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   }
 
   String _mechanicsLabel(String raw) => switch (raw.toLowerCase()) {
-    'compound' => context.tr('exercise.mechanics.compound'),
-    'isolation' => context.tr('exercise.mechanics.isolation'),
+    'compound' => context.l10n.exerciseMechanicsCompound,
+    'isolation' => context.l10n.exerciseMechanicsIsolation,
     _ => raw,
   };
 
   String _forceLabel(String raw) => switch (raw.toLowerCase()) {
-    'push' => context.tr('exercise.force.push'),
-    'pull' => context.tr('exercise.force.pull'),
-    'legs' => context.tr('exercise.force.legs'),
-    'core' => context.tr('exercise.force.core'),
-    'static' => context.tr('exercise.force.static'),
+    'push' => context.l10n.exerciseForcePush,
+    'pull' => context.l10n.exerciseForcePull,
+    'legs' => context.l10n.exerciseForceLegs,
+    'core' => context.l10n.exerciseForceCore,
+    'static' => context.l10n.exerciseForceStatic,
     _ => raw,
   };
 }
