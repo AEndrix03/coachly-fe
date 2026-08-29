@@ -143,8 +143,6 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   double _viewportHeight = 0;
   double _safeTop = 0;
   bool _reduceMotion = false;
-  int _lastDeployMeasurementBucket = -1;
-  bool _anchorRefreshScheduled = false;
   Drag? _overlayDrag;
   late final Listenable _quickNavChanges;
 
@@ -184,7 +182,6 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
   void _handleScroll() {
     _scrollOffset.value = _scrollController.offset;
     _updateRailGutter();
-    _scheduleDestinationAnchorRefresh();
   }
 
   void _updateRailGutter() {
@@ -211,28 +208,6 @@ class _ExerciseOverviewContentState extends State<ExerciseOverviewContent> {
         : Curves.easeOutCubic.transform(deployProgress);
     _railGutter.value =
         _quickNavRailGutter * entryProgress * (1 - gutterRelease);
-  }
-
-  void _scheduleDestinationAnchorRefresh() {
-    final deployProgress = _quickNavDeployProgress(
-      offset: _scrollController.offset,
-      destinationDocumentRects: _destinationDocumentRects,
-      viewportHeight: _viewportHeight,
-    );
-    if (deployProgress <= 0) {
-      _lastDeployMeasurementBucket = -1;
-      return;
-    }
-    final bucket = (deployProgress * 4).floor().clamp(0, 4);
-    if (bucket == _lastDeployMeasurementBucket || _anchorRefreshScheduled) {
-      return;
-    }
-    _lastDeployMeasurementBucket = bucket;
-    _anchorRefreshScheduled = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _anchorRefreshScheduled = false;
-      _measureAnchors(force: true);
-    });
   }
 
   void _measureAnchors({bool force = false}) {
