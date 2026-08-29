@@ -17,6 +17,8 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - build/**
+    # Helper di migrazione generati da `drift_dev schema generate`.
+    - test/core/database/generated_migrations/**
     # Package separato, con il proprio pubspec e le proprie regole: analizzarlo
     # qui riporta le deprecazioni dell'API analyzer dentro il gate della app.
     - tool/**

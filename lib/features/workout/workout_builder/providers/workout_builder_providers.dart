@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:math';
 
+import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
@@ -756,9 +756,9 @@ String? _itemNotes(WorkoutStructureItemDraft item) => switch (item) {
   WorkoutExerciseGroupDraft(:final notes) => notes,
 };
 
-String _id() {
-  final random = Random.secure();
-  return '${DateTime.now().microsecondsSinceEpoch}_${random.nextInt(1 << 32)}';
-}
+/// Unica sorgente di id del client (`docs/development/05-sync-and-offline.md`).
+const _ids = UuidIdGenerator();
+
+String _id() => _ids.newId();
 
 const _unset = Object();

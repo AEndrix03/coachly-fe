@@ -4,6 +4,8 @@ import 'src/rules/layer_imports.dart';
 import 'src/rules/no_hardcoded_strings.dart';
 import 'src/rules/no_literal_colors.dart';
 import 'src/rules/no_literal_text_style.dart';
+import 'src/rules/no_manual_uuid.dart';
+import 'src/rules/no_non_material_icons.dart';
 import 'src/rules/no_raw_datetime_now.dart';
 import 'src/rules/no_side_effects_in_build.dart';
 
@@ -27,6 +29,10 @@ class _CoachlyLints extends PluginBase {
     NoLiteralTextStyle(),
     // docs/development/13-i18n.md
     NoHardcodedStrings(),
+    // docs/development/12-iconography.md — ADR-003
+    NoNonMaterialIcons(),
+    // docs/development/05-sync-and-offline.md
+    NoManualUuid(),
     // docs/development/19-testing.md
     NoRawDateTimeNow(),
     // docs/development/03-state-riverpod.md

@@ -53,3 +53,10 @@ String? featureOf(String path) {
   final slash = rest.indexOf('/');
   return slash == -1 ? rest : rest.substring(0, slash);
 }
+
+/// La composition root: `app/bootstrap` collega DAO, gateway e provider fra
+/// loro, quindi li conosce per definizione. Non e' un percorso parallelo verso
+/// i dati, e' il punto in cui i percorsi vengono costruiti
+/// (`docs/development/01-principles.md`).
+bool isCompositionRoot(String path) =>
+    _normalize(path).contains('/lib/app/bootstrap/');

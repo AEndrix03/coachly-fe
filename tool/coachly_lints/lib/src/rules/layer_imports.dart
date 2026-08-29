@@ -160,7 +160,8 @@ class NoDataSourceOutsideRepository extends _ImportRule {
   );
 
   @override
-  bool appliesTo(String path) => !isRepository(path) && !isDataLayer(path);
+  bool appliesTo(String path) =>
+      !isRepository(path) && !isDataLayer(path) && !isCompositionRoot(path);
 
   @override
   bool isForbidden(String uri, String path) =>

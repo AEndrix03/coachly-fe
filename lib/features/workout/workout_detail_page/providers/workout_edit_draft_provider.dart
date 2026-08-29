@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
@@ -503,17 +504,13 @@ List<WorkoutExerciseModel> _orderedLegacyExercises(
       .toList();
 }
 
-String _uuid() {
-  final random = Random.secure();
-  final bytes = List<int>.generate(16, (_) => random.nextInt(256));
-  bytes[6] = (bytes[6] & 0x0f) | 0x40;
-  bytes[8] = (bytes[8] & 0x3f) | 0x80;
-  final hex = bytes
-      .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
-      .join();
-  return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-'
-      '${hex.substring(16, 20)}-${hex.substring(20)}';
-}
+/// Unica sorgente di id del client (`docs/development/05-sync-and-offline.md`).
+///
+/// Qui viveva una UUID v4 scritta a mano con `Random.secure()` mentre
+/// `core/ids` esisteva gia': due implementazioni della stessa garanzia.
+const _ids = UuidIdGenerator();
+
+String _uuid() => _ids.newId();
 
 @riverpod
 WorkoutProgrammingEntryModel? lastExercisePrescription(

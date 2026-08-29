@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_active_page/domain/workout_execution_resolver.dart';
 import 'package:coachly/features/workout/workout_active_page/data/active_workout_draft_service.dart';
@@ -18,14 +19,15 @@ import 'package:coachly/features/workout/workout_page/data/repositories/workout_
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:uuid/uuid.dart';
 
 part 'active_workout_provider.g.dart';
 
 @riverpod
 class ActiveWorkout extends _$ActiveWorkout {
   static const _executionResolver = WorkoutExecutionResolver();
-  static const _uuid = Uuid();
+
+  /// Unica sorgente di id del client (`core/ids`), non `Uuid()` diretto.
+  static const _uuid = UuidIdGenerator();
   int _loadToken = 0;
 
   @override
@@ -699,7 +701,7 @@ class ActiveWorkout extends _$ActiveWorkout {
   }) {
     final exerciseId = exercise.id;
     if (exerciseId == null || exerciseId.isEmpty) return null;
-    final entryId = _uuid.v4();
+    final entryId = _uuid.newId();
     final activeExercise = ActiveExerciseState(
       executionBlockId: groupId ?? 'block:$entryId',
       exercise: WorkoutExerciseModel(
@@ -716,7 +718,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       sets: List.generate(
         3,
         (index) => ActiveSetState(
-          id: _uuid.v4(),
+          id: _uuid.newId(),
           position: index,
           setType: 'normal',
           weight: 0,
@@ -789,7 +791,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     final replacementId = replacement.id;
     if (replacementId == null || replacementId.isEmpty) return;
     final current = state.exercises[index];
-    final replacementEntryId = _uuid.v4();
+    final replacementEntryId = _uuid.newId();
     final exercises = [...state.exercises];
     exercises[index] = current.copyWith(
       exercise: current.exercise.copyWith(

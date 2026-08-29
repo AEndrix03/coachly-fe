@@ -3,8 +3,8 @@ import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_info_sheet.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
+import 'package:flutter/cupertino.dart' show CupertinoPageRoute;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

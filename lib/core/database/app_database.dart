@@ -44,13 +44,6 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
     : super(executor ?? driftDatabase(name: 'coachly'));
 
-  /// Database in memoria per i test.
-  ///
-  /// È il vantaggio più grande della migrazione da Hive: i repository
-  /// diventano testabili senza filesystem e senza mock
-  /// (`docs/development/19-testing.md`).
-  AppDatabase.memory() : super(driftDatabase(name: 'coachly_test'));
-
   @override
   int get schemaVersion => 2;
 
