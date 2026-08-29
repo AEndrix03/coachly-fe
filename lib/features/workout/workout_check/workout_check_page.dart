@@ -26,7 +26,7 @@ class WorkoutCheckPage extends ConsumerWidget {
         appBar: AppBar(
           backgroundColor: context.exerciseTheme.background,
           surfaceTintColor: Colors.transparent,
-          title: Text(context.tr('workout.check.title')),
+          title: Text(context.l10n.workoutCheckTitle),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 14),
@@ -69,7 +69,7 @@ class _EmptyWorkoutCheck extends StatelessWidget {
       const Center(child: CoachlyWorkoutCheckGlyph(size: 44)),
       const SizedBox(height: 24),
       Text(
-        context.tr('workout.check.empty_title'),
+        context.l10n.workoutCheckEmptyTitle,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
           color: context.exerciseTheme.textPrimary,
@@ -78,7 +78,7 @@ class _EmptyWorkoutCheck extends StatelessWidget {
       ),
       const SizedBox(height: 10),
       Text(
-        context.tr('workout.check.empty_body'),
+        context.l10n.workoutCheckEmptyBody,
         textAlign: TextAlign.center,
         style: TextStyle(
           color: context.exerciseTheme.textSecondary,
@@ -111,7 +111,7 @@ class _EmptyWorkoutCheck extends StatelessWidget {
         ),
         onPressed: onAddExercise,
         icon: const Icon(Icons.add_rounded),
-        label: Text(context.tr('workout.builder.add_exercise')),
+        label: Text(context.l10n.workoutBuilderAddExercise),
       ),
     ],
   );
@@ -162,7 +162,7 @@ class _WorkoutCheckReportView extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
       children: [
         Text(
-          context.tr('workout.check.mode_bodybuilding'),
+          context.l10n.workoutCheckModeBodybuilding,
           style: TextStyle(
             color: context.exerciseTheme.primary,
             fontWeight: FontWeight.w800,
@@ -170,13 +170,10 @@ class _WorkoutCheckReportView extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          context.tr(
-            'workout.check.summary',
-            params: {
-              'passed': '${report.positiveCount}',
-              'review': '${report.reviewCount}',
-              'missing': '${report.insufficientCount}',
-            },
+          context.l10n.workoutCheckSummary(
+            '${report.positiveCount}',
+            '${report.reviewCount}',
+            '${report.insufficientCount}',
           ),
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             color: context.exerciseTheme.textPrimary,
@@ -200,7 +197,7 @@ class _WorkoutCheckReportView extends StatelessWidget {
         if (muscles.isNotEmpty) ...[
           const SizedBox(height: 26),
           Text(
-            context.tr('workout.check.muscle_coverage'),
+            context.l10n.workoutCheckMuscleCoverage,
             style: const TextStyle(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 10),
@@ -218,9 +215,8 @@ class _WorkoutCheckReportView extends StatelessWidget {
                       children: [
                         Expanded(child: Text(entry.key)),
                         Text(
-                          context.tr(
-                            'workout.check.set_exposure',
-                            params: {'count': '${entry.value}'},
+                          context.l10n.workoutCheckSetExposure(
+                            '${entry.value}',
                           ),
                           style: TextStyle(
                             color: context.exerciseTheme.textSecondary,
@@ -295,7 +291,7 @@ class _FindingCard extends StatelessWidget {
               tilePadding: EdgeInsets.zero,
               childrenPadding: EdgeInsets.zero,
               title: Text(
-                context.tr('workout.check.why'),
+                context.l10n.workoutCheckWhy,
                 style: TextStyle(
                   color: context.exerciseTheme.primary,
                   fontWeight: FontWeight.w700,
@@ -308,7 +304,7 @@ class _FindingCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        context.tr('workout.check.used_data'),
+                        context.l10n.workoutCheckUsedData,
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 6),
@@ -344,12 +340,9 @@ class _CheckUnavailable extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(context.tr('workout.check.unavailable')),
+          Text(context.l10n.workoutCheckUnavailable),
           const SizedBox(height: 12),
-          TextButton(
-            onPressed: onRetry,
-            child: Text(context.tr('common.retry')),
-          ),
+          TextButton(onPressed: onRetry, child: Text(context.l10n.commonRetry)),
         ],
       ),
     ),
