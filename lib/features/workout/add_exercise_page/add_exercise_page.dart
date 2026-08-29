@@ -55,11 +55,11 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
       appBar: AppBar(
         backgroundColor: CoachlyAthleteTheme.background,
         surfaceTintColor: Colors.transparent,
-        title: Text(context.tr('workout.add_exercise.title')),
+        title: Text(context.l10n.workoutAddExerciseTitle),
         actions: [
           TextButton(
             onPressed: () => context.pop(),
-            child: Text(context.tr('workout.detail.done')),
+            child: Text(context.l10n.workoutDetailDone),
           ),
           const SizedBox(width: 8),
         ],
@@ -99,7 +99,7 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
-                    child: Text(context.tr('workout.add_exercise.no_results')),
+                    child: Text(context.l10n.workoutAddExerciseNoResults),
                   ),
                 )
               else
@@ -131,9 +131,7 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
                       side: const BorderSide(color: CoachlyAthleteTheme.border),
                     ),
                     icon: const Icon(Icons.add_rounded),
-                    label: Text(
-                      context.tr('workout.add_exercise.create_personal'),
-                    ),
+                    label: Text(context.l10n.workoutAddExerciseCreatePersonal),
                   ),
                 ),
               ),
@@ -166,7 +164,7 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
             },
             style: const TextStyle(color: CoachlyAthleteTheme.textPrimary),
             decoration: InputDecoration(
-              hintText: context.tr('workout.add_exercise.search_hint'),
+              hintText: context.l10n.workoutAddExerciseSearchHint,
               prefixIcon: const Icon(Icons.search_rounded),
               suffixIcon: _search.text.isEmpty
                   ? null
@@ -191,15 +189,15 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
             segments: [
               ButtonSegment(
                 value: _CatalogScope.all,
-                label: Text(context.tr('workout.add_exercise.all')),
+                label: Text(context.l10n.workoutAddExerciseAll),
               ),
               ButtonSegment(
                 value: _CatalogScope.verified,
-                label: Text(context.tr('workout.add_exercise.verified')),
+                label: Text(context.l10n.workoutAddExerciseVerified),
               ),
               ButtonSegment(
                 value: _CatalogScope.mine,
-                label: Text(context.tr('workout.add_exercise.mine')),
+                label: Text(context.l10n.workoutAddExerciseMine),
               ),
             ],
             selected: {_scope},
@@ -214,10 +212,10 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
             child: Row(
               children: [
                 _FilterChip(
-                  label: context.tr('workout.add_exercise.muscle'),
+                  label: context.l10n.workoutAddExerciseMuscle,
                   active: _muscleId != null,
                   onTap: () => _chooseValue(
-                    title: context.tr('workout.add_exercise.muscle'),
+                    title: context.l10n.workoutAddExerciseMuscle,
                     values: {
                       for (final muscle in exercises.expand(
                         (e) => e.muscles ?? const [],
@@ -232,10 +230,10 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
                   ),
                 ),
                 _FilterChip(
-                  label: context.tr('workout.add_exercise.movement'),
+                  label: context.l10n.workoutAddExerciseMovement,
                   active: _movement != null,
                   onTap: () => _chooseValue(
-                    title: context.tr('workout.add_exercise.movement'),
+                    title: context.l10n.workoutAddExerciseMovement,
                     values: {
                       for (final value
                           in exercises
@@ -248,10 +246,10 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
                   ),
                 ),
                 _FilterChip(
-                  label: context.tr('workout.add_exercise.equipment'),
+                  label: context.l10n.workoutAddExerciseEquipment,
                   active: _equipmentId != null,
                   onTap: () => _chooseValue(
-                    title: context.tr('workout.add_exercise.equipment'),
+                    title: context.l10n.workoutAddExerciseEquipment,
                     values: {
                       for (final equipment in exercises.expand(
                         (e) => e.equipments ?? const [],
@@ -265,7 +263,7 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
                   ),
                 ),
                 _FilterChip(
-                  label: context.tr('workout.add_exercise.tracking'),
+                  label: context.l10n.workoutAddExerciseTracking,
                   active: _bodyweight != null,
                   onTap: () => setState(
                     () => _bodyweight = _bodyweight == null ? true : null,
@@ -372,7 +370,7 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
             ListTile(title: Text(title, style: context.scale.titleLoose.heavy)),
             if (selected != null)
               ListTile(
-                title: Text(context.tr('workout.add_exercise.clear_filter')),
+                title: Text(context.l10n.workoutAddExerciseClearFilter),
                 onTap: () => Navigator.pop(context, ''),
               ),
             ...values.entries.map(
@@ -436,7 +434,7 @@ class _ExerciseResultTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final name =
         exercise.nameI18n?.fromI18n(locale) ??
-        context.tr('exercise.fallback_name');
+        context.l10n.exerciseFallbackName;
     final equipment = exercise.equipments?.firstOrNull?.equipment.nameI18n
         .fromI18n(locale);
     final muscles = exercise.muscles
@@ -532,7 +530,7 @@ class _ExerciseResultTile extends StatelessWidget {
                     : IconButton(
                         key: const ValueKey('add'),
                         onPressed: onAdd,
-                        tooltip: context.tr('workout.detail.add_exercise'),
+                        tooltip: context.l10n.workoutDetailAddExercise,
                         icon: const Icon(Icons.add_rounded),
                       ),
               ),
@@ -667,7 +665,7 @@ class _ExerciseQuickAddSheetState extends State<ExerciseQuickAddSheet> {
               children: [
                 Text(
                   widget.exercise.nameI18n?.fromI18n(locale) ??
-                      context.tr('exercise.fallback_name'),
+                      context.l10n.exerciseFallbackName,
                   style: context.scale.headline.heavy.copyWith(
                     color: CoachlyAthleteTheme.textPrimary,
                   ),
@@ -676,7 +674,7 @@ class _ExerciseQuickAddSheetState extends State<ExerciseQuickAddSheet> {
                   Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
-                      context.tr('workout.add_exercise.last_configuration'),
+                      context.l10n.workoutAddExerciseLastConfiguration,
                       style: const TextStyle(
                         color: CoachlyAthleteTheme.primary,
                       ),
@@ -684,7 +682,7 @@ class _ExerciseQuickAddSheetState extends State<ExerciseQuickAddSheet> {
                   ),
                 const SizedBox(height: 18),
                 _InlineNumberStepper(
-                  label: context.tr('workout.sets'),
+                  label: context.l10n.workoutSets,
                   value: setCount,
                   onChanged: (value) =>
                       setState(() => setCount = value.clamp(1, 20)),
@@ -693,14 +691,14 @@ class _ExerciseQuickAddSheetState extends State<ExerciseQuickAddSheet> {
                   children: [
                     Expanded(
                       child: _field(
-                        context.tr('workout.add_exercise.reps_min'),
+                        context.l10n.workoutAddExerciseRepsMin,
                         repsMin,
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: _field(
-                        context.tr('workout.add_exercise.reps_max'),
+                        context.l10n.workoutAddExerciseRepsMax,
                         repsMax,
                       ),
                     ),
@@ -713,7 +711,7 @@ class _ExerciseQuickAddSheetState extends State<ExerciseQuickAddSheet> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: _field(
-                        '${context.tr('workout.detail.rest')} (s)',
+                        '${context.l10n.workoutDetailRest} (s)',
                         rest,
                       ),
                     ),
@@ -724,14 +722,12 @@ class _ExerciseQuickAddSheetState extends State<ExerciseQuickAddSheet> {
                   DropdownButtonFormField<String?>(
                     initialValue: sectionId,
                     decoration: InputDecoration(
-                      labelText: context.tr('workout.add_exercise.add_to'),
+                      labelText: context.l10n.workoutAddExerciseAddTo,
                     ),
                     items: [
                       DropdownMenuItem(
                         value: null,
-                        child: Text(
-                          context.tr('workout.add_exercise.no_section'),
-                        ),
+                        child: Text(context.l10n.workoutAddExerciseNoSection),
                       ),
                       ...sections.entries.map(
                         (entry) => DropdownMenuItem(
@@ -773,7 +769,7 @@ class _ExerciseQuickAddSheetState extends State<ExerciseQuickAddSheet> {
                     backgroundColor: CoachlyAthleteTheme.primary,
                     foregroundColor: CoachlyAthleteTheme.background,
                   ),
-                  child: Text(context.tr('workout.detail.add_exercise')),
+                  child: Text(context.l10n.workoutDetailAddExercise),
                 ),
               ],
             ),
@@ -853,11 +849,11 @@ class _CatalogError extends StatelessWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(context.tr('workout.add_exercise.load_error')),
+        Text(context.l10n.workoutAddExerciseLoadError),
         const SizedBox(height: 12),
         FilledButton(
           onPressed: onRetry,
-          child: Text(context.tr('exercise.retry')),
+          child: Text(context.l10n.exerciseRetry),
         ),
       ],
     ),
