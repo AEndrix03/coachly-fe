@@ -149,6 +149,14 @@ class AppStrings {
     },
     'workout.active.rest_minus_30': {'en': '−30 s', 'it': '−30 s'},
     'workout.active.rest_plus_30': {'en': '+30 s', 'it': '+30 s'},
+    'workout.active.complete_hold_hint': {
+      'en': 'Hold for 2 seconds to complete the workout.',
+      'it': 'Tieni premuto per 2 secondi per completare l’allenamento.',
+    },
+    'workout.active.complete_hold_released': {
+      'en': 'Hold to complete the workout.',
+      'it': 'Tieni premuto per completare l’allenamento!',
+    },
     'workout.active.col_set': {'en': 'SET', 'it': 'SERIE'},
     'workout.active.col_previous': {'en': 'PREVIOUS', 'it': 'PRECEDENTE'},
     'workout.active.col_reps': {'en': 'REPS', 'it': 'RIPETIZIONI'},

@@ -404,22 +404,15 @@ class CoachlyTourHighlightPainter extends CustomPainter {
     canvas.drawPath(path, Paint()..color = scrim.withValues(alpha: .55));
     for (final rect in rects) {
       final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(16));
-      final border = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8
-        ..shader = reduceMotion
-            ? null
-            : SweepGradient(
-                transform: GradientRotation(animation.value * math.pi * 2),
-                colors: [
-                  Colors.transparent,
-                  accent,
-                  Color.lerp(accent, highlight, .45)!,
-                  Colors.transparent,
-                ],
-              ).createShader(rect);
-      if (reduceMotion) border.color = accent;
-      canvas.drawRRect(rrect, border);
+      CoachlyAnimatedBorderPainter.paintBorder(
+        canvas,
+        rrect: rrect,
+        phase: animation.value,
+        reduceMotion: reduceMotion,
+        accent: accent,
+        highlight: highlight,
+        strokeWidth: 1.8,
+      );
     }
   }
 
@@ -428,4 +421,36 @@ class CoachlyTourHighlightPainter extends CustomPainter {
       oldDelegate.rects != rects ||
       oldDelegate.reduceMotion != reduceMotion ||
       oldDelegate.accent != accent;
+}
+
+/// Il bordo rotante usato dai target del tour Discover e dalle azioni premium.
+class CoachlyAnimatedBorderPainter {
+  const CoachlyAnimatedBorderPainter._();
+
+  static void paintBorder(
+    Canvas canvas, {
+    required RRect rrect,
+    required double phase,
+    required bool reduceMotion,
+    required Color accent,
+    required Color highlight,
+    required double strokeWidth,
+  }) {
+    final border = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..shader = reduceMotion
+          ? null
+          : SweepGradient(
+              transform: GradientRotation(phase * math.pi * 2),
+              colors: [
+                accent.withValues(alpha: 0),
+                accent,
+                Color.lerp(accent, highlight, .45)!,
+                accent.withValues(alpha: 0),
+              ],
+            ).createShader(rrect.outerRect);
+    if (reduceMotion) border.color = accent;
+    canvas.drawRRect(rrect, border);
+  }
 }

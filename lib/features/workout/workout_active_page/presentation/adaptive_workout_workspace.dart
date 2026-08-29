@@ -3,6 +3,7 @@ import 'package:coachly/core/assets/app_assets.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/active_workout_strings.dart';
 import 'package:coachly/features/workout/workout_active_page/presentation/main_area_scroll_assist.dart';
+import 'package:coachly/features/workout/workout_active_page/presentation/widgets/hold_to_complete_workout_button.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
@@ -122,7 +123,7 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
             totalExercises: state.totalExercises,
             rest: rest,
             onBack: onBack,
-            onMenu: onMenu,
+            onMenu: () => _showCompleteWorkoutDialog(context),
             onToggleBell: onRestToggleBell,
             onTimerTap: () => _showRestSheet(context),
           ),
@@ -141,36 +142,20 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
                     main: _buildMainArea(context),
                   ),
           ),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
-            transitionBuilder: (child, animation) => FadeTransition(
-              opacity: animation,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, .25),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
-              ),
+          if (rest.isActive)
+            _RestLiveBar(
+              rest: rest,
+              onOpen: () => _showRestSheet(context),
+              onMinus: () => onRestAdjust(-30),
+              onPlus: () => onRestAdjust(30),
+              onSkip: onSkipRest,
+            )
+          else
+            _WorkoutActionDock(
+              onStructure: () => _showStructureSheet(context),
+              onAdd: () => _showAddToWorkoutSheet(context),
+              onNotes: () => _showQuickNoteSheet(context),
             ),
-            child: rest.isActive
-                ? _RestLiveBar(
-                    key: const ValueKey('rest-live-bar'),
-                    rest: rest,
-                    onOpen: () => _showRestSheet(context),
-                    onMinus: () => onRestAdjust(-30),
-                    onPlus: () => onRestAdjust(30),
-                    onSkip: onSkipRest,
-                  )
-                : const SizedBox.shrink(key: ValueKey('live-area-empty')),
-          ),
-          _WorkoutActionDock(
-            onStructure: () => _showStructureSheet(context),
-            onAdd: () => _showAddToWorkoutSheet(context),
-            onNotes: () => _showQuickNoteSheet(context),
-          ),
         ],
       ),
     );
@@ -225,7 +210,44 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
     onDropRemoved: onDropRemoved,
     loadUnit: loadUnit,
     onInfo: () => onExerciseInfo(exercise.exercise.id),
+    rest: rest,
+    onRestOpen: () => _showRestSheet(context),
+    workoutReadyToComplete: state.phase == WorkoutPhase.completed,
+    onCompleteWorkout: onCompleteWorkout,
   );
+
+  Future<void> _showCompleteWorkoutDialog(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(dialogContext.tr('workout.complete_title')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(dialogContext.tr('workout.complete_content')),
+            SizedBox(height: dialogContext.spacing.lg),
+            HoldToCompleteWorkoutButton(
+              label: dialogContext.activeTr('completeWorkout'),
+              holdHint: dialogContext.tr('workout.active.complete_hold_hint'),
+              releasedHint: dialogContext.tr(
+                'workout.active.complete_hold_released',
+              ),
+              onCompleted: () => Navigator.of(dialogContext).pop(true),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    // La route completa il proprio Future prima che la transizione d'uscita
+    // abbia rimosso l'OverlayEntry. Non smontare nello stesso frame anche la
+    // pagina sottostante.
+    await Future<void>.delayed(context.motion.slow);
+    if (!context.mounted) return;
+    onMenu();
+  }
 
   void _showQuickNoteSheet(BuildContext context) {
     final exercise = state.currentExercise;
@@ -958,6 +980,10 @@ class _ExerciseCard extends StatelessWidget {
   final DropRemoved onDropRemoved;
   final String loadUnit;
   final VoidCallback onInfo;
+  final RestTimerState rest;
+  final VoidCallback onRestOpen;
+  final bool workoutReadyToComplete;
+  final VoidCallback onCompleteWorkout;
   const _ExerciseCard({
     required this.exercise,
     required this.activeSetId,
@@ -978,6 +1004,10 @@ class _ExerciseCard extends StatelessWidget {
     required this.onDropRemoved,
     required this.loadUnit,
     required this.onInfo,
+    required this.rest,
+    required this.onRestOpen,
+    required this.workoutReadyToComplete,
+    required this.onCompleteWorkout,
   });
   @override
   Widget build(BuildContext context) {
@@ -1028,46 +1058,62 @@ class _ExerciseCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ExerciseSetDisclosure(
-            header: InkWell(
-              onTap: onInfo,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (groupLabel != null)
-                    Text(
-                      groupLabel!,
-                      style: context.scale.micro.black.copyWith(
-                        color: CoachlyAthleteTheme.primary,
+            header: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (groupLabel != null)
+                  Text(
+                    groupLabel!,
+                    style: context.scale.micro.black.copyWith(
+                      color: CoachlyAthleteTheme.primary,
+                    ),
+                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      key: const Key('active-exercise-detail-link'),
+                      onTap: onInfo,
+                      borderRadius: BorderRadius.circular(
+                        context.radii.compact,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: context.sizes.touchTarget,
+                        ),
+                        child: Center(
+                          child: Text(
+                            exercise.displayName,
+                            // Parte da `titleLarge` per ereditare famiglia e
+                            // colore dal tema Material: sostituirla con un token
+                            // scarterebbe proprio cio' che questa riga prende.
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  // ignore: no_literal_text_style
+                                  fontSize: 30,
+                                  height: 1.05,
+                                  letterSpacing: -.7,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                        ),
                       ),
                     ),
-                  Text(
-                    exercise.displayName,
-                    // Parte da `titleLarge` per ereditare famiglia e colore
-                    // dal tema Material: sostituirla con un token scarterebbe
-                    // proprio cio' che questa riga va a prendere.
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      // ignore: no_literal_text_style
-                      fontSize: 30,
-                      height: 1.05,
-                      letterSpacing: -.7,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  ],
+                ),
+                Text(
+                  context.activeTr(
+                    'setProgress',
+                    params: {
+                      'current': '${exercise.completedSets + 1}',
+                      'total': '${exercise.totalSets}',
+                    },
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    context.activeTr(
-                      'setProgress',
-                      params: {
-                        'current': '${exercise.completedSets + 1}',
-                        'total': '${exercise.totalSets}',
-                      },
-                    ),
-                    style: context.scale.captionLoose.semibold.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  style: context.scale.captionLoose.semibold.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             table: _SetTable(
               exercise: exercise,
@@ -1100,6 +1146,10 @@ class _ExerciseCard extends StatelessWidget {
               onDropReps: onDropReps,
               onDropRemoved: onDropRemoved,
               loadUnit: loadUnit,
+              rest: rest,
+              onRestOpen: onRestOpen,
+              workoutReadyToComplete: workoutReadyToComplete,
+              onCompleteWorkout: onCompleteWorkout,
             ),
           ],
         ],
@@ -1414,6 +1464,10 @@ class _ActiveSetEditor extends StatelessWidget {
   final DropRepsChanged onDropReps;
   final DropRemoved onDropRemoved;
   final String loadUnit;
+  final RestTimerState rest;
+  final VoidCallback onRestOpen;
+  final bool workoutReadyToComplete;
+  final VoidCallback onCompleteWorkout;
   const _ActiveSetEditor({
     required this.set,
     required this.onWeight,
@@ -1427,6 +1481,10 @@ class _ActiveSetEditor extends StatelessWidget {
     required this.onDropReps,
     required this.onDropRemoved,
     required this.loadUnit,
+    required this.rest,
+    required this.onRestOpen,
+    required this.workoutReadyToComplete,
+    required this.onCompleteWorkout,
   });
   @override
   Widget build(BuildContext context) => Container(
@@ -1484,7 +1542,7 @@ class _ActiveSetEditor extends StatelessWidget {
             step: 1,
           ),
         ),
-        if (set.technique == SetTechnique.dropSet) ...[
+        if (set.drops.isNotEmpty) ...[
           const SizedBox(height: 16),
           ...set.drops.asMap().entries.map(
             (entry) => Padding(
@@ -1536,10 +1594,20 @@ class _ActiveSetEditor extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        _CompleteSetButton(
-          label: context.activeTr('completeSet'),
-          onPressed: () => onComplete(set.id),
-        ),
+        if (workoutReadyToComplete)
+          HoldToCompleteWorkoutButton(
+            label: context.activeTr('completeWorkout'),
+            holdHint: context.tr('workout.active.complete_hold_hint'),
+            releasedHint: context.tr('workout.active.complete_hold_released'),
+            onCompleted: onCompleteWorkout,
+          )
+        else
+          _CompleteSetButton(
+            label: rest.isActive
+                ? '${context.activeTr('rest')} · ${_clock(rest.remainingSeconds)}'
+                : context.activeTr('completeSet'),
+            onPressed: rest.isActive ? onRestOpen : () => onComplete(set.id),
+          ),
       ],
     ),
   );
@@ -3384,7 +3452,6 @@ class _RestLiveBar extends StatelessWidget {
   final VoidCallback onSkip;
 
   const _RestLiveBar({
-    super.key,
     required this.rest,
     required this.onOpen,
     required this.onMinus,
@@ -3401,12 +3468,13 @@ class _RestLiveBar extends StatelessWidget {
     final total = rest.initialSeconds <= 0 ? 1 : rest.initialSeconds;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-      clipBehavior: Clip.antiAlias,
+      height: context.sizes.primaryActionHeight + context.spacing.sm,
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
+        color: scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(context.radii.xl),
         border: Border.all(color: scheme.outlineVariant),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
           Positioned.fill(
@@ -3418,65 +3486,57 @@ class _RestLiveBar extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 58,
-            child: Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    onTap: onOpen,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      child: Row(
-                        children: [
-                          Text(
-                            rest.isPaused ? 'PAUSED' : 'REST',
-                            style: context.scale.captionTight.black.copyWith(
-                              color: scheme.primary,
-                              letterSpacing: 1,
-                            ),
+          Row(
+            children: [
+              IconButton(
+                tooltip: context.tr('workout.active.rest_minus_30'),
+                onPressed: onMinus,
+                icon: const Icon(Icons.remove_rounded),
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: onOpen,
+                  child: Semantics(
+                    button: true,
+                    label: '${context.activeTr('rest')} $time',
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          context.activeTr('rest').toUpperCase(),
+                          style: context.scale.captionTight.black.copyWith(
+                            color: scheme.primary,
+                            letterSpacing: 1,
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            '$time / ${_clock(total)}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontFeatures: [FontFeature.tabularFigures()],
-                            ),
+                        ),
+                        Text(
+                          '$time / ${_clock(total)}',
+                          maxLines: 1,
+                          style: context.scale.bodyTight.black.copyWith(
+                            fontFeatures: const [FontFeature.tabularFigures()],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                _LiveBarAction(label: '−30', onTap: onMinus),
-                _LiveBarAction(label: '+30', onTap: onPlus),
-                IconButton(
-                  tooltip: context.activeTr('skip'),
-                  onPressed: onSkip,
-                  icon: const Icon(Icons.skip_next_rounded),
-                ),
-              ],
-            ),
+              ),
+              IconButton(
+                tooltip: context.tr('workout.active.rest_plus_30'),
+                onPressed: onPlus,
+                icon: const Icon(Icons.add_rounded),
+              ),
+              IconButton(
+                tooltip: context.activeTr('skip'),
+                onPressed: onSkip,
+                icon: const Icon(Icons.skip_next_rounded),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-}
-
-class _LiveBarAction extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _LiveBarAction({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    width: 48,
-    height: 48,
-    child: TextButton(onPressed: onTap, child: Text(label)),
-  );
 }
 
 String _clock(int seconds) =>

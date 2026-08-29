@@ -124,6 +124,7 @@ class CoachlyMotion {
   final Duration standard;
   final Duration slow;
   final Duration deliberate;
+  final Duration confirmHold;
 
   final Curve enter;
   final Curve exit;
@@ -136,6 +137,7 @@ class CoachlyMotion {
     this.standard = const Duration(milliseconds: 200),
     this.slow = const Duration(milliseconds: 280),
     this.deliberate = const Duration(milliseconds: 500),
+    this.confirmHold = const Duration(seconds: 2),
     this.enter = Curves.easeOutCubic,
     this.exit = Curves.easeInCubic,
     this.standardCurve = Curves.easeOutCubic,

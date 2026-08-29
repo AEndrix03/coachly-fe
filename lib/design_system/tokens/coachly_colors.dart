@@ -114,6 +114,20 @@ class CoachlyColors {
 
   Color get syncOffline => textSecondary;
 
+  /// Gradiente del completamento protetto: a riposo resta nel linguaggio
+  /// acqua/smeraldo; l'ambra compare solo mentre il gesto è in corso.
+  LinearGradient completeWorkoutGradient({
+    required double phase,
+    required bool active,
+  }) => LinearGradient(
+    begin: Alignment(-1.6 + phase * 1.8, -1),
+    end: Alignment(.4 + phase * 1.8, 1),
+    colors: active
+        ? [surfaceAccent, feedbackSuccess, feedbackWarning, feedbackSuccess]
+        : [surfaceAccent, feedbackSuccess, surfaceAccent],
+    stops: active ? const [0, .34, .68, 1] : const [0, .52, 1],
+  );
+
   CoachlyColors copyWith({
     Color? surface,
     Color? surfaceElevated,

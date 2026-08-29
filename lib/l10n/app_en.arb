@@ -252,6 +252,14 @@
   "@workoutActiveRestPlus30": {
     "description": "Migrated from workout.active.rest_plus_30"
   },
+  "workoutActiveCompleteHoldHint": "Hold for 2 seconds to complete the workout.",
+  "@workoutActiveCompleteHoldHint": {
+    "description": "Accessibility hint for the guarded workout completion action"
+  },
+  "workoutActiveCompleteHoldReleased": "Hold to complete the workout.",
+  "@workoutActiveCompleteHoldReleased": {
+    "description": "Feedback shown when the workout completion button is released too early"
+  },
   "workoutActiveColSet": "SET",
   "@workoutActiveColSet": {
     "description": "Migrated from workout.active.col_set"

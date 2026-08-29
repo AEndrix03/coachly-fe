@@ -79,6 +79,10 @@ final Map<String, ArbResolver> arbBridge = <String, ArbResolver>{
   'exercise.add_to_workout': (l10n, _) => l10n.exerciseAddToWorkout,
   'workout.active.rest_minus_30': (l10n, _) => l10n.workoutActiveRestMinus30,
   'workout.active.rest_plus_30': (l10n, _) => l10n.workoutActiveRestPlus30,
+  'workout.active.complete_hold_hint': (l10n, _) =>
+      l10n.workoutActiveCompleteHoldHint,
+  'workout.active.complete_hold_released': (l10n, _) =>
+      l10n.workoutActiveCompleteHoldReleased,
   'workout.active.col_set': (l10n, _) => l10n.workoutActiveColSet,
   'workout.active.col_previous': (l10n, _) => l10n.workoutActiveColPrevious,
   'workout.active.col_reps': (l10n, _) => l10n.workoutActiveColReps,

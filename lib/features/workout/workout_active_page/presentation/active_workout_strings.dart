@@ -81,6 +81,46 @@ const _activeWorkoutStrings = <String, Map<String, String>>{
     'en': 'The load is much higher than recent comparable entries.',
     'it': 'Il carico è molto più alto delle registrazioni comparabili recenti.',
   },
+  'completion.title': {
+    'en': 'Workout complete!',
+    'it': 'Allenamento completato!',
+  },
+  'completion.subtitle': {
+    'en': 'Great work. Here is a preview of your session insights.',
+    'it': 'Ottimo lavoro. Ecco un’anteprima dei risultati della sessione.',
+  },
+  'completion.mockBadge': {'en': 'PREVIEW INSIGHTS', 'it': 'ANTEPRIMA INSIGHT'},
+  'completion.duration': {'en': 'Duration', 'it': 'Durata'},
+  'completion.durationValue': {'en': '54 min', 'it': '54 min'},
+  'completion.sets': {'en': 'Working sets', 'it': 'Serie allenanti'},
+  'completion.setsValue': {'en': '18', 'it': '18'},
+  'completion.volume': {'en': 'Total volume', 'it': 'Volume totale'},
+  'completion.volumeValue': {'en': '7,420 kg', 'it': '7.420 kg'},
+  'completion.performanceTitle': {
+    'en': 'Performance trend',
+    'it': 'Andamento performance',
+  },
+  'completion.performanceBody': {
+    'en': '+8% estimated volume compared with your recent baseline.',
+    'it': '+8% di volume stimato rispetto alla baseline recente.',
+  },
+  'completion.improvementTitle': {
+    'en': 'Strongest improvement',
+    'it': 'Miglioramento principale',
+  },
+  'completion.improvementBody': {
+    'en': 'More repetitions at the same load on your main movement.',
+    'it': 'Più ripetizioni allo stesso carico sul movimento principale.',
+  },
+  'completion.qualityTitle': {
+    'en': 'Session quality',
+    'it': 'Qualità della sessione',
+  },
+  'completion.qualityBody': {
+    'en': 'Excellent effort control · 9.1 / 10',
+    'it': 'Ottima gestione dello sforzo · 9,1 / 10',
+  },
+  'completion.home': {'en': 'Back to Homepage', 'it': 'Torna alla Homepage'},
 };
 
 extension ActiveWorkoutStrings on BuildContext {

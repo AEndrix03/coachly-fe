@@ -171,11 +171,11 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
     final success = await _controller.completeWorkout();
     if (!mounted) return;
     if (success) {
-      context.pop();
+      context.go('/community/workout-completed');
     } else {
       ref
           .read(appToastServiceProvider)
-          .showError(context, 'Unable to save workout.');
+          .showError(context, context.tr('workout.save_error'));
     }
   }
 

@@ -201,6 +201,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get workoutActiveRestPlus30 => '+30 s';
 
   @override
+  String get workoutActiveCompleteHoldHint =>
+      'Hold for 2 seconds to complete the workout.';
+
+  @override
+  String get workoutActiveCompleteHoldReleased =>
+      'Hold to complete the workout.';
+
+  @override
   String get workoutActiveColSet => 'SET';
 
   @override

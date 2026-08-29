@@ -63,6 +63,8 @@
   "exerciseAddToWorkout": "Aggiungi all’allenamento",
   "workoutActiveRestMinus30": "−30 s",
   "workoutActiveRestPlus30": "+30 s",
+  "workoutActiveCompleteHoldHint": "Tieni premuto per 2 secondi per completare l’allenamento.",
+  "workoutActiveCompleteHoldReleased": "Tieni premuto per completare l’allenamento!",
   "workoutActiveColSet": "SERIE",
   "workoutActiveColPrevious": "PRECEDENTE",
   "workoutActiveColReps": "RIPETIZIONI",

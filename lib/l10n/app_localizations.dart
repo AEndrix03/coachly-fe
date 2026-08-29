@@ -476,6 +476,18 @@ abstract class AppLocalizations {
   /// **'+30 s'**
   String get workoutActiveRestPlus30;
 
+  /// Accessibility hint for the guarded workout completion action
+  ///
+  /// In en, this message translates to:
+  /// **'Hold for 2 seconds to complete the workout.'**
+  String get workoutActiveCompleteHoldHint;
+
+  /// Feedback shown when the workout completion button is released too early
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to complete the workout.'**
+  String get workoutActiveCompleteHoldReleased;
+
   /// Migrated from workout.active.col_set
   ///
   /// In en, this message translates to:

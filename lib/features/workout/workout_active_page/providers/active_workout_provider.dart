@@ -68,6 +68,12 @@ class ActiveWorkout extends _$ActiveWorkout {
       exercises = _restoreExercises(exercises, draft);
       groups = _restoreGroups(groups, draft);
       final restoredTarget = _restoreTarget(exercises, draft);
+      final nextTarget = restoredTarget ?? _firstExecutionTarget(exercises);
+      final allSetsCompleted =
+          exercises.expand((exercise) => exercise.sets).isNotEmpty &&
+          exercises
+              .expand((exercise) => exercise.sets)
+              .every((set) => set.completed || set.skipped);
 
       state = state.copyWith(
         status: ActiveWorkoutStatus.active,
@@ -83,9 +89,13 @@ class ActiveWorkout extends _$ActiveWorkout {
         sessionChanges:
             (draft?['sessionChanges'] as List?)?.whereType<String>().toList() ??
             const [],
-        sessionStatus: WorkoutSessionStatus.active,
-        phase: WorkoutPhase.exercising,
-        currentTarget: restoredTarget ?? _firstExecutionTarget(exercises),
+        sessionStatus: allSetsCompleted
+            ? WorkoutSessionStatus.completed
+            : WorkoutSessionStatus.active,
+        phase: allSetsCompleted
+            ? WorkoutPhase.completed
+            : WorkoutPhase.exercising,
+        currentTarget: nextTarget ?? _lastExecutionTarget(exercises),
       );
       _restoreRestTimer(draft);
       ref
@@ -307,7 +317,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     if (exercise == null) return;
     final didComplete = completeSetById(setId);
     if (!didComplete) return;
-    if (state.currentTarget != null) {
+    if (state.phase != WorkoutPhase.completed) {
       final restSeconds = exercise.restSeconds;
       ref.read(restTimerProvider.notifier).startTimer(restSeconds);
       unawaited(
@@ -345,8 +355,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       after: target,
     );
     state = state.copyWith(
-      currentTarget: next,
-      clearCurrentTarget: next == null,
+      currentTarget: next ?? target,
       phase: next == null ? WorkoutPhase.completed : WorkoutPhase.resting,
       sessionStatus: next == null
           ? WorkoutSessionStatus.completed
@@ -424,7 +433,9 @@ class ActiveWorkout extends _$ActiveWorkout {
     if (target == null) return;
     state = state.copyWith(
       currentTarget: target,
-      phase: WorkoutPhase.exercising,
+      phase: state.phase == WorkoutPhase.completed
+          ? WorkoutPhase.completed
+          : WorkoutPhase.exercising,
     );
   }
 
@@ -433,7 +444,9 @@ class ActiveWorkout extends _$ActiveWorkout {
         .where((item) => item.exercise.id == exerciseId)
         .firstOrNull;
     if (exercise == null) return;
-    final set = exercise.sets.where((item) => !item.completed).firstOrNull;
+    final set =
+        exercise.sets.where((item) => !item.completed).firstOrNull ??
+        exercise.sets.lastOrNull;
     if (set != null) goToSet(set.id);
   }
 
@@ -468,21 +481,7 @@ class ActiveWorkout extends _$ActiveWorkout {
   }
 
   void changeSetTechnique(String setId, SetTechnique technique) {
-    _mutateSetById(
-      setId,
-      (set) => set.copyWith(
-        technique: technique,
-        drops: technique == SetTechnique.dropSet && set.drops.isEmpty
-            ? [
-                DropSetState(
-                  id: '$setId:drop:0',
-                  weight: set.weight * .60,
-                  reps: (set.reps - 2).clamp(0, 999),
-                ),
-              ]
-            : set.drops,
-      ),
-    );
+    _mutateSetById(setId, (set) => set.copyWith(technique: technique));
   }
 
   void addDrop(String setId, {double? weight, int? reps}) {
@@ -492,7 +491,6 @@ class ActiveWorkout extends _$ActiveWorkout {
       final sourceReps = last?.reps ?? set.reps;
       final nextWeight = weight ?? sourceWeight * .60;
       return set.copyWith(
-        technique: SetTechnique.dropSet,
         drops: [
           ...set.drops,
           DropSetState(
@@ -508,10 +506,7 @@ class ActiveWorkout extends _$ActiveWorkout {
   void removeDrop(String setId, String dropId) {
     _mutateSetById(setId, (set) {
       final remaining = set.drops.where((drop) => drop.id != dropId).toList();
-      return set.copyWith(
-        drops: remaining,
-        technique: remaining.isEmpty ? SetTechnique.none : set.technique,
-      );
+      return set.copyWith(drops: remaining);
     });
   }
 
@@ -846,8 +841,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       after: previousTarget,
     );
     state = state.copyWith(
-      currentTarget: next,
-      clearCurrentTarget: next == null,
+      currentTarget: next ?? previousTarget,
       phase: next == null ? WorkoutPhase.completed : WorkoutPhase.exercising,
       sessionStatus: next == null
           ? WorkoutSessionStatus.completed
@@ -887,6 +881,19 @@ class ActiveWorkout extends _$ActiveWorkout {
     List<ActiveExerciseState> exercises,
   ) {
     return _executionResolver.resolveNext(exercises: exercises);
+  }
+
+  WorkoutExecutionTarget? _lastExecutionTarget(
+    List<ActiveExerciseState> exercises,
+  ) {
+    final exercise = exercises.lastOrNull;
+    final set = exercise?.sets.lastOrNull;
+    if (exercise == null || set == null) return null;
+    return WorkoutExecutionTarget(
+      blockId: exercise.executionBlockId,
+      exerciseId: exercise.exercise.id,
+      setId: set.id,
+    );
   }
 
   Future<bool> completeWorkout() async {
