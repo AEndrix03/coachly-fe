@@ -1,7 +1,12 @@
 import 'package:coachly/core/error/failures.dart';
 
-/// Type-safe Either type per gestione errori funzionale
-/// Alternativa a dartz per evitare dipendenze extra
+/// Type-safe Either type per gestione errori funzionale.
+///
+/// DEPRECATO in favore di `Result<T, Failure>` (`lib/core/result/result.dart`),
+/// che `docs/development/07-errors-and-feedback.md` indica come unico tipo di
+/// ritorno del data layer. Resta in vita perche' la feature auth lo usa ancora:
+/// non usarlo in codice nuovo. L'annotazione `@Deprecated` non e' applicata per
+/// non riempire di warning i file non ancora migrati.
 sealed class Either<L, R> {
   const Either();
 
