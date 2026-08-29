@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 
 Future<bool> showAppConfirmationDialog(
@@ -42,9 +43,8 @@ Future<bool> showAppConfirmationDialog(
         ),
         content: Text(
           content,
-          style: TextStyle(
+          style: context.scale.body.copyWith(
             color: scheme.onSurface.withValues(alpha: 0.78),
-            fontSize: 15,
             height: 1.4,
           ),
         ),
@@ -118,9 +118,8 @@ Future<void> showAppNoticeDialog(
         ),
         content: Text(
           content,
-          style: TextStyle(
+          style: context.scale.body.copyWith(
             color: scheme.onSurface.withValues(alpha: 0.78),
-            fontSize: 15,
             height: 1.4,
           ),
         ),
@@ -165,10 +164,8 @@ class _DialogTitle extends StatelessWidget {
     if (effectiveIcon == null) {
       return Text(
         title,
-        style: TextStyle(
+        style: context.scale.titleLoose.bold.copyWith(
           color: textColor,
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
           height: 1.2,
         ),
       );
@@ -189,10 +186,8 @@ class _DialogTitle extends StatelessWidget {
         Expanded(
           child: Text(
             title,
-            style: TextStyle(
+            style: context.scale.titleLoose.bold.copyWith(
               color: textColor,
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
               height: 1.2,
             ),
           ),

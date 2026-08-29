@@ -506,9 +506,8 @@ class AdaptiveWorkoutWorkspace extends StatelessWidget {
                               ),
                               Text(
                                 '${state.completedSetCount} of ${state.totalSetCount} sets completed',
-                                style: TextStyle(
+                                style: context.scale.caption.copyWith(
                                   color: scheme.onSurfaceVariant,
-                                  fontSize: 12,
                                   fontFeatures: const [
                                     FontFeature.tabularFigures(),
                                   ],
@@ -602,9 +601,8 @@ class _StructureExerciseRow extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       '${exercise.totalSets} set',
-                      style: TextStyle(
+                      style: context.scale.captionTight.copyWith(
                         color: scheme.onSurfaceVariant,
-                        fontSize: 11,
                       ),
                     ),
                   ],
@@ -836,10 +834,8 @@ class _SessionNavigator extends StatelessWidget {
                   if (group != null)
                     Text(
                       _groupName(group.type),
-                      style: TextStyle(
-                        fontSize: 9,
+                      style: context.scale.microTight.heavy.copyWith(
                         color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   Expanded(
@@ -847,10 +843,7 @@ class _SessionNavigator extends StatelessWidget {
                       exercise.displayName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: context.scale.caption.bold,
                     ),
                   ),
                   Row(
@@ -862,12 +855,7 @@ class _SessionNavigator extends StatelessWidget {
                               : active
                               ? 'SET ${exercise.completedSets + 1} / ${exercise.totalSets}'
                               : '${exercise.completedSets} / ${exercise.totalSets}',
-                          style: TextStyle(
-                            fontSize: 9,
-                            letterSpacing: .5,
-                            fontWeight: active
-                                ? FontWeight.w800
-                                : FontWeight.w600,
+                          style: context.scale.microTight.semibold.copyWith(
                             color: done
                                 ? Theme.of(context).colorScheme.onSurfaceVariant
                                 : active
@@ -875,6 +863,7 @@ class _SessionNavigator extends StatelessWidget {
                                 : Theme.of(
                                     context,
                                   ).colorScheme.onSurfaceVariant,
+                            letterSpacing: .5,
                             fontFeatures: const [FontFeature.tabularFigures()],
                           ),
                         ),
@@ -1017,8 +1006,7 @@ class _ExerciseCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       'Exercise · ${exercise.completedSets}/${exercise.totalSets}',
-                      style: const TextStyle(
-                        fontSize: 11,
+                      style: context.scale.captionTight.copyWith(
                         color: CoachlyAthleteTheme.textSecondary,
                       ),
                     ),
@@ -1048,15 +1036,17 @@ class _ExerciseCard extends StatelessWidget {
                   if (groupLabel != null)
                     Text(
                       groupLabel!,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
+                      style: context.scale.micro.black.copyWith(
                         color: CoachlyAthleteTheme.primary,
                       ),
                     ),
                   Text(
                     exercise.displayName,
+                    // Parte da `titleLarge` per ereditare famiglia e colore
+                    // dal tema Material: sostituirla con un token scarterebbe
+                    // proprio cio' che questa riga va a prendere.
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      // ignore: no_literal_text_style
                       fontSize: 30,
                       height: 1.05,
                       letterSpacing: -.7,
@@ -1072,10 +1062,8 @@ class _ExerciseCard extends StatelessWidget {
                         'total': '${exercise.totalSets}',
                       },
                     ),
-                    style: TextStyle(
-                      fontSize: 13,
+                    style: context.scale.captionLoose.semibold.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -1403,7 +1391,10 @@ class _SetTable extends StatelessWidget {
   }
 }
 
+// Costante di primo livello: non esiste un BuildContext da cui leggere il
+// token. Diventera' convertibile solo spostandola dentro un widget.
 const _labelStyle = TextStyle(
+  // ignore: no_literal_text_style
   fontSize: 10,
   fontWeight: FontWeight.w800,
   color: CoachlyAthleteTheme.textSecondary,
@@ -1666,11 +1657,9 @@ class _CompleteSetButtonState extends State<_CompleteSetButton> {
                         const SizedBox(width: 10),
                         Text(
                           widget.label.toUpperCase(),
-                          style: TextStyle(
+                          style: context.scale.captionLoose.black.copyWith(
                             color: foreground,
-                            fontSize: 13,
                             height: 1,
-                            fontWeight: FontWeight.w900,
                             letterSpacing: .85,
                           ),
                         ),
@@ -1893,11 +1882,9 @@ class _SetRoleTile extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10,
-                    height: 1.05,
-                    fontWeight: FontWeight.w800,
+                  style: context.scale.micro.heavy.copyWith(
                     color: selected ? scheme.primary : scheme.onSurface,
+                    height: 1.05,
                   ),
                 ),
               ],
@@ -2061,12 +2048,10 @@ class _TechniqueToggleState extends State<_TechniqueToggle>
                         curve: Curves.easeOutBack,
                         child: Text(
                           widget.label,
-                          style: TextStyle(
+                          style: context.scale.captionTight.heavy.copyWith(
                             color: widget.selected
                                 ? widget.color
                                 : scheme.onSurfaceVariant,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),
@@ -2340,10 +2325,8 @@ class _DropValueRow extends StatelessWidget {
             child: Text(
               value,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                fontFeatures: [FontFeature.tabularFigures()],
+              style: context.scale.subtitle.heavy.copyWith(
+                fontFeatures: [const FontFeature.tabularFigures()],
               ),
             ),
           ),
@@ -2450,10 +2433,8 @@ class _Stepper extends StatelessWidget {
                   Text(
                     value,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 22,
-                      fontFeatures: [FontFeature.tabularFigures()],
+                    style: context.scale.headline.black.copyWith(
+                      fontFeatures: [const FontFeature.tabularFigures()],
                     ),
                   ),
                 ],
@@ -3450,10 +3431,8 @@ class _RestLiveBar extends StatelessWidget {
                         children: [
                           Text(
                             rest.isPaused ? 'PAUSED' : 'REST',
-                            style: TextStyle(
+                            style: context.scale.captionTight.black.copyWith(
                               color: scheme.primary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w900,
                               letterSpacing: 1,
                             ),
                           ),
@@ -3604,10 +3583,8 @@ class _DockButton extends StatelessWidget {
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: context.scale.microTight.bold.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),

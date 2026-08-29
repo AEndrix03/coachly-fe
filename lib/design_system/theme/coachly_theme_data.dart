@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/design_system/tokens/coachly_colors.dart';
 import 'package:coachly/design_system/tokens/coachly_metrics.dart';
 import 'package:coachly/design_system/tokens/coachly_text_scale.dart';

@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 
 class SectionBar extends StatelessWidget {
@@ -51,10 +52,8 @@ class SectionBar extends StatelessWidget {
             title,
             style:
                 textStyle ??
-                TextStyle(
+                context.scale.subtitle.semibold.copyWith(
                   color: scheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
                   letterSpacing: 0.2,
                 ),
           ),

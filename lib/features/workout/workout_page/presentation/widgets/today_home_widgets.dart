@@ -352,9 +352,8 @@ class ProgramContext extends StatelessWidget {
             ),
             Text(
               data.positionLabel,
-              style: TextStyle(
+              style: context.scale.caption.copyWith(
                 color: context.exerciseTheme.textSecondary,
-                fontSize: 12,
               ),
             ),
           ],
@@ -402,12 +401,10 @@ class _ProgramStep extends StatelessWidget {
       const SizedBox(width: 5),
       Text(
         data.label,
-        style: TextStyle(
+        style: context.scale.caption.medium.copyWith(
           color: data.isToday
               ? context.exerciseTheme.textPrimary
               : context.exerciseTheme.textSecondary,
-          fontSize: 12,
-          fontWeight: data.isToday ? FontWeight.w700 : FontWeight.w500,
         ),
       ),
     ],
@@ -433,10 +430,8 @@ class CalendarFeatureCard extends StatelessWidget {
             MaterialLocalizations.of(context).formatMonthYear(displayedMonth),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: context.scale.bodyLoose.heavy.copyWith(
               color: context.exerciseTheme.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 18),
@@ -449,10 +444,8 @@ class CalendarFeatureCard extends StatelessWidget {
                     context,
                   ).narrowWeekdays[(index + DateTime.monday) % 7].toUpperCase(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: context.scale.micro.heavy.copyWith(
                     color: context.exerciseTheme.textSecondary,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
@@ -476,10 +469,8 @@ class CalendarFeatureCard extends StatelessWidget {
               '${data.nextWorkoutTitle} · ${data.nextWorkoutWhen}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: context.scale.captionTight.semibold.copyWith(
                 color: context.exerciseTheme.textSecondary,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -548,7 +539,7 @@ class _CalendarDay extends StatelessWidget {
             ),
             child: Text(
               '${data.date.day}',
-              style: TextStyle(
+              style: context.scale.captionLoose.bold.copyWith(
                 color: data.isToday
                     ? context.exerciseTheme.primary
                     : data.isInDisplayedMonth != false
@@ -556,8 +547,6 @@ class _CalendarDay extends StatelessWidget {
                     : context.exerciseTheme.textSecondary.withValues(
                         alpha: .42,
                       ),
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
               ),
             ),
           ),
@@ -613,18 +602,15 @@ class _PopulatedGoal extends StatelessWidget {
         const SizedBox(height: 3),
         Text(
           data.targetDisplay!,
-          style: TextStyle(
+          style: context.scale.displayL.heavy.copyWith(
             color: context.exerciseTheme.textPrimary,
-            fontSize: 29,
-            fontWeight: FontWeight.w800,
           ),
         ),
         const SizedBox(height: 12),
         Text(
           data.currentDisplay!,
-          style: TextStyle(
+          style: context.scale.caption.copyWith(
             color: context.exerciseTheme.textSecondary,
-            fontSize: 12,
           ),
         ),
         const SizedBox(height: 8),
@@ -641,10 +627,8 @@ class _PopulatedGoal extends StatelessWidget {
         const SizedBox(height: 7),
         Text(
           data.remainingDisplay!,
-          style: TextStyle(
+          style: context.scale.caption.bold.copyWith(
             color: context.exerciseTheme.primary,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -665,10 +649,8 @@ class _EmptyGoal extends StatelessWidget {
       const SizedBox(height: 12),
       Text(
         context.tr('home.goal.empty_title'),
-        style: TextStyle(
+        style: context.scale.subtitle.heavy.copyWith(
           color: context.exerciseTheme.textPrimary,
-          fontSize: 17,
-          fontWeight: FontWeight.w800,
         ),
       ),
       const SizedBox(height: 6),
@@ -787,11 +769,9 @@ class InsightCard extends StatelessWidget {
             data.eyebrow.toUpperCase(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: context.scale.micro.heavy.copyWith(
               color: color,
-              fontSize: 10,
               letterSpacing: .8,
-              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 12),
@@ -799,10 +779,8 @@ class InsightCard extends StatelessWidget {
             data.title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: context.scale.title.heavy.copyWith(
               color: context.exerciseTheme.textPrimary,
-              fontSize: 19,
-              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 7),
@@ -882,11 +860,9 @@ class QuickActionTile extends StatelessWidget {
               context.tr(data.labelKey),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: context.scale.caption.bold.copyWith(
                 color: context.exerciseTheme.textPrimary,
-                fontSize: 12,
                 height: 1.2,
-                fontWeight: FontWeight.w700,
               ),
             ),
           ],
@@ -962,9 +938,8 @@ class GuideCard extends StatelessWidget {
                     const Spacer(),
                     Text(
                       context.tr(data.levelKey),
-                      style: TextStyle(
+                      style: context.scale.captionTight.copyWith(
                         color: context.exerciseTheme.textSecondary,
-                        fontSize: 11,
                       ),
                     ),
                   ],
@@ -990,10 +965,8 @@ class _DurationPill extends StatelessWidget {
     ),
     child: Text(
       '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}',
-      style: TextStyle(
+      style: context.scale.micro.bold.copyWith(
         color: context.colors.textPrimary,
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
       ),
     ),
   );
@@ -1085,17 +1058,15 @@ class RoutineCard extends StatelessWidget {
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: context.scale.captionTight.copyWith(
                       color: context.exerciseTheme.textSecondary,
-                      fontSize: 11,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     _lastUsed(context),
-                    style: TextStyle(
+                    style: context.scale.captionTight.copyWith(
                       color: context.exerciseTheme.textSecondary,
-                      fontSize: 11,
                     ),
                   ),
                 ],
@@ -1177,11 +1148,9 @@ class _Eyebrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
     text.toUpperCase(),
-    style: TextStyle(
+    style: context.scale.captionTight.heavy.copyWith(
       color: context.exerciseTheme.textSecondary,
-      fontSize: 11,
       letterSpacing: .9,
-      fontWeight: FontWeight.w800,
     ),
   );
 }

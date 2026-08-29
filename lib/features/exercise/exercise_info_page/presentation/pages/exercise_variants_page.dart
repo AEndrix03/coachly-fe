@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
@@ -175,10 +176,8 @@ class VariantTile extends StatelessWidget {
                   children: [
                     Text(
                       variant.name,
-                      style: TextStyle(
+                      style: context.scale.bodyLoose.semibold.copyWith(
                         color: colors.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -188,19 +187,16 @@ class VariantTile extends StatelessWidget {
                       children: [
                         Text(
                           variant.relationAxis.toUpperCase(),
-                          style: TextStyle(
+                          style: context.scale.captionTight.semibold.copyWith(
                             color: colors.primary,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
                             letterSpacing: 0.7,
                           ),
                         ),
                         if (variant.similarity case final similarity?)
                           Text(
                             _similarityLabel(similarity),
-                            style: TextStyle(
+                            style: context.scale.captionTight.copyWith(
                               color: colors.textSecondary,
-                              fontSize: 11,
                             ),
                           ),
                       ],
@@ -210,9 +206,8 @@ class VariantTile extends StatelessWidget {
                       variant.summary,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: context.scale.captionLoose.copyWith(
                         color: colors.textSecondary,
-                        fontSize: 13,
                         height: 1.35,
                       ),
                     ),

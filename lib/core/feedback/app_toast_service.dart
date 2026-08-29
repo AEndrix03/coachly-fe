@@ -197,10 +197,8 @@ class _ToastCard extends StatelessWidget {
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: context.scale.bodyTight.bold.copyWith(
                       color: textColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -208,10 +206,8 @@ class _ToastCard extends StatelessWidget {
                     message,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: context.scale.captionLoose.medium.copyWith(
                       color: textColor.withValues(alpha: 0.9),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],

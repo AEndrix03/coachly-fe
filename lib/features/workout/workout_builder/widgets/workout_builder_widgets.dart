@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:async';
 
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
@@ -405,18 +406,15 @@ class WorkoutStructureComposer extends StatelessWidget {
                         children: [
                           Text(
                             context.tr('workout.builder.add_exercise'),
-                            style: TextStyle(
+                            style: context.scale.bodyLoose.heavy.copyWith(
                               color: context.exerciseTheme.textPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
                             ),
                           ),
                           const SizedBox(height: 3),
                           Text(
                             context.tr('workout.builder.add_exercise_hint'),
-                            style: TextStyle(
+                            style: context.scale.caption.copyWith(
                               color: context.exerciseTheme.textSecondary,
-                              fontSize: 12,
                               height: 1.3,
                             ),
                           ),
@@ -536,18 +534,15 @@ class _StructureActionCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             title,
-            style: TextStyle(
+            style: context.scale.body.heavy.copyWith(
               color: context.exerciseTheme.textPrimary,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 5),
           Text(
             body,
-            style: TextStyle(
+            style: context.scale.caption.copyWith(
               color: context.exerciseTheme.textSecondary,
-              fontSize: 12,
               height: 1.35,
             ),
           ),
@@ -558,10 +553,8 @@ class _StructureActionCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   actionLabel,
-                  style: TextStyle(
+                  style: context.scale.captionLoose.heavy.copyWith(
                     color: context.exerciseTheme.primary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
@@ -749,10 +742,8 @@ class _CollapsibleDraftSectionState extends State<_CollapsibleDraftSection> {
                           child: Text(
                             workoutSectionLabel(context, section).toUpperCase(),
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: context.scale.caption.heavy.copyWith(
                               color: CoachlyAthleteTheme.textSecondary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
                               letterSpacing: .8,
                             ),
                           ),
@@ -951,9 +942,8 @@ Future<String?> showWorkoutSectionPicker(
                               const SizedBox(height: 2),
                               Text(
                                 context.tr('workout.builder.default_section'),
-                                style: TextStyle(
+                                style: context.scale.caption.copyWith(
                                   color: context.exerciseTheme.textSecondary,
-                                  fontSize: 12,
                                 ),
                               ),
                             ],
@@ -987,9 +977,8 @@ class _SectionEmpty extends StatelessWidget {
     padding: const EdgeInsets.symmetric(vertical: 10),
     child: Text(
       context.tr('workout.builder.section_empty_hint'),
-      style: TextStyle(
+      style: context.scale.captionLoose.copyWith(
         color: context.exerciseTheme.textSecondary,
-        fontSize: 13,
       ),
     ),
   );
@@ -1094,10 +1083,8 @@ class _DraftItem extends StatelessWidget {
                     Expanded(
                       child: Text(
                         '${_groupLabel(context, group.type)} · ${context.tr(group.rounds == 1 ? 'workout.detail.round_count_one' : 'workout.detail.round_count_other', params: {'count': '${group.rounds}'})}',
-                        style: const TextStyle(
+                        style: context.scale.caption.heavy.copyWith(
                           color: CoachlyAthleteTheme.primary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
@@ -1265,10 +1252,8 @@ class _ExerciseLine extends StatelessWidget {
             width: 32,
             child: Text(
               prefix,
-              style: const TextStyle(
+              style: context.scale.caption.bold.copyWith(
                 color: CoachlyAthleteTheme.textSecondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -1310,9 +1295,8 @@ class _ExerciseLine extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   formatPrescription(exercise),
-                  style: const TextStyle(
+                  style: context.scale.captionLoose.copyWith(
                     color: CoachlyAthleteTheme.textSecondary,
-                    fontSize: 13,
                   ),
                 ),
               ],
@@ -1471,10 +1455,8 @@ class _WorkoutNotesSheetState extends State<_WorkoutNotesSheet> {
       children: [
         Text(
           context.tr('workout.builder.notes_title'),
-          style: TextStyle(
+          style: context.scale.display.heavy.copyWith(
             color: context.exerciseTheme.textPrimary,
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
           ),
         ),
         const SizedBox(height: 16),
@@ -1605,10 +1587,8 @@ class NumericStepper extends StatelessWidget {
               child: Text(
                 formatter?.call(value) ?? '$value',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: context.scale.subtitle.heavy.copyWith(
                   color: context.exerciseTheme.textPrimary,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
                 ),
               ),
             ),
@@ -1816,18 +1796,15 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
                   ? 'workout.builder.new_section'
                   : 'workout.builder.edit_section',
             ),
-            style: TextStyle(
+            style: context.scale.display.heavy.copyWith(
               color: context.exerciseTheme.textPrimary,
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             context.tr('workout.builder.section_explanation'),
-            style: const TextStyle(
+            style: context.scale.body.copyWith(
               color: CoachlyAthleteTheme.textSecondary,
-              fontSize: 15,
               height: 1.4,
             ),
           ),
@@ -1893,10 +1870,8 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
           ),
           Text(
             context.tr('workout.builder.preview'),
-            style: const TextStyle(
+            style: context.scale.caption.bold.copyWith(
               color: CoachlyAthleteTheme.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
               letterSpacing: .7,
             ),
           ),
@@ -1907,10 +1882,8 @@ class _WorkoutSectionNameSheetState extends State<_WorkoutSectionNameSheet> {
                 child: Text(
                   _sectionName.toUpperCase(),
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: context.scale.captionLoose.heavy.copyWith(
                     color: CoachlyAthleteTheme.textPrimary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
                     letterSpacing: .8,
                   ),
                 ),
@@ -2110,10 +2083,8 @@ class _PrescriptionEditorState extends State<_PrescriptionEditor> {
               const SizedBox(height: 22),
               Text(
                 widget.initial.name,
-                style: const TextStyle(
+                style: context.scale.display.heavy.copyWith(
                   color: CoachlyAthleteTheme.textPrimary,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 6),

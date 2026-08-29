@@ -9,6 +9,7 @@
 // Quando la versione inglese esisterà, questo file va diviso per locale e
 // l'ignore rimosso.
 
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -71,9 +72,9 @@ class CoachlyConceptGuidePage extends StatelessWidget {
               surfaceTintColor: Colors.transparent,
               foregroundColor: colors.textPrimary,
               titleSpacing: 4,
-              title: const Text(
+              title: Text(
                 'Coachly Guide',
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                style: context.scale.subtitle.semibold,
               ),
             ),
             body: SafeArea(
@@ -87,29 +88,24 @@ class CoachlyConceptGuidePage extends StatelessWidget {
                       children: [
                         Text(
                           'IMPARA IL CONCETTO',
-                          style: TextStyle(
+                          style: context.scale.captionTight.semibold.copyWith(
                             color: colors.primary,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
                             letterSpacing: 1.1,
                           ),
                         ),
                         const SizedBox(height: 9),
                         Text(
                           topic.title,
-                          style: TextStyle(
+                          style: context.scale.displayL.semibold.copyWith(
                             color: colors.textPrimary,
-                            fontSize: 29,
-                            fontWeight: FontWeight.w600,
                             letterSpacing: -0.7,
                           ),
                         ),
                         const SizedBox(height: 10),
                         Text(
                           topic.intro,
-                          style: TextStyle(
+                          style: context.scale.bodyLoose.copyWith(
                             color: colors.textSecondary,
-                            fontSize: 16,
                             height: 1.5,
                           ),
                         ),
@@ -400,10 +396,8 @@ class _GuideSection extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: context.scale.title.semibold.copyWith(
               color: colors.textPrimary,
-              fontSize: 19,
-              fontWeight: FontWeight.w600,
               letterSpacing: -0.2,
             ),
           ),
@@ -411,9 +405,8 @@ class _GuideSection extends StatelessWidget {
           if (body case final body?)
             Text(
               body,
-              style: TextStyle(
+              style: context.scale.body.copyWith(
                 color: colors.textSecondary,
-                fontSize: 15,
                 height: 1.5,
               ),
             ),
@@ -533,10 +526,8 @@ class _GuideChecklist extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: context.scale.title.semibold.copyWith(
             color: colors.textPrimary,
-            fontSize: 19,
-            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 12),
@@ -668,9 +659,8 @@ class _SourceGlyph extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             caption,
-            style: TextStyle(
+            style: context.scale.caption.copyWith(
               color: colors.textSecondary,
-              fontSize: 12,
               height: 1.3,
             ),
           ),
@@ -776,10 +766,13 @@ class _GuideProfilePainter extends CustomPainter {
     final painter = TextPainter(
       text: TextSpan(
         text: text,
+        // Un CustomPainter non ha un BuildContext: qui il token non e'
+        // raggiungibile e il letterale e' l'unica opzione onesta.
         style: TextStyle(
-          color: color,
+          // ignore: no_literal_text_style
           fontSize: 10,
           fontWeight: FontWeight.w600,
+          color: color,
           letterSpacing: 0.6,
         ),
       ),
@@ -935,7 +928,7 @@ class _MotionGlyph extends StatelessWidget {
         Text(
           label,
           textAlign: TextAlign.center,
-          style: TextStyle(color: colors.textSecondary, fontSize: 12),
+          style: context.scale.caption.copyWith(color: colors.textSecondary),
         ),
       ],
     );
@@ -1009,7 +1002,9 @@ class _TrainingMetric extends StatelessWidget {
         ),
         Text(
           value,
-          style: TextStyle(color: colors.textSecondary, fontSize: 13),
+          style: context.scale.captionLoose.copyWith(
+            color: colors.textSecondary,
+          ),
         ),
       ],
     );
@@ -1048,14 +1043,18 @@ class _StabilityVisual extends StatelessWidget {
             Expanded(
               child: Text(
                 'Più supporto esterno',
-                style: TextStyle(color: colors.textSecondary, fontSize: 12),
+                style: context.scale.caption.copyWith(
+                  color: colors.textSecondary,
+                ),
               ),
             ),
             Expanded(
               child: Text(
                 'Più controllo tuo',
                 textAlign: TextAlign.end,
-                style: TextStyle(color: colors.textSecondary, fontSize: 12),
+                style: context.scale.caption.copyWith(
+                  color: colors.textSecondary,
+                ),
               ),
             ),
           ],
@@ -1152,10 +1151,8 @@ class _RomBar extends StatelessWidget {
             ),
             child: Text(
               level,
-              style: TextStyle(
+              style: context.scale.micro.semibold.copyWith(
                 color: color,
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
               ),
             ),
@@ -1164,7 +1161,7 @@ class _RomBar extends StatelessWidget {
           Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(color: colors.textSecondary, fontSize: 12),
+            style: context.scale.caption.copyWith(color: colors.textSecondary),
           ),
         ],
       ),

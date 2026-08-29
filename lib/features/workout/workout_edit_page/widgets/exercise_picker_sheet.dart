@@ -340,19 +340,16 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                     Text(
                       context.tr('workout.edit.add_exercise'),
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: context.scale.display.heavy.copyWith(
                         color: context.exerciseTheme.textPrimary,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
                         letterSpacing: -0.4,
                       ),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       context.tr('workout.builder.exercise_library_hint'),
-                      style: TextStyle(
+                      style: context.scale.captionLoose.copyWith(
                         color: context.exerciseTheme.textSecondary,
-                        fontSize: 13,
                       ),
                     ),
                   ],
@@ -418,15 +415,13 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         child: TextField(
           controller: _searchCtrl,
           inputFormatters: [PoliteTextInputFormatter()],
-          style: TextStyle(
+          style: context.scale.body.copyWith(
             color: context.exerciseTheme.textPrimary,
-            fontSize: 15,
           ),
           decoration: InputDecoration(
             hintText: context.tr('workout.search_exercise_hint'),
-            hintStyle: TextStyle(
+            hintStyle: context.scale.body.copyWith(
               color: context.exerciseTheme.textSecondary,
-              fontSize: 15,
             ),
             prefixIcon: Icon(
               Icons.search_rounded,
@@ -505,12 +500,10 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         ),
         child: Text(
           label,
-          style: TextStyle(
+          style: context.scale.caption.medium.copyWith(
             color: isActive
                 ? context.exerciseTheme.textPrimary
                 : context.exerciseTheme.textSecondary,
-            fontSize: 12,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
       ),
@@ -732,10 +725,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 6),
       child: Text(
         label,
-        style: TextStyle(
+        style: context.scale.captionTight.bold.copyWith(
           color: context.colors.textPrimary.withValues(alpha: 0.45),
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
           letterSpacing: 0.8,
         ),
       ),
@@ -777,12 +768,10 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               ),
               child: Text(
                 getLabel(item),
-                style: TextStyle(
+                style: context.scale.captionLoose.medium.copyWith(
                   color: isActive
                       ? context.exerciseTheme.textPrimary
                       : context.exerciseTheme.textSecondary,
-                  fontSize: 13,
-                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
             ),
@@ -828,12 +817,10 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
             const SizedBox(width: 6),
             Text(
               label,
-              style: TextStyle(
+              style: context.scale.captionLoose.medium.copyWith(
                 color: active
                     ? context.exerciseTheme.textPrimary
                     : context.exerciseTheme.textSecondary,
-                fontSize: 13,
-                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ],
@@ -963,9 +950,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           const SizedBox(height: 12),
           Text(
             context.tr('workout.no_exercise_found'),
-            style: TextStyle(
+            style: context.scale.body.copyWith(
               color: context.exerciseTheme.textSecondary,
-              fontSize: 15,
             ),
           ),
           if (_activeCount > 0) ...[
@@ -974,10 +960,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
               onTap: _clearFilters,
               child: Text(
                 context.tr('exercise.clear_filters'),
-                style: TextStyle(
+                style: context.scale.bodyTight.semibold.copyWith(
                   color: context.exerciseTheme.primary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -1057,10 +1041,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
                                   name,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
+                                  style: context.scale.bodyTight.bold.copyWith(
                                     color: context.exerciseTheme.textPrimary,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
                                     height: 1.3,
                                     letterSpacing: -0.2,
                                   ),

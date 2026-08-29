@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:async';
 
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
@@ -916,10 +917,8 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
             children: [
               Text(
                 context.tr('workout.builder.create_block_title'),
-                style: TextStyle(
+                style: context.scale.display.heavy.copyWith(
                   color: context.exerciseTheme.textPrimary,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 6),
@@ -1213,10 +1212,8 @@ class _BlockOptionalFieldAction extends StatelessWidget {
     children: [
       Text(
         title.toUpperCase(),
-        style: TextStyle(
+        style: context.scale.caption.heavy.copyWith(
           color: context.exerciseTheme.textSecondary,
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
           letterSpacing: .7,
         ),
       ),
@@ -1290,12 +1287,10 @@ class _BlockStepper extends StatelessWidget {
                 ),
                 child: Text(
                   '${stepIndex + 1}',
-                  style: TextStyle(
+                  style: context.scale.caption.heavy.copyWith(
                     color: active
                         ? context.exerciseTheme.background
                         : context.exerciseTheme.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
               );
@@ -1314,9 +1309,7 @@ class _BlockStepper extends StatelessWidget {
                         _ => TextAlign.center,
                       },
                       maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
+                      style: context.scale.caption.bold.copyWith(
                         color: entry.$1 <= currentStep
                             ? context.exerciseTheme.textPrimary
                             : context.exerciseTheme.textSecondary,
@@ -1370,10 +1363,8 @@ class _BlockTypeTile extends StatelessWidget {
                 children: [
                   Text(
                     _groupTypeLabel(context, type),
-                    style: TextStyle(
+                    style: context.scale.bodyLoose.heavy.copyWith(
                       color: context.exerciseTheme.textPrimary,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 16,
                     ),
                   ),
                   const SizedBox(height: 4),

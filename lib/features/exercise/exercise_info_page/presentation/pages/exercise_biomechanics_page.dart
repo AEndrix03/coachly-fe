@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
@@ -191,18 +192,18 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                           children: [
                             Text(
                               context.tr('exercise.rom_start'),
-                              style: _caption(colors),
+                              style: _caption(context, colors),
                             ),
                             Text(
                               context.tr('exercise.rom_end'),
-                              style: _caption(colors),
+                              style: _caption(context, colors),
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
                         Text(
                           context.tr('exercise.profile_indicative'),
-                          style: _caption(colors),
+                          style: _caption(context, colors),
                         ),
                       ],
                     ),
@@ -266,8 +267,8 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
     );
   }
 
-  TextStyle _caption(CoachlyExerciseTheme colors) =>
-      TextStyle(color: colors.textSecondary, fontSize: 12);
+  TextStyle _caption(BuildContext context, CoachlyExerciseTheme colors) =>
+      context.scale.caption.copyWith(color: colors.textSecondary);
 }
 
 class _HeroMetric extends StatelessWidget {

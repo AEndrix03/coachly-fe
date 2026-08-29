@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:async';
 
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
@@ -88,10 +89,8 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
                           ? 'workout.add_exercise.recent'
                           : 'workout.add_exercise.results',
                     ),
-                    style: const TextStyle(
+                    style: context.scale.subtitleLoose.heavy.copyWith(
                       color: CoachlyAthleteTheme.textPrimary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
@@ -370,15 +369,7 @@ class _AddExercisePageState extends ConsumerState<AddExercisePage> {
           shrinkWrap: true,
           padding: const EdgeInsets.all(16),
           children: [
-            ListTile(
-              title: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
+            ListTile(title: Text(title, style: context.scale.titleLoose.heavy)),
             if (selected != null)
               ListTile(
                 title: Text(context.tr('workout.add_exercise.clear_filter')),
@@ -496,10 +487,8 @@ class _ExerciseResultTile extends StatelessWidget {
                           child: Text(
                             name,
                             maxLines: 2,
-                            style: const TextStyle(
+                            style: context.scale.body.bold.copyWith(
                               color: CoachlyAthleteTheme.textPrimary,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
@@ -521,9 +510,8 @@ class _ExerciseResultTile extends StatelessWidget {
                         muscles,
                       ].whereType<String>().join(' · '),
                       maxLines: 2,
-                      style: const TextStyle(
+                      style: context.scale.caption.copyWith(
                         color: CoachlyAthleteTheme.textSecondary,
-                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -680,10 +668,8 @@ class _ExerciseQuickAddSheetState extends State<ExerciseQuickAddSheet> {
                 Text(
                   widget.exercise.nameI18n?.fromI18n(locale) ??
                       context.tr('exercise.fallback_name'),
-                  style: const TextStyle(
+                  style: context.scale.headline.heavy.copyWith(
                     color: CoachlyAthleteTheme.textPrimary,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 if (widget.initial != null)
@@ -831,7 +817,7 @@ class _InlineNumberStepper extends StatelessWidget {
         child: Text(
           '$value',
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+          style: context.scale.titleLoose.heavy,
         ),
       ),
       IconButton(

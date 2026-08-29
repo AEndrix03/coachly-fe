@@ -109,7 +109,10 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
                               ),
                             ),
                             const SizedBox(width: 6),
+                            // `fontSize` qui e' un parametro del widget, non
+                            // un TextStyle: la regola non puo' distinguerli.
                             const CoachBadgeWidget(
+                              // ignore: no_literal_text_style
                               fontSize: 9,
                               iconSize: 10,
                               padding: EdgeInsets.symmetric(
@@ -243,10 +246,8 @@ class _OrganizeWorkoutCardState extends ConsumerState<OrganizeWorkoutCard> {
           const SizedBox(width: 4),
           Text(
             text,
-            style: TextStyle(
-              fontSize: 10,
+            style: context.scale.micro.medium.copyWith(
               color: context.colors.textSecondary,
-              fontWeight: FontWeight.w500,
             ),
           ),
         ],

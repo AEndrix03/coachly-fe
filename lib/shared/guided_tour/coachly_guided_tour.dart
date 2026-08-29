@@ -287,19 +287,15 @@ class CoachlyTourMessageCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(
+                    style: context.scale.title.heavy.copyWith(
                       color: context.exerciseTheme.textPrimary,
-                      fontSize: 19,
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
                 Text(
                   progress,
-                  style: TextStyle(
+                  style: context.scale.caption.bold.copyWith(
                     color: context.exerciseTheme.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 IconButton(
@@ -350,9 +346,8 @@ class CoachlyTourMessageCard extends StatelessWidget {
                           Flexible(
                             child: Text(
                               dontShowAgainLabel,
-                              style: TextStyle(
+                              style: context.scale.caption.copyWith(
                                 color: context.exerciseTheme.textSecondary,
-                                fontSize: 12,
                               ),
                             ),
                           ),

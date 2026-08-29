@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/design_system/components/product/muscle_anatomy_view.dart';
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
@@ -309,9 +310,8 @@ class _LegendItem extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: TextStyle(
+          style: context.scale.caption.copyWith(
             color: context.exerciseTheme.textSecondary,
-            fontSize: 12,
           ),
         ),
       ],
@@ -339,16 +339,14 @@ class _SelectedMusclePanel extends StatelessWidget {
         children: [
           Text(
             muscle.name,
-            style: TextStyle(
+            style: context.scale.titleLoose.semibold.copyWith(
               color: colors.textPrimary,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             muscleRoleLabel(muscle.role),
-            style: TextStyle(color: colors.primary, fontSize: 13),
+            style: context.scale.captionLoose.copyWith(color: colors.primary),
           ),
           const SizedBox(height: 22),
           ExerciseSectionTitle(
@@ -453,16 +451,16 @@ class _MuscleTable extends StatelessWidget {
                 children: [
                   Text(
                     muscle.name,
-                    style: TextStyle(
+                    style: context.scale.bodyLoose.semibold.copyWith(
                       color: colors.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     muscleRoleLabel(muscle.role),
-                    style: TextStyle(color: colors.textSecondary, fontSize: 12),
+                    style: context.scale.caption.copyWith(
+                      color: colors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 14),
                   _TensionRow(

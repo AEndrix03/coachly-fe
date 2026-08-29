@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:flutter/material.dart';
@@ -79,10 +80,8 @@ class CoachlyInfoSheet extends StatelessWidget {
           const SizedBox(height: 22),
           Text(
             title,
-            style: TextStyle(
+            style: context.scale.displayLoose.heavy.copyWith(
               color: context.exerciseTheme.textPrimary,
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 22),
@@ -94,18 +93,15 @@ class CoachlyInfoSheet extends StatelessWidget {
                 children: [
                   Text(
                     section.title,
-                    style: TextStyle(
+                    style: context.scale.captionLoose.bold.copyWith(
                       color: context.exerciseTheme.primary,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 7),
                   Text(
                     section.body,
-                    style: TextStyle(
+                    style: context.scale.body.copyWith(
                       color: context.exerciseTheme.textPrimary,
-                      fontSize: 15,
                       height: 1.5,
                     ),
                   ),

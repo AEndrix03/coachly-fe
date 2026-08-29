@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 
 /// Header gradient con pill-badge, identico allo stile di WorkoutHeader.
@@ -54,21 +55,18 @@ class PageHeader extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 title,
-                style: TextStyle(
+                style: context.scale.displayLTight.bold.copyWith(
                   color: scheme.onPrimaryContainer,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.3,
                   height: 1.2,
+                  letterSpacing: 0.3,
                 ),
               ),
               if (subtitle != null) ...[
                 const SizedBox(height: 6),
                 Text(
                   subtitle!,
-                  style: TextStyle(
+                  style: context.scale.bodyTight.copyWith(
                     color: scheme.onPrimaryContainer.withValues(alpha: 0.70),
-                    fontSize: 14,
                     height: 1.4,
                   ),
                 ),
@@ -101,10 +99,8 @@ class PageHeader extends StatelessWidget {
               const SizedBox(width: 7),
               Text(
                 badgeLabel,
-                style: TextStyle(
+                style: context.scale.captionLoose.semibold.copyWith(
                   color: scheme.onPrimaryContainer.withValues(alpha: 0.95),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],

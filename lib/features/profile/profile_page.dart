@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/auth/providers/user_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
@@ -97,10 +98,8 @@ class ProfilePage extends ConsumerWidget {
             child: Center(
               child: Text(
                 initials,
-                style: TextStyle(
+                style: context.scale.subtitleLoose.bold.copyWith(
                   color: scheme.onPrimaryContainer,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -108,10 +107,8 @@ class ProfilePage extends ConsumerWidget {
           const SizedBox(width: 12),
           Text(
             context.tr('profile.member'),
-            style: TextStyle(
+            style: context.scale.captionLoose.medium.copyWith(
               color: scheme.onPrimaryContainer.withValues(alpha: 0.80),
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -143,10 +140,8 @@ class ProfilePage extends ConsumerWidget {
             const SizedBox(width: 9),
             Text(
               title,
-              style: TextStyle(
+              style: context.scale.caption.semibold.copyWith(
                 color: scheme.onSurfaceVariant,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
                 letterSpacing: 0.8,
               ),
             ),
@@ -182,10 +177,8 @@ class ProfilePage extends ConsumerWidget {
         const SizedBox(width: 12),
         Text(
           context.tr('common.language'),
-          style: TextStyle(
+          style: context.scale.bodyTight.medium.copyWith(
             color: scheme.onSurface,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
           ),
         ),
         const Spacer(),
@@ -195,7 +188,7 @@ class ProfilePage extends ConsumerWidget {
               language,
               displayLocale: currentLocale,
             ),
-            style: TextStyle(color: scheme.onSurface, fontSize: 13),
+            style: context.scale.captionLoose.copyWith(color: scheme.onSurface),
           ),
           initialValue: language,
           options: AppStrings.languageOptions.map((l) {
@@ -213,7 +206,7 @@ class ProfilePage extends ConsumerWidget {
           },
           selectedOptionBuilder: (context, value) => Text(
             AppStrings.languageDisplayName(value, displayLocale: currentLocale),
-            style: TextStyle(color: scheme.onSurface, fontSize: 13),
+            style: context.scale.captionLoose.copyWith(color: scheme.onSurface),
           ),
         ),
       ],
@@ -256,10 +249,8 @@ class ProfilePage extends ConsumerWidget {
             Expanded(
               child: Text(
                 context.tr('profile.personal_exercises'),
-                style: TextStyle(
+                style: context.scale.bodyTight.medium.copyWith(
                   color: scheme.onSurface,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -280,15 +271,15 @@ class ProfilePage extends ConsumerWidget {
       children: [
         Text(
           label,
-          style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14),
+          style: context.scale.bodyTight.copyWith(
+            color: scheme.onSurfaceVariant,
+          ),
         ),
         const Spacer(),
         Text(
           value,
-          style: TextStyle(
+          style: context.scale.bodyTight.medium.copyWith(
             color: scheme.onSurface,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -358,10 +349,8 @@ class ProfilePage extends ConsumerWidget {
                 const SizedBox(width: 10),
                 Text(
                   context.tr('profile.logout'),
-                  style: TextStyle(
+                  style: context.scale.bodyTight.semibold.copyWith(
                     color: scheme.error,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],

@@ -24,10 +24,8 @@ class ExerciseSectionTitle extends StatelessWidget {
           fit: FlexFit.loose,
           child: Text(
             title,
-            style: TextStyle(
+            style: context.scale.title.semibold.copyWith(
               color: colors.textPrimary,
-              fontSize: 19,
-              fontWeight: FontWeight.w600,
               letterSpacing: -0.25,
             ),
           ),
@@ -74,7 +72,7 @@ class ExerciseLinkButton extends StatelessWidget {
           minimumSize: const Size(44, 44),
           padding: EdgeInsets.zero,
           foregroundColor: colors.primary,
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          textStyle: context.scale.body.semibold,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -204,10 +202,8 @@ class _MediaPlaceholder extends StatelessWidget {
                   media.movementLabel,
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: context.scale.bodyLoose.semibold.copyWith(
                     color: colors.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -217,7 +213,9 @@ class _MediaPlaceholder extends StatelessWidget {
                   context.tr('exercise.media_soon'),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: colors.textSecondary, fontSize: 13),
+                  style: context.scale.captionLoose.copyWith(
+                    color: colors.textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -299,7 +297,9 @@ class ExerciseDetailScaffold extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 14),
               child: Text(
                 exerciseName,
-                style: TextStyle(color: colors.textSecondary, fontSize: 14),
+                style: context.scale.bodyTight.copyWith(
+                  color: colors.textSecondary,
+                ),
               ),
             ),
             Expanded(child: body),
@@ -335,10 +335,7 @@ class ExerciseAddAction extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(17),
             ),
-            textStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            textStyle: context.scale.bodyLoose.semibold,
           ),
           icon: const Icon(Icons.add_rounded),
           label: Text(context.tr('exercise.add_to_workout')),
@@ -568,10 +565,8 @@ class ExerciseErrorView extends StatelessWidget {
                     Text(
                       context.tr('exercise.load_failed'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: context.scale.titleLoose.semibold.copyWith(
                         color: colors.textPrimary,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 20),

@@ -474,14 +474,12 @@ class _ExerciseHeader extends StatelessWidget {
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: context.scale.subtitle.semibold.copyWith(
                 color: Color.lerp(
                   Colors.transparent,
                   colors.textPrimary,
                   opacity,
                 ),
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
               ),
             ),
           );
@@ -527,17 +525,15 @@ class _Identity extends StatelessWidget {
       children: [
         Text(
           data.name,
-          style: TextStyle(
+          style: context.scale.displayLLoose.semibold.copyWith(
             color: colors.textPrimary,
-            fontSize: 30,
-            fontWeight: FontWeight.w600,
             letterSpacing: -0.8,
           ),
         ),
         const SizedBox(height: 9),
         Text(
           '${data.movementProfile.pattern}  ·  ${data.movementProfile.jointClass}  ·  ${data.movementProfile.resistanceSource}',
-          style: TextStyle(color: colors.textSecondary, fontSize: 14),
+          style: context.scale.bodyTight.copyWith(color: colors.textSecondary),
         ),
       ],
     );
@@ -581,9 +577,8 @@ class ExerciseQuickNavAnchor extends StatelessWidget {
                     Text(
                       item.label(context),
                       maxLines: 1,
-                      style: TextStyle(
+                      style: context.scale.captionTight.copyWith(
                         color: colors.textSecondary,
-                        fontSize: 11,
                       ),
                     ),
                   ],
@@ -713,10 +708,7 @@ class _ExerciseQuickNavDestinationState
                             ExerciseQuickNavItem.values[index].actionLabel,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: context.scale.body.semibold,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -951,14 +943,12 @@ class _MorphButton extends StatelessWidget {
                             item.actionLabel,
                             maxLines: 1,
                             overflow: TextOverflow.fade,
-                            style: TextStyle(
+                            style: context.scale.body.semibold.copyWith(
                               color: Color.lerp(
                                 Colors.transparent,
                                 colors.textPrimary,
                                 labelOpacity,
                               ),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -1037,9 +1027,8 @@ class _DescriptionState extends State<_Description> {
             widget.text,
             maxLines: _expanded ? null : 3,
             overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
-            style: TextStyle(
+            style: context.scale.bodyLoose.copyWith(
               color: colors.textPrimary,
-              fontSize: 16,
               height: 1.55,
               letterSpacing: -0.1,
             ),
@@ -1105,10 +1094,8 @@ class _ExecutionSection extends StatelessWidget {
           const SizedBox(height: 26),
           Text(
             context.tr('exercise.common_mistakes'),
-            style: TextStyle(
+            style: context.scale.bodyLoose.semibold.copyWith(
               color: colors.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 11),
@@ -1169,9 +1156,8 @@ class _ExecutionRow extends StatelessWidget {
               padding: const EdgeInsets.only(top: 3),
               child: Text(
                 text,
-                style: TextStyle(
+                style: context.scale.body.copyWith(
                   color: colors.textSecondary,
-                  fontSize: 15,
                   height: 1.45,
                 ),
               ),
@@ -1291,10 +1277,8 @@ class _MuscleGroup extends StatelessWidget {
       children: [
         Text(
           label.toUpperCase(),
-          style: TextStyle(
+          style: context.scale.captionTight.semibold.copyWith(
             color: colors.primary,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
             letterSpacing: 0.8,
           ),
         ),
@@ -1304,7 +1288,9 @@ class _MuscleGroup extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 4),
             child: Text(
               muscle.name,
-              style: TextStyle(color: colors.textPrimary, fontSize: 14),
+              style: context.scale.bodyTight.copyWith(
+                color: colors.textPrimary,
+              ),
             ),
           ),
       ],
@@ -1386,16 +1372,16 @@ class _Metric extends StatelessWidget {
         Text(
           value,
           maxLines: 2,
-          style: TextStyle(
+          style: context.scale.bodyTight.semibold.copyWith(
             color: colors.textPrimary,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 5),
         Text(
           label,
-          style: TextStyle(color: colors.textSecondary, fontSize: 11),
+          style: context.scale.captionTight.copyWith(
+            color: colors.textSecondary,
+          ),
         ),
       ],
     );
@@ -1431,7 +1417,9 @@ class _EquipmentSection extends StatelessWidget {
                 if (item.required)
                   Text(
                     context.tr('exercise.required'),
-                    style: TextStyle(color: colors.textSecondary, fontSize: 12),
+                    style: context.scale.caption.copyWith(
+                      color: colors.textSecondary,
+                    ),
                   ),
               ],
             ),

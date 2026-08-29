@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:async';
 
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
@@ -261,10 +262,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               children: [
                 Text(
                   context.tr('workout.builder.info_title'),
-                  style: TextStyle(
+                  style: context.scale.display.heavy.copyWith(
                     color: context.exerciseTheme.textPrimary,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 20),
