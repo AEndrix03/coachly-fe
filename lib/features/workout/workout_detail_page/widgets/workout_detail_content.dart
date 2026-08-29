@@ -81,7 +81,7 @@ class _WorkoutGoalSectionState extends State<WorkoutGoalSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            context.tr('workout.detail.goal'),
+            context.l10n.workoutDetailGoal,
             style: context.scale.caption.bold.copyWith(
               color: CoachlyAthleteTheme.textSecondary,
               letterSpacing: .5,
@@ -138,7 +138,7 @@ class WorkoutStructure extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CoachlySectionHeader(title: context.tr('workout.detail.structure')),
+          CoachlySectionHeader(title: context.l10n.workoutDetailStructure),
           if (workout.exerciseCount == 0)
             _EmptyWorkout(onAddExercise: onAddExercise)
           else
@@ -222,14 +222,14 @@ class _EmptyWorkout extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            context.tr('workout.detail.no_exercises'),
+            context.l10n.workoutDetailNoExercises,
             style: context.scale.subtitle.bold.copyWith(
               color: CoachlyAthleteTheme.textPrimary,
             ),
           ),
           const SizedBox(height: 7),
           Text(
-            context.tr('workout.detail.empty_hint'),
+            context.l10n.workoutDetailEmptyHint,
             textAlign: TextAlign.center,
             style: context.scale.captionLoose.copyWith(
               color: CoachlyAthleteTheme.textSecondary,
@@ -245,7 +245,7 @@ class _EmptyWorkout extends StatelessWidget {
               foregroundColor: CoachlyAthleteTheme.background,
             ),
             icon: const Icon(Icons.add_rounded),
-            label: Text(context.tr('workout.detail.add_exercise')),
+            label: Text(context.l10n.workoutDetailAddExercise),
           ),
         ],
       ),
@@ -270,11 +270,11 @@ class WorkoutOverview extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CoachlySectionHeader(title: context.tr('workout.detail.overview')),
+          CoachlySectionHeader(title: context.l10n.workoutDetailOverview),
           if (muscles.isNotEmpty)
             _OverviewItem(
               icon: Icons.accessibility_new_rounded,
-              title: context.tr('workout.detail.muscle_focus'),
+              title: context.l10n.workoutDetailMuscleFocus,
               values: muscles,
             ),
           if (muscles.isNotEmpty && equipment.isNotEmpty)
@@ -282,7 +282,7 @@ class WorkoutOverview extends StatelessWidget {
           if (equipment.isNotEmpty)
             _OverviewItem(
               icon: Icons.fitness_center_rounded,
-              title: context.tr('workout.detail.equipment'),
+              title: context.l10n.workoutDetailEquipment,
               values: equipment,
             ),
         ],
@@ -357,9 +357,7 @@ class WorkoutConceptsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CoachlySectionHeader(
-            title: context.tr('workout.detail.concepts_used'),
-          ),
+          CoachlySectionHeader(title: context.l10n.workoutDetailConceptsUsed),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -390,14 +388,14 @@ class WorkoutConceptsSection extends StatelessWidget {
     CoachlyInfoSheet.show(
       context,
       title: label,
-      primaryActionLabel: context.tr('common.got_it'),
+      primaryActionLabel: context.l10n.commonGotIt,
       sections: [
         CoachlyInfoSection(
-          context.tr('workout.detail.what_is_it'),
+          context.l10n.workoutDetailWhatIsIt,
           context.tr('workout.detail.concept_${concept.name}_definition'),
         ),
         CoachlyInfoSection(
-          context.tr('workout.detail.how_to_read'),
+          context.l10n.workoutDetailHowToRead,
           context.tr('workout.detail.concept_${concept.name}_example'),
         ),
       ],
@@ -430,7 +428,5 @@ String _setCountLabel(BuildContext context, int count) => context.tr(
   params: {'count': '$count'},
 );
 
-String _durationLabel(BuildContext context, Duration duration) => context.tr(
-  'workout.detail.estimated_minutes',
-  params: {'count': '${(duration.inSeconds / 60).ceil()}'},
-);
+String _durationLabel(BuildContext context, Duration duration) => context.l10n
+    .workoutDetailEstimatedMinutes('${(duration.inSeconds / 60).ceil()}');
