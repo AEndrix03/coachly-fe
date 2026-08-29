@@ -4,7 +4,9 @@ import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_biomechanics_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_muscles_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_variants_page.dart';
+import 'package:coachly/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _runGoldens = bool.fromEnvironment('UPDATE_COACHLY_GOLDENS');
@@ -20,6 +22,13 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: exerciseDetailTheme(ThemeData.dark()),
         home: child,
       ),

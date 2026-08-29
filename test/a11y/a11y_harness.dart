@@ -1,3 +1,4 @@
+import 'package:coachly/l10n/app_localizations.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ Future<void> pumpScreen(
       locale: const Locale('it'),
       supportedLocales: AppStrings.supportedLocales,
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

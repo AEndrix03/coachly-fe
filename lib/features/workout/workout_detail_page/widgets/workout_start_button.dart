@@ -38,7 +38,7 @@ class WorkoutStartButton extends StatelessWidget {
         ),
         icon: const Icon(Icons.play_arrow_rounded),
         label: Text(
-          context.tr('workout.start'),
+          context.l10n.workoutStart,
           style: context.scale.bodyLoose.heavy,
         ),
       ),

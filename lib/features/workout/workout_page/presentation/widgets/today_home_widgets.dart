@@ -23,8 +23,8 @@ class TodayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
     final greeting = data.firstName.isEmpty
-        ? context.tr('home.header.greeting_generic')
-        : context.tr('home.header.greeting', params: {'name': data.firstName});
+        ? context.l10n.homeHeaderGreetingGeneric
+        : context.l10n.homeHeaderGreeting(data.firstName);
     return Row(
       children: [
         Expanded(
@@ -42,7 +42,7 @@ class TodayHeader extends StatelessWidget {
               ),
               const SizedBox(height: 3),
               Text(
-                context.tr('home.header.subtitle'),
+                context.l10n.homeHeaderSubtitle,
                 style: Theme.of(
                   context,
                 ).textTheme.bodySmall?.copyWith(color: colors.textSecondary),
@@ -53,12 +53,12 @@ class TodayHeader extends StatelessWidget {
         if (syncState != HomeSyncState.synced) _SyncStatus(state: syncState),
         IconButton(
           onPressed: onNotifications,
-          tooltip: context.tr('workout.notifications'),
+          tooltip: context.l10n.workoutNotifications,
           icon: const Icon(Icons.notifications_none_rounded),
         ),
         IconButton(
           onPressed: onSettings,
-          tooltip: context.tr('common.settings'),
+          tooltip: context.l10n.commonSettings,
           icon: const Icon(Icons.settings_outlined),
         ),
       ],
@@ -190,20 +190,14 @@ class _ActionToday extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           inProgress
-              ? context.tr(
-                  'home.today.progress_metadata',
-                  params: {
-                    'minutes': '${data.durationMinutes ?? 0}',
-                    'done': '${data.completedExercises ?? 0}',
-                    'total': '${data.totalExercises ?? 0}',
-                  },
+              ? context.l10n.homeTodayProgressMetadata(
+                  '${data.durationMinutes ?? 0}',
+                  '${data.completedExercises ?? 0}',
+                  '${data.totalExercises ?? 0}',
                 )
-              : context.tr(
-                  'home.today.training_metadata',
-                  params: {
-                    'minutes': '${data.durationMinutes ?? 0}',
-                    'sets': '${data.workingSets ?? 0}',
-                  },
+              : context.l10n.homeTodayTrainingMetadata(
+                  '${data.durationMinutes ?? 0}',
+                  '${data.workingSets ?? 0}',
                 ),
           style: TextStyle(
             color: colors.textSecondary,
@@ -290,10 +284,10 @@ class _NoTraining extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      _Eyebrow(context.tr('home.today.title')),
+      _Eyebrow(context.l10n.homeTodayTitle),
       const SizedBox(height: 13),
       Text(
-        context.tr('home.empty.title'),
+        context.l10n.homeEmptyTitle,
         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
           color: context.exerciseTheme.textPrimary,
           fontWeight: FontWeight.w800,
@@ -302,7 +296,7 @@ class _NoTraining extends StatelessWidget {
       ),
       const SizedBox(height: 10),
       Text(
-        context.tr('home.empty.body'),
+        context.l10n.homeEmptyBody,
         style: TextStyle(
           color: context.exerciseTheme.textSecondary,
           height: 1.45,
@@ -321,7 +315,7 @@ class _NoTraining extends StatelessWidget {
             foregroundColor: context.exerciseTheme.background,
           ),
           child: Text(
-            context.tr('home.action.create_workout'),
+            context.l10n.homeActionCreateWorkout,
             style: const TextStyle(fontWeight: FontWeight.w800),
           ),
         ),
@@ -424,7 +418,7 @@ class CalendarFeatureCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _Eyebrow(context.tr('home.calendar.title')),
+          _Eyebrow(context.l10n.homeCalendarTitle),
           const SizedBox(height: 7),
           Text(
             MaterialLocalizations.of(context).formatMonthYear(displayedMonth),
@@ -590,7 +584,7 @@ class _PopulatedGoal extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _Eyebrow(context.tr('home.goal.title')),
+        _Eyebrow(context.l10n.homeGoalTitle),
         const SizedBox(height: 13),
         Text(
           data.exerciseName!,
@@ -643,19 +637,19 @@ class _EmptyGoal extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: [
-      _Eyebrow(context.tr('home.goal.title')),
+      _Eyebrow(context.l10n.homeGoalTitle),
       const SizedBox(height: 14),
       Icon(Icons.flag_outlined, color: context.exerciseTheme.primary, size: 25),
       const SizedBox(height: 12),
       Text(
-        context.tr('home.goal.empty_title'),
+        context.l10n.homeGoalEmptyTitle,
         style: context.scale.subtitle.heavy.copyWith(
           color: context.exerciseTheme.textPrimary,
         ),
       ),
       const SizedBox(height: 6),
       Text(
-        context.tr('home.goal.empty_body'),
+        context.l10n.homeGoalEmptyBody,
         style: TextStyle(
           color: context.exerciseTheme.textSecondary,
           height: 1.35,
@@ -721,7 +715,7 @@ class _LearningInsight extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                context.tr('home.insights.learning_title'),
+                context.l10n.homeInsightsLearningTitle,
                 style: TextStyle(
                   color: context.exerciseTheme.textPrimary,
                   fontWeight: FontWeight.w700,
@@ -729,7 +723,7 @@ class _LearningInsight extends StatelessWidget {
               ),
               const SizedBox(height: 5),
               Text(
-                context.tr('home.insights.learning_body'),
+                context.l10n.homeInsightsLearningBody,
                 style: TextStyle(
                   color: context.exerciseTheme.textSecondary,
                   height: 1.35,
@@ -981,7 +975,7 @@ class RoutinesRail extends StatelessWidget {
     if (items.isEmpty) {
       return _FeatureSurface(
         child: Text(
-          context.tr('home.routines.empty_body'),
+          context.l10n.homeRoutinesEmptyBody,
           style: TextStyle(color: context.exerciseTheme.textSecondary),
         ),
       );
@@ -1049,12 +1043,9 @@ class RoutineCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    context.tr(
-                      'home.routines.metadata',
-                      params: {
-                        'exercises': '${data.exerciseCount}',
-                        'minutes': '${data.durationMinutes}',
-                      },
+                    context.l10n.homeRoutinesMetadata(
+                      '${data.exerciseCount}',
+                      '${data.durationMinutes}',
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

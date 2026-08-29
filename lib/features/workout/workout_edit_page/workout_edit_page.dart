@@ -67,20 +67,20 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
               onPressed: _close,
-              tooltip: context.tr('common.cancel'),
+              tooltip: context.l10n.commonCancel,
               icon: const Icon(Icons.close),
             ),
-            title: Text(context.tr('workout.builder.edit_title')),
+            title: Text(context.l10n.workoutBuilderEditTitle),
             centerTitle: true,
             actions: [
               PopupMenuButton<String>(
-                tooltip: context.tr('workout.builder.workout_actions'),
+                tooltip: context.l10n.workoutBuilderWorkoutActions,
                 icon: const Icon(Icons.more_horiz_rounded),
                 onSelected: (_) => _editWorkoutNotes(state.draft.focus),
                 itemBuilder: (context) => [
                   PopupMenuItem(
                     value: 'notes',
-                    child: Text(context.tr('workout.builder.add_notes')),
+                    child: Text(context.l10n.workoutBuilderAddNotes),
                   ),
                 ],
               ),
@@ -205,18 +205,14 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                         ),
                       ),
                       _EditSaveBar(
-                        summary: context.tr(
-                          'workout.builder.review_summary',
-                          params: {
-                            'exercises': context.tr(
-                              state.draft.exerciseCount == 1
-                                  ? 'workout.detail.exercise_count_one'
-                                  : 'workout.detail.exercise_count_other',
-                              params: {'count': '${state.draft.exerciseCount}'},
-                            ),
-                            'minutes':
-                                '${state.draft.estimatedDurationMinutes}',
-                          },
+                        summary: context.l10n.workoutBuilderReviewSummary(
+                          context.tr(
+                            state.draft.exerciseCount == 1
+                                ? 'workout.detail.exercise_count_one'
+                                : 'workout.detail.exercise_count_other',
+                            params: {'count': '${state.draft.exerciseCount}'},
+                          ),
+                          '${state.draft.estimatedDurationMinutes}',
                         ),
                         loading: state.isSaving,
                         enabled: state.isDirty && state.validation.isValid,
@@ -261,7 +257,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  context.tr('workout.builder.info_title'),
+                  context.l10n.workoutBuilderInfoTitle,
                   style: context.scale.display.heavy.copyWith(
                     color: context.exerciseTheme.textPrimary,
                   ),
@@ -273,8 +269,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                   maxLength: 60,
                   textInputAction: TextInputAction.next,
                   onChanged: (value) => setSheetState(() => title = value),
-                  label: context.tr('workout.builder.title_label'),
-                  hint: context.tr('workout.builder.title_hint'),
+                  label: context.l10n.workoutBuilderTitleLabel,
+                  hint: context.l10n.workoutBuilderTitleHint,
                 ),
                 const SizedBox(height: 18),
                 WorkoutGoalSelector(
@@ -283,7 +279,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  context.tr('workout.builder.session_note'),
+                  context.l10n.workoutBuilderSessionNote,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: context.exerciseTheme.textSecondary,
                     fontWeight: FontWeight.w700,
@@ -298,9 +294,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                           child: WorkoutBuilderUnderlineField(
                             controller: notesController,
                             focusNode: notesFocus,
-                            label: context.tr('workout.builder.session_note'),
-                            hint: context.tr('workout.builder.focus_hint'),
-                            helper: context.tr('workout.builder.optional'),
+                            label: context.l10n.workoutBuilderSessionNote,
+                            hint: context.l10n.workoutBuilderFocusHint,
+                            helper: context.l10n.workoutBuilderOptional,
                             minLines: 2,
                             maxLines: 4,
                             maxLength: 180,
@@ -325,7 +321,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                             },
                             icon: const Icon(Icons.add_rounded),
                             label: Text(
-                              context.tr('workout.builder.add_session_note'),
+                              context.l10n.workoutBuilderAddSessionNote,
                             ),
                           ),
                         ),
@@ -339,7 +335,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
                   onPressed: title.trim().isEmpty
                       ? null
                       : () => Navigator.pop(context, true),
-                  child: Text(context.tr('workout.builder.apply')),
+                  child: Text(context.l10n.workoutBuilderApply),
                 ),
               ],
             ),
@@ -455,7 +451,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.tr('workout.builder.move_to_section'),
+              context.l10n.workoutBuilderMoveToSection,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: context.exerciseTheme.textPrimary,
                 fontWeight: FontWeight.w800,
@@ -466,7 +462,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
               (section) => ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(
-                  section.name ?? context.tr('workout.builder.main_section'),
+                  section.name ?? context.l10n.workoutBuilderMainSection,
                 ),
                 onTap: () => Navigator.pop(context, section.id),
               ),
@@ -494,9 +490,9 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       final removedItem = removed;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(context.tr('workout.builder.item_removed')),
+          content: Text(context.l10n.workoutBuilderItemRemoved),
           action: SnackBarAction(
-            label: context.tr('common.undo'),
+            label: context.l10n.commonUndo,
             onPressed: () {
               for (final exercise in removedItem.exercises) {
                 ref
@@ -588,17 +584,17 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: context.exerciseTheme.surfaceElevated,
-        title: Text(context.tr('workout.detail.unsaved_title')),
-        content: Text(context.tr('workout.detail.unsaved_body')),
+        title: Text(context.l10n.workoutDetailUnsavedTitle),
+        content: Text(context.l10n.workoutDetailUnsavedBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(context.tr('workout.detail.continue_editing')),
+            child: Text(context.l10n.workoutDetailContinueEditing),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              context.tr('workout.detail.discard'),
+              context.l10n.workoutDetailDiscard,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
@@ -665,7 +661,7 @@ class _EditSaveBar extends StatelessWidget {
                     dimension: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : Text(context.tr('workout.builder.save_changes')),
+                : Text(context.l10n.workoutBuilderSaveChanges),
           ),
         ),
       ],

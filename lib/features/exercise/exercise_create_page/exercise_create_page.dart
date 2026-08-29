@@ -40,7 +40,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
   Future<void> _next() async {
     if (_step == 0 && _nameIt.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr('exercise.create.name_required'))),
+        SnackBar(content: Text(context.l10n.exerciseCreateNameRequired)),
       );
       return;
     }
@@ -82,7 +82,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
       // tradotto (docs/development/07-errors-and-feedback.md).
       case Err():
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.tr('exercise.create.save_failed'))),
+          SnackBar(content: Text(context.l10n.exerciseCreateSaveFailed)),
         );
       case Ok(:final value):
         context.pop<ExerciseDetailModel>(value);
@@ -94,7 +94,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
     return Scaffold(
       backgroundColor: context.colors.surface,
       appBar: AppBar(
-        title: Text(context.tr('exercise.create.title')),
+        title: Text(context.l10n.exerciseCreateTitle),
         backgroundColor: Colors.transparent,
       ),
       body: SafeArea(
@@ -118,7 +118,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                context.tr('exercise.create.hint'),
+                context.l10n.exerciseCreateHint,
                 style: TextStyle(color: context.colors.textSecondary),
               ),
             ),
@@ -143,7 +143,7 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
                           curve: Curves.easeOut,
                         );
                       },
-                      child: Text(context.tr('common.back')),
+                      child: Text(context.l10n.commonBack),
                     ),
                   const Spacer(),
                   FilledButton.icon(
@@ -183,17 +183,17 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
         'isolation',
       ].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
       onChanged: (v) => setState(() => _mechanics = v!),
-      decoration: InputDecoration(labelText: context.tr('exercise.mechanics')),
+      decoration: InputDecoration(labelText: context.l10n.exerciseMechanics),
     ),
     SwitchListTile(
       value: _bodyweight,
       onChanged: (v) => setState(() => _bodyweight = v),
-      title: Text(context.tr('exercise.bodyweight')),
+      title: Text(context.l10n.exerciseBodyweight),
     ),
     SwitchListTile(
       value: _unilateral,
       onChanged: (v) => setState(() => _unilateral = v),
-      title: Text(context.tr('exercise.unilateral')),
+      title: Text(context.l10n.exerciseUnilateral),
     ),
   ]);
   Widget _guidance() => _stepBody([
@@ -201,8 +201,8 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
     const SizedBox(height: 16),
     ListTile(
       leading: const Icon(Icons.photo_library_outlined),
-      title: Text(context.tr('exercise.create.media')),
-      subtitle: Text(context.tr('exercise.create.upload_soon')),
+      title: Text(context.l10n.exerciseCreateMedia),
+      subtitle: Text(context.l10n.exerciseCreateUploadSoon),
     ),
   ]);
   Widget _stepBody(List<Widget> children) =>

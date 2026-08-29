@@ -89,7 +89,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
             actions: stage == _CreateStage.structure
                 ? [
                     PopupMenuButton<String>(
-                      tooltip: context.tr('workout.builder.workout_actions'),
+                      tooltip: context.l10n.workoutBuilderWorkoutActions,
                       icon: const Icon(Icons.more_horiz_rounded),
                       onSelected: (_) => _editWorkoutNotes(state.draft.focus),
                       itemBuilder: (context) => [
@@ -99,7 +99,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                             children: [
                               const Icon(Icons.notes_rounded),
                               const SizedBox(width: 12),
-                              Text(context.tr('workout.builder.add_notes')),
+                              Text(context.l10n.workoutBuilderAddNotes),
                             ],
                           ),
                         ),
@@ -146,19 +146,15 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                     onDontShowAgainChanged: (value) => ref
                         .read(builderTourProvider.notifier)
                         .setDontShowAgain(value),
-                    stepLabel: context.tr(
-                      'workout.builder.tour_step',
-                      params: {
-                        'current': '${tourState.currentStepIndex + 1}',
-                        'total': '${_tourSteps.length}',
-                      },
+                    stepLabel: context.l10n.workoutBuilderTourStep(
+                      '${tourState.currentStepIndex + 1}',
+                      '${_tourSteps.length}',
                     ),
-                    nextLabel: context.tr('workout.builder.tour_next'),
-                    doneLabel: context.tr('workout.builder.tour_done'),
-                    dontShowAgainLabel: context.tr(
-                      'workout.builder.tour_dont_show_again',
-                    ),
-                    closeLabel: context.tr('common.close'),
+                    nextLabel: context.l10n.workoutBuilderTourNext,
+                    doneLabel: context.l10n.workoutBuilderTourDone,
+                    dontShowAgainLabel:
+                        context.l10n.workoutBuilderTourDontShowAgain,
+                    closeLabel: context.l10n.commonClose,
                   ),
               ],
             ),
@@ -176,7 +172,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
           children: [
             Text(
-              context.tr('workout.builder.identity_heading'),
+              context.l10n.workoutBuilderIdentityHeading,
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                 color: context.exerciseTheme.textPrimary,
                 height: 1.08,
@@ -185,7 +181,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
             ),
             const SizedBox(height: 10),
             Text(
-              context.tr('workout.builder.identity_subtitle'),
+              context.l10n.workoutBuilderIdentitySubtitle,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.exerciseTheme.textSecondary,
                 height: 1.4,
@@ -195,8 +191,8 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
             WorkoutBuilderUnderlineField(
               controller: _title,
               focusNode: _titleFocus,
-              label: context.tr('workout.builder.title_label'),
-              hint: context.tr('workout.builder.title_hint'),
+              label: context.l10n.workoutBuilderTitleLabel,
+              hint: context.l10n.workoutBuilderTitleHint,
               maxLength: 60,
               autofocus: true,
               textInputAction: TextInputAction.next,
@@ -228,9 +224,9 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                       key: const ValueKey('session-note'),
                       controller: _focus,
                       focusNode: _noteFocus,
-                      label: context.tr('workout.builder.session_note'),
-                      hint: context.tr('workout.builder.focus_hint'),
-                      helper: context.tr('workout.builder.optional'),
+                      label: context.l10n.workoutBuilderSessionNote,
+                      hint: context.l10n.workoutBuilderFocusHint,
+                      helper: context.l10n.workoutBuilderOptional,
                       maxLength: 180,
                       minLines: 2,
                       maxLines: 4,
@@ -260,9 +256,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                         ),
                         icon: const Icon(Icons.add, size: 20),
-                        label: Text(
-                          context.tr('workout.builder.add_session_note'),
-                        ),
+                        label: Text(context.l10n.workoutBuilderAddSessionNote),
                       ),
                     ),
             ),
@@ -270,7 +264,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
         ),
       ),
       _BottomAction(
-        label: context.tr('workout.builder.continue_action'),
+        label: context.l10n.workoutBuilderContinueAction,
         enabled: state.draft.title.trim().isNotEmpty,
         trailingIcon: Icons.arrow_forward,
         onPressed: () {
@@ -362,12 +356,12 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
               bottom: 16,
               child: BuilderAssistRail(
                 tourRegistry: _tourRegistry,
-                discoverLabel: context.tr('workout.builder.discover'),
-                workoutCheckLabel: context.tr('workout.check.open'),
+                discoverLabel: context.l10n.workoutBuilderDiscover,
+                workoutCheckLabel: context.l10n.workoutCheckOpen,
                 workoutCheckHeroTag:
                     'workout-check-${state.draft.localDraftId}',
                 showReplayHint: _showReplayHint,
-                replayHintLabel: context.tr('workout.builder.tour_replay_hint'),
+                replayHintLabel: context.l10n.workoutBuilderTourReplayHint,
                 onDiscover: () {
                   _dismissReplayHint();
                   ref
@@ -384,19 +378,16 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
         id: BuilderTourTarget.reviewWorkout,
         registry: _tourRegistry,
         child: _BottomAction(
-          label: context.tr('workout.builder.review_action'),
+          label: context.l10n.workoutBuilderReviewAction,
           enabled: state.draft.exerciseCount > 0,
-          summary: context.tr(
-            'workout.builder.review_summary',
-            params: {
-              'exercises': context.tr(
-                state.draft.exerciseCount == 1
-                    ? 'workout.detail.exercise_count_one'
-                    : 'workout.detail.exercise_count_other',
-                params: {'count': '${state.draft.exerciseCount}'},
-              ),
-              'minutes': '${state.draft.estimatedDurationMinutes}',
-            },
+          summary: context.l10n.workoutBuilderReviewSummary(
+            context.tr(
+              state.draft.exerciseCount == 1
+                  ? 'workout.detail.exercise_count_one'
+                  : 'workout.detail.exercise_count_other',
+              params: {'count': '${state.draft.exerciseCount}'},
+            ),
+            '${state.draft.estimatedDurationMinutes}',
           ),
           trailingIcon: Icons.arrow_forward,
           onPressed: () => setState(() => stage = _CreateStage.review),
@@ -416,7 +407,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
             const SizedBox(height: 24),
             if (state.draft.focus?.isNotEmpty == true) ...[
               Text(
-                context.tr('workout.focus'),
+                context.l10n.workoutFocus,
                 style: TextStyle(
                   color: context.exerciseTheme.textSecondary,
                   fontWeight: FontWeight.w700,
@@ -456,7 +447,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
         ),
       ),
       _BottomAction(
-        label: context.tr('workout.builder.create_action'),
+        label: context.l10n.workoutBuilderCreateAction,
         loading: state.isSaving,
         enabled: state.validation.isValid,
         onPressed: _commit,
@@ -467,19 +458,19 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
   List<CoachlyTourStepDefinition> get _tourSteps => [
     CoachlyTourStepDefinition(
       id: 'intro',
-      title: context.tr('workout.builder.tour_intro_title'),
-      body: context.tr('workout.builder.tour_intro_body'),
+      title: context.l10n.workoutBuilderTourIntroTitle,
+      body: context.l10n.workoutBuilderTourIntroBody,
     ),
     CoachlyTourStepDefinition(
       id: 'exercise',
-      title: context.tr('workout.builder.tour_exercise_title'),
-      body: context.tr('workout.builder.tour_exercise_body'),
+      title: context.l10n.workoutBuilderTourExerciseTitle,
+      body: context.l10n.workoutBuilderTourExerciseBody,
       targets: const [BuilderTourTarget.addExercise],
     ),
     CoachlyTourStepDefinition(
       id: 'sections',
-      title: context.tr('workout.builder.tour_sections_title'),
-      body: context.tr('workout.builder.tour_sections_body'),
+      title: context.l10n.workoutBuilderTourSectionsTitle,
+      body: context.l10n.workoutBuilderTourSectionsBody,
       targets: const [
         BuilderTourTarget.mainSectionHeader,
         BuilderTourTarget.sectionsAction,
@@ -487,29 +478,29 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
     ),
     CoachlyTourStepDefinition(
       id: 'notes',
-      title: context.tr('workout.builder.tour_notes_title'),
-      body: context.tr('workout.builder.tour_notes_body'),
-      secondary: context.tr('workout.builder.tour_notes_secondary'),
+      title: context.l10n.workoutBuilderTourNotesTitle,
+      body: context.l10n.workoutBuilderTourNotesBody,
+      secondary: context.l10n.workoutBuilderTourNotesSecondary,
       targets: const [BuilderTourTarget.mainSectionMenu],
     ),
     CoachlyTourStepDefinition(
       id: 'blocks',
-      title: context.tr('workout.builder.tour_blocks_title'),
-      body: context.tr('workout.builder.tour_blocks_body'),
-      secondary: context.tr('workout.builder.tour_blocks_secondary'),
+      title: context.l10n.workoutBuilderTourBlocksTitle,
+      body: context.l10n.workoutBuilderTourBlocksBody,
+      secondary: context.l10n.workoutBuilderTourBlocksSecondary,
       targets: const [BuilderTourTarget.blocksAction],
     ),
     CoachlyTourStepDefinition(
       id: 'check',
-      title: context.tr('workout.builder.tour_check_title'),
-      body: context.tr('workout.builder.tour_check_body'),
-      secondary: context.tr('workout.builder.tour_check_secondary'),
+      title: context.l10n.workoutBuilderTourCheckTitle,
+      body: context.l10n.workoutBuilderTourCheckBody,
+      secondary: context.l10n.workoutBuilderTourCheckSecondary,
       targets: const [BuilderTourTarget.workoutCheck],
     ),
     CoachlyTourStepDefinition(
       id: 'review',
-      title: context.tr('workout.builder.tour_review_title'),
-      body: context.tr('workout.builder.tour_review_body'),
+      title: context.l10n.workoutBuilderTourReviewTitle,
+      body: context.l10n.workoutBuilderTourReviewBody,
       targets: const [BuilderTourTarget.reviewWorkout],
     ),
   ];
@@ -630,7 +621,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.tr('workout.builder.move_to_section'),
+              context.l10n.workoutBuilderMoveToSection,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: context.exerciseTheme.textPrimary,
                 fontWeight: FontWeight.w800,
@@ -641,7 +632,7 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
               (section) => ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(
-                  section.name ?? context.tr('workout.builder.main_section'),
+                  section.name ?? context.l10n.workoutBuilderMainSection,
                 ),
                 onTap: () => Navigator.pop(context, section.id),
               ),
@@ -738,17 +729,17 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
         context: context,
         builder: (context) => AlertDialog(
           backgroundColor: context.exerciseTheme.surfaceElevated,
-          title: Text(context.tr('workout.detail.unsaved_title')),
-          content: Text(context.tr('workout.detail.unsaved_body')),
+          title: Text(context.l10n.workoutDetailUnsavedTitle),
+          content: Text(context.l10n.workoutDetailUnsavedBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text(context.tr('workout.detail.continue_editing')),
+              child: Text(context.l10n.workoutDetailContinueEditing),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: Text(
-                context.tr('workout.detail.discard'),
+                context.l10n.workoutDetailDiscard,
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ),
@@ -762,14 +753,14 @@ class _CreateWorkoutFlowState extends ConsumerState<CreateWorkoutFlow> {
 
   void _showGoalInfo() => CoachlyInfoSheet.show(
     context,
-    title: context.tr('workout.builder.goal_label'),
+    title: context.l10n.workoutBuilderGoalLabel,
     sections: [
       CoachlyInfoSection(
-        context.tr('workout.builder.goal_info_title'),
-        context.tr('workout.builder.goal_info_body'),
+        context.l10n.workoutBuilderGoalInfoTitle,
+        context.l10n.workoutBuilderGoalInfoBody,
       ),
     ],
-    primaryActionLabel: context.tr('common.got_it'),
+    primaryActionLabel: context.l10n.commonGotIt,
   );
 }
 
@@ -916,14 +907,14 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
             children: [
               Text(
-                context.tr('workout.builder.create_block_title'),
+                context.l10n.workoutBuilderCreateBlockTitle,
                 style: context.scale.display.heavy.copyWith(
                   color: context.exerciseTheme.textPrimary,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
-                context.tr('workout.builder.create_block_explanation'),
+                context.l10n.workoutBuilderCreateBlockExplanation,
                 style: TextStyle(color: context.exerciseTheme.textSecondary),
               ),
               const SizedBox(height: 18),
@@ -1007,10 +998,7 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
         children: [
           Expanded(
             child: Text(
-              context.tr(
-                'workout.builder.choose_exercises',
-                params: {'count': '$_requiredCount'},
-              ),
+              context.l10n.workoutBuilderChooseExercises('$_requiredCount'),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: context.exerciseTheme.textPrimary,
                 fontWeight: FontWeight.w700,
@@ -1060,9 +1048,8 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
       }),
       if (!_selectionComplete)
         Text(
-          context.tr(
-            'workout.builder.select_more_exercises',
-            params: {'count': '${_requiredCount - selected.length}'},
+          context.l10n.workoutBuilderSelectMoreExercises(
+            '${_requiredCount - selected.length}',
           ),
           style: TextStyle(color: context.exerciseTheme.textSecondary),
         ),
@@ -1074,9 +1061,8 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       Text(
-        context.tr(
-          'workout.builder.block_setup_title',
-          params: {'type': _groupTypeLabel(context, type)},
+        context.l10n.workoutBuilderBlockSetupTitle(
+          _groupTypeLabel(context, type),
         ),
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: context.exerciseTheme.textPrimary,
@@ -1085,21 +1071,21 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
       ),
       const SizedBox(height: 12),
       NumericStepper(
-        label: context.tr('workout.detail.rounds'),
+        label: context.l10n.workoutDetailRounds,
         value: rounds,
         min: 1,
         onChanged: (value) => setState(() => rounds = value),
       ),
       DurationStepper(
-        label: context.tr('workout.builder.after_each_round'),
+        label: context.l10n.workoutBuilderAfterEachRound,
         seconds: restAfterRoundSeconds,
         onChanged: (value) => setState(() => restAfterRoundSeconds = value),
       ),
       const SizedBox(height: 12),
       _BlockOptionalFieldAction(
         expanded: showNotes,
-        title: context.tr('workout.builder.notes_title'),
-        actionLabel: context.tr('workout.builder.add_notes'),
+        title: context.l10n.workoutBuilderNotesTitle,
+        actionLabel: context.l10n.workoutBuilderAddNotes,
         onPressed: () {
           setState(() => showNotes = true);
           WidgetsBinding.instance.addPostFrameCallback(
@@ -1109,9 +1095,9 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
         child: WorkoutBuilderUnderlineField(
           controller: notesController,
           focusNode: notesFocus,
-          label: context.tr('workout.builder.notes_title'),
-          hint: context.tr('workout.builder.notes_hint'),
-          helper: context.tr('workout.builder.optional'),
+          label: context.l10n.workoutBuilderNotesTitle,
+          hint: context.l10n.workoutBuilderNotesHint,
+          helper: context.l10n.workoutBuilderOptional,
           minLines: 2,
           maxLines: 4,
           maxLength: 300,
@@ -1138,7 +1124,7 @@ class _CreateBlockSheetState extends State<_CreateBlockSheet> {
       ),
       const SizedBox(height: 10),
       Text(
-        context.tr('workout.builder.block_setup_hint'),
+        context.l10n.workoutBuilderBlockSetupHint,
         style: TextStyle(
           color: context.exerciseTheme.textSecondary,
           height: 1.4,
@@ -1247,9 +1233,9 @@ class _BlockStepper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final labels = [
-      context.tr('workout.builder.step_type'),
-      context.tr('workout.builder.step_exercises'),
-      context.tr('workout.builder.step_setup'),
+      context.l10n.workoutBuilderStepType,
+      context.l10n.workoutBuilderStepExercises,
+      context.l10n.workoutBuilderStepSetup,
     ];
     return Semantics(
       label: labels[currentStep],

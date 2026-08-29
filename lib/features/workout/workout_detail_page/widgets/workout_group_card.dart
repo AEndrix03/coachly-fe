@@ -31,10 +31,10 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
   Widget build(BuildContext context) {
     final group = widget.group;
     final typeLabel = switch (group.type) {
-      WorkoutGroupType.superset => context.tr('workout.detail.superset'),
-      WorkoutGroupType.triset => context.tr('workout.detail.triset'),
-      WorkoutGroupType.giantSet => context.tr('workout.detail.giant_set'),
-      WorkoutGroupType.circuit => context.tr('workout.detail.circuit'),
+      WorkoutGroupType.superset => context.l10n.workoutDetailSuperset,
+      WorkoutGroupType.triset => context.l10n.workoutDetailTriset,
+      WorkoutGroupType.giantSet => context.l10n.workoutDetailGiantSet,
+      WorkoutGroupType.circuit => context.l10n.workoutDetailCircuit,
     };
     final exerciseCount = _exerciseCountLabel(context, group.exercises.length);
     final roundCount = _roundCountLabel(context, group.rounds);
@@ -93,7 +93,7 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
                     width: 44,
                     height: 44,
                   ),
-                  tooltip: context.tr('workout.detail.explain_concept'),
+                  tooltip: context.l10n.workoutDetailExplainConcept,
                   onPressed: () => _showGroupInfo(context, typeLabel),
                   icon: const Icon(
                     Icons.info_outline_rounded,
@@ -107,8 +107,8 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
                     height: 44,
                   ),
                   tooltip: _expanded
-                      ? context.tr('workout.detail.collapse_group')
-                      : context.tr('workout.detail.expand_group'),
+                      ? context.l10n.workoutDetailCollapseGroup
+                      : context.l10n.workoutDetailExpandGroup,
                   onPressed: () {
                     HapticFeedback.selectionClick();
                     setState(() => _expanded = !_expanded);
@@ -146,9 +146,7 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
               curve: CoachlyAthleteTheme.standardCurve,
               child: _expanded && group.restBetweenExercisesSeconds != null
                   ? _RestRow(
-                      label: context.tr(
-                        'workout.detail.rest_between_exercises',
-                      ),
+                      label: context.l10n.workoutDetailRestBetweenExercises,
                       seconds: group.restBetweenExercisesSeconds!,
                     )
                   : const SizedBox.shrink(),
@@ -158,7 +156,7 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  '${context.tr('workout.detail.rest_after_round')} · ${_formatSeconds(group.restAfterRoundSeconds!)}',
+                  '${context.l10n.workoutDetailRestAfterRound} · ${_formatSeconds(group.restAfterRoundSeconds!)}',
                   style: context.scale.caption.semibold.copyWith(
                     color: CoachlyAthleteTheme.textSecondary,
                   ),
@@ -181,14 +179,14 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
     CoachlyInfoSheet.show(
       context,
       title: typeLabel,
-      primaryActionLabel: context.tr('common.got_it'),
+      primaryActionLabel: context.l10n.commonGotIt,
       sections: [
         CoachlyInfoSection(
-          context.tr('workout.detail.what_is_it'),
+          context.l10n.workoutDetailWhatIsIt,
           context.tr(definitionKey),
         ),
         CoachlyInfoSection(
-          context.tr('workout.detail.how_to_read'),
+          context.l10n.workoutDetailHowToRead,
           '${_roundCountLabel(context, widget.group.rounds)} · ${widget.group.exercises.map((e) => e.name).join(' → ')}',
         ),
       ],
@@ -271,7 +269,7 @@ class _GroupExerciseRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   exercise.isMissing
-                      ? context.tr('workout.detail.exercise_unavailable')
+                      ? context.l10n.workoutDetailExerciseUnavailable
                       : exercise.name,
                   style: context.scale.body.bold.copyWith(
                     color: CoachlyAthleteTheme.textPrimary,
@@ -319,7 +317,7 @@ class _GroupExerciseLoadingRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: context.tr('workout.detail.exercise_loading'),
+      label: context.l10n.workoutDetailExerciseLoading,
       child: ExcludeSemantics(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 4),

@@ -264,7 +264,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
             if (current != null && _groupFor(current.exercise.id) != null)
               ListTile(
                 leading: const Icon(Icons.link_rounded),
-                title: Text(context.tr('workout.active.add_to_group')),
+                title: Text(context.l10n.workoutActiveAddToGroup),
                 onTap: () {
                   Navigator.pop(sheetContext);
                   _controller.addExercise(
@@ -275,7 +275,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
               ),
             ListTile(
               leading: const Icon(Icons.last_page_rounded),
-              title: Text(context.tr('workout.active.end_of_workout')),
+              title: Text(context.l10n.workoutActiveEndOfWorkout),
               onTap: () {
                 Navigator.pop(sheetContext);
                 _controller.addExercise(exercise);
@@ -310,7 +310,7 @@ class _ErrorState extends StatelessWidget {
           const SizedBox(height: 12),
           OutlinedButton(
             onPressed: onBack,
-            child: Text(context.tr('common.back')),
+            child: Text(context.l10n.commonBack),
           ),
         ],
       ),
@@ -350,7 +350,7 @@ class _LocalExercisePickerState extends State<_LocalExercisePicker> {
                 onChanged: (value) => setState(() => _query = value),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search_rounded),
-                  hintText: context.tr('workout.active.search_exercises'),
+                  hintText: context.l10n.workoutActiveSearchExercises,
                 ),
               ),
             ),

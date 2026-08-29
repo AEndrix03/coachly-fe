@@ -6,6 +6,7 @@ import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_muscles_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/exercise_variants_page.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/widgets/exercise_detail_widgets.dart';
+import 'package:coachly/l10n/app_localizations.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,8 +16,14 @@ import 'package:go_router/go_router.dart';
 /// Le schermate sono passate da stringhe italiane inline a `context.tr`: senza
 /// locale il fallback e' l'inglese e le asserzioni italiane non trovano nulla.
 /// L'harness dichiara la lingua invece di far dipendere il test dal default.
+///
+/// `AppLocalizations.delegate` deve essere qui: le schermate migrate a
+/// `context.l10n` risolvono le chiavi tramite `Localizations.of<AppLocalizations>`
+/// e senza questo delegate quella lookup lancia, a differenza di `context.tr`
+/// che ha un fallback su `AppStrings`.
 const _locale = Locale('it');
 const _delegates = <LocalizationsDelegate<Object?>>[
+  AppLocalizations.delegate,
   GlobalMaterialLocalizations.delegate,
   GlobalWidgetsLocalizations.delegate,
   GlobalCupertinoLocalizations.delegate,

@@ -123,10 +123,10 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          context.tr('workout.detail.exercise_removed'),
+                          context.l10n.workoutDetailExerciseRemoved,
                         ),
                         action: SnackBarAction(
-                          label: context.tr('common.undo'),
+                          label: context.l10n.commonUndo,
                           onPressed: () =>
                               notifier.restoreBlocks(beforeRemoval),
                         ),
@@ -149,7 +149,7 @@ class WorkoutStructuralEdit extends ConsumerWidget {
               foregroundColor: CoachlyAthleteTheme.background,
             ),
             icon: const Icon(Icons.add_rounded),
-            label: Text(context.tr('workout.detail.add_exercise')),
+            label: Text(context.l10n.workoutDetailAddExercise),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
@@ -158,7 +158,7 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                 : () => _addSection(context, notifier),
             style: _secondaryStyle(),
             icon: const Icon(Icons.view_agenda_outlined),
-            label: Text(context.tr('workout.detail.add_section')),
+            label: Text(context.l10n.workoutDetailAddSection),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
@@ -167,7 +167,7 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                 : () => _createGroup(context, state, notifier, exercises),
             style: _secondaryStyle(),
             icon: const Icon(Icons.link_rounded),
-            label: Text(context.tr('workout.detail.create_group')),
+            label: Text(context.l10n.workoutDetailCreateGroup),
           ),
         ],
       ),
@@ -204,7 +204,7 @@ class WorkoutStructuralEdit extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  context.tr('workout.detail.add_section'),
+                  context.l10n.workoutDetailAddSection,
                   style: context.scale.headline.heavy.copyWith(
                     color: CoachlyAthleteTheme.textPrimary,
                   ),
@@ -238,7 +238,7 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                     color: CoachlyAthleteTheme.textPrimary,
                   ),
                   decoration: InputDecoration(
-                    hintText: context.tr('workout.detail.section_name'),
+                    hintText: context.l10n.workoutDetailSectionName,
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -247,7 +247,7 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                     notifier.addSection(title: title.trim(), kind: kind);
                     Navigator.pop(sheetContext);
                   },
-                  child: Text(context.tr('common.confirm')),
+                  child: Text(context.l10n.commonConfirm),
                 ),
               ],
             ),
@@ -280,7 +280,7 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    context.tr('workout.detail.create_group'),
+                    context.l10n.workoutDetailCreateGroup,
                     style: context.scale.headline.heavy.copyWith(
                       color: CoachlyAthleteTheme.textPrimary,
                     ),
@@ -289,11 +289,11 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                     segments: [
                       ButtonSegment(
                         value: 'superset',
-                        label: Text(context.tr('workout.detail.superset')),
+                        label: Text(context.l10n.workoutDetailSuperset),
                       ),
                       ButtonSegment(
                         value: 'circuit',
-                        label: Text(context.tr('workout.detail.circuit')),
+                        label: Text(context.l10n.workoutDetailCircuit),
                       ),
                     ],
                     selected: {type},
@@ -326,7 +326,7 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                   ),
                   Row(
                     children: [
-                      Text(context.tr('workout.detail.rounds')),
+                      Text(context.l10n.workoutDetailRounds),
                       const Spacer(),
                       IconButton(
                         onPressed: rounds > 1
@@ -352,7 +352,7 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                             );
                             Navigator.pop(sheetContext);
                           },
-                    child: Text(context.tr('common.confirm')),
+                    child: Text(context.l10n.commonConfirm),
                   ),
                 ],
               ),
@@ -464,21 +464,21 @@ class _EditableBlock extends StatelessWidget {
               if (onEdit != null)
                 PopupMenuItem(
                   value: 'edit',
-                  child: Text(context.tr('common.edit')),
+                  child: Text(context.l10n.commonEdit),
                 ),
               PopupMenuItem(
                 value: 'duplicate',
-                child: Text(context.tr('common.duplicate')),
+                child: Text(context.l10n.commonDuplicate),
               ),
               if (onUngroup != null)
                 PopupMenuItem(
                   value: 'ungroup',
-                  child: Text(context.tr('workout.detail.ungroup')),
+                  child: Text(context.l10n.workoutDetailUngroup),
                 ),
               PopupMenuItem(
                 value: 'remove',
                 child: Text(
-                  context.tr('common.delete'),
+                  context.l10n.commonDelete,
                   style: const TextStyle(color: CoachlyAthleteTheme.danger),
                 ),
               ),
@@ -657,7 +657,7 @@ class _WorkoutExerciseQuickEditSheetState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    context.tr('workout.detail.edit_exercise'),
+                    context.l10n.workoutDetailEditExercise,
                     style: context.scale.headlineTight.heavy.copyWith(
                       color: CoachlyAthleteTheme.textPrimary,
                     ),
@@ -674,9 +674,9 @@ class _WorkoutExerciseQuickEditSheetState
             TabBar(
               controller: tabs,
               tabs: [
-                Tab(text: context.tr('workout.detail.base')),
-                Tab(text: context.tr('workout.detail.intensity')),
-                Tab(text: context.tr('workout.detail.advanced')),
+                Tab(text: context.l10n.workoutDetailBase),
+                Tab(text: context.l10n.workoutDetailIntensity),
+                Tab(text: context.l10n.workoutDetailAdvanced),
               ],
             ),
             Expanded(
@@ -696,7 +696,7 @@ class _WorkoutExerciseQuickEditSheetState
                   Expanded(
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text(context.tr('common.cancel')),
+                      child: Text(context.l10n.commonCancel),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -734,7 +734,7 @@ class _WorkoutExerciseQuickEditSheetState
                         HapticFeedback.mediumImpact();
                         Navigator.pop(context);
                       },
-                      child: Text(context.tr('common.confirm')),
+                      child: Text(context.l10n.commonConfirm),
                     ),
                   ),
                 ],
@@ -749,7 +749,7 @@ class _WorkoutExerciseQuickEditSheetState
   Widget _baseTab(BuildContext context) => ListView(
     padding: const EdgeInsets.all(20),
     children: [
-      _EditorLabel(context.tr('workout.sets')),
+      _EditorLabel(context.l10n.workoutSets),
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -769,7 +769,7 @@ class _WorkoutExerciseQuickEditSheetState
           ),
         ],
       ),
-      _EditorLabel(context.tr('workout.reps')),
+      _EditorLabel(context.l10n.workoutReps),
       Row(
         children: [
           Expanded(child: _numberField(repsMin)),
@@ -779,7 +779,7 @@ class _WorkoutExerciseQuickEditSheetState
       ),
       const SizedBox(height: 18),
       _EditorLabel(
-        '${context.tr('workout.detail.rest')} (${context.tr('common.seconds')})',
+        '${context.l10n.workoutDetailRest} (${context.l10n.commonSeconds})',
       ),
       _numberField(rest),
     ],
@@ -795,7 +795,7 @@ class _WorkoutExerciseQuickEditSheetState
             selected: intensityType == type,
             label: Text(
               type == 'none'
-                  ? context.tr('workout.detail.none')
+                  ? context.l10n.workoutDetailNone
                   : type.replaceAll('_', '').toUpperCase(),
             ),
             onSelected: (_) {
@@ -816,7 +816,7 @@ class _WorkoutExerciseQuickEditSheetState
   Widget _advancedTab(BuildContext context) => ListView(
     padding: const EdgeInsets.all(20),
     children: [
-      _EditorLabel(context.tr('workout.detail.set_type')),
+      _EditorLabel(context.l10n.workoutDetailSetType),
       DropdownButtonFormField<String>(
         initialValue: setType,
         items:
@@ -844,13 +844,13 @@ class _WorkoutExerciseQuickEditSheetState
       ),
       if (setType == 'backoff') ...[
         const SizedBox(height: 18),
-        _EditorLabel(context.tr('workout.detail.relative_load')),
+        _EditorLabel(context.l10n.workoutDetailRelativeLoad),
         _numberField(relativeLoad, decimal: true),
       ],
       const SizedBox(height: 12),
       SwitchListTile.adaptive(
         contentPadding: EdgeInsets.zero,
-        title: Text(context.tr('workout.detail.unilateral')),
+        title: Text(context.l10n.workoutDetailUnilateral),
         value: unilateral,
         onChanged: (value) {
           HapticFeedback.selectionClick();
@@ -858,17 +858,17 @@ class _WorkoutExerciseQuickEditSheetState
         },
       ),
       const SizedBox(height: 6),
-      _EditorLabel(context.tr('workout.detail.tempo')),
+      _EditorLabel(context.l10n.workoutDetailTempo),
       TextField(
         controller: tempo,
         textInputAction: TextInputAction.next,
         decoration: const InputDecoration(hintText: '3-1-1-0'),
       ),
       const SizedBox(height: 18),
-      _EditorLabel(context.tr('workout.detail.pause_seconds')),
+      _EditorLabel(context.l10n.workoutDetailPauseSeconds),
       _numberField(pause),
       const SizedBox(height: 18),
-      _EditorLabel(context.tr('workout.detail.exercise_note')),
+      _EditorLabel(context.l10n.workoutDetailExerciseNote),
       TextField(
         controller: notes,
         minLines: 2,

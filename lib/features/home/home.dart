@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
             ),
             SizedBox(height: context.spacing.md),
             Text(
-              context.tr('community.placeholder_title'),
+              context.l10n.communityPlaceholderTitle,
               textAlign: TextAlign.center,
               style: context.text.titleM.copyWith(
                 color: context.colors.textPrimary,
@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
             ),
             SizedBox(height: context.spacing.xs),
             Text(
-              context.tr('community.placeholder_body'),
+              context.l10n.communityPlaceholderBody,
               textAlign: TextAlign.center,
               style: context.text.bodyM.copyWith(
                 color: context.colors.textSecondary,
