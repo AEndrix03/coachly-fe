@@ -1,0 +1,3431 @@
+{
+  "@@locale": "en",
+  "commonAppName": "Coachly",
+  "@commonAppName": {
+    "description": "Migrated from common.app_name"
+  },
+  "workoutActiveSearchExercises": "Search local exercises",
+  "@workoutActiveSearchExercises": {
+    "description": "Migrated from workout.active.search_exercises"
+  },
+  "workoutActiveCluster": "Cluster",
+  "@workoutActiveCluster": {
+    "description": "Migrated from workout.active.cluster"
+  },
+  "workoutActiveFailure": "Failure",
+  "@workoutActiveFailure": {
+    "description": "Migrated from workout.active.failure"
+  },
+  "workoutActiveWeight": "Weight",
+  "@workoutActiveWeight": {
+    "description": "Migrated from workout.active.weight"
+  },
+  "workoutActiveReps": "Reps",
+  "@workoutActiveReps": {
+    "description": "Migrated from workout.active.reps"
+  },
+  "workoutActiveAddTitle": "Add to workout",
+  "@workoutActiveAddTitle": {
+    "description": "Migrated from workout.active.add_title"
+  },
+  "workoutActiveAddSubtitle": "Choose what you want to add",
+  "@workoutActiveAddSubtitle": {
+    "description": "Migrated from workout.active.add_subtitle"
+  },
+  "workoutActiveAddSet": "Add set",
+  "@workoutActiveAddSet": {
+    "description": "Migrated from workout.active.add_set"
+  },
+  "workoutActiveAddSetHint": "Add another set to this exercise",
+  "@workoutActiveAddSetHint": {
+    "description": "Migrated from workout.active.add_set_hint"
+  },
+  "workoutActiveAddMovement": "Add another movement",
+  "@workoutActiveAddMovement": {
+    "description": "Migrated from workout.active.add_movement"
+  },
+  "workoutActiveCombineHint": "Combine exercises into a sequence",
+  "@workoutActiveCombineHint": {
+    "description": "Migrated from workout.active.combine_hint"
+  },
+  "workoutActiveNoteHint": "Write a note…",
+  "@workoutActiveNoteHint": {
+    "description": "Migrated from workout.active.note_hint"
+  },
+  "workoutActiveSaving": "Saving…",
+  "@workoutActiveSaving": {
+    "description": "Migrated from workout.active.saving"
+  },
+  "workoutActiveSaved": "Saved",
+  "@workoutActiveSaved": {
+    "description": "Migrated from workout.active.saved"
+  },
+  "workoutActivePlanGuard": "PLAN GUARD",
+  "@workoutActivePlanGuard": {
+    "description": "Migrated from workout.active.plan_guard"
+  },
+  "workoutActiveFinish": "Finish workout",
+  "@workoutActiveFinish": {
+    "description": "Migrated from workout.active.finish"
+  },
+  "exerciseBiomechanicsTitle": "Biomechanics",
+  "@exerciseBiomechanicsTitle": {
+    "description": "Migrated from exercise.biomechanics.title"
+  },
+  "exerciseBiomechanicsMainPattern": "Main pattern",
+  "@exerciseBiomechanicsMainPattern": {
+    "description": "Migrated from exercise.biomechanics.main_pattern"
+  },
+  "exerciseBiomechanicsUpdating": "Data being updated",
+  "@exerciseBiomechanicsUpdating": {
+    "description": "Migrated from exercise.biomechanics.updating"
+  },
+  "exerciseBiomechanicsResistance": "External resistance",
+  "@exerciseBiomechanicsResistance": {
+    "description": "Migrated from exercise.biomechanics.resistance"
+  },
+  "exerciseBiomechanicsNoProfile": "Profile not available yet",
+  "@exerciseBiomechanicsNoProfile": {
+    "description": "Migrated from exercise.biomechanics.no_profile"
+  },
+  "exerciseBiomechanicsHowRead": "How Coachly reads this data",
+  "@exerciseBiomechanicsHowRead": {
+    "description": "Migrated from exercise.biomechanics.how_read"
+  },
+  "exerciseCreateHint": "Complete one block at a time: you can always edit the exercise later.",
+  "@exerciseCreateHint": {
+    "description": "Migrated from exercise.create.hint"
+  },
+  "exerciseCreateUploadSoon": "Upload will be available once media storage is configured.",
+  "@exerciseCreateUploadSoon": {
+    "description": "Migrated from exercise.create.upload_soon"
+  },
+  "exercisePlayMedia": "Play exercise media",
+  "@exercisePlayMedia": {
+    "description": "Migrated from exercise.play_media"
+  },
+  "exerciseMediaSoon": "Media coming soon",
+  "@exerciseMediaSoon": {
+    "description": "Migrated from exercise.media_soon"
+  },
+  "commonInformation": "Information",
+  "@commonInformation": {
+    "description": "Migrated from common.information"
+  },
+  "exerciseCommonMistakes": "Common mistakes",
+  "@exerciseCommonMistakes": {
+    "description": "Migrated from exercise.common_mistakes"
+  },
+  "exerciseMusclesPrimary": "Primary",
+  "@exerciseMusclesPrimary": {
+    "description": "Migrated from exercise.muscles_primary"
+  },
+  "exerciseMusclesSecondary": "Secondary",
+  "@exerciseMusclesSecondary": {
+    "description": "Migrated from exercise.muscles_secondary"
+  },
+  "exerciseExploreMuscles": "Explore muscles",
+  "@exerciseExploreMuscles": {
+    "description": "Migrated from exercise.explore_muscles"
+  },
+  "exercisePattern": "Pattern",
+  "@exercisePattern": {
+    "description": "Migrated from exercise.pattern"
+  },
+  "exerciseStability": "Stability",
+  "@exerciseStability": {
+    "description": "Migrated from exercise.stability"
+  },
+  "exerciseSpinalLoad": "Spinal load",
+  "@exerciseSpinalLoad": {
+    "description": "Migrated from exercise.spinal_load"
+  },
+  "exerciseExploreBiomechanics": "Explore biomechanics",
+  "@exerciseExploreBiomechanics": {
+    "description": "Migrated from exercise.explore_biomechanics"
+  },
+  "exerciseRequired": "Required",
+  "@exerciseRequired": {
+    "description": "Migrated from exercise.required"
+  },
+  "exerciseRemember": "Worth remembering",
+  "@exerciseRemember": {
+    "description": "Migrated from exercise.remember"
+  },
+  "commonMoreActions": "More actions",
+  "@commonMoreActions": {
+    "description": "Migrated from common.more_actions"
+  },
+  "exerciseMusclesFront": "Front",
+  "@exerciseMusclesFront": {
+    "description": "Migrated from exercise.muscles.front"
+  },
+  "exerciseMusclesBack": "Back",
+  "@exerciseMusclesBack": {
+    "description": "Migrated from exercise.muscles.back"
+  },
+  "exerciseMusclesViewMode": "Muscle view mode",
+  "@exerciseMusclesViewMode": {
+    "description": "Migrated from exercise.muscles.view_mode"
+  },
+  "exerciseMusclesRolePrimary": "Primary",
+  "@exerciseMusclesRolePrimary": {
+    "description": "Migrated from exercise.muscles.role_primary"
+  },
+  "exerciseMusclesRoleSecondary": "Secondary",
+  "@exerciseMusclesRoleSecondary": {
+    "description": "Migrated from exercise.muscles.role_secondary"
+  },
+  "exerciseMusclesRoleStabilizer": "Stabiliser",
+  "@exerciseMusclesRoleStabilizer": {
+    "description": "Migrated from exercise.muscles.role_stabilizer"
+  },
+  "exerciseMusclesLengthened": "Lengthened",
+  "@exerciseMusclesLengthened": {
+    "description": "Migrated from exercise.muscles.lengthened"
+  },
+  "exerciseMusclesMidrange": "Mid ROM",
+  "@exerciseMusclesMidrange": {
+    "description": "Migrated from exercise.muscles.midrange"
+  },
+  "exerciseMusclesMid": "Mid",
+  "@exerciseMusclesMid": {
+    "description": "Migrated from exercise.muscles.mid"
+  },
+  "exerciseMusclesShortened": "Shortened",
+  "@exerciseMusclesShortened": {
+    "description": "Migrated from exercise.muscles.shortened"
+  },
+  "exerciseMusclesTitle": "Muscles",
+  "@exerciseMusclesTitle": {
+    "description": "Migrated from exercise.muscles.title"
+  },
+  "exerciseVariantsTitle": "Variants",
+  "@exerciseVariantsTitle": {
+    "description": "Migrated from exercise.variants.title"
+  },
+  "commonLoading": "Loading…",
+  "@commonLoading": {
+    "description": "Migrated from common.loading"
+  },
+  "exerciseCreateNameRequired": "At least the Italian name is required.",
+  "@exerciseCreateNameRequired": {
+    "description": "Migrated from exercise.create.name_required"
+  },
+  "exerciseCreateTitle": "Create exercise",
+  "@exerciseCreateTitle": {
+    "description": "Migrated from exercise.create.title"
+  },
+  "commonBack": "Back",
+  "@commonBack": {
+    "description": "Migrated from common.back"
+  },
+  "exerciseCreateMedia": "Photos and video",
+  "@exerciseCreateMedia": {
+    "description": "Migrated from exercise.create.media"
+  },
+  "commonShare": "Share",
+  "@commonShare": {
+    "description": "Migrated from common.share"
+  },
+  "exerciseRomStart": "ROM start",
+  "@exerciseRomStart": {
+    "description": "Migrated from exercise.rom_start"
+  },
+  "exerciseRomEnd": "ROM end",
+  "@exerciseRomEnd": {
+    "description": "Migrated from exercise.rom_end"
+  },
+  "exerciseProfileIndicative": "Indicative profile",
+  "@exerciseProfileIndicative": {
+    "description": "Migrated from exercise.profile_indicative"
+  },
+  "exerciseAddToWorkout": "Add to workout",
+  "@exerciseAddToWorkout": {
+    "description": "Migrated from exercise.add_to_workout"
+  },
+  "workoutActiveRestMinus30": "−30 s",
+  "@workoutActiveRestMinus30": {
+    "description": "Migrated from workout.active.rest_minus_30"
+  },
+  "workoutActiveRestPlus30": "+30 s",
+  "@workoutActiveRestPlus30": {
+    "description": "Migrated from workout.active.rest_plus_30"
+  },
+  "workoutActiveColSet": "SET",
+  "@workoutActiveColSet": {
+    "description": "Migrated from workout.active.col_set"
+  },
+  "workoutActiveColPrevious": "PREVIOUS",
+  "@workoutActiveColPrevious": {
+    "description": "Migrated from workout.active.col_previous"
+  },
+  "workoutActiveColReps": "REPS",
+  "@workoutActiveColReps": {
+    "description": "Migrated from workout.active.col_reps"
+  },
+  "workoutActiveColRir": "RIR",
+  "@workoutActiveColRir": {
+    "description": "Migrated from workout.active.col_rir"
+  },
+  "workoutActiveRirExplained": "RIR · Reps in Reserve",
+  "@workoutActiveRirExplained": {
+    "description": "Migrated from workout.active.rir_explained"
+  },
+  "workoutActiveBlocks": "BLOCKS",
+  "@workoutActiveBlocks": {
+    "description": "Migrated from workout.active.blocks"
+  },
+  "workoutActiveExercises": "EXERCISES",
+  "@workoutActiveExercises": {
+    "description": "Migrated from workout.active.exercises"
+  },
+  "workoutActiveAddExercise": "Add exercise",
+  "@workoutActiveAddExercise": {
+    "description": "Migrated from workout.active.add_exercise"
+  },
+  "workoutActiveQuickAdd": "QUICK ADD",
+  "@workoutActiveQuickAdd": {
+    "description": "Migrated from workout.active.quick_add"
+  },
+  "workoutActiveAddToGroup": "Add to current group",
+  "@workoutActiveAddToGroup": {
+    "description": "Migrated from workout.active.add_to_group"
+  },
+  "workoutActiveEndOfWorkout": "End of workout",
+  "@workoutActiveEndOfWorkout": {
+    "description": "Migrated from workout.active.end_of_workout"
+  },
+  "communityPlaceholderTitle": "Community is on the way",
+  "@communityPlaceholderTitle": {
+    "description": "Migrated from community.placeholder_title"
+  },
+  "communityPlaceholderBody": "Soon you will be able to follow coaches and share your workouts.",
+  "@communityPlaceholderBody": {
+    "description": "Migrated from community.placeholder_body"
+  },
+  "commonSettings": "Settings",
+  "@commonSettings": {
+    "description": "Migrated from common.settings"
+  },
+  "commonLanguage": "Language",
+  "@commonLanguage": {
+    "description": "Migrated from common.language"
+  },
+  "commonSelectLanguage": "Select a language",
+  "@commonSelectLanguage": {
+    "description": "Migrated from common.select_language"
+  },
+  "commonEnglish": "English",
+  "@commonEnglish": {
+    "description": "Migrated from common.english"
+  },
+  "commonItalian": "Italian",
+  "@commonItalian": {
+    "description": "Migrated from common.italian"
+  },
+  "commonVersion": "Version",
+  "@commonVersion": {
+    "description": "Migrated from common.version"
+  },
+  "commonBuild": "Build",
+  "@commonBuild": {
+    "description": "Migrated from common.build"
+  },
+  "commonError": "Error",
+  "@commonError": {
+    "description": "Migrated from common.error"
+  },
+  "commonGoBack": "Go back",
+  "@commonGoBack": {
+    "description": "Migrated from common.go_back"
+  },
+  "commonBackToTop": "Back to top",
+  "@commonBackToTop": {
+    "description": "Migrated from common.back_to_top"
+  },
+  "commonConfirm": "Confirm",
+  "@commonConfirm": {
+    "description": "Migrated from common.confirm"
+  },
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "Migrated from common.cancel"
+  },
+  "commonClose": "Close",
+  "@commonClose": {
+    "description": "Migrated from common.close"
+  },
+  "commonRetry": "Retry",
+  "@commonRetry": {
+    "description": "Migrated from common.retry"
+  },
+  "commonUndo": "UNDO",
+  "@commonUndo": {
+    "description": "Migrated from common.undo"
+  },
+  "commonEdit": "Edit",
+  "@commonEdit": {
+    "description": "Migrated from common.edit"
+  },
+  "commonDuplicate": "Duplicate",
+  "@commonDuplicate": {
+    "description": "Migrated from common.duplicate"
+  },
+  "commonDelete": "Delete",
+  "@commonDelete": {
+    "description": "Migrated from common.delete"
+  },
+  "commonActivate": "Activate",
+  "@commonActivate": {
+    "description": "Migrated from common.activate"
+  },
+  "commonDeactivate": "Deactivate",
+  "@commonDeactivate": {
+    "description": "Migrated from common.deactivate"
+  },
+  "commonWorkouts": "Workouts",
+  "@commonWorkouts": {
+    "description": "Migrated from common.workouts"
+  },
+  "commonExercises": "Exercises",
+  "@commonExercises": {
+    "description": "Migrated from common.exercises"
+  },
+  "commonWorkout": "workout",
+  "@commonWorkout": {
+    "description": "Migrated from common.workout"
+  },
+  "commonDays": "days",
+  "@commonDays": {
+    "description": "Migrated from common.days"
+  },
+  "commonNa": "N/A",
+  "@commonNa": {
+    "description": "Migrated from common.na"
+  },
+  "commonSeconds": "seconds",
+  "@commonSeconds": {
+    "description": "Migrated from common.seconds"
+  },
+  "commonGotIt": "Got it",
+  "@commonGotIt": {
+    "description": "Migrated from common.got_it"
+  },
+  "commonWhyItMatters": "Why it matters",
+  "@commonWhyItMatters": {
+    "description": "Migrated from common.why_it_matters"
+  },
+  "commonLearnMore": "Learn more →",
+  "@commonLearnMore": {
+    "description": "Migrated from common.learn_more"
+  },
+  "navCommunity": "Community",
+  "@navCommunity": {
+    "description": "Migrated from nav.community"
+  },
+  "navWorkouts": "Workouts",
+  "@navWorkouts": {
+    "description": "Migrated from nav.workouts"
+  },
+  "navCoach": "Coach",
+  "@navCoach": {
+    "description": "Migrated from nav.coach"
+  },
+  "navIdeas": "Ideas",
+  "@navIdeas": {
+    "description": "Migrated from nav.ideas"
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Migrated from nav.profile"
+  },
+  "profileProfile": "Profile",
+  "@profileProfile": {
+    "description": "Migrated from profile.profile"
+  },
+  "profileYourProfile": "Your profile",
+  "@profileYourProfile": {
+    "description": "Migrated from profile.your_profile"
+  },
+  "profileMember": "Coachly Member",
+  "@profileMember": {
+    "description": "Migrated from profile.member"
+  },
+  "profilePreferences": "Preferences",
+  "@profilePreferences": {
+    "description": "Migrated from profile.preferences"
+  },
+  "profileAppSection": "App",
+  "@profileAppSection": {
+    "description": "Migrated from profile.app_section"
+  },
+  "profileWorkoutSection": "Workout",
+  "@profileWorkoutSection": {
+    "description": "Migrated from profile.workout_section"
+  },
+  "profilePersonalExercises": "Personal Exercises",
+  "@profilePersonalExercises": {
+    "description": "Migrated from profile.personal_exercises"
+  },
+  "profileLogout": "Logout",
+  "@profileLogout": {
+    "description": "Migrated from profile.logout"
+  },
+  "profileLogoutTitle": "Logout",
+  "@profileLogoutTitle": {
+    "description": "Migrated from profile.logout_title"
+  },
+  "profileLogoutContent": "Are you sure you want to log out?",
+  "@profileLogoutContent": {
+    "description": "Migrated from profile.logout_content"
+  },
+  "profileLogoutConfirm": "Exit",
+  "@profileLogoutConfirm": {
+    "description": "Migrated from profile.logout_confirm"
+  },
+  "workoutRecent": "Recent Workouts",
+  "@workoutRecent": {
+    "description": "Migrated from workout.recent"
+  },
+  "workoutResume": "Pick up where you left off",
+  "@workoutResume": {
+    "description": "Migrated from workout.resume"
+  },
+  "workoutAll": "All Workouts",
+  "@workoutAll": {
+    "description": "Migrated from workout.all"
+  },
+  "workoutMyWorkoutsCount": "My workouts ({count})",
+  "@workoutMyWorkoutsCount": {
+    "description": "Migrated from workout.my_workouts_count",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutSearchHint": "Search workouts",
+  "@workoutSearchHint": {
+    "description": "Migrated from workout.search_hint"
+  },
+  "workoutClearSearch": "Clear search",
+  "@workoutClearSearch": {
+    "description": "Migrated from workout.clear_search"
+  },
+  "workoutNoSearchResults": "No workouts match your search.",
+  "@workoutNoSearchResults": {
+    "description": "Migrated from workout.no_search_results"
+  },
+  "workoutSort": "Sort workouts",
+  "@workoutSort": {
+    "description": "Migrated from workout.sort"
+  },
+  "workoutSortRecent": "Last used",
+  "@workoutSortRecent": {
+    "description": "Migrated from workout.sort_recent"
+  },
+  "workoutSortName": "Name",
+  "@workoutSortName": {
+    "description": "Migrated from workout.sort_name"
+  },
+  "workoutSortProgress": "Progress",
+  "@workoutSortProgress": {
+    "description": "Migrated from workout.sort_progress"
+  },
+  "workoutProgressOverview": "Your progress",
+  "@workoutProgressOverview": {
+    "description": "Migrated from workout.progress_overview"
+  },
+  "workoutProgressOverviewHint": "A quick view of your training consistency.",
+  "@workoutProgressOverviewHint": {
+    "description": "Migrated from workout.progress_overview_hint"
+  },
+  "workoutActions": "Workout actions",
+  "@workoutActions": {
+    "description": "Migrated from workout.actions"
+  },
+  "workoutNoActive": "You have no active workouts. Reactivate one from the archive below or create a new one.",
+  "@workoutNoActive": {
+    "description": "Migrated from workout.no_active"
+  },
+  "workoutArchivedCount": "Archived workouts ({count})",
+  "@workoutArchivedCount": {
+    "description": "Migrated from workout.archived_count",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutArchivedHint": "Hidden from your active workout list",
+  "@workoutArchivedHint": {
+    "description": "Migrated from workout.archived_hint"
+  },
+  "workoutNotifications": "Notifications",
+  "@workoutNotifications": {
+    "description": "Migrated from workout.notifications"
+  },
+  "workoutNotificationsSoon": "Notifications feature coming soon",
+  "@workoutNotificationsSoon": {
+    "description": "Migrated from workout.notifications_soon"
+  },
+  "workoutDescription": "Description",
+  "@workoutDescription": {
+    "description": "Migrated from workout.description"
+  },
+  "workoutSets": "Sets",
+  "@workoutSets": {
+    "description": "Migrated from workout.sets"
+  },
+  "workoutReps": "Reps",
+  "@workoutReps": {
+    "description": "Migrated from workout.reps"
+  },
+  "workoutLoad": "Load",
+  "@workoutLoad": {
+    "description": "Migrated from workout.load"
+  },
+  "workoutRest": "Rest",
+  "@workoutRest": {
+    "description": "Migrated from workout.rest"
+  },
+  "workoutStart": "Start Workout",
+  "@workoutStart": {
+    "description": "Migrated from workout.start"
+  },
+  "workoutLastUsed": "Last: {date}",
+  "@workoutLastUsed": {
+    "description": "Migrated from workout.last_used",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDuration": "Duration",
+  "@workoutDuration": {
+    "description": "Migrated from workout.duration"
+  },
+  "workoutDurationMinutes": "Duration (min)",
+  "@workoutDurationMinutes": {
+    "description": "Migrated from workout.duration_minutes"
+  },
+  "workoutFocus": "Focus",
+  "@workoutFocus": {
+    "description": "Migrated from workout.focus"
+  },
+  "workoutType": "Type",
+  "@workoutType": {
+    "description": "Migrated from workout.type"
+  },
+  "workoutHypertrophy": "Hypertrophy",
+  "@workoutHypertrophy": {
+    "description": "Migrated from workout.hypertrophy"
+  },
+  "workoutBuilderCreateTitle": "Create workout",
+  "@workoutBuilderCreateTitle": {
+    "description": "Migrated from workout.builder.create_title"
+  },
+  "workoutBuilderEditTitle": "Edit workout",
+  "@workoutBuilderEditTitle": {
+    "description": "Migrated from workout.builder.edit_title"
+  },
+  "workoutBuilderStructureTitle": "Build the structure",
+  "@workoutBuilderStructureTitle": {
+    "description": "Migrated from workout.builder.structure_title"
+  },
+  "workoutBuilderReviewTitle": "Review workout",
+  "@workoutBuilderReviewTitle": {
+    "description": "Migrated from workout.builder.review_title"
+  },
+  "workoutBuilderIdentityHeading": "Let’s build\nyour workout.",
+  "@workoutBuilderIdentityHeading": {
+    "description": "Migrated from workout.builder.identity_heading"
+  },
+  "workoutBuilderIdentitySubtitle": "Name your workout and choose its main goal.",
+  "@workoutBuilderIdentitySubtitle": {
+    "description": "Migrated from workout.builder.identity_subtitle"
+  },
+  "workoutBuilderTitleLabel": "Workout name",
+  "@workoutBuilderTitleLabel": {
+    "description": "Migrated from workout.builder.title_label"
+  },
+  "workoutBuilderTitleHint": "Back & Chest",
+  "@workoutBuilderTitleHint": {
+    "description": "Migrated from workout.builder.title_hint"
+  },
+  "workoutBuilderGoalLabel": "Session goal",
+  "@workoutBuilderGoalLabel": {
+    "description": "Migrated from workout.builder.goal_label"
+  },
+  "workoutBuilderFocusLabel": "Session note",
+  "@workoutBuilderFocusLabel": {
+    "description": "Migrated from workout.builder.focus_label"
+  },
+  "workoutBuilderFocusHint": "What should this session emphasize?",
+  "@workoutBuilderFocusHint": {
+    "description": "Migrated from workout.builder.focus_hint"
+  },
+  "workoutBuilderGoalHypertrophy": "Hypertrophy",
+  "@workoutBuilderGoalHypertrophy": {
+    "description": "Migrated from workout.builder.goal_hypertrophy"
+  },
+  "workoutBuilderGoalStrength": "Strength",
+  "@workoutBuilderGoalStrength": {
+    "description": "Migrated from workout.builder.goal_strength"
+  },
+  "workoutBuilderGoalGeneral": "General",
+  "@workoutBuilderGoalGeneral": {
+    "description": "Migrated from workout.builder.goal_general"
+  },
+  "workoutBuilderGoalHypertrophyDescription": "Muscle growth",
+  "@workoutBuilderGoalHypertrophyDescription": {
+    "description": "Migrated from workout.builder.goal_hypertrophy_description"
+  },
+  "workoutBuilderGoalStrengthDescription": "Performance & load",
+  "@workoutBuilderGoalStrengthDescription": {
+    "description": "Migrated from workout.builder.goal_strength_description"
+  },
+  "workoutBuilderGoalGeneralDescription": "Balanced training",
+  "@workoutBuilderGoalGeneralDescription": {
+    "description": "Migrated from workout.builder.goal_general_description"
+  },
+  "workoutBuilderGoalInfoTooltip": "About session goals",
+  "@workoutBuilderGoalInfoTooltip": {
+    "description": "Migrated from workout.builder.goal_info_tooltip"
+  },
+  "workoutBuilderAddSessionNote": "Add a session note",
+  "@workoutBuilderAddSessionNote": {
+    "description": "Migrated from workout.builder.add_session_note"
+  },
+  "workoutBuilderSessionNote": "Session note",
+  "@workoutBuilderSessionNote": {
+    "description": "Migrated from workout.builder.session_note"
+  },
+  "workoutBuilderOptional": "Optional",
+  "@workoutBuilderOptional": {
+    "description": "Migrated from workout.builder.optional"
+  },
+  "workoutBuilderGoalInfoTitle": "Session context",
+  "@workoutBuilderGoalInfoTitle": {
+    "description": "Migrated from workout.builder.goal_info_title"
+  },
+  "workoutBuilderGoalInfoBody": "The goal describes the session’s main type of work and helps Coachly present the workout in context.",
+  "@workoutBuilderGoalInfoBody": {
+    "description": "Migrated from workout.builder.goal_info_body"
+  },
+  "workoutBuilderContinueAction": "Continue",
+  "@workoutBuilderContinueAction": {
+    "description": "Migrated from workout.builder.continue_action"
+  },
+  "workoutBuilderReviewAction": "Review workout",
+  "@workoutBuilderReviewAction": {
+    "description": "Migrated from workout.builder.review_action"
+  },
+  "workoutBuilderCreateAction": "Create workout",
+  "@workoutBuilderCreateAction": {
+    "description": "Migrated from workout.builder.create_action"
+  },
+  "workoutBuilderUntitled": "Untitled workout",
+  "@workoutBuilderUntitled": {
+    "description": "Migrated from workout.builder.untitled"
+  },
+  "workoutBuilderEmpty": "Add your first exercise to start building the workout.",
+  "@workoutBuilderEmpty": {
+    "description": "Migrated from workout.builder.empty"
+  },
+  "workoutBuilderEmptyTitle": "Build your session",
+  "@workoutBuilderEmptyTitle": {
+    "description": "Migrated from workout.builder.empty_title"
+  },
+  "workoutBuilderEmptyBody": "Start with your first exercise. You can organize it later into sections or blocks.",
+  "@workoutBuilderEmptyBody": {
+    "description": "Migrated from workout.builder.empty_body"
+  },
+  "workoutBuilderAddFirstExercise": "Add first exercise",
+  "@workoutBuilderAddFirstExercise": {
+    "description": "Migrated from workout.builder.add_first_exercise"
+  },
+  "workoutBuilderAdd": "Add",
+  "@workoutBuilderAdd": {
+    "description": "Migrated from workout.builder.add"
+  },
+  "workoutBuilderSection": "Section",
+  "@workoutBuilderSection": {
+    "description": "Migrated from workout.builder.section"
+  },
+  "workoutBuilderBlock": "Block",
+  "@workoutBuilderBlock": {
+    "description": "Migrated from workout.builder.block"
+  },
+  "workoutBuilderSectionEmpty": "Add exercise",
+  "@workoutBuilderSectionEmpty": {
+    "description": "Migrated from workout.builder.section_empty"
+  },
+  "workoutBuilderPosition": "position {position}",
+  "@workoutBuilderPosition": {
+    "description": "Migrated from workout.builder.position",
+    "placeholders": {
+      "position": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderProgramming": "Programming",
+  "@workoutBuilderProgramming": {
+    "description": "Migrated from workout.builder.programming"
+  },
+  "workoutBuilderRepRange": "Rep range",
+  "@workoutBuilderRepRange": {
+    "description": "Migrated from workout.builder.rep_range"
+  },
+  "workoutBuilderRest": "Rest",
+  "@workoutBuilderRest": {
+    "description": "Migrated from workout.builder.rest"
+  },
+  "workoutBuilderTargetLoadHeading": "TARGET LOAD",
+  "@workoutBuilderTargetLoadHeading": {
+    "description": "Migrated from workout.builder.target_load_heading"
+  },
+  "workoutBuilderSetTargetLoad": "Set target load",
+  "@workoutBuilderSetTargetLoad": {
+    "description": "Migrated from workout.builder.set_target_load"
+  },
+  "workoutBuilderFromHistory": "From history",
+  "@workoutBuilderFromHistory": {
+    "description": "Migrated from workout.builder.from_history"
+  },
+  "workoutBuilderIntensity": "Intensity",
+  "@workoutBuilderIntensity": {
+    "description": "Migrated from workout.builder.intensity"
+  },
+  "workoutBuilderProgression": "Progression",
+  "@workoutBuilderProgression": {
+    "description": "Migrated from workout.builder.progression"
+  },
+  "workoutBuilderAdvanced": "Advanced",
+  "@workoutBuilderAdvanced": {
+    "description": "Migrated from workout.builder.advanced"
+  },
+  "workoutBuilderNotConfigured": "Not configured",
+  "@workoutBuilderNotConfigured": {
+    "description": "Migrated from workout.builder.not_configured"
+  },
+  "workoutBuilderManual": "Manual",
+  "@workoutBuilderManual": {
+    "description": "Migrated from workout.builder.manual"
+  },
+  "workoutBuilderAdvancedSummary": "Tempo, set types, notes…",
+  "@workoutBuilderAdvancedSummary": {
+    "description": "Migrated from workout.builder.advanced_summary"
+  },
+  "workoutBuilderRepsMin": "Minimum reps",
+  "@workoutBuilderRepsMin": {
+    "description": "Migrated from workout.builder.reps_min"
+  },
+  "workoutBuilderRepsMax": "Maximum reps",
+  "@workoutBuilderRepsMax": {
+    "description": "Migrated from workout.builder.reps_max"
+  },
+  "workoutBuilderDecrease": "Decrease {label}",
+  "@workoutBuilderDecrease": {
+    "description": "Migrated from workout.builder.decrease",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderIncrease": "Increase {label}",
+  "@workoutBuilderIncrease": {
+    "description": "Migrated from workout.builder.increase",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderAddExercise": "Add exercise",
+  "@workoutBuilderAddExercise": {
+    "description": "Migrated from workout.builder.add_exercise"
+  },
+  "workoutBuilderAddExerciseHint": "Choose an exercise and configure its working sets.",
+  "@workoutBuilderAddExerciseHint": {
+    "description": "Migrated from workout.builder.add_exercise_hint"
+  },
+  "workoutBuilderDiscover": "Discover workout builder",
+  "@workoutBuilderDiscover": {
+    "description": "Migrated from workout.builder.discover"
+  },
+  "workoutBuilderTourStep": "Step {current} of {total}",
+  "@workoutBuilderTourStep": {
+    "description": "Migrated from workout.builder.tour_step",
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderTourNext": "Next",
+  "@workoutBuilderTourNext": {
+    "description": "Migrated from workout.builder.tour_next"
+  },
+  "workoutBuilderTourDone": "Done",
+  "@workoutBuilderTourDone": {
+    "description": "Migrated from workout.builder.tour_done"
+  },
+  "workoutBuilderTourDontShowAgain": "Don''t show again",
+  "@workoutBuilderTourDontShowAgain": {
+    "description": "Migrated from workout.builder.tour_dont_show_again"
+  },
+  "workoutBuilderTourIntroTitle": "Build it your way",
+  "@workoutBuilderTourIntroTitle": {
+    "description": "Migrated from workout.builder.tour_intro_title"
+  },
+  "workoutBuilderTourIntroBody": "Exercises, sections, blocks and notes. Structure your workout exactly how you want it.",
+  "@workoutBuilderTourIntroBody": {
+    "description": "Migrated from workout.builder.tour_intro_body"
+  },
+  "workoutBuilderTourExerciseTitle": "Start with an exercise",
+  "@workoutBuilderTourExerciseTitle": {
+    "description": "Migrated from workout.builder.tour_exercise_title"
+  },
+  "workoutBuilderTourExerciseBody": "Choose from the Coachly library or create your own.",
+  "@workoutBuilderTourExerciseBody": {
+    "description": "Migrated from workout.builder.tour_exercise_body"
+  },
+  "workoutBuilderTourSectionsTitle": "Keep things organized",
+  "@workoutBuilderTourSectionsTitle": {
+    "description": "Migrated from workout.builder.tour_sections_title"
+  },
+  "workoutBuilderTourSectionsBody": "As your workout grows, split it into sections. Create as many as you need.",
+  "@workoutBuilderTourSectionsBody": {
+    "description": "Migrated from workout.builder.tour_sections_body"
+  },
+  "workoutBuilderTourNotesTitle": "Leave context for later",
+  "@workoutBuilderTourNotesTitle": {
+    "description": "Migrated from workout.builder.tour_notes_title"
+  },
+  "workoutBuilderTourNotesBody": "Add notes to any section and update them during the workout.",
+  "@workoutBuilderTourNotesBody": {
+    "description": "Migrated from workout.builder.tour_notes_body"
+  },
+  "workoutBuilderTourNotesSecondary": "Save any useful cues, goals and reminders here.",
+  "@workoutBuilderTourNotesSecondary": {
+    "description": "Migrated from workout.builder.tour_notes_secondary"
+  },
+  "workoutBuilderTourBlocksTitle": "Train exercises together",
+  "@workoutBuilderTourBlocksTitle": {
+    "description": "Migrated from workout.builder.tour_blocks_title"
+  },
+  "workoutBuilderTourBlocksBody": "Build supersets, circuits and more by grouping exercises into a block.",
+  "@workoutBuilderTourBlocksBody": {
+    "description": "Migrated from workout.builder.tour_blocks_body"
+  },
+  "workoutBuilderTourBlocksSecondary": "Control timing and targets together.",
+  "@workoutBuilderTourBlocksSecondary": {
+    "description": "Migrated from workout.builder.tour_blocks_secondary"
+  },
+  "workoutBuilderTourCheckTitle": "Check the whole workout",
+  "@workoutBuilderTourCheckTitle": {
+    "description": "Migrated from workout.builder.tour_check_title"
+  },
+  "workoutBuilderTourCheckBody": "See muscle coverage, overlap and structure for your goal.",
+  "@workoutBuilderTourCheckBody": {
+    "description": "Migrated from workout.builder.tour_check_body"
+  },
+  "workoutBuilderTourCheckSecondary": "Coachly explains what stands out. You decide what changes.",
+  "@workoutBuilderTourCheckSecondary": {
+    "description": "Migrated from workout.builder.tour_check_secondary"
+  },
+  "workoutBuilderTourReviewTitle": "Review before you finish",
+  "@workoutBuilderTourReviewTitle": {
+    "description": "Migrated from workout.builder.tour_review_title"
+  },
+  "workoutBuilderTourReviewBody": "Review the complete workout before creating it.",
+  "@workoutBuilderTourReviewBody": {
+    "description": "Migrated from workout.builder.tour_review_body"
+  },
+  "workoutBuilderTourReplayHint": "Discover is always here when you need it.",
+  "@workoutBuilderTourReplayHint": {
+    "description": "Migrated from workout.builder.tour_replay_hint"
+  },
+  "workoutCheckOpen": "Check workout",
+  "@workoutCheckOpen": {
+    "description": "Migrated from workout.check.open"
+  },
+  "workoutCheckTitle": "Workout Check",
+  "@workoutCheckTitle": {
+    "description": "Migrated from workout.check.title"
+  },
+  "workoutCheckEmptyTitle": "Your workout is still empty",
+  "@workoutCheckEmptyTitle": {
+    "description": "Migrated from workout.check.empty_title"
+  },
+  "workoutCheckEmptyBody": "Add a few exercises and Coachly will start building its analysis.",
+  "@workoutCheckEmptyBody": {
+    "description": "Migrated from workout.check.empty_body"
+  },
+  "workoutCheckCapabilityMuscles": "Muscle coverage",
+  "@workoutCheckCapabilityMuscles": {
+    "description": "Migrated from workout.check.capability_muscles"
+  },
+  "workoutCheckCapabilityPatterns": "Movement patterns",
+  "@workoutCheckCapabilityPatterns": {
+    "description": "Migrated from workout.check.capability_patterns"
+  },
+  "workoutCheckCapabilityOverlap": "Exercise overlap",
+  "@workoutCheckCapabilityOverlap": {
+    "description": "Migrated from workout.check.capability_overlap"
+  },
+  "workoutCheckCapabilityStructure": "Session structure",
+  "@workoutCheckCapabilityStructure": {
+    "description": "Migrated from workout.check.capability_structure"
+  },
+  "workoutCheckCapabilityGoal": "Goal alignment",
+  "@workoutCheckCapabilityGoal": {
+    "description": "Migrated from workout.check.capability_goal"
+  },
+  "workoutCheckModeBodybuilding": "BODYBUILDING",
+  "@workoutCheckModeBodybuilding": {
+    "description": "Migrated from workout.check.mode_bodybuilding"
+  },
+  "workoutCheckSummary": "{passed} checks passed · {review} to review · {missing} need more data",
+  "@workoutCheckSummary": {
+    "description": "Migrated from workout.check.summary",
+    "placeholders": {
+      "passed": {
+        "type": "String"
+      },
+      "review": {
+        "type": "String"
+      },
+      "missing": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckDataPartial": "Some exercise metadata is not cached yet. The report only uses data available on this device.",
+  "@workoutCheckDataPartial": {
+    "description": "Migrated from workout.check.data_partial"
+  },
+  "workoutCheckDataInsufficient": "Detailed exercise metadata is not available locally yet. Structure and timing checks remain available.",
+  "@workoutCheckDataInsufficient": {
+    "description": "Migrated from workout.check.data_insufficient"
+  },
+  "workoutCheckMuscleCoverage": "Muscle coverage",
+  "@workoutCheckMuscleCoverage": {
+    "description": "Migrated from workout.check.muscle_coverage"
+  },
+  "workoutCheckCoverageTitle": "Muscle coverage is available",
+  "@workoutCheckCoverageTitle": {
+    "description": "Migrated from workout.check.coverage_title"
+  },
+  "workoutCheckCoverageBody": "Coachly found catalogue muscle relations across {muscles} muscle areas. Treat set exposure as an orientation, not an exact physiological measure.",
+  "@workoutCheckCoverageBody": {
+    "description": "Migrated from workout.check.coverage_body",
+    "placeholders": {
+      "muscles": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckMovementTitle": "Movement profile",
+  "@workoutCheckMovementTitle": {
+    "description": "Migrated from workout.check.movement_title"
+  },
+  "workoutCheckMovementBody": "{count} locally available movement profiles contribute to this workout.",
+  "@workoutCheckMovementBody": {
+    "description": "Migrated from workout.check.movement_body",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckSetExposure": "{count} set exposure",
+  "@workoutCheckSetExposure": {
+    "description": "Migrated from workout.check.set_exposure",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckStructureTitle": "The workout has a clear structure",
+  "@workoutCheckStructureTitle": {
+    "description": "Migrated from workout.check.structure_title"
+  },
+  "workoutCheckStructureBody": "{sections} populated sections and {blocks} connected blocks organize the session.",
+  "@workoutCheckStructureBody": {
+    "description": "Migrated from workout.check.structure_body",
+    "placeholders": {
+      "sections": {
+        "type": "String"
+      },
+      "blocks": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckDurationTitle": "Estimated duration · ~{minutes} min",
+  "@workoutCheckDurationTitle": {
+    "description": "Migrated from workout.check.duration_title",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckDurationBody": "This is an approximate estimate based on working sets and configured rest.",
+  "@workoutCheckDurationBody": {
+    "description": "Migrated from workout.check.duration_body"
+  },
+  "workoutCheckGoalTitle": "Goal context is available",
+  "@workoutCheckGoalTitle": {
+    "description": "Migrated from workout.check.goal_title"
+  },
+  "workoutCheckGoalBody": "Coachly evaluates the workout using the selected {goal} goal.",
+  "@workoutCheckGoalBody": {
+    "description": "Migrated from workout.check.goal_body",
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckGoalMissingTitle": "Goal alignment needs more data",
+  "@workoutCheckGoalMissingTitle": {
+    "description": "Migrated from workout.check.goal_missing_title"
+  },
+  "workoutCheckGoalMissingBody": "Choose a training goal to make this check more specific.",
+  "@workoutCheckGoalMissingBody": {
+    "description": "Migrated from workout.check.goal_missing_body"
+  },
+  "workoutCheckOverlapTitle": "Some exercises have similar profiles",
+  "@workoutCheckOverlapTitle": {
+    "description": "Migrated from workout.check.overlap_title"
+  },
+  "workoutCheckOverlapBody": "Coachly found a shared movement profile and {count} common muscle relations. Review whether the overlap is intentional.",
+  "@workoutCheckOverlapBody": {
+    "description": "Migrated from workout.check.overlap_body",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckOverlapClearTitle": "No strong exercise overlap stands out",
+  "@workoutCheckOverlapClearTitle": {
+    "description": "Migrated from workout.check.overlap_clear_title"
+  },
+  "workoutCheckOverlapClearBody": "The locally available profiles do not show an obvious duplicate pattern.",
+  "@workoutCheckOverlapClearBody": {
+    "description": "Migrated from workout.check.overlap_clear_body"
+  },
+  "workoutCheckWhy": "Why?",
+  "@workoutCheckWhy": {
+    "description": "Migrated from workout.check.why"
+  },
+  "workoutCheckUsedData": "Coachly used:",
+  "@workoutCheckUsedData": {
+    "description": "Migrated from workout.check.used_data"
+  },
+  "workoutCheckEvidenceSections": "{count} populated sections",
+  "@workoutCheckEvidenceSections": {
+    "description": "Migrated from workout.check.evidence_sections",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckEvidenceBlocks": "{count} exercise blocks",
+  "@workoutCheckEvidenceBlocks": {
+    "description": "Migrated from workout.check.evidence_blocks",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckEvidenceExercises": "{count} exercises",
+  "@workoutCheckEvidenceExercises": {
+    "description": "Migrated from workout.check.evidence_exercises",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckEvidenceSets": "{count} working sets",
+  "@workoutCheckEvidenceSets": {
+    "description": "Migrated from workout.check.evidence_sets",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckEvidenceRest": "Configured rest times",
+  "@workoutCheckEvidenceRest": {
+    "description": "Migrated from workout.check.evidence_rest"
+  },
+  "workoutCheckEvidenceExecution": "Approximate execution time",
+  "@workoutCheckEvidenceExecution": {
+    "description": "Migrated from workout.check.evidence_execution"
+  },
+  "workoutCheckEvidenceGoal": "Selected goal: {goal}",
+  "@workoutCheckEvidenceGoal": {
+    "description": "Migrated from workout.check.evidence_goal",
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckEvidenceMovement": "Shared movement profile: {movement}",
+  "@workoutCheckEvidenceMovement": {
+    "description": "Migrated from workout.check.evidence_movement",
+    "placeholders": {
+      "movement": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckEvidenceMuscles": "{count} shared muscle relations",
+  "@workoutCheckEvidenceMuscles": {
+    "description": "Migrated from workout.check.evidence_muscles",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckEvidencePeakMuscle": "{muscle}: {count} related working sets",
+  "@workoutCheckEvidencePeakMuscle": {
+    "description": "Migrated from workout.check.evidence_peak_muscle",
+    "placeholders": {
+      "muscle": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckEvidenceCatalogue": "Locally cached catalogue muscle metadata",
+  "@workoutCheckEvidenceCatalogue": {
+    "description": "Migrated from workout.check.evidence_catalogue"
+  },
+  "workoutCheckEvidencePattern": "Movement profile: {pattern}",
+  "@workoutCheckEvidencePattern": {
+    "description": "Migrated from workout.check.evidence_pattern",
+    "placeholders": {
+      "pattern": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutCheckUnavailable": "Workout Check is temporarily unavailable.",
+  "@workoutCheckUnavailable": {
+    "description": "Migrated from workout.check.unavailable"
+  },
+  "workoutBuilderExerciseLibraryHint": "Search your exercise library",
+  "@workoutBuilderExerciseLibraryHint": {
+    "description": "Migrated from workout.builder.exercise_library_hint"
+  },
+  "workoutBuilderChooseDestination": "Where should it go?",
+  "@workoutBuilderChooseDestination": {
+    "description": "Migrated from workout.builder.choose_destination"
+  },
+  "workoutBuilderChooseDestinationHint": "Choose a section. Main is selected by default.",
+  "@workoutBuilderChooseDestinationHint": {
+    "description": "Migrated from workout.builder.choose_destination_hint"
+  },
+  "workoutBuilderDefaultSection": "Default",
+  "@workoutBuilderDefaultSection": {
+    "description": "Migrated from workout.builder.default_section"
+  },
+  "workoutBuilderCollapseSection": "Collapse section",
+  "@workoutBuilderCollapseSection": {
+    "description": "Migrated from workout.builder.collapse_section"
+  },
+  "workoutBuilderExpandSection": "Expand section",
+  "@workoutBuilderExpandSection": {
+    "description": "Migrated from workout.builder.expand_section"
+  },
+  "workoutBuilderAddExerciseToSection": "Add exercise to {section}",
+  "@workoutBuilderAddExerciseToSection": {
+    "description": "Migrated from workout.builder.add_exercise_to_section",
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderSectionEmptyHint": "No exercises in this section yet.",
+  "@workoutBuilderSectionEmptyHint": {
+    "description": "Migrated from workout.builder.section_empty_hint"
+  },
+  "workoutBuilderSectionsHintTitle": "Sections",
+  "@workoutBuilderSectionsHintTitle": {
+    "description": "Migrated from workout.builder.sections_hint_title"
+  },
+  "workoutBuilderSectionsHintBody": "Organize the workout into clear parts.",
+  "@workoutBuilderSectionsHintBody": {
+    "description": "Migrated from workout.builder.sections_hint_body"
+  },
+  "workoutBuilderBlocksHintTitle": "Blocks",
+  "@workoutBuilderBlocksHintTitle": {
+    "description": "Migrated from workout.builder.blocks_hint_title"
+  },
+  "workoutBuilderBlocksHintBody": "Connect exercises performed together.",
+  "@workoutBuilderBlocksHintBody": {
+    "description": "Migrated from workout.builder.blocks_hint_body"
+  },
+  "workoutBuilderCreateSupersetShort": "Create a superset →",
+  "@workoutBuilderCreateSupersetShort": {
+    "description": "Migrated from workout.builder.create_superset_short"
+  },
+  "workoutBuilderStructureActions": "Add to workout structure",
+  "@workoutBuilderStructureActions": {
+    "description": "Migrated from workout.builder.structure_actions"
+  },
+  "workoutBuilderExercise": "Exercise",
+  "@workoutBuilderExercise": {
+    "description": "Migrated from workout.builder.exercise"
+  },
+  "workoutBuilderSaveChanges": "Save changes",
+  "@workoutBuilderSaveChanges": {
+    "description": "Migrated from workout.builder.save_changes"
+  },
+  "workoutBuilderNewSection": "New section",
+  "@workoutBuilderNewSection": {
+    "description": "Migrated from workout.builder.new_section"
+  },
+  "workoutBuilderEditSection": "Edit section",
+  "@workoutBuilderEditSection": {
+    "description": "Migrated from workout.builder.edit_section"
+  },
+  "workoutBuilderSectionPreparation": "Preparation",
+  "@workoutBuilderSectionPreparation": {
+    "description": "Migrated from workout.builder.section_preparation"
+  },
+  "workoutBuilderSectionMain": "Main",
+  "@workoutBuilderSectionMain": {
+    "description": "Migrated from workout.builder.section_main"
+  },
+  "workoutBuilderSectionAccessories": "Accessories",
+  "@workoutBuilderSectionAccessories": {
+    "description": "Migrated from workout.builder.section_accessories"
+  },
+  "workoutBuilderSectionFinisher": "Finisher",
+  "@workoutBuilderSectionFinisher": {
+    "description": "Migrated from workout.builder.section_finisher"
+  },
+  "workoutBuilderSectionCooldown": "Cooldown",
+  "@workoutBuilderSectionCooldown": {
+    "description": "Migrated from workout.builder.section_cooldown"
+  },
+  "workoutBuilderSectionExplanation": "Organize exercises without changing how they''re performed.",
+  "@workoutBuilderSectionExplanation": {
+    "description": "Migrated from workout.builder.section_explanation"
+  },
+  "workoutBuilderCustomize": "Customize",
+  "@workoutBuilderCustomize": {
+    "description": "Migrated from workout.builder.customize"
+  },
+  "workoutBuilderCustomSectionHint": "Upper body",
+  "@workoutBuilderCustomSectionHint": {
+    "description": "Migrated from workout.builder.custom_section_hint"
+  },
+  "workoutBuilderPreview": "PREVIEW",
+  "@workoutBuilderPreview": {
+    "description": "Migrated from workout.builder.preview"
+  },
+  "workoutBuilderCustomName": "Custom name",
+  "@workoutBuilderCustomName": {
+    "description": "Migrated from workout.builder.custom_name"
+  },
+  "workoutBuilderAddSection": "Add section",
+  "@workoutBuilderAddSection": {
+    "description": "Migrated from workout.builder.add_section"
+  },
+  "workoutBuilderChooseSectionType": "Choose a type",
+  "@workoutBuilderChooseSectionType": {
+    "description": "Migrated from workout.builder.choose_section_type"
+  },
+  "workoutBuilderOpenExerciseDetails": "Open {name} details",
+  "@workoutBuilderOpenExerciseDetails": {
+    "description": "Migrated from workout.builder.open_exercise_details",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderItemActions": "Exercise actions",
+  "@workoutBuilderItemActions": {
+    "description": "Migrated from workout.builder.item_actions"
+  },
+  "workoutBuilderMove": "Move",
+  "@workoutBuilderMove": {
+    "description": "Migrated from workout.builder.move"
+  },
+  "workoutBuilderMoveToSection": "Move to section",
+  "@workoutBuilderMoveToSection": {
+    "description": "Migrated from workout.builder.move_to_section"
+  },
+  "workoutBuilderMainSection": "Main",
+  "@workoutBuilderMainSection": {
+    "description": "Migrated from workout.builder.main_section"
+  },
+  "workoutBuilderMoreActions": "More structure actions",
+  "@workoutBuilderMoreActions": {
+    "description": "Migrated from workout.builder.more_actions"
+  },
+  "workoutBuilderCreateBlock": "Create exercise block",
+  "@workoutBuilderCreateBlock": {
+    "description": "Migrated from workout.builder.create_block"
+  },
+  "workoutBuilderCreateBlockShort": "Create block",
+  "@workoutBuilderCreateBlockShort": {
+    "description": "Migrated from workout.builder.create_block_short"
+  },
+  "workoutBuilderConfigureBlock": "Configure exercise block",
+  "@workoutBuilderConfigureBlock": {
+    "description": "Migrated from workout.builder.configure_block"
+  },
+  "workoutBuilderBlockEditExplanation": "Review exercise order and the essential block settings.",
+  "@workoutBuilderBlockEditExplanation": {
+    "description": "Migrated from workout.builder.block_edit_explanation"
+  },
+  "workoutBuilderRestAfterRound": "Rest after round · {duration}",
+  "@workoutBuilderRestAfterRound": {
+    "description": "Migrated from workout.builder.rest_after_round",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderSelectedExercises": "SELECTED",
+  "@workoutBuilderSelectedExercises": {
+    "description": "Migrated from workout.builder.selected_exercises"
+  },
+  "workoutBuilderBetweenExercises": "Between exercises",
+  "@workoutBuilderBetweenExercises": {
+    "description": "Migrated from workout.builder.between_exercises"
+  },
+  "workoutBuilderAfterEachRound": "After each round",
+  "@workoutBuilderAfterEachRound": {
+    "description": "Migrated from workout.builder.after_each_round"
+  },
+  "workoutBuilderReviewSummary": "{exercises} · ~{minutes} min",
+  "@workoutBuilderReviewSummary": {
+    "description": "Migrated from workout.builder.review_summary",
+    "placeholders": {
+      "exercises": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderCreateSuperset": "Create a superset",
+  "@workoutBuilderCreateSuperset": {
+    "description": "Migrated from workout.builder.create_superset"
+  },
+  "workoutBuilderConnectExercises": "Connect exercises",
+  "@workoutBuilderConnectExercises": {
+    "description": "Migrated from workout.builder.connect_exercises"
+  },
+  "workoutBuilderCreateBlockTitle": "Create block",
+  "@workoutBuilderCreateBlockTitle": {
+    "description": "Migrated from workout.builder.create_block_title"
+  },
+  "workoutBuilderCreateBlockExplanation": "Connect multiple exercises into one group.",
+  "@workoutBuilderCreateBlockExplanation": {
+    "description": "Migrated from workout.builder.create_block_explanation"
+  },
+  "workoutBuilderStepType": "Type",
+  "@workoutBuilderStepType": {
+    "description": "Migrated from workout.builder.step_type"
+  },
+  "workoutBuilderStepExercises": "Exercises",
+  "@workoutBuilderStepExercises": {
+    "description": "Migrated from workout.builder.step_exercises"
+  },
+  "workoutBuilderStepSetup": "Setup",
+  "@workoutBuilderStepSetup": {
+    "description": "Migrated from workout.builder.step_setup"
+  },
+  "workoutBuilderChooseExercises": "Choose {count} exercises",
+  "@workoutBuilderChooseExercises": {
+    "description": "Migrated from workout.builder.choose_exercises",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderSelectMoreExercises": "Select {count} more to continue.",
+  "@workoutBuilderSelectMoreExercises": {
+    "description": "Migrated from workout.builder.select_more_exercises",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderAddAnotherExercise": "Add another exercise",
+  "@workoutBuilderAddAnotherExercise": {
+    "description": "Migrated from workout.builder.add_another_exercise"
+  },
+  "workoutBuilderAddNotes": "Add notes",
+  "@workoutBuilderAddNotes": {
+    "description": "Migrated from workout.builder.add_notes"
+  },
+  "workoutBuilderNotesTitle": "Notes",
+  "@workoutBuilderNotesTitle": {
+    "description": "Migrated from workout.builder.notes_title"
+  },
+  "workoutBuilderNotesHint": "Add useful instructions or context…",
+  "@workoutBuilderNotesHint": {
+    "description": "Migrated from workout.builder.notes_hint"
+  },
+  "workoutBuilderSaveNotes": "Save notes",
+  "@workoutBuilderSaveNotes": {
+    "description": "Migrated from workout.builder.save_notes"
+  },
+  "workoutBuilderWorkoutActions": "Workout actions",
+  "@workoutBuilderWorkoutActions": {
+    "description": "Migrated from workout.builder.workout_actions"
+  },
+  "workoutBuilderSectionActions": "Section actions",
+  "@workoutBuilderSectionActions": {
+    "description": "Migrated from workout.builder.section_actions"
+  },
+  "workoutBuilderBlockSetupTitle": "{type} setup",
+  "@workoutBuilderBlockSetupTitle": {
+    "description": "Migrated from workout.builder.block_setup_title",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderBlockSetupHint": "Exercises alternate in order before the round rest.",
+  "@workoutBuilderBlockSetupHint": {
+    "description": "Migrated from workout.builder.block_setup_hint"
+  },
+  "workoutBuilderCreateSelectedBlock": "Create {type}",
+  "@workoutBuilderCreateSelectedBlock": {
+    "description": "Migrated from workout.builder.create_selected_block",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutBuilderBlockTypeSuperset": "2 exercises · Alternate between two exercises.",
+  "@workoutBuilderBlockTypeSuperset": {
+    "description": "Migrated from workout.builder.block_type_superset"
+  },
+  "workoutBuilderBlockTypeTriset": "3 exercises",
+  "@workoutBuilderBlockTypeTriset": {
+    "description": "Migrated from workout.builder.block_type_triset"
+  },
+  "workoutBuilderBlockTypeGiantSet": "4+ exercises",
+  "@workoutBuilderBlockTypeGiantSet": {
+    "description": "Migrated from workout.builder.block_type_giantSet"
+  },
+  "workoutBuilderBlockTypeCircuit": "2+ exercises",
+  "@workoutBuilderBlockTypeCircuit": {
+    "description": "Migrated from workout.builder.block_type_circuit"
+  },
+  "workoutBuilderAddBlock": "Add block",
+  "@workoutBuilderAddBlock": {
+    "description": "Migrated from workout.builder.add_block"
+  },
+  "workoutBuilderAddSuperset": "Add superset",
+  "@workoutBuilderAddSuperset": {
+    "description": "Migrated from workout.builder.add_superset"
+  },
+  "workoutBuilderLearnStructure": "Learn about structure",
+  "@workoutBuilderLearnStructure": {
+    "description": "Migrated from workout.builder.learn_structure"
+  },
+  "workoutBuilderOrganizeTitle": "Organize the workout",
+  "@workoutBuilderOrganizeTitle": {
+    "description": "Migrated from workout.builder.organize_title"
+  },
+  "workoutBuilderSectionInfo": "A section groups exercises to improve readability and does not change how they are performed.",
+  "@workoutBuilderSectionInfo": {
+    "description": "Migrated from workout.builder.section_info"
+  },
+  "workoutBuilderBlockInfo": "A block, such as a superset or circuit, connects exercises and changes their order and recovery.",
+  "@workoutBuilderBlockInfo": {
+    "description": "Migrated from workout.builder.block_info"
+  },
+  "workoutBuilderInfoTitle": "Workout information",
+  "@workoutBuilderInfoTitle": {
+    "description": "Migrated from workout.builder.info_title"
+  },
+  "workoutBuilderApply": "Apply",
+  "@workoutBuilderApply": {
+    "description": "Migrated from workout.builder.apply"
+  },
+  "workoutBuilderItemRemoved": "Item removed",
+  "@workoutBuilderItemRemoved": {
+    "description": "Migrated from workout.builder.item_removed"
+  },
+  "workoutShare": "Share",
+  "@workoutShare": {
+    "description": "Migrated from workout.share"
+  },
+  "workoutShareSoon": "Workout sharing coming soon",
+  "@workoutShareSoon": {
+    "description": "Migrated from workout.share_soon"
+  },
+  "workoutHeaderTitle": "Your Workouts",
+  "@workoutHeaderTitle": {
+    "description": "Migrated from workout.header_title"
+  },
+  "workoutAuthDisabled": "Authentication disabled",
+  "@workoutAuthDisabled": {
+    "description": "Migrated from workout.auth_disabled"
+  },
+  "workoutAuthDisabledContent": "Login, logout, and token management are temporarily disconnected during backend refactoring.",
+  "@workoutAuthDisabledContent": {
+    "description": "Migrated from workout.auth_disabled_content"
+  },
+  "workoutAccessDisabled": "Access disabled",
+  "@workoutAccessDisabled": {
+    "description": "Migrated from workout.access_disabled"
+  },
+  "workoutWeek": "Week",
+  "@workoutWeek": {
+    "description": "Migrated from workout.week"
+  },
+  "workoutStreak": "Streak",
+  "@workoutStreak": {
+    "description": "Migrated from workout.streak"
+  },
+  "workoutActiveShort": "Active",
+  "@workoutActiveShort": {
+    "description": "Migrated from workout.active_short"
+  },
+  "workoutCompleted": "Completed",
+  "@workoutCompleted": {
+    "description": "Migrated from workout.completed"
+  },
+  "workoutDetailExercises": "Exercises",
+  "@workoutDetailExercises": {
+    "description": "Migrated from workout.detail.exercises"
+  },
+  "workoutDetailExerciseCountOne": "{count} exercise",
+  "@workoutDetailExerciseCountOne": {
+    "description": "Migrated from workout.detail.exercise_count_one",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDetailExerciseCountOther": "{count} exercises",
+  "@workoutDetailExerciseCountOther": {
+    "description": "Migrated from workout.detail.exercise_count_other",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDetailSetCountOne": "{count} working set",
+  "@workoutDetailSetCountOne": {
+    "description": "Migrated from workout.detail.set_count_one",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDetailSetCountOther": "{count} working sets",
+  "@workoutDetailSetCountOther": {
+    "description": "Migrated from workout.detail.set_count_other",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDetailEstimatedMinutes": "~{count} min",
+  "@workoutDetailEstimatedMinutes": {
+    "description": "Migrated from workout.detail.estimated_minutes",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDetailOverview": "Overview",
+  "@workoutDetailOverview": {
+    "description": "Migrated from workout.detail.overview"
+  },
+  "workoutDetailMuscleFocus": "Muscle focus",
+  "@workoutDetailMuscleFocus": {
+    "description": "Migrated from workout.detail.muscle_focus"
+  },
+  "workoutDetailEquipment": "Equipment",
+  "@workoutDetailEquipment": {
+    "description": "Migrated from workout.detail.equipment"
+  },
+  "workoutDetailWorkingSets": "Working sets",
+  "@workoutDetailWorkingSets": {
+    "description": "Migrated from workout.detail.working_sets"
+  },
+  "workoutDetailWorkingSetsDefinition": "The prescribed sets that count as the main training work for this exercise.",
+  "@workoutDetailWorkingSetsDefinition": {
+    "description": "Migrated from workout.detail.working_sets_definition"
+  },
+  "workoutDetailRepRangeDefinition": "The target number of repetitions for each working set.",
+  "@workoutDetailRepRangeDefinition": {
+    "description": "Migrated from workout.detail.rep_range_definition"
+  },
+  "workoutDetailRecoveryDefinition": "The suggested rest before the next working set.",
+  "@workoutDetailRecoveryDefinition": {
+    "description": "Migrated from workout.detail.recovery_definition"
+  },
+  "workoutDetailGoal": "Goal",
+  "@workoutDetailGoal": {
+    "description": "Migrated from workout.detail.goal"
+  },
+  "workoutDetailShowMore": "Show more",
+  "@workoutDetailShowMore": {
+    "description": "Migrated from workout.detail.show_more"
+  },
+  "workoutDetailShowLess": "Show less",
+  "@workoutDetailShowLess": {
+    "description": "Migrated from workout.detail.show_less"
+  },
+  "workoutDetailStructure": "Structure",
+  "@workoutDetailStructure": {
+    "description": "Migrated from workout.detail.structure"
+  },
+  "workoutDetailRest": "Rest",
+  "@workoutDetailRest": {
+    "description": "Migrated from workout.detail.rest"
+  },
+  "workoutDetailTarget": "Target",
+  "@workoutDetailTarget": {
+    "description": "Migrated from workout.detail.target"
+  },
+  "workoutDetailIntensity": "Intensity",
+  "@workoutDetailIntensity": {
+    "description": "Migrated from workout.detail.intensity"
+  },
+  "workoutDetailRecovery": "Recovery",
+  "@workoutDetailRecovery": {
+    "description": "Migrated from workout.detail.recovery"
+  },
+  "workoutDetailTargetLoad": "Target load",
+  "@workoutDetailTargetLoad": {
+    "description": "Migrated from workout.detail.target_load"
+  },
+  "workoutDetailNotes": "Notes",
+  "@workoutDetailNotes": {
+    "description": "Migrated from workout.detail.notes"
+  },
+  "workoutDetailExerciseDetail": "Exercise details",
+  "@workoutDetailExerciseDetail": {
+    "description": "Migrated from workout.detail.exercise_detail"
+  },
+  "workoutDetailExerciseUnavailable": "Exercise unavailable",
+  "@workoutDetailExerciseUnavailable": {
+    "description": "Migrated from workout.detail.exercise_unavailable"
+  },
+  "workoutDetailExerciseFallback": "Exercise",
+  "@workoutDetailExerciseFallback": {
+    "description": "Migrated from workout.detail.exercise_fallback"
+  },
+  "workoutDetailExerciseLoading": "Loading exercise",
+  "@workoutDetailExerciseLoading": {
+    "description": "Migrated from workout.detail.exercise_loading"
+  },
+  "workoutDetailOpenExerciseSemantics": "Open details for {name}",
+  "@workoutDetailOpenExerciseSemantics": {
+    "description": "Migrated from workout.detail.open_exercise_semantics",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDetailExerciseSemanticsPosition": "Exercise {position}",
+  "@workoutDetailExerciseSemanticsPosition": {
+    "description": "Migrated from workout.detail.exercise_semantics_position",
+    "placeholders": {
+      "position": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDetailExpandDetails": "Expand details",
+  "@workoutDetailExpandDetails": {
+    "description": "Migrated from workout.detail.expand_details"
+  },
+  "workoutDetailCollapseDetails": "Collapse details",
+  "@workoutDetailCollapseDetails": {
+    "description": "Migrated from workout.detail.collapse_details"
+  },
+  "workoutDetailSuperset": "SUPERSET",
+  "@workoutDetailSuperset": {
+    "description": "Migrated from workout.detail.superset"
+  },
+  "workoutDetailTriset": "TRISET",
+  "@workoutDetailTriset": {
+    "description": "Migrated from workout.detail.triset"
+  },
+  "workoutDetailGiantSet": "GIANT SET",
+  "@workoutDetailGiantSet": {
+    "description": "Migrated from workout.detail.giant_set"
+  },
+  "workoutDetailCircuit": "CIRCUIT",
+  "@workoutDetailCircuit": {
+    "description": "Migrated from workout.detail.circuit"
+  },
+  "workoutDetailRounds": "rounds",
+  "@workoutDetailRounds": {
+    "description": "Migrated from workout.detail.rounds"
+  },
+  "workoutDetailRoundCountOne": "{count} round",
+  "@workoutDetailRoundCountOne": {
+    "description": "Migrated from workout.detail.round_count_one",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDetailRoundCountOther": "{count} rounds",
+  "@workoutDetailRoundCountOther": {
+    "description": "Migrated from workout.detail.round_count_other",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutDetailRestAfterRound": "Rest after round",
+  "@workoutDetailRestAfterRound": {
+    "description": "Migrated from workout.detail.rest_after_round"
+  },
+  "workoutDetailRestBetweenExercises": "Rest between exercises",
+  "@workoutDetailRestBetweenExercises": {
+    "description": "Migrated from workout.detail.rest_between_exercises"
+  },
+  "workoutDetailExpandGroup": "Expand group",
+  "@workoutDetailExpandGroup": {
+    "description": "Migrated from workout.detail.expand_group"
+  },
+  "workoutDetailCollapseGroup": "Collapse group",
+  "@workoutDetailCollapseGroup": {
+    "description": "Migrated from workout.detail.collapse_group"
+  },
+  "workoutDetailExplainConcept": "Explain this concept",
+  "@workoutDetailExplainConcept": {
+    "description": "Migrated from workout.detail.explain_concept"
+  },
+  "workoutDetailWhatIsIt": "What it is",
+  "@workoutDetailWhatIsIt": {
+    "description": "Migrated from workout.detail.what_is_it"
+  },
+  "workoutDetailHowToRead": "How to read it",
+  "@workoutDetailHowToRead": {
+    "description": "Migrated from workout.detail.how_to_read"
+  },
+  "workoutDetailSupersetDefinition": "Two or more exercises performed in sequence before resting.",
+  "@workoutDetailSupersetDefinition": {
+    "description": "Migrated from workout.detail.superset_definition"
+  },
+  "workoutDetailTrisetDefinition": "Three exercises performed in sequence before resting.",
+  "@workoutDetailTrisetDefinition": {
+    "description": "Migrated from workout.detail.triset_definition"
+  },
+  "workoutDetailGiantSetDefinition": "A longer sequence of exercises performed before resting.",
+  "@workoutDetailGiantSetDefinition": {
+    "description": "Migrated from workout.detail.giant_set_definition"
+  },
+  "workoutDetailCircuitDefinition": "A sequence of exercises repeated for the prescribed rounds.",
+  "@workoutDetailCircuitDefinition": {
+    "description": "Migrated from workout.detail.circuit_definition"
+  },
+  "workoutDetailNoExercises": "No exercises",
+  "@workoutDetailNoExercises": {
+    "description": "Migrated from workout.detail.no_exercises"
+  },
+  "workoutDetailEmptyHint": "Build this session from the Coachly catalog or your exercises.",
+  "@workoutDetailEmptyHint": {
+    "description": "Migrated from workout.detail.empty_hint"
+  },
+  "workoutDetailAddExercise": "Add exercise",
+  "@workoutDetailAddExercise": {
+    "description": "Migrated from workout.detail.add_exercise"
+  },
+  "workoutDetailProgrammingDetails": "Programming details",
+  "@workoutDetailProgrammingDetails": {
+    "description": "Migrated from workout.detail.programming_details"
+  },
+  "workoutDetailRepRange": "Rep range",
+  "@workoutDetailRepRange": {
+    "description": "Migrated from workout.detail.rep_range"
+  },
+  "workoutDetailConceptsUsed": "Concepts used in this workout",
+  "@workoutDetailConceptsUsed": {
+    "description": "Migrated from workout.detail.concepts_used"
+  },
+  "workoutDetailSyncPending": "Sync pending",
+  "@workoutDetailSyncPending": {
+    "description": "Migrated from workout.detail.sync_pending"
+  },
+  "workoutDetailEditSession": "Edit session",
+  "@workoutDetailEditSession": {
+    "description": "Migrated from workout.detail.edit_session"
+  },
+  "workoutDetailDone": "Done",
+  "@workoutDetailDone": {
+    "description": "Migrated from workout.detail.done"
+  },
+  "workoutDetailExerciseRemoved": "Exercise removed",
+  "@workoutDetailExerciseRemoved": {
+    "description": "Migrated from workout.detail.exercise_removed"
+  },
+  "workoutDetailAddSection": "Add section",
+  "@workoutDetailAddSection": {
+    "description": "Migrated from workout.detail.add_section"
+  },
+  "workoutDetailCreateGroup": "Create superset / circuit",
+  "@workoutDetailCreateGroup": {
+    "description": "Migrated from workout.detail.create_group"
+  },
+  "workoutDetailSectionPreparation": "Preparation",
+  "@workoutDetailSectionPreparation": {
+    "description": "Migrated from workout.detail.section_preparation"
+  },
+  "workoutDetailSectionMain": "Main work",
+  "@workoutDetailSectionMain": {
+    "description": "Migrated from workout.detail.section_main"
+  },
+  "workoutDetailSectionAccessory": "Accessories",
+  "@workoutDetailSectionAccessory": {
+    "description": "Migrated from workout.detail.section_accessory"
+  },
+  "workoutDetailSectionCustom": "Custom",
+  "@workoutDetailSectionCustom": {
+    "description": "Migrated from workout.detail.section_custom"
+  },
+  "workoutDetailSectionName": "Section name",
+  "@workoutDetailSectionName": {
+    "description": "Migrated from workout.detail.section_name"
+  },
+  "workoutDetailUngroup": "Ungroup",
+  "@workoutDetailUngroup": {
+    "description": "Migrated from workout.detail.ungroup"
+  },
+  "workoutDetailEditExercise": "Edit exercise",
+  "@workoutDetailEditExercise": {
+    "description": "Migrated from workout.detail.edit_exercise"
+  },
+  "workoutDetailBase": "Base",
+  "@workoutDetailBase": {
+    "description": "Migrated from workout.detail.base"
+  },
+  "workoutDetailAdvanced": "Advanced",
+  "@workoutDetailAdvanced": {
+    "description": "Migrated from workout.detail.advanced"
+  },
+  "workoutDetailSetType": "Set type",
+  "@workoutDetailSetType": {
+    "description": "Migrated from workout.detail.set_type"
+  },
+  "workoutDetailRelativeLoad": "Reduction from top set (%)",
+  "@workoutDetailRelativeLoad": {
+    "description": "Migrated from workout.detail.relative_load"
+  },
+  "workoutDetailUnilateral": "Unilateral",
+  "@workoutDetailUnilateral": {
+    "description": "Migrated from workout.detail.unilateral"
+  },
+  "workoutDetailTempo": "Tempo",
+  "@workoutDetailTempo": {
+    "description": "Migrated from workout.detail.tempo"
+  },
+  "workoutDetailPauseSeconds": "Pause (seconds)",
+  "@workoutDetailPauseSeconds": {
+    "description": "Migrated from workout.detail.pause_seconds"
+  },
+  "workoutDetailExerciseNote": "Exercise note",
+  "@workoutDetailExerciseNote": {
+    "description": "Migrated from workout.detail.exercise_note"
+  },
+  "workoutDetailAdvancedProgressive": "Tempo, pauses, unilateral work, target load and notes remain hidden until needed.",
+  "@workoutDetailAdvancedProgressive": {
+    "description": "Migrated from workout.detail.advanced_progressive"
+  },
+  "workoutDetailNone": "None",
+  "@workoutDetailNone": {
+    "description": "Migrated from workout.detail.none"
+  },
+  "workoutDetailSavedOffline": "Saved offline",
+  "@workoutDetailSavedOffline": {
+    "description": "Migrated from workout.detail.saved_offline"
+  },
+  "workoutDetailUnsavedTitle": "Unsaved changes",
+  "@workoutDetailUnsavedTitle": {
+    "description": "Migrated from workout.detail.unsaved_title"
+  },
+  "workoutDetailUnsavedBody": "Save or discard the changes before leaving edit mode.",
+  "@workoutDetailUnsavedBody": {
+    "description": "Migrated from workout.detail.unsaved_body"
+  },
+  "workoutDetailContinueEditing": "Continue editing",
+  "@workoutDetailContinueEditing": {
+    "description": "Migrated from workout.detail.continue_editing"
+  },
+  "workoutDetailDiscard": "Discard",
+  "@workoutDetailDiscard": {
+    "description": "Migrated from workout.detail.discard"
+  },
+  "workoutDetailSaveExit": "Save and exit",
+  "@workoutDetailSaveExit": {
+    "description": "Migrated from workout.detail.save_exit"
+  },
+  "workoutAddExerciseTitle": "Add exercise",
+  "@workoutAddExerciseTitle": {
+    "description": "Migrated from workout.add_exercise.title"
+  },
+  "workoutAddExerciseSearchHint": "Search exercise, muscle or equipment…",
+  "@workoutAddExerciseSearchHint": {
+    "description": "Migrated from workout.add_exercise.search_hint"
+  },
+  "workoutAddExerciseAll": "All",
+  "@workoutAddExerciseAll": {
+    "description": "Migrated from workout.add_exercise.all"
+  },
+  "workoutAddExerciseVerified": "Verified",
+  "@workoutAddExerciseVerified": {
+    "description": "Migrated from workout.add_exercise.verified"
+  },
+  "workoutAddExerciseMine": "Mine",
+  "@workoutAddExerciseMine": {
+    "description": "Migrated from workout.add_exercise.mine"
+  },
+  "workoutAddExerciseMuscle": "Muscle",
+  "@workoutAddExerciseMuscle": {
+    "description": "Migrated from workout.add_exercise.muscle"
+  },
+  "workoutAddExerciseMovement": "Movement",
+  "@workoutAddExerciseMovement": {
+    "description": "Migrated from workout.add_exercise.movement"
+  },
+  "workoutAddExerciseEquipment": "Equipment",
+  "@workoutAddExerciseEquipment": {
+    "description": "Migrated from workout.add_exercise.equipment"
+  },
+  "workoutAddExerciseTracking": "Tracking",
+  "@workoutAddExerciseTracking": {
+    "description": "Migrated from workout.add_exercise.tracking"
+  },
+  "workoutAddExerciseRecent": "Recent",
+  "@workoutAddExerciseRecent": {
+    "description": "Migrated from workout.add_exercise.recent"
+  },
+  "workoutAddExerciseResults": "Results",
+  "@workoutAddExerciseResults": {
+    "description": "Migrated from workout.add_exercise.results"
+  },
+  "workoutAddExerciseNoResults": "No exercises match these filters.",
+  "@workoutAddExerciseNoResults": {
+    "description": "Migrated from workout.add_exercise.no_results"
+  },
+  "workoutAddExerciseClearFilter": "Clear filter",
+  "@workoutAddExerciseClearFilter": {
+    "description": "Migrated from workout.add_exercise.clear_filter"
+  },
+  "workoutAddExerciseCreatePersonal": "Create personal exercise",
+  "@workoutAddExerciseCreatePersonal": {
+    "description": "Migrated from workout.add_exercise.create_personal"
+  },
+  "workoutAddExerciseLastConfiguration": "Using your last compatible prescription",
+  "@workoutAddExerciseLastConfiguration": {
+    "description": "Migrated from workout.add_exercise.last_configuration"
+  },
+  "workoutAddExerciseRepsMin": "Min reps",
+  "@workoutAddExerciseRepsMin": {
+    "description": "Migrated from workout.add_exercise.reps_min"
+  },
+  "workoutAddExerciseRepsMax": "Max reps",
+  "@workoutAddExerciseRepsMax": {
+    "description": "Migrated from workout.add_exercise.reps_max"
+  },
+  "workoutAddExerciseAddTo": "Add to",
+  "@workoutAddExerciseAddTo": {
+    "description": "Migrated from workout.add_exercise.add_to"
+  },
+  "workoutAddExerciseNoSection": "No section",
+  "@workoutAddExerciseNoSection": {
+    "description": "Migrated from workout.add_exercise.no_section"
+  },
+  "workoutAddExerciseLoadError": "Unable to load the exercise catalog.",
+  "@workoutAddExerciseLoadError": {
+    "description": "Migrated from workout.add_exercise.load_error"
+  },
+  "workoutDetailConceptRirDefinition": "Reps in reserve estimates how many repetitions remained before failure.",
+  "@workoutDetailConceptRirDefinition": {
+    "description": "Migrated from workout.detail.concept_rir_definition"
+  },
+  "workoutDetailConceptRirExample": "RIR 2 means you could have completed about two more repetitions.",
+  "@workoutDetailConceptRirExample": {
+    "description": "Migrated from workout.detail.concept_rir_example"
+  },
+  "workoutDetailConceptRpeDefinition": "RPE describes perceived effort on a scale up to 10.",
+  "@workoutDetailConceptRpeDefinition": {
+    "description": "Migrated from workout.detail.concept_rpe_definition"
+  },
+  "workoutDetailConceptRpeExample": "RPE 8 is a challenging set with roughly two reps in reserve.",
+  "@workoutDetailConceptRpeExample": {
+    "description": "Migrated from workout.detail.concept_rpe_example"
+  },
+  "workoutDetailConceptPercentage1RMDefinition": "The load is prescribed as a percentage of your one-rep maximum.",
+  "@workoutDetailConceptPercentage1RMDefinition": {
+    "description": "Migrated from workout.detail.concept_percentage1RM_definition"
+  },
+  "workoutDetailConceptPercentage1RMExample": "75% 1RM means using three quarters of your estimated maximum.",
+  "@workoutDetailConceptPercentage1RMExample": {
+    "description": "Migrated from workout.detail.concept_percentage1RM_example"
+  },
+  "workoutDetailConceptSupersetDefinition": "Exercises performed in sequence before resting.",
+  "@workoutDetailConceptSupersetDefinition": {
+    "description": "Migrated from workout.detail.concept_superset_definition"
+  },
+  "workoutDetailConceptSupersetExample": "A1 is followed by A2, then by the prescribed recovery.",
+  "@workoutDetailConceptSupersetExample": {
+    "description": "Migrated from workout.detail.concept_superset_example"
+  },
+  "workoutDetailConceptCircuitDefinition": "A sequence of exercises repeated for multiple rounds.",
+  "@workoutDetailConceptCircuitDefinition": {
+    "description": "Migrated from workout.detail.concept_circuit_definition"
+  },
+  "workoutDetailConceptCircuitExample": "Complete B1, B2 and B3, rest, then repeat.",
+  "@workoutDetailConceptCircuitExample": {
+    "description": "Migrated from workout.detail.concept_circuit_example"
+  },
+  "workoutDetailConceptTopSetDefinition": "The heaviest primary work set for the exercise.",
+  "@workoutDetailConceptTopSetDefinition": {
+    "description": "Migrated from workout.detail.concept_topSet_definition"
+  },
+  "workoutDetailConceptTopSetExample": "1 × 4–6 at RPE 8.",
+  "@workoutDetailConceptTopSetExample": {
+    "description": "Migrated from workout.detail.concept_topSet_example"
+  },
+  "workoutDetailConceptBackoffDefinition": "Follow-up sets performed with less load than the top set.",
+  "@workoutDetailConceptBackoffDefinition": {
+    "description": "Migrated from workout.detail.concept_backoff_definition"
+  },
+  "workoutDetailConceptBackoffExample": "3 × 6–8 at 7.5% less than the top set.",
+  "@workoutDetailConceptBackoffExample": {
+    "description": "Migrated from workout.detail.concept_backoff_example"
+  },
+  "workoutDetailConceptAmrapDefinition": "Perform as many technically sound repetitions as possible.",
+  "@workoutDetailConceptAmrapDefinition": {
+    "description": "Migrated from workout.detail.concept_amrap_definition"
+  },
+  "workoutDetailConceptAmrapExample": "Stop when another clean repetition is no longer available.",
+  "@workoutDetailConceptAmrapExample": {
+    "description": "Migrated from workout.detail.concept_amrap_example"
+  },
+  "workoutOrganizeTitle": "Organize Workouts",
+  "@workoutOrganizeTitle": {
+    "description": "Migrated from workout.organize.title"
+  },
+  "workoutOrganizeActive": "Active Workouts",
+  "@workoutOrganizeActive": {
+    "description": "Migrated from workout.organize.active"
+  },
+  "workoutOrganizeInactive": "Inactive Workouts",
+  "@workoutOrganizeInactive": {
+    "description": "Migrated from workout.organize.inactive"
+  },
+  "workoutOrganizeEmpty": "No workouts in this category",
+  "@workoutOrganizeEmpty": {
+    "description": "Migrated from workout.organize.empty"
+  },
+  "workoutOrganizeDeleteTitle": "Confirm Deletion",
+  "@workoutOrganizeDeleteTitle": {
+    "description": "Migrated from workout.organize.delete_title"
+  },
+  "workoutOrganizeDeleteContent": "Are you sure you want to delete the workout \"{name}\"?",
+  "@workoutOrganizeDeleteContent": {
+    "description": "Migrated from workout.organize.delete_content",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutOrganizeStatusTitle": "Confirm Status Change",
+  "@workoutOrganizeStatusTitle": {
+    "description": "Migrated from workout.organize.status_title"
+  },
+  "workoutOrganizeStatusContent": "Are you sure you want to {action} the workout \"{name}\"?",
+  "@workoutOrganizeStatusContent": {
+    "description": "Migrated from workout.organize.status_content",
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutOrganizeActionActivate": "activate",
+  "@workoutOrganizeActionActivate": {
+    "description": "Migrated from workout.organize.action_activate"
+  },
+  "workoutOrganizeActionDeactivate": "deactivate",
+  "@workoutOrganizeActionDeactivate": {
+    "description": "Migrated from workout.organize.action_deactivate"
+  },
+  "workoutOrganizeExercisesCount": "{count} exercises",
+  "@workoutOrganizeExercisesCount": {
+    "description": "Migrated from workout.organize.exercises_count",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutOrganizeCoach": "Coach {name}",
+  "@workoutOrganizeCoach": {
+    "description": "Migrated from workout.organize.coach",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutLoadError": "Error while loading.",
+  "@workoutLoadError": {
+    "description": "Migrated from workout.load_error"
+  },
+  "workoutCompleteTitle": "Complete workout?",
+  "@workoutCompleteTitle": {
+    "description": "Migrated from workout.complete_title"
+  },
+  "workoutCompleteContent": "All data will be saved and the session registered.",
+  "@workoutCompleteContent": {
+    "description": "Migrated from workout.complete_content"
+  },
+  "workoutCompleteConfirm": "Complete",
+  "@workoutCompleteConfirm": {
+    "description": "Migrated from workout.complete_confirm"
+  },
+  "workoutCompletedSaved": "Workout completed and saved!",
+  "@workoutCompletedSaved": {
+    "description": "Migrated from workout.completed_saved"
+  },
+  "workoutSaveError": "Error while saving.",
+  "@workoutSaveError": {
+    "description": "Migrated from workout.save_error"
+  },
+  "exerciseUnknownError": "Unknown error",
+  "@exerciseUnknownError": {
+    "description": "Migrated from exercise.unknown_error"
+  },
+  "exerciseLoadFailed": "Unable to load",
+  "@exerciseLoadFailed": {
+    "description": "Migrated from exercise.load_failed"
+  },
+  "exerciseRetry": "Retry",
+  "@exerciseRetry": {
+    "description": "Migrated from exercise.retry"
+  },
+  "exerciseFallbackName": "Exercise",
+  "@exerciseFallbackName": {
+    "description": "Migrated from exercise.fallback_name"
+  },
+  "exerciseMusclesInvolved": "Target muscles",
+  "@exerciseMusclesInvolved": {
+    "description": "Migrated from exercise.muscles_involved"
+  },
+  "exerciseSafetyTips": "Safety tips",
+  "@exerciseSafetyTips": {
+    "description": "Migrated from exercise.safety_tips"
+  },
+  "exerciseEquipment": "Equipment",
+  "@exerciseEquipment": {
+    "description": "Migrated from exercise.equipment"
+  },
+  "exerciseVariants": "Variants",
+  "@exerciseVariants": {
+    "description": "Migrated from exercise.variants"
+  },
+  "exerciseNoInformation": "No information available.",
+  "@exerciseNoInformation": {
+    "description": "Migrated from exercise.no_information"
+  },
+  "exerciseNoTechnicalData": "No technical data available.",
+  "@exerciseNoTechnicalData": {
+    "description": "Migrated from exercise.no_technical_data"
+  },
+  "exerciseRequiredEquipment": "Required equipment",
+  "@exerciseRequiredEquipment": {
+    "description": "Migrated from exercise.required_equipment"
+  },
+  "exerciseNoMuscleData": "No muscle data available.",
+  "@exerciseNoMuscleData": {
+    "description": "Migrated from exercise.no_muscle_data"
+  },
+  "exerciseActivation": "Activation {value}%",
+  "@exerciseActivation": {
+    "description": "Migrated from exercise.activation",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionExitTitle": "Exit current session?",
+  "@sessionExitTitle": {
+    "description": "Migrated from session.exit_title"
+  },
+  "sessionExitContent": "If you exit now, progress from this session will not be saved.",
+  "@sessionExitContent": {
+    "description": "Migrated from session.exit_content"
+  },
+  "sessionStay": "Stay in session",
+  "@sessionStay": {
+    "description": "Migrated from session.stay"
+  },
+  "sessionExitWithoutSave": "Exit without saving",
+  "@sessionExitWithoutSave": {
+    "description": "Migrated from session.exit_without_save"
+  },
+  "sessionDiscardTitle": "Finish and discard?",
+  "@sessionDiscardTitle": {
+    "description": "Migrated from session.discard_title"
+  },
+  "sessionDiscardContent": "All data from this workout will be deleted.",
+  "@sessionDiscardContent": {
+    "description": "Migrated from session.discard_content"
+  },
+  "sessionDiscardConfirm": "Discard",
+  "@sessionDiscardConfirm": {
+    "description": "Migrated from session.discard_confirm"
+  },
+  "sessionBellOn": "Bell enabled",
+  "@sessionBellOn": {
+    "description": "Migrated from session.bell_on"
+  },
+  "sessionBellOff": "Bell disabled",
+  "@sessionBellOff": {
+    "description": "Migrated from session.bell_off"
+  },
+  "sessionStopTimer": "Stop timer",
+  "@sessionStopTimer": {
+    "description": "Migrated from session.stop_timer"
+  },
+  "sessionRestCompleteTitle": "Rest complete",
+  "@sessionRestCompleteTitle": {
+    "description": "Migrated from session.rest_complete_title"
+  },
+  "sessionRestCompleteBody": "You are ready for the next set.",
+  "@sessionRestCompleteBody": {
+    "description": "Migrated from session.rest_complete_body"
+  },
+  "sessionContinue": "Continue",
+  "@sessionContinue": {
+    "description": "Migrated from session.continue"
+  },
+  "sessionNotes": "Workout notes",
+  "@sessionNotes": {
+    "description": "Migrated from session.notes"
+  },
+  "sessionHistory": "Workout history",
+  "@sessionHistory": {
+    "description": "Migrated from session.history"
+  },
+  "sessionFinishDiscard": "Finish and discard",
+  "@sessionFinishDiscard": {
+    "description": "Migrated from session.finish_discard"
+  },
+  "sessionExerciseCount": "{count} exercises",
+  "@sessionExerciseCount": {
+    "description": "Migrated from session.exercise_count",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionVoiceTitle": "Voice entry",
+  "@sessionVoiceTitle": {
+    "description": "Migrated from session.voice.title"
+  },
+  "sessionVoiceTooltip": "Voice bulk entry",
+  "@sessionVoiceTooltip": {
+    "description": "Migrated from session.voice.tooltip"
+  },
+  "sessionVoiceListening": "Listening...",
+  "@sessionVoiceListening": {
+    "description": "Migrated from session.voice.listening"
+  },
+  "sessionVoiceTapStopHint": "Speak and press Stop when you are done.",
+  "@sessionVoiceTapStopHint": {
+    "description": "Migrated from session.voice.tap_stop_hint"
+  },
+  "sessionVoiceLiveTranscript": "Live transcript",
+  "@sessionVoiceLiveTranscript": {
+    "description": "Migrated from session.voice.live_transcript"
+  },
+  "sessionVoiceWaitingTranscript": "Waiting for speech...",
+  "@sessionVoiceWaitingTranscript": {
+    "description": "Migrated from session.voice.waiting_transcript"
+  },
+  "sessionVoiceStop": "Stop",
+  "@sessionVoiceStop": {
+    "description": "Migrated from session.voice.stop"
+  },
+  "sessionVoiceReactivateHint": "Microphone paused unexpectedly. Press Stop and try again.",
+  "@sessionVoiceReactivateHint": {
+    "description": "Migrated from session.voice.reactivate_hint"
+  },
+  "sessionVoiceCaptureError": "Unable to start microphone capture.",
+  "@sessionVoiceCaptureError": {
+    "description": "Migrated from session.voice.capture_error"
+  },
+  "sessionVoiceProcessing": "Processing voice input...",
+  "@sessionVoiceProcessing": {
+    "description": "Migrated from session.voice.processing"
+  },
+  "sessionVoiceNoSpeech": "No speech detected. Try again.",
+  "@sessionVoiceNoSpeech": {
+    "description": "Migrated from session.voice.no_speech"
+  },
+  "sessionVoiceNoMatch": "No matching exercise found.",
+  "@sessionVoiceNoMatch": {
+    "description": "Migrated from session.voice.no_match"
+  },
+  "sessionVoiceNoExercises": "No exercises available in this session.",
+  "@sessionVoiceNoExercises": {
+    "description": "Migrated from session.voice.no_exercises"
+  },
+  "sessionVoiceApplyFailed": "Unable to apply parsed values.",
+  "@sessionVoiceApplyFailed": {
+    "description": "Migrated from session.voice.apply_failed"
+  },
+  "sessionVoiceChooseTitle": "Choose the matched exercise",
+  "@sessionVoiceChooseTitle": {
+    "description": "Migrated from session.voice.choose_title"
+  },
+  "sessionVoiceConfidence": "Confidence",
+  "@sessionVoiceConfidence": {
+    "description": "Migrated from session.voice.confidence"
+  },
+  "sessionVoiceApplied": "{exercise}: {sets}x{reps} @ {kg}kg",
+  "@sessionVoiceApplied": {
+    "description": "Migrated from session.voice.applied",
+    "placeholders": {
+      "exercise": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      },
+      "reps": {
+        "type": "String"
+      },
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutEditDescription": "Description",
+  "@workoutEditDescription": {
+    "description": "Migrated from workout.edit.description"
+  },
+  "workoutEditAddExercise": "Add Exercise",
+  "@workoutEditAddExercise": {
+    "description": "Migrated from workout.edit.add_exercise"
+  },
+  "workoutEditExercisesCount": "Exercises ({count})",
+  "@workoutEditExercisesCount": {
+    "description": "Migrated from workout.edit.exercises_count",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "workoutEditExercisesHint": "Tap a card to edit it. Drag its number to change the order.",
+  "@workoutEditExercisesHint": {
+    "description": "Migrated from workout.edit.exercises_hint"
+  },
+  "workoutEditNoExercise": "No exercises",
+  "@workoutEditNoExercise": {
+    "description": "Migrated from workout.edit.no_exercise"
+  },
+  "workoutEditAddFirstExercise": "Add your first exercise to begin",
+  "@workoutEditAddFirstExercise": {
+    "description": "Migrated from workout.edit.add_first_exercise"
+  },
+  "workoutEditRemoveTitle": "Remove exercise",
+  "@workoutEditRemoveTitle": {
+    "description": "Migrated from workout.edit.remove_title"
+  },
+  "workoutEditRemoveContent": "Are you sure you want to remove this exercise?",
+  "@workoutEditRemoveContent": {
+    "description": "Migrated from workout.edit.remove_content"
+  },
+  "workoutEditRemoveConfirm": "Remove",
+  "@workoutEditRemoveConfirm": {
+    "description": "Migrated from workout.edit.remove_confirm"
+  },
+  "workoutEditVariantTitle": "Exercise variants",
+  "@workoutEditVariantTitle": {
+    "description": "Migrated from workout.edit.variant_title"
+  },
+  "workoutEditSaved": "Workout saved successfully",
+  "@workoutEditSaved": {
+    "description": "Migrated from workout.edit.saved"
+  },
+  "workoutEditSaveCompleted": "Save completed",
+  "@workoutEditSaveCompleted": {
+    "description": "Migrated from workout.edit.save_completed"
+  },
+  "workoutEditSaveFailed": "Save failed",
+  "@workoutEditSaveFailed": {
+    "description": "Migrated from workout.edit.save_failed"
+  },
+  "workoutEditUnsavedTitle": "Unsaved changes",
+  "@workoutEditUnsavedTitle": {
+    "description": "Migrated from workout.edit.unsaved_title"
+  },
+  "workoutEditUnsavedContent": "You have unsaved changes. Exit without saving?",
+  "@workoutEditUnsavedContent": {
+    "description": "Migrated from workout.edit.unsaved_content"
+  },
+  "workoutEditExit": "Exit",
+  "@workoutEditExit": {
+    "description": "Migrated from workout.edit.exit"
+  },
+  "workoutEditNameHint": "Workout name...",
+  "@workoutEditNameHint": {
+    "description": "Migrated from workout.edit.name_hint"
+  },
+  "exerciseNoVariants": "No variants available.",
+  "@exerciseNoVariants": {
+    "description": "Migrated from exercise.no_variants"
+  },
+  "aiCreateWorkout": "Create Workout",
+  "@aiCreateWorkout": {
+    "description": "Migrated from ai.create_workout"
+  },
+  "aiAnalyzeProgress": "Analyze progress",
+  "@aiAnalyzeProgress": {
+    "description": "Migrated from ai.analyze_progress"
+  },
+  "aiGoalTips": "Goal tips",
+  "@aiGoalTips": {
+    "description": "Migrated from ai.goal_tips"
+  },
+  "aiGreeting": "Hi! I am your AI Coach. I can help with workout plans, progress analysis, nutrition tips, and more. How can I help today? 💪",
+  "@aiGreeting": {
+    "description": "Migrated from ai.greeting"
+  },
+  "aiSampleQuestion": "I am doing bench press and feel tired. Should I continue?",
+  "@aiSampleQuestion": {
+    "description": "Migrated from ai.sample_question"
+  },
+  "aiSampleAnswer": "Great question! If you feel normal muscle fatigue, continue. If you feel pain or joint instability, stop. Consider reducing the load by 5-10% in the remaining sets to keep proper form. 🎯",
+  "@aiSampleAnswer": {
+    "description": "Migrated from ai.sample_answer"
+  },
+  "workoutEmptyCreateFirst": "Create your\nfirst workout!",
+  "@workoutEmptyCreateFirst": {
+    "description": "Migrated from workout.empty.create_first"
+  },
+  "workoutAddNotesHint": "Add notes...",
+  "@workoutAddNotesHint": {
+    "description": "Migrated from workout.add_notes_hint"
+  },
+  "workoutSearchExerciseHint": "Search exercise...",
+  "@workoutSearchExerciseHint": {
+    "description": "Migrated from workout.search_exercise_hint"
+  },
+  "workoutNoExerciseFound": "No exercise found",
+  "@workoutNoExerciseFound": {
+    "description": "Migrated from workout.no_exercise_found"
+  },
+  "workoutEditRequiredFields": "Fill all required fields and add at least one exercise",
+  "@workoutEditRequiredFields": {
+    "description": "Migrated from workout.edit.required_fields"
+  },
+  "sessionSaving": "Saving...",
+  "@sessionSaving": {
+    "description": "Migrated from session.saving"
+  },
+  "sessionComplete": "Complete session",
+  "@sessionComplete": {
+    "description": "Migrated from session.complete"
+  },
+  "exerciseInfo": "Exercise info",
+  "@exerciseInfo": {
+    "description": "Migrated from exercise.info"
+  },
+  "exerciseActions": "Exercise actions",
+  "@exerciseActions": {
+    "description": "Migrated from exercise.actions"
+  },
+  "exerciseAddSet": "Add set",
+  "@exerciseAddSet": {
+    "description": "Migrated from exercise.add_set"
+  },
+  "exerciseDetailInfo": "Detailed information about the exercise.",
+  "@exerciseDetailInfo": {
+    "description": "Migrated from exercise.detail_info"
+  },
+  "exerciseTechnique": "Technique",
+  "@exerciseTechnique": {
+    "description": "Migrated from exercise.technique"
+  },
+  "exerciseVideoTutorial": "Video tutorial",
+  "@exerciseVideoTutorial": {
+    "description": "Migrated from exercise.video_tutorial"
+  },
+  "exerciseFullDetails": "Full details",
+  "@exerciseFullDetails": {
+    "description": "Migrated from exercise.full_details"
+  },
+  "workoutEmptySubtitle": "Design workouts tailored to you.\nStart your fitness journey today.",
+  "@workoutEmptySubtitle": {
+    "description": "Migrated from workout.empty.subtitle"
+  },
+  "workoutEmptyStart": "Let''s start",
+  "@workoutEmptyStart": {
+    "description": "Migrated from workout.empty.start"
+  },
+  "offlineMode": "Offline mode",
+  "@offlineMode": {
+    "description": "Migrated from offline.mode"
+  },
+  "offlineSessionExpired": "Session expired. Reconnect to sync.",
+  "@offlineSessionExpired": {
+    "description": "Migrated from offline.session_expired"
+  },
+  "exerciseDifficulty": "Difficulty",
+  "@exerciseDifficulty": {
+    "description": "Migrated from exercise.difficulty"
+  },
+  "exerciseMechanics": "Mechanics",
+  "@exerciseMechanics": {
+    "description": "Migrated from exercise.mechanics"
+  },
+  "exerciseType": "Type",
+  "@exerciseType": {
+    "description": "Migrated from exercise.type"
+  },
+  "exerciseBodyweight": "Bodyweight",
+  "@exerciseBodyweight": {
+    "description": "Migrated from exercise.bodyweight"
+  },
+  "exerciseMuscle": "Muscle",
+  "@exerciseMuscle": {
+    "description": "Migrated from exercise.muscle"
+  },
+  "exerciseForceType": "Force type",
+  "@exerciseForceType": {
+    "description": "Migrated from exercise.force_type"
+  },
+  "exerciseBodyweightOnly": "Bodyweight only",
+  "@exerciseBodyweightOnly": {
+    "description": "Migrated from exercise.bodyweight_only"
+  },
+  "exerciseWithEquipment": "With equipment",
+  "@exerciseWithEquipment": {
+    "description": "Migrated from exercise.with_equipment"
+  },
+  "exerciseUnilateral": "Unilateral",
+  "@exerciseUnilateral": {
+    "description": "Migrated from exercise.unilateral"
+  },
+  "exerciseClearFilters": "Clear filters",
+  "@exerciseClearFilters": {
+    "description": "Migrated from exercise.clear_filters"
+  },
+  "exerciseScopeCommunity": "Community",
+  "@exerciseScopeCommunity": {
+    "description": "Migrated from exercise.scope.community"
+  },
+  "exerciseScopeDefault": "Default",
+  "@exerciseScopeDefault": {
+    "description": "Migrated from exercise.scope.default"
+  },
+  "exerciseScopeMine": "Mine",
+  "@exerciseScopeMine": {
+    "description": "Migrated from exercise.scope.mine"
+  },
+  "exercisePersonalCreate": "Create personal exercise",
+  "@exercisePersonalCreate": {
+    "description": "Migrated from exercise.personal.create"
+  },
+  "exercisePersonalEdit": "Edit personal exercise",
+  "@exercisePersonalEdit": {
+    "description": "Migrated from exercise.personal.edit"
+  },
+  "exercisePersonalCreated": "Exercise created",
+  "@exercisePersonalCreated": {
+    "description": "Migrated from exercise.personal.created"
+  },
+  "exercisePersonalName": "Name",
+  "@exercisePersonalName": {
+    "description": "Migrated from exercise.personal.name"
+  },
+  "exercisePersonalDescription": "Description",
+  "@exercisePersonalDescription": {
+    "description": "Migrated from exercise.personal.description"
+  },
+  "exercisePersonalDelete": "Delete exercise",
+  "@exercisePersonalDelete": {
+    "description": "Migrated from exercise.personal.delete"
+  },
+  "exercisePersonalDeleteConfirm": "Delete this personal exercise?",
+  "@exercisePersonalDeleteConfirm": {
+    "description": "Migrated from exercise.personal.delete_confirm"
+  },
+  "exercisePersonalEmpty": "No personal exercises yet.",
+  "@exercisePersonalEmpty": {
+    "description": "Migrated from exercise.personal.empty"
+  },
+  "exerciseDifficultyBeginner": "Beginner",
+  "@exerciseDifficultyBeginner": {
+    "description": "Migrated from exercise.difficulty.beginner"
+  },
+  "exerciseDifficultyIntermediate": "Intermediate",
+  "@exerciseDifficultyIntermediate": {
+    "description": "Migrated from exercise.difficulty.intermediate"
+  },
+  "exerciseDifficultyAdvanced": "Advanced",
+  "@exerciseDifficultyAdvanced": {
+    "description": "Migrated from exercise.difficulty.advanced"
+  },
+  "exerciseMechanicsCompound": "Compound",
+  "@exerciseMechanicsCompound": {
+    "description": "Migrated from exercise.mechanics.compound"
+  },
+  "exerciseMechanicsIsolation": "Isolation",
+  "@exerciseMechanicsIsolation": {
+    "description": "Migrated from exercise.mechanics.isolation"
+  },
+  "exerciseForcePush": "Push",
+  "@exerciseForcePush": {
+    "description": "Migrated from exercise.force.push"
+  },
+  "exerciseForcePull": "Pull",
+  "@exerciseForcePull": {
+    "description": "Migrated from exercise.force.pull"
+  },
+  "exerciseForceLegs": "Legs",
+  "@exerciseForceLegs": {
+    "description": "Migrated from exercise.force.legs"
+  },
+  "exerciseForceCore": "Core",
+  "@exerciseForceCore": {
+    "description": "Migrated from exercise.force.core"
+  },
+  "exerciseForceStatic": "Static",
+  "@exerciseForceStatic": {
+    "description": "Migrated from exercise.force.static"
+  },
+  "authLoginTitle": "Sign in with Keycloak",
+  "@authLoginTitle": {
+    "description": "Migrated from auth.login.title"
+  },
+  "authLoginDescription": "Sign-in runs in the system browser with Authorization Code Flow and PKCE. The app never handles username or password directly.",
+  "@authLoginDescription": {
+    "description": "Migrated from auth.login.description"
+  },
+  "authLoginConfigurationHint": "If the Keycloak client and redirect URIs are configured correctly, after login you are redirected back to the app automatically.",
+  "@authLoginConfigurationHint": {
+    "description": "Migrated from auth.login.configuration_hint"
+  },
+  "authLoginCta": "Continue with Keycloak",
+  "@authLoginCta": {
+    "description": "Migrated from auth.login.cta"
+  },
+  "aiHeaderReady": "Always ready to help",
+  "@aiHeaderReady": {
+    "description": "Migrated from ai.header_ready"
+  },
+  "aiPlanWeek": "Plan week",
+  "@aiPlanWeek": {
+    "description": "Migrated from ai.plan_week"
+  },
+  "aiWriteMessage": "Write your message...",
+  "@aiWriteMessage": {
+    "description": "Migrated from ai.write_message"
+  },
+  "aiLoading": "Loading AI Coach...",
+  "@aiLoading": {
+    "description": "Migrated from ai.loading"
+  },
+  "aiMonitorWorkout": "Monitoring your workout",
+  "@aiMonitorWorkout": {
+    "description": "Migrated from ai.monitor_workout"
+  },
+  "aiListening": "LISTENING...",
+  "@aiListening": {
+    "description": "Migrated from ai.listening"
+  },
+  "aiSpeakNow": "Speak now...",
+  "@aiSpeakNow": {
+    "description": "Migrated from ai.speak_now"
+  },
+  "aiSend": "Send",
+  "@aiSend": {
+    "description": "Migrated from ai.send"
+  },
+  "aiWriteOrSpeak": "Write or speak...",
+  "@aiWriteOrSpeak": {
+    "description": "Migrated from ai.write_or_speak"
+  },
+  "aiLive": "LIVE",
+  "@aiLive": {
+    "description": "Migrated from ai.live"
+  },
+  "aiNow": "now",
+  "@aiNow": {
+    "description": "Migrated from ai.now"
+  },
+  "aiMinutesAgo": "{value}m ago",
+  "@aiMinutesAgo": {
+    "description": "Migrated from ai.minutes_ago",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "aiContextLine": "{exercise} · Set {current}/{total} · {weight} kg · {time}",
+  "@aiContextLine": {
+    "description": "Migrated from ai.context_line",
+    "placeholders": {
+      "exercise": {
+        "type": "String"
+      },
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      },
+      "weight": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "aiQuickAdjust": "ADJUST",
+  "@aiQuickAdjust": {
+    "description": "Migrated from ai.quick.adjust"
+  },
+  "aiQuickProgress": "PROGRESS",
+  "@aiQuickProgress": {
+    "description": "Migrated from ai.quick.progress"
+  },
+  "aiQuickFatigue": "FATIGUE",
+  "@aiQuickFatigue": {
+    "description": "Migrated from ai.quick.fatigue"
+  },
+  "aiQuickNext": "NEXT",
+  "@aiQuickNext": {
+    "description": "Migrated from ai.quick.next"
+  },
+  "aiQuickNutrition": "NUTRITION",
+  "@aiQuickNutrition": {
+    "description": "Migrated from ai.quick.nutrition"
+  },
+  "aiDefaultOpening": "I am ready. Tell me how you feel in this set and I will guide you.",
+  "@aiDefaultOpening": {
+    "description": "Migrated from ai.default_opening"
+  },
+  "aiModelUnavailable": "Model not available now. I will use simplified offline answers.",
+  "@aiModelUnavailable": {
+    "description": "Migrated from ai.model_unavailable"
+  },
+  "aiModelLoadingRetry": "AI model is still warming up. Retry in a few seconds.",
+  "@aiModelLoadingRetry": {
+    "description": "Migrated from ai.model_loading_retry"
+  },
+  "aiRetryShort": "I did not complete the answer. Try again with a shorter request.",
+  "@aiRetryShort": {
+    "description": "Migrated from ai.retry_short"
+  },
+  "aiJsonFallback": "Rephrase briefly: I can give you a practical tip right now.",
+  "@aiJsonFallback": {
+    "description": "Migrated from ai.json_fallback"
+  },
+  "aiMessageFallback": "I am tracking in real time: keep control and technical quality.",
+  "@aiMessageFallback": {
+    "description": "Migrated from ai.message_fallback"
+  },
+  "aiContextLoadingExercise": "Loading exercise",
+  "@aiContextLoadingExercise": {
+    "description": "Migrated from ai.context_loading_exercise"
+  },
+  "aiPromptSystemEn": "You are Coachly AI Coach, an on-device fitness assistant with real-time workout context.\nReply ONLY with a single valid JSON object. No text before or after. No markdown.\nWhen an insight is useful: '{'\"message\":\"<reply in English, 1-2 sentences>\",\"insight_card\":'{'\"icon\":\"<emoji>\",\"label\":\"<UPPERCASE 1-3 WORDS>\",\"body\":\"<max 12 words>\"'}''}'\nWhen no insight is needed: '{'\"message\":\"<reply in English, 1-2 sentences>\",\"insight_card\":null'}'\nBe concise, direct, motivating.",
+  "@aiPromptSystemEn": {
+    "description": "Migrated from ai.prompt.system.en"
+  },
+  "aiPromptContextTitle": "[WORKOUT CONTEXT]",
+  "@aiPromptContextTitle": {
+    "description": "Migrated from ai.prompt.context_title"
+  },
+  "aiPromptUserTitle": "[USER MESSAGE]",
+  "@aiPromptUserTitle": {
+    "description": "Migrated from ai.prompt.user_title"
+  },
+  "aiPromptExerciseLine": "Exercise: {name} | Set: {current}/{total}",
+  "@aiPromptExerciseLine": {
+    "description": "Migrated from ai.prompt.exercise_line",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "aiPromptWeightLine": "Weight: {weight}kg x {reps} target reps",
+  "@aiPromptWeightLine": {
+    "description": "Migrated from ai.prompt.weight_line",
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "reps": {
+        "type": "String"
+      }
+    }
+  },
+  "aiPromptFatigueLine": "Fatigue index: {value}",
+  "@aiPromptFatigueLine": {
+    "description": "Migrated from ai.prompt.fatigue_line",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "aiPromptRecentWeightsLine": "Recent weight history: {value}",
+  "@aiPromptRecentWeightsLine": {
+    "description": "Migrated from ai.prompt.recent_weights_line",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "aiPromptMinutesLine": "Session minutes: {value}",
+  "@aiPromptMinutesLine": {
+    "description": "Migrated from ai.prompt.minutes_line",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "aiOfflineBody": "Fatigue {value}% on {exercise}",
+  "@aiOfflineBody": {
+    "description": "Migrated from ai.offline.body",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      }
+    }
+  },
+  "aiOfflineBodyDefault": "Keep clean technique and regular recovery",
+  "@aiOfflineBodyDefault": {
+    "description": "Migrated from ai.offline.body_default"
+  },
+  "aiOfflineMessage": "I read: {message}. Keep controlled pace and stable form now.",
+  "@aiOfflineMessage": {
+    "description": "Migrated from ai.offline.message",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "aiOfflineLabel": "QUICK CHECK",
+  "@aiOfflineLabel": {
+    "description": "Migrated from ai.offline.label"
+  },
+  "aiDownloadTitle": "AI Model Required",
+  "@aiDownloadTitle": {
+    "description": "Migrated from ai.download.title"
+  },
+  "aiDownloadSubtitle": "Qwen2.5 1.5B · 1.5 GB · runs fully offline",
+  "@aiDownloadSubtitle": {
+    "description": "Migrated from ai.download.subtitle"
+  },
+  "aiDownloadDescription": "The AI coach needs to download a model once. After that it runs entirely on your device with no internet required.",
+  "@aiDownloadDescription": {
+    "description": "Migrated from ai.download.description"
+  },
+  "aiDownloadButton": "Download",
+  "@aiDownloadButton": {
+    "description": "Migrated from ai.download.button"
+  },
+  "aiDownloadProgress": "Downloading... {progress}%",
+  "@aiDownloadProgress": {
+    "description": "Migrated from ai.download.progress",
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "aiDownloadError": "Download failed. Tap to retry.",
+  "@aiDownloadError": {
+    "description": "Migrated from ai.download.error"
+  },
+  "settingsLocalAiSection": "AI Coach",
+  "@settingsLocalAiSection": {
+    "description": "Migrated from settings.local_ai.section"
+  },
+  "settingsLocalAiToggle": "Use local AI",
+  "@settingsLocalAiToggle": {
+    "description": "Migrated from settings.local_ai.toggle"
+  },
+  "settingsLocalAiToggleSubtitle": "Run AI entirely on your device, offline",
+  "@settingsLocalAiToggleSubtitle": {
+    "description": "Migrated from settings.local_ai.toggle_subtitle"
+  },
+  "settingsLocalAiModelQuality": "Model quality",
+  "@settingsLocalAiModelQuality": {
+    "description": "Migrated from settings.local_ai.model_quality"
+  },
+  "settingsLocalAiModelMinimal": "Minimal",
+  "@settingsLocalAiModelMinimal": {
+    "description": "Migrated from settings.local_ai.model_minimal"
+  },
+  "settingsLocalAiModelGood": "Good",
+  "@settingsLocalAiModelGood": {
+    "description": "Migrated from settings.local_ai.model_good"
+  },
+  "settingsLocalAiModelBest": "Best",
+  "@settingsLocalAiModelBest": {
+    "description": "Migrated from settings.local_ai.model_best"
+  },
+  "settingsLocalAiUninstallAll": "Uninstall downloaded models",
+  "@settingsLocalAiUninstallAll": {
+    "description": "Migrated from settings.local_ai.uninstall_all"
+  },
+  "settingsLocalAiUninstallTitle": "Uninstall models?",
+  "@settingsLocalAiUninstallTitle": {
+    "description": "Migrated from settings.local_ai.uninstall_title"
+  },
+  "settingsLocalAiUninstallBody": "All downloaded AI models will be removed from your device.",
+  "@settingsLocalAiUninstallBody": {
+    "description": "Migrated from settings.local_ai.uninstall_body"
+  },
+  "settingsLocalAiUninstallConfirm": "Uninstall",
+  "@settingsLocalAiUninstallConfirm": {
+    "description": "Migrated from settings.local_ai.uninstall_confirm"
+  },
+  "settingsLocalAiEnableTitle": "Enable local AI?",
+  "@settingsLocalAiEnableTitle": {
+    "description": "Migrated from settings.local_ai.enable_title"
+  },
+  "settingsLocalAiStorageInfo": "Storage required: {size}",
+  "@settingsLocalAiStorageInfo": {
+    "description": "Migrated from settings.local_ai.storage_info",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLocalAiNoCost": "No additional costs",
+  "@settingsLocalAiNoCost": {
+    "description": "Migrated from settings.local_ai.no_cost"
+  },
+  "settingsLocalAiModernDevice": "Designed for modern devices",
+  "@settingsLocalAiModernDevice": {
+    "description": "Migrated from settings.local_ai.modern_device"
+  },
+  "settingsLocalAiCanDisable": "You can disable it at any time",
+  "@settingsLocalAiCanDisable": {
+    "description": "Migrated from settings.local_ai.can_disable"
+  },
+  "settingsLocalAiEnableConfirm": "Enable",
+  "@settingsLocalAiEnableConfirm": {
+    "description": "Migrated from settings.local_ai.enable_confirm"
+  },
+  "settingsLocalAiHfToken": "HuggingFace Token (optional)",
+  "@settingsLocalAiHfToken": {
+    "description": "Migrated from settings.local_ai.hf_token"
+  },
+  "settingsLocalAiHfTokenHint": "hf_...",
+  "@settingsLocalAiHfTokenHint": {
+    "description": "Migrated from settings.local_ai.hf_token_hint"
+  },
+  "settingsLocalAiHfTokenSubtitle": "Required to download gated models from HuggingFace",
+  "@settingsLocalAiHfTokenSubtitle": {
+    "description": "Migrated from settings.local_ai.hf_token_subtitle"
+  },
+  "aiDisabledTitle": "Local AI disabled",
+  "@aiDisabledTitle": {
+    "description": "Migrated from ai.disabled.title"
+  },
+  "aiDisabledSubtitle": "Enable local AI in your profile settings to use the AI coach during workouts.",
+  "@aiDisabledSubtitle": {
+    "description": "Migrated from ai.disabled.subtitle"
+  },
+  "aiOomTitle": "Not enough memory",
+  "@aiOomTitle": {
+    "description": "Migrated from ai.oom.title"
+  },
+  "aiOomSubtitle": "This model is too large for your device''s available memory. Choose a lighter model in the profile settings.",
+  "@aiOomSubtitle": {
+    "description": "Migrated from ai.oom.subtitle"
+  },
+  "homeHeaderGreeting": "Hi, {name}",
+  "@homeHeaderGreeting": {
+    "description": "Migrated from home.header.greeting",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeHeaderGreetingGeneric": "Hi",
+  "@homeHeaderGreetingGeneric": {
+    "description": "Migrated from home.header.greeting_generic"
+  },
+  "homeHeaderSubtitle": "Ready to train?",
+  "@homeHeaderSubtitle": {
+    "description": "Migrated from home.header.subtitle"
+  },
+  "homeSyncOffline": "Offline",
+  "@homeSyncOffline": {
+    "description": "Migrated from home.sync.offline"
+  },
+  "homeSyncSyncing": "Syncing…",
+  "@homeSyncSyncing": {
+    "description": "Migrated from home.sync.syncing"
+  },
+  "homeTodayTitle": "Today",
+  "@homeTodayTitle": {
+    "description": "Migrated from home.today.title"
+  },
+  "homeTodayInProgress": "Workout in progress",
+  "@homeTodayInProgress": {
+    "description": "Migrated from home.today.in_progress"
+  },
+  "homeTodayPlannedBreak": "Planned break",
+  "@homeTodayPlannedBreak": {
+    "description": "Migrated from home.today.planned_break"
+  },
+  "homeTodayProgramPaused": "Programming paused",
+  "@homeTodayProgramPaused": {
+    "description": "Migrated from home.today.program_paused"
+  },
+  "homeTodayRecoveryDay": "Recovery day",
+  "@homeTodayRecoveryDay": {
+    "description": "Migrated from home.today.recovery_day"
+  },
+  "homeTodayStartWorkout": "Start workout",
+  "@homeTodayStartWorkout": {
+    "description": "Migrated from home.today.start_workout"
+  },
+  "homeTodayResumeWorkout": "Resume",
+  "@homeTodayResumeWorkout": {
+    "description": "Migrated from home.today.resume_workout"
+  },
+  "homeTodayTrainingMetadata": "~{minutes} min · {sets} working sets",
+  "@homeTodayTrainingMetadata": {
+    "description": "Migrated from home.today.training_metadata",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "homeTodayProgressMetadata": "{minutes} min · {done} / {total} exercises",
+  "@homeTodayProgressMetadata": {
+    "description": "Migrated from home.today.progress_metadata",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "homeTodayNextSession": "Next session: {workout} · {date}",
+  "@homeTodayNextSession": {
+    "description": "Migrated from home.today.next_session",
+    "placeholders": {
+      "workout": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "homeEmptyTitle": "Start training with Coachly",
+  "@homeEmptyTitle": {
+    "description": "Migrated from home.empty.title"
+  },
+  "homeEmptyBody": "Create a routine, build a program, or record a free workout.",
+  "@homeEmptyBody": {
+    "description": "Migrated from home.empty.body"
+  },
+  "homeCyclePosition": "Cycle {position} of {length}",
+  "@homeCyclePosition": {
+    "description": "Migrated from home.cycle.position",
+    "placeholders": {
+      "position": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "homeCycleSemantics": "Cycle {position} of {length}, {percent}% complete",
+  "@homeCycleSemantics": {
+    "description": "Migrated from home.cycle.semantics",
+    "placeholders": {
+      "position": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "homeCalendarTitle": "Calendar",
+  "@homeCalendarTitle": {
+    "description": "Migrated from home.calendar.title"
+  },
+  "homeCalendarNext": "Next",
+  "@homeCalendarNext": {
+    "description": "Migrated from home.calendar.next"
+  },
+  "homeCalendarToday": "Today",
+  "@homeCalendarToday": {
+    "description": "Migrated from home.calendar.today"
+  },
+  "homeCalendarCycle": "Day {position} of a {length}-day cycle",
+  "@homeCalendarCycle": {
+    "description": "Migrated from home.calendar.cycle",
+    "placeholders": {
+      "position": {
+        "type": "String"
+      },
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGoalTitle": "Main goal",
+  "@homeGoalTitle": {
+    "description": "Migrated from home.goal.title"
+  },
+  "homeGoalBaseline": "Building your baseline",
+  "@homeGoalBaseline": {
+    "description": "Migrated from home.goal.baseline"
+  },
+  "homeGoalEmptyTitle": "Set your first goal",
+  "@homeGoalEmptyTitle": {
+    "description": "Migrated from home.goal.empty_title"
+  },
+  "homeGoalEmptyBody": "Your next concrete milestone will appear here.",
+  "@homeGoalEmptyBody": {
+    "description": "Migrated from home.goal.empty_body"
+  },
+  "homeInsightsTitle": "Coachly Insights",
+  "@homeInsightsTitle": {
+    "description": "Migrated from home.insights.title"
+  },
+  "homeInsightsLearningTitle": "Coachly is learning from your training",
+  "@homeInsightsLearningTitle": {
+    "description": "Migrated from home.insights.learning_title"
+  },
+  "homeInsightsLearningBody": "Complete a few sessions to receive personalized guidance.",
+  "@homeInsightsLearningBody": {
+    "description": "Migrated from home.insights.learning_body"
+  },
+  "homeInsightProgressionTitle": "Ready to progress",
+  "@homeInsightProgressionTitle": {
+    "description": "Migrated from home.insight.progression_title"
+  },
+  "homeInsightProgressionBody": "One of your routines is close to its progression target.",
+  "@homeInsightProgressionBody": {
+    "description": "Migrated from home.insight.progression_body"
+  },
+  "homeInsightProgressionSpecific": "You are close to the progression target. Complete the next comparable session to confirm the increase.",
+  "@homeInsightProgressionSpecific": {
+    "description": "Migrated from home.insight.progression_specific"
+  },
+  "homeInsightConsistencyTitle": "Your path is taking shape",
+  "@homeInsightConsistencyTitle": {
+    "description": "Migrated from home.insight.consistency_title"
+  },
+  "homeInsightConsistencyBody": "Keep recording comparable sessions to make suggestions more precise.",
+  "@homeInsightConsistencyBody": {
+    "description": "Migrated from home.insight.consistency_body"
+  },
+  "homeActionsTitle": "Quick actions",
+  "@homeActionsTitle": {
+    "description": "Migrated from home.actions.title"
+  },
+  "homeActionCreateWorkout": "Create workout",
+  "@homeActionCreateWorkout": {
+    "description": "Migrated from home.action.create_workout"
+  },
+  "homeActionCreateExercise": "Create exercise",
+  "@homeActionCreateExercise": {
+    "description": "Migrated from home.action.create_exercise"
+  },
+  "homeActionEmptyWorkout": "Empty workout",
+  "@homeActionEmptyWorkout": {
+    "description": "Migrated from home.action.empty_workout"
+  },
+  "homeGuidesTitle": "Coachly Guides",
+  "@homeGuidesTitle": {
+    "description": "Migrated from home.guides.title"
+  },
+  "homeGuideDoubleProgression": "How double progression works",
+  "@homeGuideDoubleProgression": {
+    "description": "Migrated from home.guide.double_progression"
+  },
+  "homeGuideRir": "What RIR really means",
+  "@homeGuideRir": {
+    "description": "Migrated from home.guide.rir"
+  },
+  "homeGuideMachines": "Why machine loads are not comparable",
+  "@homeGuideMachines": {
+    "description": "Migrated from home.guide.machines"
+  },
+  "homeGuideNineDayCycle": "Build a nine-day training cycle",
+  "@homeGuideNineDayCycle": {
+    "description": "Migrated from home.guide.nine_day_cycle"
+  },
+  "homeGuideBeginner": "Beginner",
+  "@homeGuideBeginner": {
+    "description": "Migrated from home.guide.beginner"
+  },
+  "homeGuideIntermediate": "Intermediate",
+  "@homeGuideIntermediate": {
+    "description": "Migrated from home.guide.intermediate"
+  },
+  "homeGuideAllLevels": "All levels",
+  "@homeGuideAllLevels": {
+    "description": "Migrated from home.guide.all_levels"
+  },
+  "homeRoutinesTitle": "Your routines",
+  "@homeRoutinesTitle": {
+    "description": "Migrated from home.routines.title"
+  },
+  "homeRoutinesMetadata": "{exercises} exercises · ~{minutes} min",
+  "@homeRoutinesMetadata": {
+    "description": "Migrated from home.routines.metadata",
+    "placeholders": {
+      "exercises": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "homeRoutinesLastYesterday": "Last: yesterday",
+  "@homeRoutinesLastYesterday": {
+    "description": "Migrated from home.routines.last_yesterday"
+  },
+  "homeRoutinesLastDays": "Last: {days} days ago",
+  "@homeRoutinesLastDays": {
+    "description": "Migrated from home.routines.last_days",
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "homeRoutinesEmptyTitle": "Create your first routine",
+  "@homeRoutinesEmptyTitle": {
+    "description": "Migrated from home.routines.empty_title"
+  },
+  "homeRoutinesEmptyBody": "Turn your next session into a reusable plan.",
+  "@homeRoutinesEmptyBody": {
+    "description": "Migrated from home.routines.empty_body"
+  },
+  "homeErrorTitle": "Your local data could not be opened",
+  "@homeErrorTitle": {
+    "description": "Migrated from home.error.title"
+  },
+  "homeErrorBody": "Pull down to try again.",
+  "@homeErrorBody": {
+    "description": "Migrated from home.error.body"
+  },
+  "setsCompletedCount": "{count, plural, =0{No sets completed} =1{1 set completed} other{{count} sets completed}}",
+  "@setsCompletedCount": {
+    "description": "ICU plural example",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exercisesInWorkoutCount": "{count, plural, =0{No exercises} =1{1 exercise} other{{count} exercises}}",
+  "@exercisesInWorkoutCount": {
+    "description": "ICU plural example",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

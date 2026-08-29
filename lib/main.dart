@@ -6,6 +6,7 @@ import 'package:coachly/features/auth/providers/auth_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/core/themes/theme.dart';
+import 'package:coachly/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,8 +49,9 @@ class CoachlyApplication extends ConsumerWidget {
           darkTheme: AppThemeScheme.darkTheme,
           themeMode: ThemeMode.dark,
           locale: locale,
-          supportedLocales: AppStrings.supportedLocales,
+          supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: const [
+            AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
