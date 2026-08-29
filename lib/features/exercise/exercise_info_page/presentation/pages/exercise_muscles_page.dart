@@ -66,7 +66,7 @@ class _ExerciseMusclesContentState extends State<ExerciseMusclesContent> {
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
     return ExerciseDetailScaffold(
-      title: context.tr('exercise.muscles.title'),
+      title: context.l10n.exerciseMusclesTitle,
       exerciseName: widget.data.name,
       body: CustomScrollView(
         key: const Key('muscles-page-scroll'),
@@ -114,7 +114,7 @@ class _ExerciseMusclesContentState extends State<ExerciseMusclesContent> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             _ViewChip(
-              label: context.tr('exercise.muscles.front'),
+              label: context.l10n.exerciseMusclesFront,
               selected: !_backView,
               onTap: () {
                 if (!_backView) return;
@@ -123,7 +123,7 @@ class _ExerciseMusclesContentState extends State<ExerciseMusclesContent> {
             ),
             const SizedBox(width: 8),
             _ViewChip(
-              label: context.tr('exercise.muscles.back'),
+              label: context.l10n.exerciseMusclesBack,
               selected: _backView,
               onTap: () {
                 if (_backView) return;
@@ -184,7 +184,7 @@ class _ModeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.exerciseTheme;
     return Semantics(
-      label: context.tr('exercise.muscles.view_mode'),
+      label: context.l10n.exerciseMusclesViewMode,
       child: Container(
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
@@ -276,15 +276,15 @@ class _MuscleLegend extends StatelessWidget {
       children: [
         _LegendItem(
           color: colors.primary,
-          label: context.tr('exercise.muscles.role_primary'),
+          label: context.l10n.exerciseMusclesRolePrimary,
         ),
         _LegendItem(
           color: context.exerciseTheme.primaryMuted,
-          label: context.tr('exercise.muscles.role_secondary'),
+          label: context.l10n.exerciseMusclesRoleSecondary,
         ),
         _LegendItem(
           color: colors.info,
-          label: context.tr('exercise.muscles.role_stabilizer'),
+          label: context.l10n.exerciseMusclesRoleStabilizer,
         ),
       ],
     );
@@ -365,15 +365,15 @@ class _SelectedMusclePanel extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _TensionRow(
-            label: context.tr('exercise.muscles.lengthened'),
+            label: context.l10n.exerciseMusclesLengthened,
             level: muscle.tension.lengthened,
           ),
           _TensionRow(
-            label: context.tr('exercise.muscles.midrange'),
+            label: context.l10n.exerciseMusclesMidrange,
             level: muscle.tension.midRange,
           ),
           _TensionRow(
-            label: context.tr('exercise.muscles.shortened'),
+            label: context.l10n.exerciseMusclesShortened,
             level: muscle.tension.shortened,
           ),
         ],
@@ -464,15 +464,15 @@ class _MuscleTable extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
                   _TensionRow(
-                    label: context.tr('exercise.muscles.lengthened'),
+                    label: context.l10n.exerciseMusclesLengthened,
                     level: muscle.tension.lengthened,
                   ),
                   _TensionRow(
-                    label: context.tr('exercise.muscles.mid'),
+                    label: context.l10n.exerciseMusclesMid,
                     level: muscle.tension.midRange,
                   ),
                   _TensionRow(
-                    label: context.tr('exercise.muscles.shortened'),
+                    label: context.l10n.exerciseMusclesShortened,
                     level: muscle.tension.shortened,
                   ),
                 ],

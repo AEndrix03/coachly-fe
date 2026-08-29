@@ -44,7 +44,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
         // Il messaggio del Failure e' diagnostico: all'utente si mostra un
         // testo tradotto (docs/development/07-errors-and-feedback.md).
         case Err():
-          _error = context.tr('common.error');
+          _error = context.l10n.commonError;
       }
     });
   }
@@ -64,8 +64,8 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
       builder: (context) => AlertDialog(
         title: Text(
           editing == null
-              ? context.tr('exercise.personal.create')
-              : context.tr('exercise.personal.edit'),
+              ? context.l10n.exercisePersonalCreate
+              : context.l10n.exercisePersonalEdit,
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -74,14 +74,14 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
               controller: nameController,
               maxLength: 80,
               decoration: InputDecoration(
-                labelText: context.tr('exercise.personal.name'),
+                labelText: context.l10n.exercisePersonalName,
               ),
             ),
             TextField(
               controller: descriptionController,
               maxLength: 160,
               decoration: InputDecoration(
-                labelText: context.tr('exercise.personal.description'),
+                labelText: context.l10n.exercisePersonalDescription,
               ),
             ),
           ],
@@ -89,11 +89,11 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(context.tr('common.cancel')),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(context.tr('common.confirm')),
+            child: Text(context.l10n.commonConfirm),
           ),
         ],
       ),
@@ -141,16 +141,16 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(context.tr('exercise.personal.delete')),
-        content: Text(context.tr('exercise.personal.delete_confirm')),
+        title: Text(context.l10n.exercisePersonalDelete),
+        content: Text(context.l10n.exercisePersonalDeleteConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(context.tr('common.cancel')),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(context.tr('common.confirm')),
+            child: Text(context.l10n.commonConfirm),
           ),
         ],
       ),
@@ -168,7 +168,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
   Widget build(BuildContext context) {
     final locale = ref.watch(languageProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(context.tr('profile.personal_exercises'))),
+      appBar: AppBar(title: Text(context.l10n.profilePersonalExercises)),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openCreateDialog(),
         child: const Icon(Icons.add),
@@ -178,7 +178,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
           : _error != null
           ? Center(child: Text(_error!))
           : _exercises.isEmpty
-          ? Center(child: Text(context.tr('exercise.personal.empty')))
+          ? Center(child: Text(context.l10n.exercisePersonalEmpty))
           : ListView.separated(
               itemCount: _exercises.length,
               separatorBuilder: (_, __) => const Divider(height: 1),
@@ -188,11 +188,11 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
                   title: Text(
                     exercise.nameI18n?.fromI18n(locale) ??
                         exercise.id ??
-                        context.tr('common.na'),
+                        context.l10n.commonNa,
                   ),
                   subtitle: Text(
                     exercise.descriptionI18n?.fromI18n(locale) ??
-                        context.tr('common.na'),
+                        context.l10n.commonNa,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

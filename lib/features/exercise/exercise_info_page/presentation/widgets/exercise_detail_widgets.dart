@@ -35,7 +35,7 @@ class ExerciseSectionTitle extends StatelessWidget {
           SizedBox.square(
             dimension: 44,
             child: IconButton(
-              tooltip: context.tr('common.information'),
+              tooltip: context.l10n.commonInformation,
               padding: EdgeInsets.zero,
               onPressed: onInfo,
               icon: Icon(
@@ -131,7 +131,7 @@ class ExerciseMediaHero extends StatelessWidget {
                   Center(
                     child: Semantics(
                       button: true,
-                      label: context.tr('exercise.play_media'),
+                      label: context.l10n.exercisePlayMedia,
                       child: Container(
                         width: 58,
                         height: 58,
@@ -210,7 +210,7 @@ class _MediaPlaceholder extends StatelessWidget {
               const SizedBox(height: 4),
               Flexible(
                 child: Text(
-                  context.tr('exercise.media_soon'),
+                  context.l10n.exerciseMediaSoon,
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                   style: context.scale.captionLoose.copyWith(
@@ -338,7 +338,7 @@ class ExerciseAddAction extends StatelessWidget {
             textStyle: context.scale.bodyLoose.semibold,
           ),
           icon: const Icon(Icons.add_rounded),
-          label: Text(context.tr('exercise.add_to_workout')),
+          label: Text(context.l10n.exerciseAddToWorkout),
         ),
       ),
     );
@@ -357,13 +357,13 @@ Future<void> showCoachlyInfoSheet(
     context,
     title: title,
     sections: [
-      CoachlyInfoSection(context.tr('workout.detail.what_is_it'), description),
-      CoachlyInfoSection(context.tr('common.why_it_matters'), whyItMatters),
+      CoachlyInfoSection(context.l10n.workoutDetailWhatIsIt, description),
+      CoachlyInfoSection(context.l10n.commonWhyItMatters, whyItMatters),
       if (disclaimer != null)
-        CoachlyInfoSection(context.tr('common.app_name'), disclaimer),
+        CoachlyInfoSection(context.l10n.commonAppName, disclaimer),
     ],
-    primaryActionLabel: context.tr('common.got_it'),
-    secondaryActionLabel: context.tr('common.learn_more'),
+    primaryActionLabel: context.l10n.commonGotIt,
+    secondaryActionLabel: context.l10n.commonLearnMore,
     onSecondaryAction: () {
       final navigator = Navigator.of(context);
       final reduceMotion = MediaQuery.disableAnimationsOf(context);
@@ -563,7 +563,7 @@ class ExerciseErrorView extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      context.tr('exercise.load_failed'),
+                      context.l10n.exerciseLoadFailed,
                       textAlign: TextAlign.center,
                       style: context.scale.titleLoose.semibold.copyWith(
                         color: colors.textPrimary,
@@ -572,7 +572,7 @@ class ExerciseErrorView extends StatelessWidget {
                     const SizedBox(height: 20),
                     OutlinedButton(
                       onPressed: onRetry,
-                      child: Text(context.tr('common.retry')),
+                      child: Text(context.l10n.commonRetry),
                     ),
                   ],
                 ),

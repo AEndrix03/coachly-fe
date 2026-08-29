@@ -46,11 +46,9 @@ double _quickNavDeployProgress({
 extension on ExerciseQuickNavItem {
   /// Metodo e non getter: l'etichetta è localizzata e serve il context.
   String label(BuildContext context) => switch (this) {
-    ExerciseQuickNavItem.biomechanics => context.tr(
-      'exercise.biomechanics.title',
-    ),
-    ExerciseQuickNavItem.muscles => context.tr('exercise.muscles.title'),
-    ExerciseQuickNavItem.variants => context.tr('exercise.variants.title'),
+    ExerciseQuickNavItem.biomechanics => context.l10n.exerciseBiomechanicsTitle,
+    ExerciseQuickNavItem.muscles => context.l10n.exerciseMusclesTitle,
+    ExerciseQuickNavItem.variants => context.l10n.exerciseVariantsTitle,
   };
 
   String get actionLabel => switch (this) {
@@ -452,7 +450,7 @@ class _ExerciseHeader extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
       foregroundColor: colors.textPrimary,
       leading: IconButton(
-        tooltip: context.tr('common.back'),
+        tooltip: context.l10n.commonBack,
         onPressed: () => Navigator.of(context).maybePop(),
         icon: Icon(
           Icons.arrow_back_ios_new_rounded,
@@ -497,13 +495,13 @@ class _ExerciseHeader extends StatelessWidget {
           ),
         ),
         PopupMenuButton<String>(
-          tooltip: context.tr('common.more_actions'),
+          tooltip: context.l10n.commonMoreActions,
           color: colors.surfaceElevated,
           icon: const Icon(Icons.more_horiz_rounded),
           itemBuilder: (_) => [
             PopupMenuItem(
               value: 'share',
-              child: Text(context.tr('common.share')),
+              child: Text(context.l10n.commonShare),
             ),
           ],
         ),
@@ -1093,7 +1091,7 @@ class _ExecutionSection extends StatelessWidget {
         if (execution.commonMistakes.isNotEmpty) ...[
           const SizedBox(height: 26),
           Text(
-            context.tr('exercise.common_mistakes'),
+            context.l10n.exerciseCommonMistakes,
             style: context.scale.bodyLoose.semibold.copyWith(
               color: colors.textPrimary,
             ),
@@ -1240,12 +1238,12 @@ class _MusclesPreview extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _MuscleGroup(
-                      label: context.tr('exercise.muscles_primary'),
+                      label: context.l10n.exerciseMusclesPrimary,
                       muscles: primary,
                     ),
                     const SizedBox(height: 16),
                     _MuscleGroup(
-                      label: context.tr('exercise.muscles_secondary'),
+                      label: context.l10n.exerciseMusclesSecondary,
                       muscles: secondary.take(3).toList(),
                     ),
                   ],
@@ -1255,7 +1253,7 @@ class _MusclesPreview extends StatelessWidget {
           ),
         ),
         ExerciseLinkButton(
-          label: context.tr('exercise.explore_muscles'),
+          label: context.l10n.exerciseExploreMuscles,
           onTap: onOpen,
         ),
       ],
@@ -1311,7 +1309,7 @@ class _BiomechanicsPreview extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ExerciseSectionTitle(
-          context.tr('exercise.biomechanics.title'),
+          context.l10n.exerciseBiomechanicsTitle,
           onInfo: () => showCoachlyInfoSheet(
             context,
             title: 'Stabilità richiesta',
@@ -1329,27 +1327,27 @@ class _BiomechanicsPreview extends StatelessWidget {
             Expanded(
               child: _Metric(
                 value: data.movementProfile.pattern,
-                label: context.tr('exercise.pattern'),
+                label: context.l10n.exercisePattern,
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: _Metric(
                 value: training.stability,
-                label: context.tr('exercise.stability'),
+                label: context.l10n.exerciseStability,
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: _Metric(
                 value: training.spinalLoad,
-                label: context.tr('exercise.spinal_load'),
+                label: context.l10n.exerciseSpinalLoad,
               ),
             ),
           ],
         ),
         ExerciseLinkButton(
-          label: context.tr('exercise.explore_biomechanics'),
+          label: context.l10n.exerciseExploreBiomechanics,
           onTap: onOpen,
         ),
       ],
@@ -1416,7 +1414,7 @@ class _EquipmentSection extends StatelessWidget {
                 ),
                 if (item.required)
                   Text(
-                    context.tr('exercise.required'),
+                    context.l10n.exerciseRequired,
                     style: context.scale.caption.copyWith(
                       color: colors.textSecondary,
                     ),
@@ -1458,7 +1456,7 @@ class _SafetySection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.tr('exercise.remember'),
+                  context.l10n.exerciseRemember,
                   style: TextStyle(
                     color: colors.textPrimary,
                     fontWeight: FontWeight.w600,

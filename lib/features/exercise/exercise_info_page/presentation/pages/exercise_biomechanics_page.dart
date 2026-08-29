@@ -39,7 +39,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
     final colors = context.exerciseTheme;
     final biomechanics = data.biomechanics;
     return ExerciseDetailScaffold(
-      title: context.tr('exercise.biomechanics.title'),
+      title: context.l10n.exerciseBiomechanicsTitle,
       exerciseName: data.name,
       body: CustomScrollView(
         key: const Key('biomechanics-page-scroll'),
@@ -52,7 +52,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 _HeroMetric(
                   value: data.movementProfile.pattern,
-                  label: context.tr('exercise.biomechanics.main_pattern'),
+                  label: context.l10n.exerciseBiomechanicsMainPattern,
                 ),
                 const SizedBox(height: 12),
                 _DataRows(
@@ -78,7 +78,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 if (biomechanics.jointActions.isEmpty)
                   Text(
-                    context.tr('exercise.biomechanics.updating'),
+                    context.l10n.exerciseBiomechanicsUpdating,
                     style: TextStyle(color: colors.textSecondary),
                   )
                 else
@@ -106,7 +106,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                   rows: [
                     ('Stabilità richiesta', biomechanics.training.stability),
                     (
-                      context.tr('exercise.spinal_load'),
+                      context.l10n.exerciseSpinalLoad,
                       biomechanics.training.spinalLoad,
                     ),
                     (
@@ -131,7 +131,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                 const SizedBox(height: 12),
                 _HeroMetric(
                   value: data.movementProfile.resistanceSource,
-                  label: context.tr('exercise.biomechanics.resistance'),
+                  label: context.l10n.exerciseBiomechanicsResistance,
                   compact: true,
                 ),
                 const SizedBox(height: 28),
@@ -167,7 +167,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            context.tr('exercise.biomechanics.no_profile'),
+                            context.l10n.exerciseBiomechanicsNoProfile,
                             style: TextStyle(color: colors.textSecondary),
                           ),
                         ),
@@ -191,18 +191,18 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              context.tr('exercise.rom_start'),
+                              context.l10n.exerciseRomStart,
                               style: _caption(context, colors),
                             ),
                             Text(
-                              context.tr('exercise.rom_end'),
+                              context.l10n.exerciseRomEnd,
                               style: _caption(context, colors),
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          context.tr('exercise.profile_indicative'),
+                          context.l10n.exerciseProfileIndicative,
                           style: _caption(context, colors),
                         ),
                       ],
@@ -249,7 +249,7 @@ class ExerciseBiomechanicsContent extends StatelessWidget {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  context.tr('exercise.biomechanics.how_read'),
+                                  context.l10n.exerciseBiomechanicsHowRead,
                                 ),
                               ),
                             ],
