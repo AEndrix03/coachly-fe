@@ -158,6 +158,18 @@ Alcune cose non si esprimono in un lint. Diventano test in CI:
 | `migration_test` | ogni schema Drift migra dallo snapshot precedente | 04 | ✅ `test/core/database/` |
 | `golden_test` | i componenti del design system non cambiano per caso | 10 | ✅ locale, tag `golden` |
 | `dependency_test` | nessuna dipendenza dichiarata e non usata | 02 | ✅ `test/tooling/` |
+| `route_reachability_test` | ogni rotta dichiarata ha un ingresso nel codice | 08 | ✅ `test/tooling/` |
+
+Il `route_reachability_test` nasce da tre ritrovamenti nello stesso giorno: il
+sottosistema vocale (1.248 righe), `WorkoutOrganizePage` (533) e
+`UserSettingsPage` (59). Tutti completi, tutti tradotti, nessuno raggiungibile.
+Nessun lint li vedeva — compilavano, e una rotta dichiarata nel router
+*sembra* una rotta viva. Il pulsante impostazioni della home puntava a
+`/profile`, non alla schermata delle impostazioni.
+
+Il costo di non averlo avuto è misurabile: la migrazione ARB ha tradotto
+`UserSettingsPage` in un commit dedicato, prima che scoprissimo che nessuno può
+aprirla.
 
 Il `text_scaling_test` era il più rilevante proprio perché `textScaler` aveva
 **zero occorrenze**: la app a text scaling alto non era mai stata eseguita da
