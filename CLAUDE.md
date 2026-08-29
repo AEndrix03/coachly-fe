@@ -31,9 +31,18 @@ esatto da lanciare.
 
 ## Stato noto del repository
 
-- La suite di test **non compila** (`workout_builder_widgets_test.dart`,
-  `workout_detail_golden_test.dart`). È la Fase 0 del piano di migrazione.
-- `qual/` è una copia di lavoro non tracciata: **ignorala**, produce 211 dei 308
-  issue dell'analyzer.
+- La suite è **verde**: 222 test, `flutter analyze` a zero issue. Il gate è
+  `.github/workflows/ci.yml`; `tool/check_tests.sh` fallisce sulle regressioni
+  e `tool/test_baseline.txt` è vuota.
+- `qual/` è una copia di lavoro non tracciata: **ignorala**, è esclusa
+  dall'analyzer.
+- Esistono ora, contrariamente a quanto dice la sezione 3 della rule: Drift,
+  Dio, `core/time/Clock`, `core/ids`, `Result<T, Failure>`, `AppLogger`, il
+  `RequestCoalescer`, l'outbox, `core/flags`, `core/analytics`,
+  `core/observability` (con debug screen su `/debug`), i file ARB con
+  `context.l10n`. **Non** esistono ancora: `context.colors`, il catalogo
+  pre-seeded, l'event log delle sessioni.
+- Il debito di lint residuo è `no_literal_text_style`, 188 occorrenze, e si
+  assorbe schermata per schermata.
 - `docs/` è escluso dal `.gitignore` globale dell'utente e ri-abilitato dal
   `.gitignore` di questo repository.

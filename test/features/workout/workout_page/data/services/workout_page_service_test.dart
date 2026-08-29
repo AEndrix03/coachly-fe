@@ -5,23 +5,22 @@ import 'package:coachly/features/workout/workout_page/data/dto/workout_session_w
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
+
+import '../../../../../core/network/fake_dio.dart';
 
 void main() {
   group('WorkoutPageService.patchWorkout', () {
     test('create uses POST /api/workouts with payload contract', () async {
-      final client = _RecordingHttpClient(
-        responder: (_) => http.Response('', 200),
-      );
+      final client = FakeDioAdapter(responder: (_) => const FakeResponse.ok());
       final service = WorkoutPageService(
-        ApiClient(client: client, baseUrl: 'https://localhost:8800/api'),
+        ApiClient(dio: fakeDio(client), baseUrl: 'https://localhost:8800/api'),
       );
 
       await service.patchWorkout('new', _sampleCommand());
 
       expect(client.lastRequest, isNotNull);
       expect(client.lastRequest!.method, 'POST');
-      expect(client.lastRequest!.url.path, '/api/workouts');
+      expect(client.lastRequest!.uri.path, '/api/workouts');
       expect(client.lastRequest!.headers['Content-Type'], 'application/json');
       expect(client.lastRequest!.headers['Accept'], 'application/json');
       expect(client.lastRequest!.headers.containsKey('X-User-Id'), isFalse);
@@ -35,18 +34,16 @@ void main() {
     });
 
     test('update uses PUT /api/workouts/{id} without id in body', () async {
-      final client = _RecordingHttpClient(
-        responder: (_) => http.Response('', 200),
-      );
+      final client = FakeDioAdapter(responder: (_) => const FakeResponse.ok());
       final service = WorkoutPageService(
-        ApiClient(client: client, baseUrl: 'https://localhost:8800/api'),
+        ApiClient(dio: fakeDio(client), baseUrl: 'https://localhost:8800/api'),
       );
 
       await service.patchWorkout('w-123', _sampleCommand());
 
       expect(client.lastRequest, isNotNull);
       expect(client.lastRequest!.method, 'PUT');
-      expect(client.lastRequest!.url.path, '/api/workouts/w-123');
+      expect(client.lastRequest!.uri.path, '/api/workouts/w-123');
       expect(client.lastRequest!.headers['Content-Type'], 'application/json');
       expect(client.lastRequest!.headers['Accept'], 'application/json');
       expect(client.lastRequest!.headers.containsKey('X-User-Id'), isFalse);
@@ -59,8 +56,8 @@ void main() {
 
   group('WorkoutPageService.fetchWorkouts', () {
     test('normalizes translations from JSON string response', () async {
-      final client = _RecordingHttpClient(
-        responder: (_) => http.Response(
+      final client = FakeDioAdapter(
+        responder: (_) => FakeResponse.body(
           jsonEncode([
             {
               'id': 'w-1',
@@ -79,7 +76,7 @@ void main() {
         ),
       );
       final service = WorkoutPageService(
-        ApiClient(client: client, baseUrl: 'https://localhost:8800/api'),
+        ApiClient(dio: fakeDio(client), baseUrl: 'https://localhost:8800/api'),
       );
 
       final response = await service.fetchWorkouts();
@@ -95,8 +92,8 @@ void main() {
     test(
       'maps gateway blocks payload to legacy workout model without null cast errors',
       () async {
-        final client = _RecordingHttpClient(
-          responder: (_) => http.Response(
+        final client = FakeDioAdapter(
+          responder: (_) => FakeResponse.body(
             jsonEncode([
               {
                 'id': '0142e601-b8a7-44e8-adff-0e2f24dc4a1b',
@@ -136,7 +133,10 @@ void main() {
         );
 
         final service = WorkoutPageService(
-          ApiClient(client: client, baseUrl: 'https://localhost:8800/api'),
+          ApiClient(
+            dio: fakeDio(client),
+            baseUrl: 'https://localhost:8800/api',
+          ),
         );
 
         final response = await service.fetchWorkouts();
@@ -158,18 +158,21 @@ void main() {
     test(
       'uses POST /api/workouts/{id}/sessions and sends per-set reps/load',
       () async {
-        final client = _RecordingHttpClient(
-          responder: (_) => http.Response('', 200),
+        final client = FakeDioAdapter(
+          responder: (_) => const FakeResponse.ok(),
         );
         final service = WorkoutPageService(
-          ApiClient(client: client, baseUrl: 'https://localhost:8800/api'),
+          ApiClient(
+            dio: fakeDio(client),
+            baseUrl: 'https://localhost:8800/api',
+          ),
         );
 
         await service.saveWorkoutSession('w-123', _sampleSessionCommand());
 
         expect(client.lastRequest, isNotNull);
         expect(client.lastRequest!.method, 'POST');
-        expect(client.lastRequest!.url.path, '/api/workouts/w-123/sessions');
+        expect(client.lastRequest!.uri.path, '/api/workouts/w-123/sessions');
         expect(client.lastRequest!.headers['Content-Type'], 'application/json');
         expect(client.lastRequest!.headers['Accept'], 'application/json');
 
@@ -269,31 +272,4 @@ WorkoutSessionWriteCommand _sampleSessionCommand() {
       ),
     ],
   );
-}
-
-class _RecordingHttpClient extends http.BaseClient {
-  final http.Response Function(http.BaseRequest request) responder;
-
-  http.BaseRequest? lastRequest;
-  String? lastBody;
-
-  _RecordingHttpClient({required this.responder});
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    lastRequest = request;
-    if (request is http.Request) {
-      lastBody = request.body;
-    } else {
-      lastBody = null;
-    }
-
-    final response = responder(request);
-    return http.StreamedResponse(
-      Stream.value(utf8.encode(response.body)),
-      response.statusCode,
-      headers: response.headers,
-      request: request,
-    );
-  }
 }

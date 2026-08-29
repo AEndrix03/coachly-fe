@@ -61,9 +61,14 @@ intuito.
 migrazione (vedi `docs/development/26-migration-plan.md`). Molte cose che i
 documenti danno per esistenti **NON esistono ancora nel codice**.
 
-Alla data di scrittura **non esistono**: `context.colors` e i token, `context.l10n`
-e i file ARB, `core/time/Clock`, `core/ids`, `Result<T, Failure>`, `AppLogger`,
-Drift, Dio, il request coalescer, l'outbox.
+Lo stato aggiornato di cosa esiste e cosa no sta in `CLAUDE.md`, sezione
+"Stato noto del repository". **Leggilo**: molte cose che questa sezione dava
+per mancanti sono state costruite (Drift, Dio, `Clock`, `core/ids`, `Result`,
+`AppLogger`, il request coalescer, l'outbox, ARB e `context.l10n`), e
+affermare che mancano è oggi l'errore B, non l'errore A.
+
+Restano da costruire: `context.colors` e i token di colore in uso, il catalogo
+pre-seeded, l'event log delle sessioni.
 
 Da questo derivano due errori opposti, **entrambi gravi**:
 
@@ -75,8 +80,9 @@ Da questo derivano due errori opposti, **entrambi gravi**:
 
 ### ❌ Errore B — allucinare che il target esista
 
-> *"La cancellazione è automatica via `CancelToken` di Dio"* — Dio non c'è.
-> *"Il coalescing è gestito da `RequestCoalescer` in `core/network`"* — non c'è.
+> *"Il colore lo prendo da `context.colors.warning`"* — i token di colore
+> semantici non ci sono ancora.
+> *"Il catalogo arriva dall'asset pre-installato"* — l'asset non esiste.
 
 **VIETATO.** Produce codice che non compila e affermazioni false.
 

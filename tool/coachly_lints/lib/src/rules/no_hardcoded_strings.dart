@@ -59,6 +59,11 @@ class NoHardcodedStrings extends DartLintRule {
     final normalized = path.replaceAll(r'\', '/');
     // Il catalogo delle traduzioni è fatto di stringhe letterali per natura.
     if (normalized.contains('/lib/shared/i18n/')) return;
+    // La schermata diagnostica non è prodotto: il suo pubblico è chi sviluppa,
+    // e tradurla renderebbe più difficile incollare un report in una issue.
+    // Non è raggiungibile dalla navigazione e nelle build release non esiste
+    // (`docs/development/18-observability.md`).
+    if (normalized.contains('/lib/core/observability/')) return;
     // Sotto il data layer non esiste testo per l'utente: il `message` di un
     // Failure o di una ApiResponse è diagnostico
     // (`docs/development/07-errors-and-feedback.md`). Segnalarlo renderebbe la

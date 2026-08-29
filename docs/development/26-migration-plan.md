@@ -64,13 +64,13 @@ Nessun cambiamento visibile all'utente. Sbloccano tutto il resto.
 
 ## Fase 2 — Rete
 
-| # | Azione | Doc |
-|---|---|---|
-| 2.1 | Migrazione a Dio, conservando il refresh coalescente | 06 |
-| 2.2 | Request coalescing centralizzato | 06 |
-| 2.3 | `CancelToken` legato ai provider autoDispose | 06 |
-| 2.4 | Interceptor: auth, request-id, idempotency, log, metriche | 06 |
-| 2.5 | Repository che ritornano `Result` | 07 |
+| # | Azione | Doc | Stato |
+|---|---|---|---|
+| 2.1 | Migrazione a Dio, conservando il refresh coalescente | 06 | ✅ |
+| 2.2 | Request coalescing centralizzato | 06 | ✅ |
+| 2.3 | `CancelToken` legato ai provider autoDispose | 06 | ⏳ il token e' reale, va agganciato ai provider |
+| 2.4 | Interceptor: auth, request-id, idempotency, log, metriche | 06 | ⏳ auth fatto |
+| 2.5 | Repository che ritornano `Result` | 07 | ⏳ parziale |
 
 Da qui in poi le chiamate multiple e gli overlay sovrapposti non sono più
 possibili, **anche prima** di toccare il database.

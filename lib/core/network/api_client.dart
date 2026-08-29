@@ -1,22 +1,38 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/network/api_endpoints.dart';
 import 'package:coachly/core/network/api_response.dart';
-import 'package:coachly/core/network/interceptors/auth_interceptor_client.dart';
+import 'package:coachly/core/network/interceptors/auth_interceptor.dart';
 import 'package:coachly/core/network/request_coalescer.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+/// Annullamento di una richiesta in volo (ADR-006).
+///
+/// È il `CancelToken` di Dio, non più il surrogato costruito su
+/// `package:http`: quello scartava la risposta, ma il traffico partiva e
+/// arrivava comunque. Ora la richiesta viene realmente interrotta — che su un
+/// client local-first, dove ogni GET è opzionale per definizione, è la
+/// differenza fra sprecare banda e non sprecarla.
+///
+/// Uso previsto:
+///
+/// ```dart
+/// final token = CancelToken();
+/// ref.onDispose(token.cancel);
+/// ```
+///
+/// **Una cancellazione non è un errore.** Si mappa su [CancelledFailure] e non
+/// produce mai un messaggio all'utente né una segnalazione al crash reporter.
+export 'package:dio/dio.dart' show CancelToken;
 
 part 'api_client.g.dart';
 
 /// Timeout di rete. Vedi `docs/development/06-networking.md`.
 ///
 /// I 30 s uniformi precedenti erano troppi per una chiamata interattiva e
-/// troppo pochi per un batch di sync.
+/// troppo pochi per un batch di sync. Con Dio sono due timeout distinti e non
+/// più una scadenza unica in cui connect e receive si sommavano.
 abstract final class NetworkTimeouts {
   /// Tempo massimo per stabilire la connessione.
   static const Duration connect = Duration(seconds: 10);
@@ -28,41 +44,10 @@ abstract final class NetworkTimeouts {
   static const Duration syncReceive = Duration(seconds: 60);
 }
 
-/// Annullamento di una richiesta in volo.
-///
-/// `package:http` non supporta la cancellazione: finché non si passa a Dio
-/// (ADR-006) questo token non interrompe il traffico già partito, ma scarta la
-/// risposta e libera la voce del coalescer, così che un provider `autoDispose`
-/// distrutto non riceva più nulla e chi arriva dopo riparta pulito.
-///
-/// Uso previsto:
-///
-/// ```dart
-/// final token = CancelToken();
-/// ref.onDispose(token.cancel);
-/// ```
-///
-/// **Una cancellazione non è un errore.** Si mappa su [CancelledFailure] e non
-/// produce mai un messaggio all'utente né una segnalazione al crash reporter.
-class CancelToken {
-  final Completer<void> _completer = Completer<void>();
-
-  bool get isCancelled => _completer.isCompleted;
-
-  /// Si completa quando il token viene annullato. Non fallisce mai.
-  Future<void> get whenCancelled => _completer.future;
-
-  void cancel() {
-    if (!_completer.isCompleted) _completer.complete();
-  }
-}
-
-// Provider per ApiClient
 @riverpod
 ApiClient apiClient(Ref ref) {
-  final httpClient = ref.watch(authHttpClientProvider);
   return ApiClient(
-    client: httpClient,
+    dio: ref.watch(authDioProvider),
     baseUrl: ApiEndpoints.apiBaseUrl,
     logger: ref.watch(appLoggerProvider),
   );
@@ -75,7 +60,7 @@ ApiClient apiClient(Ref ref) {
 class ApiClient {
   static const Failure _cancelled = CancelledFailure();
 
-  final http.Client _client;
+  final Dio _dio;
   final AppLogger _logger;
   final RequestCoalescer _coalescer;
   final String baseUrl;
@@ -84,23 +69,35 @@ class ApiClient {
   final Map<String, String> defaultHeaders;
 
   ApiClient({
-    required http.Client client,
+    required Dio dio,
     required this.baseUrl,
     AppLogger logger = const ConsoleAppLogger(),
     RequestCoalescer? coalescer,
     this.connectTimeout = NetworkTimeouts.connect,
     this.receiveTimeout = NetworkTimeouts.receive,
     Map<String, String>? defaultHeaders,
-  }) : _client = client,
+  }) : _dio = dio,
        _logger = logger,
        _coalescer = coalescer ?? RequestCoalescer(),
        defaultHeaders =
            defaultHeaders ??
-           {'Content-Type': 'application/json', 'Accept': 'application/json'};
+           const {
+             'Content-Type': 'application/json',
+             'Accept': 'application/json',
+           } {
+    _dio.options = _dio.options.copyWith(
+      baseUrl: baseUrl,
+      connectTimeout: connectTimeout,
+      receiveTimeout: receiveTimeout,
+      // Gli stati non-2xx tornano come risposta, non come eccezione: la
+      // tassonomia degli errori è di `ApiResponse`, non di Dio.
+      validateStatus: (_) => true,
+    );
+  }
 
   /// `true` se la risposta è l'esito di una cancellazione.
   ///
-  /// Chi la riceve non mostra nulla: vedi [CancelToken].
+  /// Chi la riceve non mostra nulla.
   static bool wasCancelled(ApiResponse<Object?> response) =>
       !response.success && response.statusCode == _cancelled.code;
 
@@ -112,23 +109,23 @@ class ApiClient {
     Duration? receiveTimeoutOverride,
   }) async {
     final key = RequestCoalescer.keyFor('GET', endpoint, queryParameters);
+    _logger.debug('GET', context: {'path': endpoint});
     try {
-      final uri = _buildUri(endpoint, queryParameters);
-      _logger.debug('GET', context: {'path': endpoint});
-
-      final inFlight = _coalescer.run<http.Response>(
+      final inFlight = _coalescer.run<Response<dynamic>>(
         key,
-        () => _client
-            .get(uri, headers: defaultHeaders)
-            .timeout(_deadline(receiveTimeoutOverride)),
+        () => _dio.get<dynamic>(
+          _path(endpoint),
+          queryParameters: queryParameters,
+          cancelToken: cancelToken,
+          options: _options(receiveTimeoutOverride),
+        ),
       );
-
-      final response = await _awaitCancellable(inFlight, cancelToken, key);
-      if (response == null) return _cancelledResponse<T>(endpoint);
-
-      return _handleResponse<T>(response, fromJson);
-    } catch (e) {
-      return _handleError<T>(e);
+      return _handleResponse<T>(await inFlight, fromJson);
+    } catch (error) {
+      // Un annullamento libera la voce del coalescer: chi arriva dopo deve
+      // ripartire pulito, non ereditare una richiesta morta.
+      if (_isCancellation(error)) _coalescer.invalidate(key);
+      return _handleError<T>(error, endpoint);
     }
   }
 
@@ -139,28 +136,15 @@ class ApiClient {
     T Function(dynamic)? fromJson,
     CancelToken? cancelToken,
     Duration? receiveTimeoutOverride,
-  }) async {
-    try {
-      final uri = _buildUri(endpoint, queryParameters);
-      _logger.debug('POST', context: {'path': endpoint});
-
-      // Nessun coalescing sulle scritture: non sono idempotenti.
-      final request = _client
-          .post(
-            uri,
-            headers: defaultHeaders,
-            body: body != null ? jsonEncode(body) : null,
-          )
-          .timeout(_deadline(receiveTimeoutOverride));
-
-      final response = await _awaitCancellable(request, cancelToken, null);
-      if (response == null) return _cancelledResponse<T>(endpoint);
-
-      return _handleResponse<T>(response, fromJson);
-    } catch (e) {
-      return _handleError<T>(e);
-    }
-  }
+  }) => _write<T>(
+    'POST',
+    endpoint,
+    body: body,
+    queryParameters: queryParameters,
+    fromJson: fromJson,
+    cancelToken: cancelToken,
+    receiveTimeoutOverride: receiveTimeoutOverride,
+  );
 
   Future<ApiResponse<T>> put<T>(
     String endpoint, {
@@ -169,27 +153,15 @@ class ApiClient {
     T Function(dynamic)? fromJson,
     CancelToken? cancelToken,
     Duration? receiveTimeoutOverride,
-  }) async {
-    try {
-      final uri = _buildUri(endpoint, queryParameters);
-      _logger.debug('PUT', context: {'path': endpoint});
-
-      final request = _client
-          .put(
-            uri,
-            headers: defaultHeaders,
-            body: body != null ? jsonEncode(body) : null,
-          )
-          .timeout(_deadline(receiveTimeoutOverride));
-
-      final response = await _awaitCancellable(request, cancelToken, null);
-      if (response == null) return _cancelledResponse<T>(endpoint);
-
-      return _handleResponse<T>(response, fromJson);
-    } catch (e) {
-      return _handleError<T>(e);
-    }
-  }
+  }) => _write<T>(
+    'PUT',
+    endpoint,
+    body: body,
+    queryParameters: queryParameters,
+    fromJson: fromJson,
+    cancelToken: cancelToken,
+    receiveTimeoutOverride: receiveTimeoutOverride,
+  );
 
   Future<ApiResponse<T>> delete<T>(
     String endpoint, {
@@ -197,168 +169,122 @@ class ApiClient {
     T Function(dynamic)? fromJson,
     CancelToken? cancelToken,
     Duration? receiveTimeoutOverride,
-  }) async {
-    try {
-      final uri = _buildUri(endpoint, queryParameters);
-      _logger.debug('DELETE', context: {'path': endpoint});
+  }) => _write<T>(
+    'DELETE',
+    endpoint,
+    queryParameters: queryParameters,
+    fromJson: fromJson,
+    cancelToken: cancelToken,
+    receiveTimeoutOverride: receiveTimeoutOverride,
+  );
 
-      final request = _client
-          .delete(uri, headers: defaultHeaders)
-          .timeout(_deadline(receiveTimeoutOverride));
-
-      final response = await _awaitCancellable(request, cancelToken, null);
-      if (response == null) return _cancelledResponse<T>(endpoint);
-
-      return _handleResponse<T>(response, fromJson);
-    } catch (e) {
-      return _handleError<T>(e);
-    }
-  }
-
-  /// `package:http` espone un solo timeout complessivo: finché non c'è Dio,
-  /// connect e receive si sommano in una scadenza unica.
-  Duration _deadline(Duration? receiveTimeoutOverride) =>
-      connectTimeout + (receiveTimeoutOverride ?? receiveTimeout);
-
-  /// Attende [request] a meno che [cancelToken] non venga annullato prima.
-  ///
-  /// Ritorna `null` se la richiesta è stata annullata. Se [coalescerKey] non è
-  /// nullo, l'annullamento libera anche la voce del coalescer.
-  Future<http.Response?> _awaitCancellable(
-    Future<http.Response> request,
+  /// Nessun coalescing sulle scritture: non sono idempotenti.
+  Future<ApiResponse<T>> _write<T>(
+    String method,
+    String endpoint, {
+    Map<String, dynamic>? body,
+    Map<String, String>? queryParameters,
+    T Function(dynamic)? fromJson,
     CancelToken? cancelToken,
-    String? coalescerKey,
-  ) {
-    if (cancelToken == null) return request;
-
-    final completer = Completer<http.Response?>();
-
-    void releaseKey() {
-      if (coalescerKey != null) _coalescer.invalidate(coalescerKey);
-    }
-
-    if (cancelToken.isCancelled) {
-      releaseKey();
-      // L'esito della richiesta va comunque consumato, o resta un errore
-      // asincrono non gestito.
-      unawaited(
-        request.then<void>((_) {}, onError: (Object _, StackTrace __) {}),
+    Duration? receiveTimeoutOverride,
+  }) async {
+    _logger.debug(method, context: {'path': endpoint});
+    try {
+      final response = await _dio.request<dynamic>(
+        _path(endpoint),
+        data: body,
+        queryParameters: queryParameters,
+        cancelToken: cancelToken,
+        options: _options(receiveTimeoutOverride).copyWith(method: method),
       );
-      return Future<http.Response?>.value(null);
+      return _handleResponse<T>(response, fromJson);
+    } catch (error) {
+      return _handleError<T>(error, endpoint);
     }
-
-    request.then<void>(
-      (response) {
-        if (!completer.isCompleted) completer.complete(response);
-      },
-      onError: (Object error, StackTrace stackTrace) {
-        if (!completer.isCompleted) completer.completeError(error, stackTrace);
-      },
-    );
-
-    unawaited(
-      cancelToken.whenCancelled.then((_) {
-        if (completer.isCompleted) return;
-        releaseKey();
-        completer.complete(null);
-      }),
-    );
-
-    return completer.future;
   }
 
-  ApiResponse<T> _cancelledResponse<T>(String endpoint) {
-    _logger.debug('Request cancelled', context: {'path': endpoint});
-    return ApiResponse.error(
-      message: _cancelled.message,
-      statusCode: _cancelled.code,
-    );
-  }
+  Options _options(Duration? receiveTimeoutOverride) => Options(
+    headers: Map<String, String>.of(defaultHeaders),
+    receiveTimeout: receiveTimeoutOverride ?? receiveTimeout,
+  );
 
-  Uri _buildUri(String endpoint, Map<String, String>? queryParameters) {
-    final path = endpoint.startsWith('/') ? endpoint : '/$endpoint';
-    return Uri.parse('$baseUrl$path').replace(queryParameters: queryParameters);
-  }
+  String _path(String endpoint) =>
+      endpoint.startsWith('/') ? endpoint : '/$endpoint';
+
+  static bool _isCancellation(Object error) =>
+      error is DioException && error.type == DioExceptionType.cancel;
 
   ApiResponse<T> _handleResponse<T>(
-    http.Response response,
+    Response<dynamic> response,
     T Function(dynamic)? fromJson,
   ) {
+    final status = response.statusCode ?? 0;
+
     // Mai il body completo: contiene dati dell'utente e in release sarebbe
     // comunque stampato. Vedi docs/development/18-observability.md.
-    _logger.debug(
-      'Response',
-      context: {
-        'status': response.statusCode,
-        'bytes': response.bodyBytes.length,
-      },
+    _logger.debug('Response', context: {'status': status});
+
+    if (status >= 200 && status < 300) {
+      final data = response.data;
+      // 204 No Content e simili.
+      if (data == null || (data is String && data.isEmpty)) {
+        return ApiResponse.success(data: null, statusCode: status);
+      }
+      return ApiResponse.success(
+        data: fromJson != null ? fromJson(data) : data as T?,
+        statusCode: status,
+      );
+    }
+
+    return _parseErrorResponse<T>(response, status);
+  }
+
+  ApiResponse<T> _parseErrorResponse<T>(
+    Response<dynamic> response,
+    int status,
+  ) {
+    final data = response.data;
+    if (data is Map) {
+      return ApiResponse.error(
+        message: (data['message'] as String?) ?? 'Unknown error',
+        statusCode: status,
+        errors: data['errors'],
+      );
+    }
+    return ApiResponse.error(
+      message: 'Failed to parse error response',
+      statusCode: status,
     );
-
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      // Handle empty response body for success codes like 204 No Content
-      if (response.body.isEmpty) {
-        return ApiResponse.success(data: null, statusCode: response.statusCode);
-      }
-      final jsonData = jsonDecode(response.body);
-
-      if (fromJson != null) {
-        // The fromJson function is now responsible for converting the decoded
-        // JSON (which could be a Map or a List) into the final type T.
-        return ApiResponse.success(
-          data: fromJson(jsonData),
-          statusCode: response.statusCode,
-        );
-      } else {
-        // This case is kept for when no parsing function is provided,
-        // but it's less type-safe.
-        return ApiResponse.success(
-          data: jsonData as T?,
-          statusCode: response.statusCode,
-        );
-      }
-    } else {
-      return _parseErrorResponse<T>(response);
-    }
   }
 
-  ApiResponse<T> _parseErrorResponse<T>(http.Response response) {
-    try {
-      final jsonData = jsonDecode(response.body);
+  ApiResponse<T> _handleError<T>(Object error, String endpoint) {
+    if (_isCancellation(error)) {
+      // Non è un errore: non si logga come warning e non si mostra.
+      _logger.debug('Request cancelled', context: {'path': endpoint});
       return ApiResponse.error(
-        message: jsonData['message'] ?? 'Unknown error',
-        statusCode: response.statusCode,
-        errors: jsonData['errors'],
-      );
-    } catch (e) {
-      return ApiResponse.error(
-        message: 'Failed to parse error response: ${response.body}',
-        statusCode: response.statusCode,
+        message: _cancelled.message,
+        statusCode: _cancelled.code,
       );
     }
-  }
 
-  ApiResponse<T> _handleError<T>(dynamic error) {
     _logger.warn('Request failed', error: error);
 
-    if (error is TimeoutException) {
-      return ApiResponse.error(
+    if (error is! DioException) {
+      return ApiResponse.error(message: 'Unexpected error: $error');
+    }
+
+    return switch (error.type) {
+      DioExceptionType.connectionTimeout ||
+      DioExceptionType.sendTimeout ||
+      DioExceptionType.receiveTimeout => ApiResponse.error(
         message: 'Request timeout. Please try again.',
         statusCode: 408,
-      );
-    } else if (error is SocketException) {
-      return ApiResponse.error(
+      ),
+      DioExceptionType.connectionError => ApiResponse.error(
         message: 'No internet connection',
         statusCode: 0,
-      );
-    } else if (error is http.ClientException) {
-      return ApiResponse.error(
-        message: 'Network error occurred',
-        statusCode: 0,
-      );
-    } else {
-      return ApiResponse.error(
-        message: 'Unexpected error: ${error.toString()}',
-      );
-    }
+      ),
+      _ => ApiResponse.error(message: 'Network error occurred', statusCode: 0),
+    };
   }
 }

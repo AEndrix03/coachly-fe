@@ -1,39 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/request_coalescer.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 
-/// Client di prova che tiene una risposta in sospeso finché il test non la
-/// rilascia, e conta quante richieste ha ricevuto.
-class _PendingClient extends http.BaseClient {
-  final List<Uri> requests = <Uri>[];
-  final Map<String, Completer<String>> _pending = <String, Completer<String>>{};
-
-  int get callCount => requests.length;
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    requests.add(request.url);
-    final completer = _pending.putIfAbsent(
-      request.url.path,
-      Completer<String>.new,
-    );
-    final body = await completer.future;
-    return http.StreamedResponse(
-      Stream<List<int>>.value(utf8.encode(body)),
-      200,
-      request: request,
-    );
-  }
-
-  void complete(String path, String body) {
-    _pending.putIfAbsent(path, Completer<String>.new).complete(body);
-    _pending.remove(path);
-  }
-}
+import 'fake_dio.dart';
 
 void main() {
   group('RequestCoalescer', () {
@@ -66,12 +37,15 @@ void main() {
   });
 
   group('ApiClient.get coalescing', () {
-    late _PendingClient client;
+    late FakeDioAdapter client;
     late ApiClient api;
 
     setUp(() {
-      client = _PendingClient();
-      api = ApiClient(client: client, baseUrl: 'https://coachly.test/api');
+      client = FakeDioAdapter()..holdRequests = true;
+      api = ApiClient(
+        dio: fakeDio(client),
+        baseUrl: 'https://coachly.test/api',
+      );
     });
 
     test(
@@ -86,7 +60,7 @@ void main() {
           fromJson: (json) => json as Map<String, dynamic>,
         );
 
-        await Future<void>.delayed(Duration.zero);
+        await pumpEventQueue();
         client.complete('/api/exercises/1', '{"id":"1"}');
 
         final results = await Future.wait([first, second]);
@@ -106,7 +80,7 @@ void main() {
         fromJson: (json) => json as Map<String, dynamic>,
       );
 
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
       client.complete('/api/exercises/1', '{"id":"1"}');
       client.complete('/api/exercises/2', '{"id":"2"}');
 
@@ -119,7 +93,7 @@ void main() {
         '/exercises/1',
         fromJson: (json) => json as Map<String, dynamic>,
       );
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
       client.complete('/api/exercises/1', '{"id":"1"}');
       await first;
 
@@ -127,7 +101,7 @@ void main() {
         '/exercises/1',
         fromJson: (json) => json as Map<String, dynamic>,
       );
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
       client.complete('/api/exercises/1', '{"id":"1"}');
       await second;
 
@@ -137,9 +111,9 @@ void main() {
 
   group('CancelToken', () {
     test('una richiesta cancellata non emette il risultato', () async {
-      final client = _PendingClient();
+      final client = FakeDioAdapter()..holdRequests = true;
       final api = ApiClient(
-        client: client,
+        dio: fakeDio(client),
         baseUrl: 'https://coachly.test/api',
       );
       final token = CancelToken();
@@ -150,7 +124,7 @@ void main() {
         cancelToken: token,
       );
 
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
       token.cancel();
 
       final response = await future;
@@ -159,13 +133,13 @@ void main() {
 
       // La risposta tardiva non deve riaprire nulla.
       client.complete('/api/exercises/1', '{"id":"1"}');
-      await Future<void>.delayed(Duration.zero);
+      await pumpEventQueue();
     });
 
     test('un token gia cancellato non parte con una risposta', () async {
-      final client = _PendingClient();
+      final client = FakeDioAdapter()..holdRequests = true;
       final api = ApiClient(
-        client: client,
+        dio: fakeDio(client),
         baseUrl: 'https://coachly.test/api',
       );
       final token = CancelToken()..cancel();
@@ -183,9 +157,9 @@ void main() {
     test(
       'una cancellazione dopo la cancellazione libera il coalescer',
       () async {
-        final client = _PendingClient();
+        final client = FakeDioAdapter()..holdRequests = true;
         final api = ApiClient(
-          client: client,
+          dio: fakeDio(client),
           baseUrl: 'https://coachly.test/api',
         );
         final token = CancelToken();
@@ -195,7 +169,10 @@ void main() {
           fromJson: (json) => json as Map<String, dynamic>,
           cancelToken: token,
         );
-        await Future<void>.delayed(Duration.zero);
+        await pumpEventQueue();
+        // La richiesta deve essere davvero partita: cancellarla prima che
+        // arrivi all'adapter verificherebbe un caso diverso.
+        expect(client.callCount, 1);
         token.cancel();
         await cancelled;
 
@@ -203,7 +180,7 @@ void main() {
           '/exercises/1',
           fromJson: (json) => json as Map<String, dynamic>,
         );
-        await Future<void>.delayed(Duration.zero);
+        await pumpEventQueue();
         client.complete('/api/exercises/1', '{"id":"1"}');
         final response = await retry;
 

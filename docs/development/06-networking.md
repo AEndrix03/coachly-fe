@@ -21,12 +21,12 @@ rete a regime è minima:
 Quattro famiglie. Se il numero cresce, è un segnale che qualcosa sta tornando a
 leggere dalla rete ciò che dovrebbe leggere dal database.
 
-## ADR-006 — Si adotta Dio
+## ADR-006 — Si adotta Dio ✅ fatto
 
-Oggi: `package:http` con un `AuthHttpClient` custom. Il refresh token con
-deduplica è scritto bene e va conservato come comportamento.
+`package:http` e `AuthHttpClient` sono stati rimossi. Il refresh token
+deduplicato è stato conservato come comportamento, dentro `AuthInterceptor`.
 
-Si passa a **Dio** per due ragioni:
+Si è passati a **Dio** per due ragioni:
 
 1. **Cancellazione.** `package:http` non la supporta. Oggi un provider
    `autoDispose` distrutto lascia la richiesta in volo: traffico sprecato e
@@ -35,8 +35,25 @@ Si passa a **Dio** per due ragioni:
 2. **Interceptor** come meccanismo di primo livello, invece di una sottoclasse
    di `BaseClient`.
 
-Il momento è adesso: il data layer viene riscritto comunque, e ADR-005 dice che
-non c'è retrocompatibilità da proteggere. Farlo dopo costerebbe di più.
+Il momento era quello: il data layer veniva riscritto comunque, e ADR-005 dice
+che non c'è retrocompatibilità da proteggere.
+
+Cosa è cambiato davvero, oltre alla dipendenza:
+
+- **La cancellazione interrompe.** Il `CancelToken` precedente era un
+  surrogato: scartava la risposta e liberava il coalescer, ma il traffico
+  partiva e arrivava comunque. Ora la richiesta viene abortita.
+- **Connect e receive sono due timeout distinti.** Con `package:http` esisteva
+  una scadenza unica in cui i due si sommavano, quindi i 10 s di connect
+  documentati non erano applicati da nessuno.
+- **Il replay dopo 401 non ricopia la richiesta a mano.** C'era un
+  `_copyRequest` con un ramo per `Request`, uno per `MultipartRequest` e uno
+  `StateError` per tutto il resto; `RequestOptions` è già riutilizzabile. Una
+  bandiera in `extra` impedisce il ciclo di replay.
+- **I test di rete hanno un solo fake.** `FakeDioAdapter` in
+  `test/core/network/` sostituisce i quattro client di prova che ogni test si
+  era scritto per conto suo — ed era il motivo per cui questa migrazione
+  toccava cinque file di test invece di uno.
 
 ## `ApiClient`
 

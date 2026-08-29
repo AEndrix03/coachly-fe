@@ -12,7 +12,8 @@ import 'package:coachly/features/workout/workout_page/data/services/workout_page
 import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
+
+import '../network/fake_dio.dart';
 
 /// Il backoff del sync diventa verificabile solo con un Clock iniettato:
 /// `nextAttemptAt` e' un istante calcolato a partire da "adesso".
@@ -171,7 +172,9 @@ LocalWorkoutSession _buildLocalSession({
 
 class _FailingWorkoutPageService extends WorkoutPageService {
   _FailingWorkoutPageService()
-    : super(ApiClient(client: _NoopHttpClient(), baseUrl: 'https://localhost'));
+    : super(
+        ApiClient(dio: fakeDio(FakeDioAdapter()), baseUrl: 'https://localhost'),
+      );
 
   int uploadCalls = 0;
 
@@ -185,12 +188,5 @@ class _FailingWorkoutPageService extends WorkoutPageService {
       message: 'Temporary server issue',
       statusCode: 503,
     );
-  }
-}
-
-class _NoopHttpClient extends http.BaseClient {
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) {
-    throw UnimplementedError('No real HTTP calls are expected in this test.');
   }
 }

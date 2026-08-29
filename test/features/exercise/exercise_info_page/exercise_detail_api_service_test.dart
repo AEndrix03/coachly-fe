@@ -5,23 +5,21 @@ import 'package:coachly/features/exercise/exercise_info_page/data/services/exerc
 import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
+
+import '../../../core/network/fake_dio.dart';
 
 void main() {
   test(
     'maps the exercise detail backend contract into the stable view data',
     () async {
-      final client = MockClient((request) async {
-        expect(request.url.path, '/api/exercises/exercise-id/details');
-        return http.Response.bytes(
-          utf8.encode(jsonEncode(_exerciseDetailJson)),
-          200,
-          headers: _jsonHeaders,
-        );
-      });
+      final client = FakeDioAdapter(
+        responder: (request) {
+          expect(request.uri.path, '/api/exercises/exercise-id/details');
+          return FakeResponse.body(jsonEncode(_exerciseDetailJson), 200);
+        },
+      );
       final service = ApiExerciseDetailViewService(
-        ApiClient(client: client, baseUrl: 'https://coachly.test/api'),
+        ApiClient(dio: fakeDio(client), baseUrl: 'https://coachly.test/api'),
       );
 
       final data = await service.fetch('exercise-id', const Locale('it'));
@@ -53,10 +51,10 @@ void main() {
   );
 
   test('loads the complete catalogue from the filtered endpoint', () async {
-    final client = MockClient((request) async {
-      expect(request.url.path, '/api/exercises/filtered');
-      return http.Response.bytes(
-        utf8.encode(
+    final client = FakeDioAdapter(
+      responder: (request) {
+        expect(request.uri.path, '/api/exercises/filtered');
+        return FakeResponse.body(
           jsonEncode([
             _exerciseDetailJson,
             {
@@ -66,13 +64,12 @@ void main() {
               'nameI18n': {'it': 'Back Squat'},
             },
           ]),
-        ),
-        200,
-        headers: _jsonHeaders,
-      );
-    });
+          200,
+        );
+      },
+    );
     final service = ApiExerciseDetailViewService(
-      ApiClient(client: client, baseUrl: 'https://coachly.test/api'),
+      ApiClient(dio: fakeDio(client), baseUrl: 'https://coachly.test/api'),
     );
 
     final catalog = await service.fetchAll(const Locale('it'));
@@ -177,7 +174,3 @@ const _exerciseDetailJson = <String, Object?>{
     },
   ],
 };
-
-/// Il backend risponde in UTF-8. Senza charset esplicito `http.Response`
-/// decodifica in latin1 e i payload che contengono `•` o accenti falliscono.
-const _jsonHeaders = {'content-type': 'application/json; charset=utf-8'};

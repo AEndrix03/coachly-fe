@@ -18,7 +18,8 @@ import 'package:coachly/features/workout/workout_page/data/services/workout_page
 import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
+
+import '../../../../../core/network/fake_dio.dart';
 
 const _exerciseId = '11111111-1111-4111-8111-111111111111';
 
@@ -335,7 +336,9 @@ WorkoutSessionWriteCommand _buildSession() {
 
 class _FakeWorkoutPageService extends WorkoutPageService {
   _FakeWorkoutPageService()
-    : super(ApiClient(client: _NoopHttpClient(), baseUrl: 'https://localhost'));
+    : super(
+        ApiClient(dio: fakeDio(FakeDioAdapter()), baseUrl: 'https://localhost'),
+      );
 
   int uploadCalls = 0;
   int patchCalls = 0;
@@ -356,12 +359,5 @@ class _FakeWorkoutPageService extends WorkoutPageService {
   ) async {
     patchCalls += 1;
     return ApiResponse.success();
-  }
-}
-
-class _NoopHttpClient extends http.BaseClient {
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) {
-    throw UnimplementedError('No HTTP calls expected in repository tests.');
   }
 }

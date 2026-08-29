@@ -13,7 +13,8 @@ import 'package:coachly/features/workout/workout_page/data/services/workout_page
 import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
+
+import '../../../../../core/network/fake_dio.dart';
 
 void main() {
   late AppDatabase db;
@@ -211,7 +212,9 @@ WorkoutModel _buildWorkout({required String id, required bool dirty}) {
 
 class _FakeWorkoutPageService extends WorkoutPageService {
   _FakeWorkoutPageService()
-    : super(ApiClient(client: _NoopHttpClient(), baseUrl: 'https://localhost'));
+    : super(
+        ApiClient(dio: fakeDio(FakeDioAdapter()), baseUrl: 'https://localhost'),
+      );
 
   int uploadCalls = 0;
   int patchCalls = 0;
@@ -246,12 +249,5 @@ class _FakeWorkoutPageService extends WorkoutPageService {
     return ApiResponse.success(
       data: [_buildWorkout(id: 'workout-1', dirty: false)],
     );
-  }
-}
-
-class _NoopHttpClient extends http.BaseClient {
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) {
-    throw UnimplementedError('No real HTTP calls are expected in sync tests.');
   }
 }
