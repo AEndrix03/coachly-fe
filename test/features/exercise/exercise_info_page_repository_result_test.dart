@@ -4,9 +4,12 @@ import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/core/database/app_database.dart';
+import 'package:coachly/core/time/clock.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_hive_service.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_info_page_service.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Servizio di rete finto: nessuna `ApiClient`, nessuna socket.
@@ -66,76 +69,35 @@ class _FakeService implements ExerciseInfoPageService {
       ApiResponse<void>.success();
 }
 
-/// Cache locale finta: nessun Hive aperto.
-class _FakeHiveService implements ExerciseHiveService {
-  final Map<String, ExerciseDetailModel> details = {};
-  List<ExerciseModel> summaries = [];
-  Object? readThrows;
-
-  @override
-  Future<ExerciseDetailModel?> getExercise(String exerciseId) async {
-    final error = readThrows;
-    if (error != null) throw error;
-    return details[exerciseId];
-  }
-
-  @override
-  Future<List<ExerciseDetailModel>> getExercises() async =>
-      details.values.toList();
-
-  @override
-  Future<void> saveExerciseDetail(ExerciseDetailModel exercise) async {
-    details[exercise.id ?? ''] = exercise;
-  }
-
-  @override
-  Future<void> saveExerciseSummaries(List<ExerciseModel> exercises) async {
-    summaries = exercises;
-  }
-
-  @override
-  Future<bool> isEmpty() async => summaries.isEmpty;
-
-  @override
-  Future<List<ExerciseModel>> getExerciseSummaries() async => summaries;
-
-  @override
-  Future<List<ExerciseModel>> getFilteredExerciseSummaries(
-    ExerciseFilterModel filter, {
-    Set<String> excludedExerciseIds = const {},
-  }) async => summaries
-      .where((exercise) => !excludedExerciseIds.contains(exercise.id))
-      .toList();
-
-  @override
-  Future<List<ExerciseDetailModel>> getFilteredExercises(
-    ExerciseFilterModel filter, {
-    Set<String> excludedExerciseIds = const {},
-  }) async => details.values
-      .where((exercise) => !excludedExerciseIds.contains(exercise.id))
-      .toList();
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
 void main() {
   late _FakeService service;
-  late _FakeHiveService hive;
+  late AppDatabase db;
+  late ExerciseCatalogDao catalog;
   late ExerciseInfoPageRepositoryImpl repository;
 
   const detail = ExerciseDetailModel(id: 'squat');
   const summary = ExerciseModel(id: 'squat');
 
+  /// Ciò che il catalogo restituisce dopo un giro dal database: i campi
+  /// booleani filtrabili hanno un default di colonna, non restano `null`.
+  const storedSummary = ExerciseModel(
+    id: 'squat',
+    isUnilateral: false,
+    isBodyweight: false,
+  );
+
   setUp(() {
     service = _FakeService();
-    hive = _FakeHiveService();
-    repository = ExerciseInfoPageRepositoryImpl(service, hive);
+    db = AppDatabase(NativeDatabase.memory());
+    catalog = ExerciseCatalogDao(db, FixedClock(DateTime.utc(2026, 1, 1)));
+    repository = ExerciseInfoPageRepositoryImpl(service, catalog);
   });
+
+  tearDown(() => db.close());
 
   group('getExerciseDetailResult', () {
     test('la cache locale risponde senza toccare la rete', () async {
-      hive.details['squat'] = detail;
+      await catalog.upsertDetail(detail);
 
       final result = await repository.getExerciseDetailResult('squat');
 
@@ -149,7 +111,7 @@ void main() {
       final result = await repository.getExerciseDetailResult('squat');
 
       expect(result.isOk, isTrue);
-      expect(hive.details['squat'], detail);
+      expect(await catalog.getDetail('squat'), detail);
     });
 
     test('uno status code diventa il Failure corrispondente', () async {
@@ -171,8 +133,8 @@ void main() {
       expect(result.failureOrNull, isA<UnexpectedFailure>());
     });
 
-    test('un errore della cache locale diventa un Failure', () async {
-      hive.readThrows = Exception('hive closed');
+    test('un errore del database locale diventa un Failure', () async {
+      await db.close();
 
       final result = await repository.getExerciseDetailResult('squat');
 
@@ -204,7 +166,7 @@ void main() {
 
       final result = await repository.getExerciseSummariesResult();
 
-      expect(result.valueOrNull, [summary]);
+      expect(result.valueOrNull, [storedSummary]);
       expect(service.allExercisesCalls, 1);
     });
 
@@ -231,6 +193,71 @@ void main() {
       final result = await repository.refreshFromRemoteResult();
 
       expect(result.failureOrNull, isA<NetworkFailure>());
+    });
+  });
+
+  group('filtri sulla cache locale', () {
+    const barbellRow = ExerciseModel(
+      id: 'squat',
+      nameI18n: {'it': 'Squat con bilanciere'},
+      difficultyLevel: 'advanced',
+      mechanicsType: 'compound',
+      isUnilateral: false,
+      isBodyweight: false,
+    );
+    const bodyweightRow = ExerciseModel(
+      id: 'push-up',
+      nameI18n: {'it': 'Piegamenti'},
+      difficultyLevel: 'beginner',
+      mechanicsType: 'compound',
+      isUnilateral: false,
+      isBodyweight: true,
+    );
+
+    setUp(() {
+      service.allExercisesResponse = ApiResponse.success(
+        data: const [barbellRow, bodyweightRow],
+      );
+    });
+
+    test('con la cache attiva un filtro non testuale trova comunque', () async {
+      // La regressione storica: con Hive questa lista era vuota, perché la
+      // cache persisteva tre campi e il filtro ne interrogava nove.
+      final result = await repository.getFilteredExerciseSummariesResult(
+        const ExerciseFilterModel(isBodyweight: true),
+      );
+
+      expect(result.valueOrNull?.map((exercise) => exercise.id), ['push-up']);
+      // La rete è stata toccata una volta sola, per riempire la cache vuota.
+      expect(service.allExercisesCalls, 1);
+    });
+
+    test('il filtro per difficoltà restringe la lista', () async {
+      final result = await repository.getFilteredExerciseSummariesResult(
+        const ExerciseFilterModel(difficultyLevel: 'advanced'),
+      );
+
+      expect(result.valueOrNull?.map((exercise) => exercise.id), ['squat']);
+    });
+
+    test('lo stream emette dopo una scrittura locale', () async {
+      final emissions = <List<String?>>[];
+      final subscription = repository
+          .watchExerciseSummaries(const ExerciseFilterModel())
+          .listen(
+            (summaries) => emissions.add(
+              summaries.map((exercise) => exercise.id).toList(),
+            ),
+          );
+
+      await pumpEventQueue();
+      await repository.refreshFromRemoteResult();
+      await pumpEventQueue();
+
+      await subscription.cancel();
+
+      expect(emissions.first, isEmpty);
+      expect(emissions.last, ['push-up', 'squat']);
     });
   });
 }

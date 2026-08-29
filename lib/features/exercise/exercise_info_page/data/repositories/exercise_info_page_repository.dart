@@ -1,5 +1,4 @@
 import 'package:coachly/core/error/failures.dart';
-import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
@@ -21,6 +20,17 @@ abstract class IExerciseInfoPageRepository {
   Future<Result<ExerciseDetailModel, Failure>> getExerciseDetailResult(
     String exerciseId,
   );
+
+  /// I riepiloghi del catalogo, ricalcolati a ogni scrittura locale.
+  ///
+  /// È la forma canonica della lettura (`docs/development/04-data-layer.md`,
+  /// regola 4): la UI si aggiorna perché il database notifica, non perché
+  /// qualcuno ha chiamato `ref.invalidate`. Non ritorna `Result` perché una
+  /// query locale che fallisce è un errore di programmazione, non un esito.
+  Stream<List<ExerciseModel>> watchExerciseSummaries(
+    ExerciseFilterModel filter, {
+    Set<String> excludedExerciseIds = const {},
+  });
 
   Future<Result<List<ExerciseModel>, Failure>> getAllExercisesResult();
 
@@ -65,6 +75,4 @@ abstract class IExerciseInfoPageRepository {
   Future<Result<void, Failure>> deletePersonalExerciseResult(String exerciseId);
 
   Future<Result<List<ExerciseDetailModel>, Failure>> refreshFromRemoteResult();
-
-  // ── Ponti di compatibilità (da rimuovere) ─────────────────────────────────
 }

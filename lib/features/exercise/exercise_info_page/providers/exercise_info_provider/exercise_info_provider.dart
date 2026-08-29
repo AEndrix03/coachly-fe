@@ -4,7 +4,7 @@ import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exe
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_hive_service.dart';
+import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_info_page_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,8 +21,8 @@ ExerciseInfoPageService exerciseInfoPageService(Ref ref) {
 @riverpod
 IExerciseInfoPageRepository exerciseInfoPageRepository(Ref ref) {
   final service = ref.watch(exerciseInfoPageServiceProvider);
-  final hiveService = ref.watch(exerciseHiveServiceProvider);
-  return ExerciseInfoPageRepositoryImpl(service, hiveService);
+  final catalog = ref.watch(exerciseCatalogDaoProvider);
+  return ExerciseInfoPageRepositoryImpl(service, catalog);
 }
 
 // State Class
