@@ -21,13 +21,13 @@ import 'package:coachly/features/exercise/personal_exercises_page/personal_exerc
 import 'package:coachly/features/home/home.dart';
 import 'package:coachly/features/profile/profile_page.dart';
 import 'package:coachly/features/workout/workout_active_page/workout_active_page.dart';
+import 'package:coachly/features/workout/workout_active_page/presentation/workout_completion_page.dart';
 import 'package:coachly/features/workout/workout_builder/create_workout_flow.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_check/workout_check_page.dart';
 import 'package:coachly/features/workout/add_exercise_page/add_exercise_page.dart';
 import 'package:coachly/features/workout/workout_detail_page/workout_detail_page.dart';
 import 'package:coachly/features/workout/workout_edit_page/workout_edit_page.dart';
-import 'package:coachly/features/workout/workout_organize_page/workout_organize_page.dart';
 
 part 'app_router.g.dart';
 
@@ -146,7 +146,7 @@ StatefulShellBranch _branchFor(AppTab tab) {
           AppTab.profile => const ProfilePage(),
         },
         routes: switch (tab) {
-          AppTab.community => const <RouteBase>[],
+          AppTab.community => _communityRoutes,
           AppTab.workouts => _workoutRoutes,
           AppTab.profile => _profileRoutes,
         },
@@ -155,12 +155,16 @@ StatefulShellBranch _branchFor(AppTab tab) {
   );
 }
 
-final List<RouteBase> _workoutRoutes = [
+final List<RouteBase> _communityRoutes = [
   GoRoute(
-    path: 'organize',
+    path: 'workout-completed',
+    parentNavigatorKey: _rootNavigatorKey,
     pageBuilder: (context, state) =>
-        _fadeTransition(state, const WorkoutOrganizePage()),
+        _athleteTransition(state, const WorkoutCompletionPage()),
   ),
+];
+
+final List<RouteBase> _workoutRoutes = [
   GoRoute(
     path: 'workout/:id',
     pageBuilder: (context, state) {
