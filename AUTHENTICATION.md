@@ -30,18 +30,35 @@ Sono overrideabili con `--dart-define`:
 flutter run ^
   --dart-define=API_BASE_URL=https://dev.aredegalli.it:8800/api ^
   --dart-define=KEYCLOAK_ISSUER=https://auth.aredegalli.it/realms/coachly-app ^
-  --dart-define=KEYCLOAK_CLIENT_ID=coachly-app
+  --dart-define=KEYCLOAK_CLIENT_ID=coachly-mobile
 ```
 
 Se avvii da Android Studio solo con il tasto Run, puoi evitare il terminale. In quel caso:
 
 1. Apri `Run > Edit Configurations...`
 2. Seleziona la configurazione Flutter
-3. Aggiungi in `Additional run args` solo se il client id reale non e `coachly-app`
+3. I default del codice sono gia' quelli del realm dev: `Additional run args` serve solo per puntare a un ambiente diverso
 
-## Assunzione importante
+## Client id: verificato, non assunto
 
-Nel codice ho impostato come default `KEYCLOAK_CLIENT_ID=coachly-app` perché dal materiale fornito il nome certo disponibile è quello del realm. Se il client Keycloak reale ha un id diverso, il login non funzionerà finché non imposti il valore corretto via `--dart-define`.
+Il client e' **`coachly-mobile`**, che e' il default nel codice. `coachly-app`
+e' il nome del *realm*, non del client, ed era un'assunzione scritta quando il
+realm non era interrogabile.
+
+Verificato contro il realm dev:
+
+```
+GET /realms/coachly-app/protocol/openid-connect/auth?client_id=coachly-app
+  -> pagina di errore Keycloak, "Client non trovato"
+     (identica a quella di un client id inventato)
+
+GET /realms/coachly-app/protocol/openid-connect/auth?client_id=coachly-mobile
+  -> 302 con error_description=Missing parameter: code_challenge_method
+     cioe' il client esiste, accetta il redirect e pretende PKCE
+```
+
+La richiesta di PKCE conferma che e' un client **pubblico**, come deve essere
+per un'app mobile: nessun client secret va spedito nel bundle.
 
 ## Configurazione Keycloak richiesta
 

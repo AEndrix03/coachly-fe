@@ -107,11 +107,17 @@ codice ne contiene 216.
 
 ## Cosa fare per primo
 
-Da `26-migration-plan.md`, i tre interventi con il rapporto valore/costo più alto:
+I tre interventi con il rapporto valore/costo più alto erano la guardia sul
+logout, il request coalescing e il catalogo pre-seeded. I primi due sono fatti,
+insieme alla Fase 0 e alla CI che rende verificabile tutto il resto.
 
-1. **Guardia sul logout con outbox non vuota** — oggi è una perdita di dati attiva
-2. **Request coalescing** — elimina chiamate multiple e overlay sovrapposti
-3. **Catalogo pre-seeded** — azzera la voce di traffico principale
+Restano, in ordine:
 
-Prima di tutto, però, la Fase 0: la suite di test non compila, e senza CI nessuna
-di queste regole è verificabile.
+1. **Catalogo pre-seeded** (fase 3.3) — azzera la voce di traffico principale.
+   Bloccato lato backend: `GET /catalog/delta?since=` non esiste ancora e il
+   bundle `catalog.sqlite` va generato in CI dall'export del BE.
+2. **Event log delle sessioni** (fase 3.5) — oggi `sessions` salva lo stato
+   finale mergiato in un `payload` JSON. È il dataset che giustifica
+   l'esistenza del backend, e non viene prodotto.
+3. **Struttura per dominio invece che per schermata** — vedi la coda di
+   `02-project-structure.md`. È il gap più grosso e l'unico non tracciato.

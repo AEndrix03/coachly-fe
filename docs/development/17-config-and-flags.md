@@ -47,9 +47,11 @@ final class AppConfig {
 
 Nessuna feature legge `String.fromEnvironment` direttamente.
 
-> **Da correggere subito.** `KEYCLOAK_CLIENT_ID` ha default `coachly-mobile` nel
-> codice, mentre `AUTHENTICATION.md` documenta `coachly-app`. Uno dei due è
-> sbagliato e il sintomo sarebbe un login che fallisce senza spiegazione.
+> **Risolto.** Il disallineamento fra `coachly-mobile` (codice) e `coachly-app`
+> (`AUTHENTICATION.md`) e' stato sciolto interrogando il realm: `coachly-app` e'
+> il nome del realm e come client **non esiste**, `coachly-mobile` esiste ed e'
+> un client pubblico con PKCE obbligatorio. Il default del codice era quello
+> giusto; la documentazione e' stata corretta.
 
 ## `CACHE_MODE`
 

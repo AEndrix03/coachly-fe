@@ -67,9 +67,12 @@ Implementati in `tool/coachly_lints/`, agganciati via
 | `no_cross_feature_presentation` | 0 | 10 | 01 D4 |
 | `no_data_layer_in_presentation` | 0 | 3 | 01 D1 |
 | `no_side_effects_in_build` | 0 | 0 | 03 |
-| `no_raw_datetime_now` | 0 (attende `core/time`) | — | 19 |
+| `no_raw_datetime_now` | 0 | — | 19 |
 | `no_material_in_application` | 0 | — | 01 D2 |
-| `no_data_source_outside_repository` | 0 (attende `data/remote`) | — | 01 D6 |
+| `no_data_source_outside_repository` | 0 | — | 01 D6 |
+| `no_non_material_icons` | 0 | 2 | 12, ADR-003 |
+| `no_manual_uuid` | 0 | 3 | 05 |
+| `no_literal_text_style` | 188 | 188 | 09 |
 
 Come ci si è arrivati, in ordine di resa:
 
@@ -93,15 +96,26 @@ secondo la nuova struttura è già coperta.
 **Da qui il gate può diventare bloccante su tutto il repository**, non solo sui
 file toccati: il debito è a zero e ogni nuova violazione è una regressione.
 
+`no_non_material_icons` non vieta `package:flutter/cupertino.dart`: da lì
+arriva anche `CupertinoPage`, che è una transizione e non un'icona. Vieta i
+pacchetti di glifi e `CupertinoIcons`.
+
+`no_manual_uuid` ha eliminato tre generatori scritti a mano — una UUID v4
+compilata a mano con `Random.secure()` e un `'${micros}_${random}'` — mentre
+`core/ids` esisteva già.
+
+Il debito residuo è **`no_literal_text_style`, 188 occorrenze**, ed è l'unico.
+Non si chiude con una sostituzione meccanica: i token portano `height` e
+`fontWeight`, i letterali quasi mai, quindi rimappare cambierebbe
+l'interlinea di 188 punti dello schermo. Si assorbe schermata per schermata
+mentre la si tocca, che è esattamente il meccanismo di `check_changed.sh`.
+
 Regole ancora da implementare, in ordine di valore:
 
 | Regola | Cosa vieta | Doc | Prerequisito |
 |---|---|---|---|
 | `no_hardcoded_strings` | stringhe letterali in `Text()` e proprietà user-facing | 13 | ARB (fase 5.2) |
-| `no_literal_text_style` | `TextStyle(...)` costruito fuori dai token | 09 | — |
-| `no_magic_spacing` | `SizedBox`/`EdgeInsets`/`BorderRadius` con letterali non-token | 09 | — |
-| `no_non_material_icons` | import di `ionicons`, `lucide_icons_flutter` | 12 | — |
-| `no_manual_uuid` | generazione id fuori da `core/ids/` | 05 | `core/ids` |
+| `no_magic_spacing` | `SizedBox`/`EdgeInsets`/`BorderRadius` con letterali non-token | 09 | token di spazio realmente in uso |
 
 `no_magic_spacing` è la più delicata: deve distinguere un numero magico da un
 token, quindi va scritta solo dopo che i token di spazio sono realmente in uso,
@@ -131,36 +145,60 @@ nuovo.
 
 Alcune cose non si esprimono in un lint. Diventano test in CI:
 
-| Test | Verifica | Doc |
-|---|---|---|
-| `l10n_parity_test` | ogni chiave ARB esiste in tutte le lingue | 13 |
-| `l10n_unused_test` | nessuna chiave ARB orfana | 13 |
-| `tap_target_test` | `androidTapTargetGuideline` sulle schermate principali | 14 |
-| `contrast_test` | `textContrastGuideline` | 14 |
-| `text_scaling_test` | nessun overflow a `textScaler` 2.0 | 14 |
-| `migration_test` | ogni schema Drift migra dallo snapshot precedente | 04 |
-| `golden_test` | i componenti del design system non cambiano per caso | 10 |
-| `dependency_test` | nessuna dipendenza dichiarata e non usata | 02 |
+| Test | Verifica | Doc | Stato |
+|---|---|---|---|
+| `l10n_parity_test` | ogni chiave ARB esiste in tutte le lingue | 13 | ✅ `test/l10n/` |
+| `l10n_unused_test` | nessuna chiave ARB orfana | 13 | ✅ `test/l10n/` |
+| `tap_target_test` | `androidTapTargetGuideline` sulle schermate principali | 14 | ✅ `test/a11y/` |
+| `contrast_test` | `textContrastGuideline` | 14 | ✅ `test/a11y/` |
+| `text_scaling_test` | nessun overflow a `textScaler` 2.0 | 14 | ✅ `test/a11y/` |
+| `migration_test` | ogni schema Drift migra dallo snapshot precedente | 04 | ✅ `test/core/database/` |
+| `golden_test` | i componenti del design system non cambiano per caso | 10 | ✅ locale, tag `golden` |
+| `dependency_test` | nessuna dipendenza dichiarata e non usata | 02 | ✅ `test/tooling/` |
 
-Il `text_scaling_test` è particolarmente rilevante: `textScaler` oggi ha **zero
-occorrenze** nel codice, quindi la app a text scaling alto non è mai stata
-verificata da nessuno.
+Il `text_scaling_test` era il più rilevante proprio perché `textScaler` aveva
+**zero occorrenze**: la app a text scaling alto non era mai stata eseguita da
+nessuno. Alla prima esecuzione ha trovato due difetti reali, entrambi corretti
+senza toccare il layout a scala 1:
+
+- il segnaposto media dell'esercizio sfondava di 27px il riquadro 16:9 a
+  `textScaler` 2.0 — le due righe di testo ora sono `Flexible` con ellissi;
+- il titolo dell'app bar della pagina esercizio è trasparente finché non si
+  scrolla, ma era comunque annunciato come header: contrasto 1.00, misurato
+  correttamente. Ora è escluso dalla semantica finché è invisibile.
+
+Nessuno dei due si vede guardando lo schermo di un telefono nuovo al chiuso, che
+è il motivo per cui erano lì.
 
 ## Pipeline CI
 
+`.github/workflows/ci.yml`:
+
 ```
-flutter analyze                → zero errori
-tool/check_changed.sh          → zero violazioni sui file del PR
-flutter test                   → tutto verde
+codice generato allineato    → arb + gen_l10n + build_runner, poi git diff
 dart format --set-exit-if-changed
+flutter analyze                → zero issue
+tool/check_changed.sh          → zero violazioni sui file del PR
+tool/check_tests.sh            → zero regressioni rispetto alla baseline
 ```
+
+Un secondo job non bloccante misura il debito con `custom_lint` su tutto il
+repository. La distinzione è deliberata: il gate riguarda ciò che tocchi, la
+misura riguarda ciò che resta.
+
+I golden sono esclusi dalla CI (`dart_test.yaml`, tag `golden`): confrontano
+pixel, e le immagini di riferimento generate su Windows divergono su un runner
+Linux per il font rendering, non per il codice. Valgono in locale. Per
+riattivarli in CI vanno rigenerati sulla stessa immagine che li esegue.
 
 `dart run custom_lint` da solo riporta tutte le violazioni esistenti: serve per
 misurare il debito, non come gate.
 
-La suite compila e gira (fase 0.1). Restano 12 test rossi per deriva fra UI e
-asserzioni: vedi `26-migration-plan.md`. La CI va attivata accettando quel
-residuo come baseline nota, non aspettando che sia zero.
+`tool/check_tests.sh` confronta i test rossi con `tool/test_baseline.txt` e
+fallisce sia su una regressione sia su un test in baseline tornato verde. La
+seconda condizione è quella che impedisce alla baseline di diventare una
+discarica: un test riparato deve uscirne nello stesso PR. Oggi la baseline è
+**vuota** — il residuo della Fase 0 è stato riassorbito.
 
 ## Convenzioni di codice
 

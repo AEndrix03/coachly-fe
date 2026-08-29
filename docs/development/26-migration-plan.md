@@ -23,24 +23,31 @@ Nulla di architetturale. Senza queste, tutto il resto non è verificabile.
 | 0.3 | Rimuovere le dipendenze a zero utilizzi + `equatable` | ✅ 7 rimosse |
 | 0.4 | Guardare i `debugPrint`, togliere i body dalle risposte | ✅ `AppLogger` |
 | 0.5 | Rimuovere `syncEnabled` (codice morto) e i mock rimasti | ✅ |
-| 0.6 | **Guardia sul logout con outbox non vuota** | ✅ con test, **UI da collegare** |
-| 0.7 | Correggere il default di `KEYCLOAK_CLIENT_ID` | ⏳ serve il valore reale dal realm Keycloak |
-| 0.8 | Passata di dead code | ⏳ |
+| 0.6 | **Guardia sul logout con outbox non vuota** | ✅ con test e dialog collegato |
+| 0.7 | Correggere il default di `KEYCLOAK_CLIENT_ID` | ✅ verificato sul realm: era giusto il codice |
+| 0.8 | Passata di dead code | ✅ |
 
-**Residuo della Fase 0**
+**Fase 0 chiusa.**
 
-- 12 test rossi per deriva fra UI e asserzioni: 4 golden con diff ~20%, 6 su
-  `exercise_detail_redesign`, 1 su `workout_exercise_card`, 1 sul foglio sezioni
-  del builder. Non si "aggiustano" senza decidere caso per caso se ha ragione il
-  test o la UI, e diversi toccano schermate in corso di riscrittura.
-- `logout()` ora ritorna `bool` e rifiuta se la coda non è vuota. I due call
-  site (`profile_page.dart`, `offline_mode_banner.dart`) ignorano il valore:
-  finché non vengono collegati, il logout con dati pendenti **non fa nulla** e
-  logga un warning. Va aggiunto un dialog che chiami `logout(force: true)` dopo
-  conferma esplicita.
-- Come effetto collaterale della tassonomia sealed, `Result<T, Failure>` della
-  Fase 1.4 è già mezzo fatto: manca solo il tipo `Result` e la conversione al
-  confine.
+I 12 test rossi sono stati esaminati uno per uno, come il documento chiedeva.
+In tutti i casi aveva ragione la UI: le asserzioni descrivevano interazioni
+sostituite dal redesign — il nome dell'esercizio che espandeva la scheda invece
+di aprire il dettaglio, il foglio sezioni senza il passaggio "Personalizza",
+liste diventate pigre che il test contava senza scrollare, un harness in
+inglese contro asserzioni in italiano. I quattro golden sono stati rigenerati:
+uno di essi registrava lo stato collassato ed era **byte per byte identico** a
+un altro golden, cioè non verificava niente da quando la scheda era cambiata.
+
+La suite è verde: 209 test, zero rossi, `tool/test_baseline.txt` vuota.
+
+`logout()` rifiuta se la coda non è vuota, e `profile_page.dart` ora mostra il
+rifiuto: un secondo dialog dice quante modifiche andrebbero perse e solo dopo
+conferma esplicita chiama `logout(force: true)`.
+
+`KEYCLOAK_CLIENT_ID` è stato risolto interrogando il realm invece di
+assumere: `coachly-app` è il nome del realm e come client non esiste,
+`coachly-mobile` esiste ed è pubblico con PKCE obbligatorio. Il default del
+codice era corretto, `AUTHENTICATION.md` no.
 
 ## Fase 1 — Fondamenta invisibili
 

@@ -70,10 +70,9 @@ abstract final class AppConfig {
     defaultValue: 'https://auth.aredegalli.it/realms/coachly-app',
   );
 
-  // `AUTHENTICATION.md` documenta `coachly-app`, il codice precedente usava
-  // `coachly-mobile`. Il disallineamento e' segnalato in
-  // `docs/development/17-config-and-flags.md` e non e' risolto qui: cambiare
-  // il default senza conferma dal realm Keycloak romperebbe il login.
+  // Verificato contro il realm: `coachly-app` e' il nome del *realm* e come
+  // client non esiste ("Client non trovato"), `coachly-mobile` esiste ed e'
+  // pubblico con PKCE obbligatorio. Vedi `AUTHENTICATION.md`.
   static const String keycloakClientId = String.fromEnvironment(
     'KEYCLOAK_CLIENT_ID',
     defaultValue: 'coachly-mobile',
