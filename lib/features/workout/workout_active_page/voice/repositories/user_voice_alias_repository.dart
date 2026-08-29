@@ -1,66 +1,57 @@
-import 'package:coachly/app/sync/local_database_service.dart';
+import 'package:coachly/features/workout/workout_active_page/data/local/voice_dao.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final userVoiceAliasRepositoryProvider = Provider<UserVoiceAliasRepository>((
   ref,
 ) {
-  final localDb = ref.watch(localDatabaseServiceProvider);
-  return UserVoiceAliasRepository(localDb);
+  return UserVoiceAliasRepository(ref.watch(voiceDaoProvider));
 });
 
+/// Alias vocali imparati dall'utente (`docs/development/23-voice.md`).
+///
+/// Il database è per utente (`docs/development/24-security-and-privacy.md`),
+/// quindi la chiave è la sola frase normalizzata: non serve prefissarla con
+/// l'id dell'utente come faceva la vecchia box Hive condivisa.
 class UserVoiceAliasRepository {
-  const UserVoiceAliasRepository(this._localDbService);
+  const UserVoiceAliasRepository(this._dao);
 
-  final LocalDatabaseService _localDbService;
+  final VoiceDao _dao;
 
   Future<UserVoiceAliasMatch?> getAlias({
-    required String userId,
     required String normalizedSpokenForm,
   }) async {
-    final key = _buildKey(userId, normalizedSpokenForm);
-    final raw = _localDbService.voiceAliases.get(key);
-    if (raw == null) {
-      return null;
-    }
-
-    final exerciseId = raw['exerciseId'] as String?;
-    if (exerciseId == null || exerciseId.trim().isEmpty) {
-      return null;
-    }
-
-    final confirmations = (raw['confirmations'] as num?)?.toInt() ?? 0;
+    final row = await _dao.aliasFor(normalizedSpokenForm);
+    if (row == null || row.exerciseId.trim().isEmpty) return null;
     return UserVoiceAliasMatch(
-      exerciseId: exerciseId,
-      confirmations: confirmations,
+      exerciseId: row.exerciseId,
+      confirmations: row.hits,
     );
   }
 
+  /// Ogni conferma manuale alza il contatore di hit, e con esso la confidenza
+  /// della prossima risoluzione della stessa frase.
   Future<void> registerSelection({
-    required String userId,
     required String normalizedSpokenForm,
     required String exerciseId,
-  }) async {
-    final key = _buildKey(userId, normalizedSpokenForm);
-    final current = _localDbService.voiceAliases.get(key);
-
-    var confirmations = 1;
-    if (current != null && current['exerciseId'] == exerciseId) {
-      final currentConfirmations =
-          (current['confirmations'] as num?)?.toInt() ?? 0;
-      confirmations = currentConfirmations + 1;
-    }
-
-    await _localDbService.voiceAliases.put(key, {
-      'userId': userId,
-      'spokenForm': normalizedSpokenForm,
-      'exerciseId': exerciseId,
-      'confirmations': confirmations,
-      'updatedAt': DateTime.now().toIso8601String(),
-    });
+  }) {
+    return _dao.upsertAlias(
+      phrase: normalizedSpokenForm,
+      exerciseId: exerciseId,
+    );
   }
 
-  String _buildKey(String userId, String spokenForm) {
-    return '$userId::$spokenForm';
+  /// Lettura reattiva: la UI si aggiorna perché il database notifica.
+  Stream<List<UserVoiceAliasMatch>> watchAliases() {
+    return _dao.watchAliases().map(
+      (rows) => rows
+          .map(
+            (row) => UserVoiceAliasMatch(
+              exerciseId: row.exerciseId,
+              confirmations: row.hits,
+            ),
+          )
+          .toList(growable: false),
+    );
   }
 }

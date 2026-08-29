@@ -1,17 +1,35 @@
-import 'package:coachly/app/sync/local_database_service.dart';
+import 'dart:convert';
+
+import 'package:coachly/core/ids/id_generator.dart';
+import 'package:coachly/features/workout/workout_active_page/data/local/voice_dao.dart';
 import 'package:coachly/features/workout/workout_active_page/voice/models/voice_resolution_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final voiceResolutionLogRepositoryProvider =
     Provider<VoiceResolutionLogRepository>((ref) {
-      final localDb = ref.watch(localDatabaseServiceProvider);
-      return VoiceResolutionLogRepository(localDb);
+      return VoiceResolutionLogRepository(
+        ref.watch(voiceDaoProvider),
+        ref.watch(idGeneratorProvider),
+      );
     });
 
+/// Log di risoluzione vocale, dataset per la calibrazione delle soglie.
+///
+/// **Privacy** (`docs/development/24-security-and-privacy.md`): le trascrizioni
+/// nascono da un microfono aperto in un luogo pubblico, dove possono comparire
+/// terzi. Quindi:
+///
+/// - il testo grezzo pre-normalizzazione **non si conserva**: di
+///   [ParsedVoiceEntry] questo repository legge solo `normalizedText`, mai
+///   `originalText`;
+/// - i log restano **locali** e non entrano in outbox: salgono solo con un
+///   consenso esplicito e separato, che oggi è di default `off`;
+/// - si potano dopo 90 giorni, via [pruneExpired].
 class VoiceResolutionLogRepository {
-  const VoiceResolutionLogRepository(this._localDbService);
+  const VoiceResolutionLogRepository(this._dao, this._ids);
 
-  final LocalDatabaseService _localDbService;
+  final VoiceDao _dao;
+  final IdGenerator _ids;
 
   Future<String> createLog({
     required ParsedVoiceEntry parsedEntry,
@@ -19,45 +37,39 @@ class VoiceResolutionLogRepository {
     required double confidence,
     required VoiceMatchDecisionType decisionType,
   }) async {
-    final logId = DateTime.now().microsecondsSinceEpoch.toString();
-    await _localDbService.voiceResolutionLogs.put(logId, {
-      'id': logId,
-      'originalText': parsedEntry.originalText,
-      'normalizedText': parsedEntry.normalizedText,
-      'parsedExercisePhrase': parsedEntry.exercisePhrase,
-      'detectedSets': parsedEntry.sets,
-      'detectedReps': parsedEntry.reps,
-      'detectedWeight': parsedEntry.weightKg,
-      'topCandidates': candidates.take(5).map((candidate) {
-        return {
-          'exerciseId': candidate.exerciseId,
-          'displayName': candidate.displayName,
-          'baseScore': candidate.baseScore,
-          'finalScore': candidate.finalScore,
-          'isInActiveWorkout': candidate.isInActiveWorkout,
-        };
-      }).toList(),
-      'selectedExerciseId': null,
-      'confidence': confidence,
-      'decision': decisionType.name,
-      'createdAt': DateTime.now().toIso8601String(),
-    });
+    final logId = _ids.newId();
+    await _dao.logResolution(
+      id: logId,
+      // Solo il normalizzato: `parsedEntry.originalText` non va persistito.
+      normalizedText: parsedEntry.normalizedText,
+      outcome: decisionType.name,
+      confidence: confidence,
+      candidates: jsonEncode([
+        for (final candidate in candidates.take(5))
+          {
+            'exerciseId': candidate.exerciseId,
+            'displayName': candidate.displayName,
+            'baseScore': candidate.baseScore,
+            'finalScore': candidate.finalScore,
+            'isInActiveWorkout': candidate.isInActiveWorkout,
+          },
+      ]),
+      chosenExerciseId: candidates.isEmpty ? null : candidates.first.exerciseId,
+    );
     return logId;
   }
 
+  /// Annota l'esercizio che l'utente ha scelto correggendo la proposta.
   Future<void> markSelection({
     required String logId,
     required String selectedExerciseId,
-  }) async {
-    final current = _localDbService.voiceResolutionLogs.get(logId);
-    if (current == null) {
-      return;
-    }
-
-    await _localDbService.voiceResolutionLogs.put(logId, {
-      ...current,
-      'selectedExerciseId': selectedExerciseId,
-      'updatedAt': DateTime.now().toIso8601String(),
-    });
+  }) {
+    return _dao.markCorrection(
+      id: logId,
+      correctedExerciseId: selectedExerciseId,
+    );
   }
+
+  /// Potatura a 90 giorni. Va chiamata all'avvio del sottosistema vocale.
+  Future<int> pruneExpired() => _dao.pruneExpiredLogs();
 }

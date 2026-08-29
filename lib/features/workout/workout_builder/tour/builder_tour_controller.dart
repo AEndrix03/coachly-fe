@@ -1,5 +1,8 @@
-import 'package:coachly/app/sync/local_database_service.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum BuilderTourOrigin { automatic, manual }
 
@@ -45,16 +48,40 @@ final builderTourProvider =
       BuilderTourController.new,
     );
 
+/// "Tour visto" è una **preferenza banale**: sta in `SharedPreferencesAsync`,
+/// non in Drift (`docs/development/04-data-layer.md`). Perderla significa al
+/// massimo rivedere una volta il tour.
 class BuilderTourController extends Notifier<BuilderTourState> {
-  static const _autoShowKey = 'workoutBuilderTourAutoShow';
+  static const String autoShowKey = 'workoutBuilderTourAutoShow';
   static const stepCount = 7;
 
-  @override
-  BuilderTourState build() => const BuilderTourState();
+  @visibleForTesting
+  static SharedPreferencesAsync preferences = SharedPreferencesAsync();
 
-  bool get shouldAutoShow {
-    final value = LocalDatabaseService().settings.get(_autoShowKey);
-    return value is! bool || value;
+  /// Valore idratato dalle preferenze. Il default è `true`, lo stesso che
+  /// valeva quando la chiave non era mai stata scritta.
+  bool _autoShow = true;
+
+  @override
+  BuilderTourState build() {
+    unawaited(_restore());
+    return const BuilderTourState();
+  }
+
+  Future<void> _restore() async {
+    _autoShow = await preferences.getBool(autoShowKey) ?? true;
+  }
+
+  /// Lettura sincrona: il chiamante decide se avviare il tour dentro un
+  /// `build`, dove non può attendere. L'idratazione parte alla creazione del
+  /// controller, molto prima che la pagina raggiunga lo step in cui il tour
+  /// si propone.
+  bool get shouldAutoShow => _autoShow;
+
+  /// Variante attendibile, per i test e per i chiamanti asincroni.
+  Future<bool> shouldAutoShowAsync() async {
+    await _restore();
+    return _autoShow;
   }
 
   void start(BuilderTourOrigin origin) {
@@ -78,6 +105,7 @@ class BuilderTourController extends Notifier<BuilderTourState> {
 
   Future<void> setDontShowAgain(bool value) async {
     state = state.copyWith(dontShowAgain: value);
-    await LocalDatabaseService().settings.put(_autoShowKey, !value);
+    _autoShow = !value;
+    await preferences.setBool(autoShowKey, _autoShow);
   }
 }

@@ -85,9 +85,10 @@ class VoiceResolutionService {
     );
 
     UserVoiceAliasMatch? aliasMatch;
-    if ((context.userId ?? '').isNotEmpty && phrase.isNotEmpty) {
+    if (phrase.isNotEmpty) {
+      // Il database è per utente: la frase normalizzata basta come chiave
+      // (`docs/development/24-security-and-privacy.md`).
       aliasMatch = await _aliasRepository.getAlias(
-        userId: context.userId!,
         normalizedSpokenForm: phrase,
       );
     }
@@ -127,11 +128,9 @@ class VoiceResolutionService {
     required String selectedExerciseId,
   }) async {
     final phrase = resolution.parsedEntry.exercisePhrase.trim();
-    final userId = context.userId?.trim();
 
-    if (userId != null && userId.isNotEmpty && phrase.isNotEmpty) {
+    if (phrase.isNotEmpty) {
       await _aliasRepository.registerSelection(
-        userId: userId,
         normalizedSpokenForm: phrase,
         exerciseId: selectedExerciseId,
       );

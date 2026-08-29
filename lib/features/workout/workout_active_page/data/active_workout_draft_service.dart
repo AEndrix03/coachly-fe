@@ -1,23 +1,30 @@
-import 'package:coachly/app/sync/local_database_service.dart';
+import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/workout/workout_active_page/coach/domain/coach_decision.dart';
+import 'package:coachly/features/workout/workout_active_page/data/local/active_workout_draft_dao.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 
 final activeWorkoutDraftServiceProvider = Provider<ActiveWorkoutDraftService>((
   ref,
 ) {
   return ActiveWorkoutDraftService(
-    ref.watch(localDatabaseServiceProvider).activeWorkoutDrafts,
+    ref.watch(activeWorkoutDraftDaoProvider),
+    ref.watch(clockProvider),
   );
 });
 
+/// Serializza lo stato dell'allenamento attivo nella bozza locale.
+///
+/// La persistenza vive nel DAO Drift: qui resta solo la traduzione fra lo stato
+/// applicativo e il documento salvato (`docs/development/04-data-layer.md`).
 class ActiveWorkoutDraftService {
-  final Box<Map> _box;
-  const ActiveWorkoutDraftService(this._box);
+  const ActiveWorkoutDraftService(this._dao, this._clock);
+
+  final ActiveWorkoutDraftDao _dao;
+  final Clock _clock;
 
   Future<void> save(String workoutId, ActiveWorkoutState state) async {
-    await _box.put(workoutId, {
+    await _dao.save(workoutId, {
       'sessionId': state.sessionId,
       'startedAt': state.startedAt?.toIso8601String(),
       'currentBlockId': state.currentTarget?.blockId,
@@ -25,7 +32,7 @@ class ActiveWorkoutDraftService {
       'currentSetId': state.currentTarget?.setId,
       'phase': state.phase.name,
       'lastSetCompletedAt': state.lastSetCompletedAt?.toIso8601String(),
-      'updatedAt': DateTime.now().toIso8601String(),
+      'updatedAt': _clock.nowUtc().toIso8601String(),
       'sessionChanges': state.sessionChanges,
       'exerciseEntryIds': [
         for (final exercise in state.exercises) exercise.exercise.id,
@@ -72,18 +79,15 @@ class ActiveWorkoutDraftService {
     });
   }
 
-  Map<String, dynamic>? read(String workoutId) {
-    final raw = _box.get(workoutId);
-    return raw?.map((key, value) => MapEntry(key.toString(), value));
-  }
+  Future<Map<String, dynamic>?> read(String workoutId) => _dao.read(workoutId);
 
   Future<void> saveRest({
     required String workoutId,
     required DateTime endsAt,
     required int initialSeconds,
   }) async {
-    final current = read(workoutId) ?? <String, dynamic>{};
-    await _box.put(workoutId, {
+    final current = await read(workoutId) ?? <String, dynamic>{};
+    await _dao.save(workoutId, {
       ...current,
       'restEndsAt': endsAt.toIso8601String(),
       'restInitialSeconds': initialSeconds,
@@ -91,24 +95,24 @@ class ActiveWorkoutDraftService {
   }
 
   Future<void> clearRest(String workoutId) async {
-    final current = read(workoutId);
+    final current = await read(workoutId);
     if (current == null) return;
     current.remove('restEndsAt');
     current.remove('restInitialSeconds');
-    await _box.put(workoutId, current);
+    await _dao.save(workoutId, current);
   }
 
   Future<void> saveCoachDecision(
     String workoutId,
     CoachDecision? decision,
   ) async {
-    final current = read(workoutId) ?? <String, dynamic>{};
+    final current = await read(workoutId) ?? <String, dynamic>{};
     if (decision == null) {
       current.remove('coachDecision');
     } else {
       current['coachDecision'] = _candidateToJson(decision.primary);
     }
-    await _box.put(workoutId, current);
+    await _dao.save(workoutId, current);
   }
 
   CoachDecision? readCoachDecision(Map<String, dynamic>? draft) {
@@ -171,5 +175,5 @@ class ActiveWorkoutDraftService {
     ],
   };
 
-  Future<void> delete(String workoutId) => _box.delete(workoutId);
+  Future<void> delete(String workoutId) => _dao.delete(workoutId);
 }

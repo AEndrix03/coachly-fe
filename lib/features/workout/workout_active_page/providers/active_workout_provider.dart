@@ -59,7 +59,12 @@ class ActiveWorkout extends _$ActiveWorkout {
       if (!ref.mounted || token != _loadToken) {
         return;
       }
-      final draft = ref.read(activeWorkoutDraftServiceProvider).read(workoutId);
+      final draft = await ref
+          .read(activeWorkoutDraftServiceProvider)
+          .read(workoutId);
+      if (!ref.mounted || token != _loadToken) {
+        return;
+      }
       exercises = _restoreExercises(exercises, draft);
       groups = _restoreGroups(groups, draft);
       final restoredTarget = _restoreTarget(exercises, draft);

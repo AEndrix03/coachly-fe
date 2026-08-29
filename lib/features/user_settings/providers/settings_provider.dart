@@ -1,28 +1,46 @@
-import 'package:coachly/app/sync/local_database_service.dart';
+import 'dart:async';
+
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'settings_provider.g.dart';
 
+/// Lingua dell'interfaccia.
+///
+/// È una **preferenza banale**: sta in `SharedPreferencesAsync`, non in Drift
+/// (`docs/development/04-data-layer.md`, "Cosa non sta in Drift"). Perderla
+/// significa ripartire dalla lingua di default, che è esattamente il
+/// comportamento del primo avvio.
 @riverpod
 class Language extends _$Language {
+  static const String preferenceKey = 'language';
+
+  @visibleForTesting
+  static SharedPreferencesAsync preferences = SharedPreferencesAsync();
+
   @override
   Locale build() {
-    final db = LocalDatabaseService();
-    final storedLanguage = db.settings.get('language') as String?;
-    final parsedStoredLocale = _parseLocale(storedLanguage);
-    if (parsedStoredLocale != null) {
-      return parsedStoredLocale;
-    }
+    // La lettura delle preferenze è asincrona: si parte dalla lingua di
+    // default e si riallinea appena il valore salvato è disponibile. Vedi
+    // `Attriti` del task: non è una `Future.microtask` di caricamento dati,
+    // è l'idratazione di una preferenza che ha un default valido.
+    unawaited(_restore());
     return AppStrings.defaultLocale;
+  }
+
+  Future<void> _restore() async {
+    final stored = await preferences.getString(preferenceKey);
+    final parsed = _parseLocale(stored);
+    if (parsed == null || !ref.mounted || parsed == state) return;
+    state = parsed;
   }
 
   Future<void> setLanguage(Locale locale) async {
     final normalizedLocale = AppStrings.normalizeLocale(locale);
-    final db = LocalDatabaseService();
-    await db.settings.put('language', normalizedLocale.languageCode);
     state = normalizedLocale;
+    await preferences.setString(preferenceKey, normalizedLocale.languageCode);
   }
 
   Locale? _parseLocale(String? rawValue) {

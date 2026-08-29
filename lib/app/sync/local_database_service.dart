@@ -15,11 +15,6 @@ class LocalDatabaseService {
   static String get workoutSessionsBox => 'workout_sessions_v$_dbVersion';
   static String get sessionSyncJobsBox => 'session_sync_jobs_v$_dbVersion';
   static String get workoutStructuredBox => 'workout_structured_v$_dbVersion';
-  static String get activeWorkoutDraftsBox =>
-      'active_workout_drafts_v$_dbVersion';
-  static String get voiceAliasesBox => 'voice_aliases_v$_dbVersion';
-  static String get voiceResolutionLogsBox =>
-      'voice_resolution_logs_v$_dbVersion';
 
   static const String _exercisesBox = 'exercises';
   static const String _exerciseCatalogBox = 'exercise_catalog';
@@ -51,9 +46,6 @@ class LocalDatabaseService {
     await Hive.openBox<Map>(workoutSessionsBox);
     await Hive.openBox<Map>(sessionSyncJobsBox);
     await Hive.openBox<Map>(workoutStructuredBox);
-    await Hive.openBox<Map>(activeWorkoutDraftsBox);
-    await Hive.openBox<Map>(voiceAliasesBox);
-    await Hive.openBox<Map>(voiceResolutionLogsBox);
     await Hive.openBox<Map>(_exercisesBox);
     await Hive.openBox<Map>(_exerciseCatalogBox);
     await Hive.openBox<dynamic>(_settingsBox);
@@ -62,15 +54,25 @@ class LocalDatabaseService {
     debugPrint('Local database initialized (v$_dbVersion)');
   }
 
+  /// Box migrate a Drift: si cancellano dal disco, non si riaprono.
+  ///
+  /// ADR-005 — nessun utente in produzione, quindi nessuna migrazione dei dati
+  /// (`docs/development/04-data-layer.md`).
+  static const List<String> _boxesMigratedToDrift = [
+    'active_workout_drafts_v1',
+    'voice_aliases_v1',
+    'voice_resolution_logs_v1',
+  ];
+
   Future<void> _cleanOldBoxes() async {
+    for (final box in _boxesMigratedToDrift) {
+      await _safeDelete(box);
+    }
     for (int version = 1; version < _dbVersion; version += 1) {
       await _safeDelete('workouts_v$version');
       await _safeDelete('workout_sessions_v$version');
       await _safeDelete('session_sync_jobs_v$version');
       await _safeDelete('workout_structured_v$version');
-      await _safeDelete('active_workout_drafts_v$version');
-      await _safeDelete('voice_aliases_v$version');
-      await _safeDelete('voice_resolution_logs_v$version');
     }
   }
 
@@ -94,12 +96,6 @@ class LocalDatabaseService {
   Box<Map> get sessionSyncJobs => Hive.box<Map>(sessionSyncJobsBox);
 
   Box<Map> get workoutStructured => Hive.box<Map>(workoutStructuredBox);
-
-  Box<Map> get activeWorkoutDrafts => Hive.box<Map>(activeWorkoutDraftsBox);
-
-  Box<Map> get voiceAliases => Hive.box<Map>(voiceAliasesBox);
-
-  Box<Map> get voiceResolutionLogs => Hive.box<Map>(voiceResolutionLogsBox);
 
   Box<dynamic> get settings => Hive.box<dynamic>(_settingsBox);
 
@@ -169,9 +165,6 @@ class LocalDatabaseService {
     await Hive.box<Map>(workoutSessionsBox).clear();
     await Hive.box<Map>(sessionSyncJobsBox).clear();
     await Hive.box<Map>(workoutStructuredBox).clear();
-    await Hive.box<Map>(activeWorkoutDraftsBox).clear();
-    await Hive.box<Map>(voiceAliasesBox).clear();
-    await Hive.box<Map>(voiceResolutionLogsBox).clear();
     await Hive.box<Map>(_exercisesBox).clear();
     await Hive.box<Map>(_exerciseCatalogBox).clear();
     await Hive.box<dynamic>(_settingsBox).clear();
