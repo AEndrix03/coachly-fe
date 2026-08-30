@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:coachly/features/workouts/data/models/tag_dto/tag_dto.dart';
-import 'package:coachly/features/workouts/data/models/workout_exercise_model/workout_exercise_model.dart';
-import 'package:coachly/features/workouts/data/models/workout_programming_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_exercise_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_programming_model.dart';
 import 'package:coachly/shared/json_converters/map_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

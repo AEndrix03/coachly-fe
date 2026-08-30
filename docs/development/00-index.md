@@ -119,7 +119,6 @@ Restano, in ordine:
 2. **Event log delle sessioni** (fase 3.5) — oggi `sessions` salva lo stato
    finale mergiato in un `payload` JSON. È il dataset che giustifica
    l'esistenza del backend, e non viene prodotto.
-3. **Presentazione per dominio invece che per schermata** — il data layer è
-   stato riorganizzato per aggregato (`02-project-structure.md`); resta la
-   presentazione, che va spostata mentre si lavora alle schermate, non in
-   un'unica passata.
+3. **Controller fra schermate e repository** (fase 4.5) — la struttura per
+   livelli è arrivata e ha reso visibili 7 punti in cui una schermata parla
+   direttamente al repository. Il lint ora li blocca sui file toccati.

@@ -7,7 +7,7 @@ import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/sync/data/local/outbox_dao.dart';
 import 'package:coachly/features/sessions/data/local/session_dao.dart';
 import 'package:coachly/features/workouts/data/local/workout_dao.dart';
-import 'package:coachly/features/sessions/data/models/local_workout_session_model.dart';
+import 'package:coachly/features/sessions/domain/models/local_workout_session_model.dart';
 import 'package:coachly/features/workouts/data/services/workout_page_service.dart';
 import 'package:coachly/features/sessions/data/services/workout_session_sync_service.dart';
 import 'package:drift/native.dart';

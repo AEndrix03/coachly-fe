@@ -2,9 +2,9 @@ import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/sessions/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workouts/data/dto/workout_write_command.dart';
-import 'package:coachly/features/sessions/data/models/local_workout_session_model.dart';
-import 'package:coachly/features/workouts/data/models/workout_model/workout_model.dart';
-import 'package:coachly/features/workouts/data/models/workout_stats_model/workout_stats_model.dart';
+import 'package:coachly/features/sessions/domain/models/local_workout_session_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_stats_model.dart';
 
 abstract class IWorkoutPageRepository {
   /// Tutte le sessioni locali.

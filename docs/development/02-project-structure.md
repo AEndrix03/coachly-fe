@@ -169,16 +169,48 @@ passo più difficile di quanto sia.
 Prima di questo giro `features/voice/` è stata estratta allo stesso modo, e poi
 rimossa del tutto perché non era cablata (vedi `23-voice.md`).
 
-## Quello che resta
+## La struttura è quella del documento
 
-**La presentazione è ancora per schermata.** `workout/` contiene otto cartelle
-`workout_*_page`, ognuna con le proprie `providers/`, `widgets/` e a volte
-`domain/`. Non è più il problema che era — non ci sono più data layer
-duplicati né repository che portano il nome di una schermata — ma non è ancora
-la struttura del documento.
+```
+features/
+├── active_workout/   application · data · domain · presentation
+├── auth/
+├── exercises/        application · data · domain · presentation
+├── home/
+├── profile/
+├── sessions/         data · domain
+├── sync/             data
+├── user_settings/
+└── workouts/         application · data · domain · presentation
+```
 
-È lavoro diverso da quello appena fatto: spostare un DAO non cambia niente per
-l'utente, mentre riorganizzare la presentazione tocca i file più grandi del
-repository (`adaptive_workout_workspace.dart` a 3.854 righe) e va fatto mentre
-si lavora a quelle schermate, non in un'unica passata.
+Le sette cartelle `workout_*_page/` e le tre `exercise_*_page/` non esistono
+più: providers, widget, pagine e regole sono nei quattro livelli. La navbar è
+uscita da `features/common/` ed è in `app/navigation/`, perché è la shell della
+app e non una feature.
 
+### Cosa ha rivelato lo spostamento
+
+Il punto non era estetico. I lint di dependency rule cercano i nomi delle
+cartelle — `presentation/`, `application/`, `data/` — e finché i file stavano
+in `workout_detail_page/widgets/` **non trovavano niente da controllare**.
+Appena la struttura è arrivata, sono comparse **24 violazioni** che erano lì da
+sempre:
+
+- 16 erano modelli di dominio parcheggiati in `data/models/`. `WorkoutModel`,
+  `ExerciseDetailModel` e altri sette sono usati da presentation e application
+  quanto dal data layer: sono modelli di dominio, e ora stanno in
+  `domain/models/`. I DTO veri — quelli che nessuno sopra il repository tocca —
+  sono rimasti in `data/`, ed è la distinzione che il documento chiede.
+- 1 era un controller che importava Material per un `Locale`, che vive in
+  `dart:ui`.
+- **7 restano**, e non si chiudono spostando file: sono pagine e widget che
+  importano `*_repository_impl.dart` per raggiungere il provider del
+  repository. La composizione sta giustamente accanto al repository (D6: è
+  l'unico autorizzato a conoscere i DAO), quindi il rimedio non è un altro
+  import — è un controller in `application/` fra la schermata e il dato.
+  Riguarda `exercise_picker_sheet`, `workout_detail_page`, `workout_edit_page`,
+  `workout_active_page`, `exercise_create_page`, `personal_exercises_page`.
+
+Sono la fase 4.5 del piano di migrazione, e ora il lint le vede: bloccano i PR
+che toccano quei file.

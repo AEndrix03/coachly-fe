@@ -1,4 +1,4 @@
-import 'package:coachly/features/workouts/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:coachly/features/workouts/domain/models/editable_exercise_model.dart';
 import 'package:coachly/features/workouts/application/workout_edit_provider.dart';
 import 'package:coachly/features/workouts/data/mappers/workout_write_command_mapper.dart';
 import 'package:flutter/material.dart';

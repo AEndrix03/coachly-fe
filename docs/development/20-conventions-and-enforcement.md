@@ -58,17 +58,19 @@ Implementati in `tool/coachly_lints/`, agganciati via
 `analyzer: plugins: [custom_lint]`. Ogni regola implementa una riga di
 `01-principles.md`.
 
-**Stato attuale — 0 violazioni** (erano 170 alla prima esecuzione):
+**Stato attuale — 7 violazioni** (erano 170 alla prima esecuzione, poi 0, poi
+24 quando la struttura per livelli ha reso i lint finalmente applicabili — vedi
+`02-project-structure.md`):
 
 | Regola | Residue | Iniziali | Doc |
 |---|---|---|---|
 | `no_literal_colors` | 0 | 142 | 09 |
 | `no_features_in_core` | 0 | 15 | 01 D5 |
 | `no_cross_feature_presentation` | 0 | 10 | 01 D4 |
-| `no_data_layer_in_presentation` | 0 | 3 | 01 D1 |
+| `no_data_layer_in_presentation` | 7 | 3 → 23 | 01 D1 |
 | `no_side_effects_in_build` | 0 | 0 | 03 |
 | `no_raw_datetime_now` | 0 | — | 19 |
-| `no_material_in_application` | 0 | — | 01 D2 |
+| `no_material_in_application` | 0 | 1 | 01 D2 |
 | `no_data_source_outside_repository` | 0 | — | 01 D6 |
 | `no_non_material_icons` | 0 | 2 | 12, ADR-003 |
 | `no_manual_uuid` | 0 | 3 | 05 |

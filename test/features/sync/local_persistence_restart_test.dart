@@ -4,13 +4,13 @@ import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercises/data/local/custom_exercise_dao.dart';
-import 'package:coachly/features/exercises/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
 import 'package:coachly/features/sessions/data/local/session_dao.dart';
-import 'package:coachly/features/sessions/data/models/local_workout_session_model.dart';
+import 'package:coachly/features/sessions/domain/models/local_workout_session_model.dart';
 import 'package:coachly/features/sync/data/local/outbox_dao.dart';
 import 'package:coachly/features/active_workout/data/local/active_workout_draft_dao.dart';
 import 'package:coachly/features/workouts/data/local/workout_dao.dart';
-import 'package:coachly/features/workouts/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 

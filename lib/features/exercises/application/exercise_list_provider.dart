@@ -1,4 +1,4 @@
-import 'package:coachly/features/exercises/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
 import 'package:coachly/features/exercises/application/exercise_detail_view_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

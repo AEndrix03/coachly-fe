@@ -1,6 +1,6 @@
 import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository_impl.dart';
 import 'package:coachly/core/result/result.dart';
-import 'package:coachly/features/exercises/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';

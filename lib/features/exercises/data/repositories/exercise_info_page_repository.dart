@@ -1,8 +1,8 @@
 import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/result/result.dart';
-import 'package:coachly/features/exercises/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercises/data/models/new/exercise_filter_model/exercise_filter_model.dart';
-import 'package:coachly/features/exercises/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_filter_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
 
 /// Repository del catalogo esercizi.
 ///

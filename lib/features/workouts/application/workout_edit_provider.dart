@@ -1,13 +1,15 @@
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
-import 'package:coachly/features/workouts/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:coachly/features/workouts/domain/models/editable_exercise_model.dart';
 import 'package:coachly/features/workouts/data/mappers/workout_write_command_mapper.dart';
-import 'package:coachly/features/workouts/data/models/workout_exercise_model/workout_exercise_model.dart';
-import 'package:coachly/features/workouts/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_exercise_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/workouts/application/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart'; // Required for fromI18n
 import 'package:coachly/shared/i18n/app_strings.dart';
-import 'package:flutter/material.dart'; // Required for Locale
+// `Locale` vive in dart:ui. Un controller non importa Material
+// (`docs/development/01-principles.md`, dependency rule D2).
+import 'dart:ui' show Locale;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'workout_edit_provider.g.dart';

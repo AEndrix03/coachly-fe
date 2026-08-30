@@ -6,8 +6,8 @@ import 'package:coachly/core/database/tables/user_tables.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercises/data/mappers/exercise_catalog_mappers.dart';
-import 'package:coachly/features/exercises/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercises/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/database/tables/user_tables.dart';
 import 'package:coachly/features/workouts/data/models/structured_workout_snapshot_model.dart';
-import 'package:coachly/features/workouts/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

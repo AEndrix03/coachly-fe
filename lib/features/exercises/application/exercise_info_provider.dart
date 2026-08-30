@@ -1,7 +1,7 @@
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/result/result.dart';
-import 'package:coachly/features/exercises/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercises/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
+import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
 import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository_impl.dart'
     show exerciseInfoPageRepositoryProvider;
 import 'package:coachly/features/exercises/data/services/exercise_info_page_service.dart';

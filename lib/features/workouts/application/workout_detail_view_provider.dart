@@ -1,6 +1,6 @@
 import 'package:coachly/features/workouts/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workouts/presentation/models/workout_detail_mock_factory.dart';
-import 'package:coachly/features/workouts/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

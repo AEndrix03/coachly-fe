@@ -11,7 +11,7 @@ import 'package:coachly/features/workouts/presentation/widgets/workout_detail_co
 import 'package:coachly/features/workouts/presentation/widgets/workout_detail_app_bar.dart';
 import 'package:coachly/features/workouts/presentation/widgets/workout_structural_edit.dart';
 import 'package:coachly/features/workouts/presentation/widgets/workout_start_button.dart';
-import 'package:coachly/features/workouts/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/application/workout_list_provider.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';

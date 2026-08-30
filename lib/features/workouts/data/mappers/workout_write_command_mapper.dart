@@ -1,10 +1,10 @@
 import 'package:coachly/core/error/failures.dart';
-import 'package:coachly/features/workouts/data/models/editable_exercise_model/editable_exercise_model.dart';
+import 'package:coachly/features/workouts/domain/models/editable_exercise_model.dart';
 import 'package:coachly/features/workouts/application/workout_edit_provider.dart';
 import 'package:coachly/features/workouts/data/dto/workout_write_command.dart';
-import 'package:coachly/features/workouts/data/models/workout_exercise_model/workout_exercise_model.dart';
-import 'package:coachly/features/workouts/data/models/workout_model/workout_model.dart';
-import 'package:coachly/features/workouts/data/models/workout_programming_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_exercise_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_programming_model.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutWriteCommandMapper {

@@ -1,5 +1,5 @@
 import 'package:coachly/design_system/theme/exercise_theme.dart';
-import 'package:coachly/features/workouts/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/presentation/models/today_home_view_data.dart';
 import 'package:coachly/features/workouts/application/today_home_provider.dart';
 import 'package:coachly/features/workouts/presentation/widgets/today_home_widgets.dart';
