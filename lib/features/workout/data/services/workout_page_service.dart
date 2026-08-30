@@ -6,18 +6,22 @@ import 'package:coachly/features/workout/data/mappers/workout_remote_mapper.dart
 import 'package:coachly/features/workout/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workout/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/data/models/workout_stats_model/workout_stats_model.dart';
-import 'package:flutter/foundation.dart';
+import 'package:coachly/core/logging/app_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final workoutPageServiceProvider = Provider<WorkoutPageService>((ref) {
   final apiClient = ref.watch(apiClientProvider);
-  return WorkoutPageService(apiClient);
+  return WorkoutPageService(apiClient, ref.watch(appLoggerProvider));
 });
 
 class WorkoutPageService {
   final ApiClient _apiClient;
+  final AppLogger _logger;
 
-  WorkoutPageService(this._apiClient);
+  WorkoutPageService(
+    this._apiClient, [
+    this._logger = const ConsoleAppLogger(),
+  ]);
 
   Future<ApiResponse<List<WorkoutModel>>> fetchWorkouts() async {
     return await _apiClient.get<List<WorkoutModel>>(
@@ -36,8 +40,9 @@ class WorkoutPageService {
               );
               workouts.add(WorkoutRemoteMapper.fromApiJson(payload));
             } catch (error) {
-              debugPrint(
-                'Skipping invalid workout payload in fetchWorkouts: $error',
+              _logger.warn(
+                'Skipping invalid workout payload in fetchWorkouts',
+                error: error,
               );
             }
           }
@@ -117,6 +122,16 @@ class WorkoutPageService {
   ) async {
     return await _apiClient.put<void>(
       '/workouts/$workoutId',
+      body: commandPayload,
+      fromJson: (_) {},
+    );
+  }
+
+  Future<ApiResponse<void>> createWorkoutPayload(
+    Map<String, dynamic> commandPayload,
+  ) {
+    return _apiClient.post<void>(
+      '/workouts',
       body: commandPayload,
       fromJson: (_) {},
     );

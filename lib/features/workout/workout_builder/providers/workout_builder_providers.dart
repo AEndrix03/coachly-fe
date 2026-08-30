@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:coachly/core/ids/id_generator.dart';
+import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercise/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
@@ -408,9 +409,11 @@ class CreateWorkoutController extends _$CreateWorkoutController
     }
     state = state.copyWith(isSaving: true, error: null);
     final locale = ref.read(languageProvider).languageCode;
-    final now = DateTime.now();
+    final now = ref.read(clockProvider).now();
     final workout = WorkoutModel(
-      id: 'local_${now.microsecondsSinceEpoch}',
+      // Il BE accetta l'id UUID fornito nel POST: lo stesso identificatore e'
+      // quindi valido offline, nelle FK locali e dopo la sincronizzazione.
+      id: ref.read(idGeneratorProvider).newId(),
       titleI18n: {locale: state.draft.title.trim()},
       descriptionI18n: state.draft.focus?.trim().isNotEmpty == true
           ? {locale: state.draft.focus!.trim()}

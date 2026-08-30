@@ -110,6 +110,18 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
     await patchWorkout(workout.copyWith(active: active), updatedAt: updatedAt);
   }
 
+  /// Nasconde subito la scheda, ma conserva payload e relazioni finche' la
+  /// cancellazione non e' stata confermata dal server.
+  Future<void> markDeleted(String workoutId, {required DateTime deletedAt}) {
+    return (update(workouts)..where((row) => row.id.equals(workoutId))).write(
+      WorkoutsCompanion(
+        dirty: const Value(true),
+        deletedAt: Value(deletedAt),
+        updatedAt: Value(deletedAt),
+      ),
+    );
+  }
+
   Future<void> markSynced(String workoutId, {DateTime? updatedAt}) async {
     await (update(workouts)..where((row) => row.id.equals(workoutId))).write(
       WorkoutsCompanion(

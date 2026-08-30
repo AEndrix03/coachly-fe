@@ -216,38 +216,81 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
   @override
   Future<Result<void, Failure>> enableWorkout(String workoutId) async {
-    await _workoutDao.setActive(
-      workoutId,
-      active: true,
-      updatedAt: _clock.nowUtc(),
-    );
-    return const Ok(null);
+    final workout = await _workoutDao.getWorkout(workoutId);
+    if (workout == null) return const Err(NotFoundFailure('Workout not found'));
+    return updateWorkout(workout.copyWith(active: true));
   }
 
   @override
   Future<Result<void, Failure>> disableWorkout(String workoutId) async {
-    await _workoutDao.setActive(
-      workoutId,
-      active: false,
-      updatedAt: _clock.nowUtc(),
-    );
-    return const Ok(null);
+    final workout = await _workoutDao.getWorkout(workoutId);
+    if (workout == null) return const Err(NotFoundFailure('Workout not found'));
+    return updateWorkout(workout.copyWith(active: false));
   }
 
   @override
   Future<Result<void, Failure>> deleteWorkout(String workoutId) async {
-    final result = (await _apiService.deleteWorkout(workoutId)).toVoidResult();
-    if (result case Err()) return result;
-    await _workoutDao.deleteWorkout(workoutId);
-    return result;
+    final workout = await _workoutDao.getWorkout(workoutId);
+    if (workout == null) return const Err(NotFoundFailure('Workout not found'));
+    try {
+      final now = _clock.nowUtc();
+      await _database.transaction(() async {
+        await _workoutDao.markDeleted(workoutId, deletedAt: now);
+        await _outboxDao.enqueue(
+          id: _idGenerator.newIdempotencyKey(),
+          entityType: 'workout',
+          entityId: workoutId,
+          operation: 'delete',
+          payload: '{}',
+        );
+      });
+      unawaited(
+        _sessionSyncService.syncPendingSessions(trigger: 'delete_workout'),
+      );
+      return const Ok(null);
+    } catch (error) {
+      return Err(exceptionToFailure(error));
+    }
   }
 
   @override
   Future<Result<void, Failure>> updateWorkout(
     WorkoutModel updatedWorkout,
   ) async {
-    await _workoutDao.patchWorkout(updatedWorkout, updatedAt: _clock.nowUtc());
-    return const Ok(null);
+    try {
+      final existing = await _workoutDao.getWorkout(updatedWorkout.id);
+      final operation = existing == null ? 'create' : 'update';
+      final command = WorkoutWriteCommandMapper.fromWorkoutModel(
+        updatedWorkout,
+      );
+      final now = _clock.nowUtc();
+      await _database.transaction(() async {
+        await _workoutDao.patchWorkout(updatedWorkout, updatedAt: now);
+        await _workoutDao.saveSnapshot(
+          StructuredWorkoutSnapshot(
+            workoutId: updatedWorkout.id,
+            workoutWriteCommandJson: jsonEncode(
+              command.toJson(includeId: true),
+            ),
+            sourceUpdatedAt: updatedWorkout.lastUsed,
+            updatedAt: now,
+          ),
+        );
+        await _outboxDao.enqueue(
+          id: _idGenerator.newIdempotencyKey(),
+          entityType: 'workout',
+          entityId: updatedWorkout.id,
+          operation: operation,
+          payload: jsonEncode(command.toJson(includeId: operation == 'create')),
+        );
+      });
+      unawaited(
+        _sessionSyncService.syncPendingSessions(trigger: 'save_workout'),
+      );
+      return const Ok(null);
+    } catch (error) {
+      return Err(exceptionToFailure(error));
+    }
   }
 
   @override
@@ -255,13 +298,11 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
     String workoutId,
     WorkoutWriteCommand command,
   ) async {
-    final result = (await _apiService.patchWorkout(
-      workoutId,
-      command,
-    )).toVoidResult();
-    if (result case Err()) return result;
-    await refreshFromRemote();
-    return result;
+    // La modifica e il relativo comando sono gia' stati resi durevoli da
+    // [updateWorkout]. Questo metodo resta come ponte per i chiamanti durante
+    // la migrazione e si limita a sollecitare la coda.
+    await _sessionSyncService.syncPendingSessions(trigger: 'patch_workout');
+    return const Ok(null);
   }
 
   @override

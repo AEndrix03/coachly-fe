@@ -102,6 +102,17 @@ class CustomExerciseDao extends DatabaseAccessor<AppDatabase>
         ),
       );
 
+  Future<void> deletePermanently(String id) async {
+    await transaction(() async {
+      await (delete(localizedTexts)..where(
+            (row) =>
+                row.entityId.equals(id) & row.entityType.equals(_entityType),
+          ))
+          .go();
+      await (delete(customExercises)..where((row) => row.id.equals(id))).go();
+    });
+  }
+
   Future<void> replaceAll(List<ExerciseDetailModel> exercises) async {
     await transaction(() async {
       await delete(customExercises).go();

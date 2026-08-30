@@ -17,7 +17,7 @@ import 'package:coachly/features/workout/data/repositories/workout_page_reposito
 import 'package:coachly/features/sessions/data/services/workout_session_sync_service.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
+import 'package:coachly/core/logging/app_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
@@ -29,6 +29,7 @@ final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
     ref.watch(authServiceProvider),
     ref.watch(appDatabaseProvider),
     ref.watch(clockProvider),
+    ref.watch(appLoggerProvider),
   );
 });
 
@@ -61,7 +62,9 @@ class AppDataSyncService {
 
   bool _hasSyncedCurrentSession = false;
   bool _hasAppliedColdStart = false;
-  bool _isSyncing = false;
+  Future<void>? _fullSync;
+  Future<void>? _exerciseRefresh;
+  final AppLogger _logger;
 
   AppDataSyncService(
     this._ref,
@@ -71,6 +74,7 @@ class AppDataSyncService {
     this._authService,
     this._database,
     this._clock,
+    this._logger,
   );
 
   /// Returns true if the last successful sync is older than [_cacheTtl].
@@ -83,7 +87,10 @@ class AppDataSyncService {
 
   Future<void> syncOnAuthenticatedAccess({bool force = false}) async {
     await _applyColdStartOnce();
-    if (_isSyncing) return;
+    final running = _fullSync;
+    if (running != null) return running;
+    final exerciseRefresh = _exerciseRefresh;
+    if (exerciseRefresh != null) await exerciseRefresh;
     if (_hasSyncedCurrentSession && !force && !await _isCacheStale) return;
 
     if (!await _canSync()) {
@@ -94,27 +101,31 @@ class AppDataSyncService {
       _sessionSyncService.syncPendingSessions(trigger: 'authenticated_access'),
     );
 
-    _isSyncing = true;
+    final operation = _runFullSync();
+    _fullSync = operation;
     try {
-      final workoutResult = await _workoutRepository.refreshFromRemote();
-      final exerciseResult = await _exerciseRepository
-          .refreshFromRemoteResult();
-      final success = workoutResult.isOk && exerciseResult.isOk;
-
-      if (success) {
-        _hasSyncedCurrentSession = true;
-        await SharedPreferencesAsync().setString(
-          _lastSyncKey,
-          _clock.nowUtc().toIso8601String(),
-        );
-        _ref.invalidate(workoutListProvider);
-        _ref.invalidate(recentWorkoutsProvider);
-        _ref.invalidate(exerciseInfoProvider);
-        _ref.invalidate(exerciseDetailCatalogProvider);
-        _ref.invalidate(exerciseListProvider);
-      }
+      await operation;
     } finally {
-      _isSyncing = false;
+      if (identical(_fullSync, operation)) _fullSync = null;
+    }
+  }
+
+  Future<void> _runFullSync() async {
+    final workoutResult = await _workoutRepository.refreshFromRemote();
+    final exerciseResult = await _exerciseRepository.refreshFromRemoteResult();
+    final success = workoutResult.isOk && exerciseResult.isOk;
+
+    if (success) {
+      _hasSyncedCurrentSession = true;
+      await SharedPreferencesAsync().setString(
+        _lastSyncKey,
+        _clock.nowUtc().toIso8601String(),
+      );
+      _ref.invalidate(workoutListProvider);
+      _ref.invalidate(recentWorkoutsProvider);
+      _ref.invalidate(exerciseInfoProvider);
+      _ref.invalidate(exerciseDetailCatalogProvider);
+      _ref.invalidate(exerciseListProvider);
     }
   }
 
@@ -124,18 +135,26 @@ class AppDataSyncService {
   /// been saved. A running full sync already refreshes exercises, so concurrent
   /// resume events do not issue duplicate requests.
   Future<void> refreshExercisesOnAppResume() async {
-    if (_isSyncing || !await _canSync()) return;
+    if (_fullSync != null) return;
+    final running = _exerciseRefresh;
+    if (running != null) return running;
+    if (!await _canSync()) return;
 
-    _isSyncing = true;
+    final operation = _runExerciseRefresh();
+    _exerciseRefresh = operation;
     try {
-      final result = await _exerciseRepository.refreshFromRemoteResult();
-      if (result.isOk) {
-        _ref.invalidate(exerciseInfoProvider);
-        _ref.invalidate(exerciseDetailCatalogProvider);
-        _ref.invalidate(exerciseListProvider);
-      }
+      await operation;
     } finally {
-      _isSyncing = false;
+      if (identical(_exerciseRefresh, operation)) _exerciseRefresh = null;
+    }
+  }
+
+  Future<void> _runExerciseRefresh() async {
+    final result = await _exerciseRepository.refreshFromRemoteResult();
+    if (result.isOk) {
+      _ref.invalidate(exerciseInfoProvider);
+      _ref.invalidate(exerciseDetailCatalogProvider);
+      _ref.invalidate(exerciseListProvider);
     }
   }
 
@@ -161,13 +180,13 @@ class AppDataSyncService {
       (result) => result != ConnectivityResult.none,
     );
     if (!isOnline) {
-      debugPrint('Sync skipped: device offline');
+      _logger.debug('Sync skipped: device offline');
       return false;
     }
 
     final accessToken = await _authService.getAccessToken();
     if (accessToken == null || !JwtValidator.isTokenValid(accessToken)) {
-      debugPrint('Sync skipped: JWT missing or invalid');
+      _logger.debug('Sync skipped: JWT missing or invalid');
       return false;
     }
 

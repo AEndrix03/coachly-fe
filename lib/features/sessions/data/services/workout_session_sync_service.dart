@@ -7,6 +7,10 @@ import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/exercise/data/local/custom_exercise_dao.dart';
+import 'package:coachly/features/exercise/data/services/exercise_info_page_service.dart';
+import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart'
+    show exerciseInfoPageServiceProvider;
 import 'package:coachly/features/sync/data/local/outbox_dao.dart';
 import 'package:coachly/features/sessions/data/local/session_dao.dart';
 import 'package:coachly/features/workout/data/local/workout_dao.dart';
@@ -25,6 +29,8 @@ final workoutSessionSyncServiceProvider = Provider<WorkoutSessionSyncService>((
     workoutDao: ref.watch(workoutDaoProvider),
     outboxDao: ref.watch(outboxDaoProvider),
     workoutPageService: ref.watch(workoutPageServiceProvider),
+    exerciseService: ref.watch(exerciseInfoPageServiceProvider),
+    customExerciseDao: ref.watch(customExerciseDaoProvider),
     clock: ref.watch(clockProvider),
     logger: ref.watch(appLoggerProvider),
     isAuthenticatedReader: () {
@@ -73,6 +79,8 @@ class WorkoutSessionSyncService {
   final WorkoutDao _workoutDao;
   final OutboxDao _outboxDao;
   final WorkoutPageService _workoutPageService;
+  final ExerciseInfoPageService? _exerciseService;
+  final CustomExerciseDao? _customExerciseDao;
   final Clock _clock;
   final AppLogger _logger;
   final bool Function() _isAuthenticatedReader;
@@ -87,6 +95,8 @@ class WorkoutSessionSyncService {
     required WorkoutDao workoutDao,
     required OutboxDao outboxDao,
     required WorkoutPageService workoutPageService,
+    ExerciseInfoPageService? exerciseService,
+    CustomExerciseDao? customExerciseDao,
     required bool Function() isAuthenticatedReader,
     void Function()? invalidateWorkoutCaches,
     Clock clock = const SystemClock(),
@@ -96,6 +106,8 @@ class WorkoutSessionSyncService {
        _workoutDao = workoutDao,
        _outboxDao = outboxDao,
        _workoutPageService = workoutPageService,
+       _exerciseService = exerciseService,
+       _customExerciseDao = customExerciseDao,
        _clock = clock,
        _logger = logger,
        _isAuthenticatedReader = isAuthenticatedReader,
@@ -129,9 +141,7 @@ class WorkoutSessionSyncService {
     _isSyncing = true;
     try {
       // FIFO: l'ordine di creazione e' l'ordine di invio.
-      final rows = await _outboxDao.pendingOrdered(
-        entityType: sessionEntityType,
-      );
+      final rows = await _outboxDao.pendingOrdered();
       final now = _clock.nowUtc();
 
       for (final row in rows) {
@@ -140,7 +150,12 @@ class WorkoutSessionSyncService {
           continue;
         }
 
-        final outcome = await _syncRow(row);
+        final outcome = await switch (row.entityType) {
+          sessionEntityType => _syncSessionRow(row),
+          'workout' => _syncWorkoutRow(row),
+          'custom_exercise' => _syncCustomExerciseRow(row),
+          _ => _markUnsupported(row),
+        };
         if (outcome == _SyncOutcome.transientFailure) {
           // FIFO semantics: stop and retry later.
           break;
@@ -188,7 +203,7 @@ class WorkoutSessionSyncService {
     return connectivityResults.any((r) => r != ConnectivityResult.none);
   }
 
-  Future<_SyncOutcome> _syncRow(OutboxRow row) async {
+  Future<_SyncOutcome> _syncSessionRow(OutboxRow row) async {
     final session = await _sessionDao.getSession(row.entityId);
     if (session == null) {
       await _outboxDao.markFailedPermanent(
@@ -253,6 +268,89 @@ class WorkoutSessionSyncService {
     );
     await _refreshWorkoutCacheFromRemote();
     return _SyncOutcome.success;
+  }
+
+  Future<_SyncOutcome> _syncWorkoutRow(OutboxRow row) async {
+    await _outboxDao.markSending(row.id);
+    final payload = _decodeJsonMap(row.payload);
+    final response = switch (row.operation) {
+      'create' => await _workoutPageService.createWorkoutPayload(payload),
+      'update' => await _workoutPageService.patchWorkoutPayload(
+        row.entityId,
+        payload,
+      ),
+      'delete' => await _workoutPageService.deleteWorkout(row.entityId),
+      _ => null,
+    };
+    if (response == null) return _markUnsupported(row);
+    if (!response.success) {
+      return _handleOutboxFailure(row: row, response: response);
+    }
+    if (row.operation == 'delete') {
+      await _workoutDao.deleteWorkout(row.entityId);
+    } else {
+      await _workoutDao.markSynced(row.entityId, updatedAt: _clock.nowUtc());
+    }
+    await _outboxDao.markSent(row.id);
+    _invalidateWorkoutCaches();
+    return _SyncOutcome.success;
+  }
+
+  Future<_SyncOutcome> _syncCustomExerciseRow(OutboxRow row) async {
+    final exerciseService = _exerciseService;
+    final customExerciseDao = _customExerciseDao;
+    if (exerciseService == null || customExerciseDao == null) {
+      return _markUnsupported(row);
+    }
+    await _outboxDao.markSending(row.id);
+    final payload = _decodeJsonMap(row.payload);
+    final response = switch (row.operation) {
+      'create' => await exerciseService.createPersonalExercisePayload(payload),
+      'update' => await exerciseService.updatePersonalExercisePayload(
+        row.entityId,
+        payload,
+      ),
+      'delete' => await exerciseService.deletePersonalExercise(row.entityId),
+      _ => null,
+    };
+    if (response == null) return _markUnsupported(row);
+    if (!response.success) {
+      return _handleOutboxFailure(row: row, response: response);
+    }
+    if (row.operation == 'delete') {
+      await customExerciseDao.deletePermanently(row.entityId);
+    }
+    await _outboxDao.markSent(row.id);
+    return _SyncOutcome.success;
+  }
+
+  Future<_SyncOutcome> _markUnsupported(OutboxRow row) async {
+    await _outboxDao.markFailedPermanent(
+      row.id,
+      error: 'Unsupported outbox operation: ${row.entityType}/${row.operation}',
+    );
+    return _SyncOutcome.permanentFailure;
+  }
+
+  Future<_SyncOutcome> _handleOutboxFailure({
+    required OutboxRow row,
+    required ApiResponse<void> response,
+  }) async {
+    final errorMessage = _buildErrorMessage(response);
+    if (_isTransientStatus(response.statusCode)) {
+      await _outboxDao.markFailed(row.id, error: errorMessage);
+      return _SyncOutcome.transientFailure;
+    }
+    await _outboxDao.markFailedPermanent(row.id, error: errorMessage);
+    _logger.warn(
+      'Outbox operation failed permanently; local data kept.',
+      context: {
+        'outboxId': row.id,
+        'entityType': row.entityType,
+        'entityId': row.entityId,
+      },
+    );
+    return _SyncOutcome.permanentFailure;
   }
 
   bool _needsSessionUpload(LocalWorkoutSession session) {

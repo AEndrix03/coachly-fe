@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart'
     show exerciseInfoPageServiceProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:coachly/core/error/failures.dart';
+import 'package:coachly/core/database/app_database.dart';
+import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/core/result/api_response_result.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercise/data/local/custom_exercise_dao.dart';
@@ -13,6 +16,8 @@ import 'package:coachly/features/exercise/data/models/new/exercise_filter_model/
 import 'package:coachly/features/exercise/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/data/repositories/exercise_info_page_repository.dart';
 import 'package:coachly/features/exercise/data/services/exercise_info_page_service.dart';
+import 'package:coachly/features/sync/data/local/outbox_dao.dart';
+import 'package:coachly/features/sessions/data/services/workout_session_sync_service.dart';
 
 /// Implementazione di riferimento della migrazione a `Result<T, Failure>`.
 ///
@@ -31,12 +36,23 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   final ExerciseInfoPageService _service;
   final ExerciseCatalogDao _catalog;
   final CustomExerciseDao _customExercises;
+  final OutboxDao? _outbox;
+  final AppDatabase? _database;
+  final IdGenerator? _ids;
+  final WorkoutSessionSyncService? _syncService;
 
   ExerciseInfoPageRepositoryImpl(
     this._service,
     this._catalog,
-    this._customExercises,
-  );
+    this._customExercises, {
+    OutboxDao? outbox,
+    AppDatabase? database,
+    IdGenerator? ids,
+    WorkoutSessionSyncService? syncService,
+  }) : _outbox = outbox,
+       _database = database,
+       _ids = ids,
+       _syncService = syncService;
 
   @override
   Future<List<ExerciseDetailModel>> getDownloadedDetails() =>
@@ -145,9 +161,6 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   @override
   Future<Result<List<ExerciseModel>, Failure>> getMyExercisesResult() async {
     try {
-      // Local-first anche qui: la rete rinfresca in background, la lettura
-      // viene dal database (`docs/development/05-sync-and-offline.md`).
-      unawaited(_refreshCustomExercises());
       return Ok(await _customExercises.getSummaries());
     } catch (e) {
       return Err(exceptionToFailure(e));
@@ -164,7 +177,9 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
         final detail = (await _service.fetchExerciseDetails(id)).toResult();
         if (detail case Ok(:final value)) details.add(value);
       }
-      await _customExercises.replaceAll(details);
+      for (final detail in details) {
+        await _customExercises.upsert(detail);
+      }
     }
   }
 
@@ -260,7 +275,12 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     bool? isBodyweight,
   }) async {
     try {
-      final result = (await _service.createPersonalExercise({
+      final ids = _ids!;
+      final database = _database!;
+      final outbox = _outbox!;
+      final id = ids.newId();
+      final body = <String, dynamic>{
+        'id': id,
         'nameI18n': nameI18n,
         'descriptionI18n': descriptionI18n,
         'tipsI18n': tipsI18n,
@@ -269,9 +289,34 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
         'forceType': forceType,
         'isUnilateral': isUnilateral,
         'isBodyweight': isBodyweight,
-      })).toResult();
-      await _refreshCacheAfterWrite(result);
-      return result;
+      };
+      final local = ExerciseDetailModel(
+        id: id,
+        isPersonal: true,
+        nameI18n: nameI18n,
+        descriptionI18n: descriptionI18n,
+        tipsI18n: tipsI18n,
+        difficultyLevel: difficultyLevel,
+        mechanicsType: mechanicsType,
+        forceType: forceType,
+        isUnilateral: isUnilateral,
+        isBodyweight: isBodyweight,
+      );
+      await database.transaction(() async {
+        await _customExercises.upsert(local);
+        await outbox.enqueue(
+          id: ids.newIdempotencyKey(),
+          entityType: 'custom_exercise',
+          entityId: id,
+          operation: 'create',
+          payload: jsonEncode(body),
+        );
+      });
+      final syncService = _syncService;
+      if (syncService != null) {
+        unawaited(syncService.syncPendingSessions(trigger: 'create_exercise'));
+      }
+      return Ok(local);
     } catch (e) {
       return Err(exceptionToFailure(e));
     }
@@ -290,7 +335,10 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     bool? isBodyweight,
   }) async {
     try {
-      final result = (await _service.updatePersonalExercise(exerciseId, {
+      final ids = _ids!;
+      final database = _database!;
+      final outbox = _outbox!;
+      final body = <String, dynamic>{
         'nameI18n': nameI18n,
         'descriptionI18n': descriptionI18n,
         'tipsI18n': tipsI18n,
@@ -299,9 +347,34 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
         'forceType': forceType,
         'isUnilateral': isUnilateral,
         'isBodyweight': isBodyweight,
-      })).toResult();
-      await _refreshCacheAfterWrite(result);
-      return result;
+      };
+      final current = await _customExercises.getDetail(exerciseId);
+      final local = (current ?? ExerciseDetailModel(id: exerciseId)).copyWith(
+        isPersonal: true,
+        nameI18n: nameI18n,
+        descriptionI18n: descriptionI18n,
+        tipsI18n: tipsI18n,
+        difficultyLevel: difficultyLevel,
+        mechanicsType: mechanicsType,
+        forceType: forceType,
+        isUnilateral: isUnilateral,
+        isBodyweight: isBodyweight,
+      );
+      await database.transaction(() async {
+        await _customExercises.upsert(local);
+        await outbox.enqueue(
+          id: ids.newIdempotencyKey(),
+          entityType: 'custom_exercise',
+          entityId: exerciseId,
+          operation: 'update',
+          payload: jsonEncode(body),
+        );
+      });
+      final syncService = _syncService;
+      if (syncService != null) {
+        unawaited(syncService.syncPendingSessions(trigger: 'update_exercise'));
+      }
+      return Ok(local);
     } catch (e) {
       return Err(exceptionToFailure(e));
     }
@@ -312,11 +385,24 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     String exerciseId,
   ) async {
     try {
-      final result = (await _service.deletePersonalExercise(
-        exerciseId,
-      )).toVoidResult();
-      await _refreshCacheAfterWrite(result);
-      return result;
+      final ids = _ids!;
+      final database = _database!;
+      final outbox = _outbox!;
+      await database.transaction(() async {
+        await _customExercises.markDeleted(exerciseId);
+        await outbox.enqueue(
+          id: ids.newIdempotencyKey(),
+          entityType: 'custom_exercise',
+          entityId: exerciseId,
+          operation: 'delete',
+          payload: '{}',
+        );
+      });
+      final syncService = _syncService;
+      if (syncService != null) {
+        unawaited(syncService.syncPendingSessions(trigger: 'delete_exercise'));
+      }
+      return const Ok(null);
     } catch (e) {
       return Err(exceptionToFailure(e));
     }
@@ -332,6 +418,7 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
           return Err(failure);
         case Ok(:final value):
           await _catalog.upsertSummaries(value);
+          await _refreshCustomExercises();
           // I dettagli restano volutamente pigri, uno esercizio alla volta.
           return const Ok([]);
       }
@@ -341,12 +428,6 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   }
 
   // Interni ──────────────────────────────────────────────────────────────────
-
-  Future<void> _refreshCacheAfterWrite(Result<Object?, Failure> result) async {
-    if (result.isOk) {
-      await refreshFromRemoteResult();
-    }
-  }
 
   /// Popola la cache locale quando è vuota.
   ///
@@ -392,5 +473,9 @@ final exerciseInfoPageRepositoryProvider =
         ref.watch(exerciseInfoPageServiceProvider),
         ref.watch(exerciseCatalogDaoProvider),
         ref.watch(customExerciseDaoProvider),
+        outbox: ref.watch(outboxDaoProvider),
+        database: ref.watch(appDatabaseProvider),
+        ids: ref.watch(idGeneratorProvider),
+        syncService: ref.watch(workoutSessionSyncServiceProvider),
       ),
     );

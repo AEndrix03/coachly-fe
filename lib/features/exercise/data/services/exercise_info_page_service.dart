@@ -118,4 +118,17 @@ class ExerciseInfoPageService {
   Future<ApiResponse<void>> deletePersonalExercise(String exerciseId) async {
     return await _apiClient.delete<void>('/exercises/$exerciseId');
   }
+
+  Future<ApiResponse<void>> createPersonalExercisePayload(
+    Map<String, dynamic> body,
+  ) => _apiClient.post<void>('/exercises', body: body, fromJson: (_) {});
+
+  Future<ApiResponse<void>> updatePersonalExercisePayload(
+    String exerciseId,
+    Map<String, dynamic> body,
+  ) => _apiClient.put<void>(
+    '/exercises/$exerciseId',
+    body: body,
+    fromJson: (_) {},
+  );
 }

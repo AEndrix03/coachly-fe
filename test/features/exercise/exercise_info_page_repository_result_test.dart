@@ -8,6 +8,8 @@ import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/features/exercise/data/local/custom_exercise_dao.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/time/clock.dart';
+import 'package:coachly/core/ids/id_generator.dart';
+import 'package:coachly/features/sync/data/local/outbox_dao.dart';
 import 'package:coachly/features/exercise/data/local/exercise_catalog_dao.dart';
 import 'package:coachly/features/exercise/data/repositories/exercise_info_page_repository_impl.dart';
 import 'package:coachly/features/exercise/data/services/exercise_info_page_service.dart';
@@ -69,6 +71,17 @@ class _FakeService implements ExerciseInfoPageService {
   @override
   Future<ApiResponse<void>> deletePersonalExercise(String exerciseId) async =>
       ApiResponse<void>.success();
+
+  @override
+  Future<ApiResponse<void>> createPersonalExercisePayload(
+    Map<String, dynamic> body,
+  ) async => ApiResponse<void>.success();
+
+  @override
+  Future<ApiResponse<void>> updatePersonalExercisePayload(
+    String exerciseId,
+    Map<String, dynamic> body,
+  ) async => ApiResponse<void>.success();
 }
 
 void main() {
@@ -100,6 +113,9 @@ void main() {
         FixedClock(DateTime.utc(2026, 1, 1)),
         const SilentAppLogger(),
       ),
+      outbox: OutboxDao(db, clock: FixedClock(DateTime.utc(2026, 1, 1))),
+      database: db,
+      ids: SequentialIdGenerator(),
     );
   });
 
@@ -167,6 +183,49 @@ void main() {
       // test/core/network/request_coalescer_test.dart.
       // Le due scritture in cache sono idempotenti.
       expect(service.detailCalls, 2);
+    });
+  });
+
+  group('scritture local-first', () {
+    test('create persiste esercizio e outbox senza chiamare la rete', () async {
+      final result = await repository.createPersonalExerciseResult(
+        nameI18n: const {'it': 'Esercizio offline'},
+      );
+
+      expect(result.isOk, isTrue);
+      expect(
+        (await repository.getMyExercisesResult()).valueOrNull,
+        hasLength(1),
+      );
+      final pending = await OutboxDao(
+        db,
+        clock: FixedClock(DateTime.utc(2026, 1, 1)),
+      ).pendingOrdered();
+      expect(pending, hasLength(1));
+      expect(pending.single.entityType, 'custom_exercise');
+      expect(pending.single.operation, 'create');
+    });
+
+    test('delete nasconde localmente e conserva la tombstone', () async {
+      final created = await repository.createPersonalExerciseResult(
+        nameI18n: const {'it': 'Da eliminare'},
+      );
+      final id = created.valueOrNull!.id!;
+
+      final deleted = await repository.deletePersonalExerciseResult(id);
+
+      expect(deleted.isOk, isTrue);
+      expect((await repository.getMyExercisesResult()).valueOrNull, isEmpty);
+      expect(await db.select(db.customExercises).get(), hasLength(1));
+      expect(
+        (await db.select(db.customExercises).get()).single.deletedAt,
+        isNotNull,
+      );
+      final pending = await OutboxDao(
+        db,
+        clock: FixedClock(DateTime.utc(2026, 1, 1)),
+      ).pendingOrdered();
+      expect(pending.map((row) => row.operation), ['create', 'delete']);
     });
   });
 

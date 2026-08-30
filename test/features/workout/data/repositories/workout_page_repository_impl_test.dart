@@ -242,6 +242,34 @@ void main() {
       final workout = await workoutDao.getWorkout('workout-1');
       expect(workout!.active, isFalse);
       expect(workout.dirty, isTrue);
+      final pending = await outboxDao.pendingOrdered();
+      expect(pending.single.entityType, 'workout');
+      expect(pending.single.operation, 'update');
+    });
+
+    test('una nuova scheda viene persistita con operazione create', () async {
+      final created = _buildWorkout().copyWith(
+        id: '22222222-2222-4222-8222-222222222222',
+      );
+
+      final result = await repository.updateWorkout(created);
+
+      expect(result.isOk, isTrue);
+      expect(await workoutDao.getWorkout(created.id), isNotNull);
+      final pending = await outboxDao.pendingOrdered();
+      expect(pending.single.operation, 'create');
+      expect(pending.single.payload, contains(created.id));
+    });
+
+    test('delete applica una tombstone e accoda senza rete', () async {
+      final result = await repository.deleteWorkout('workout-1');
+
+      expect(result.isOk, isTrue);
+      expect(await workoutDao.getWorkouts(), isEmpty);
+      expect(await workoutDao.getWorkout('workout-1'), isNotNull);
+      final pending = await outboxDao.pendingOrdered();
+      expect(pending.single.operation, 'delete');
+      expect(fakeWorkoutPageService.deleteCalls, 0);
     });
 
     test('patchWorkouts non calpesta una scheda dirty', () async {
@@ -342,6 +370,7 @@ class _FakeWorkoutPageService extends WorkoutPageService {
 
   int uploadCalls = 0;
   int patchCalls = 0;
+  int deleteCalls = 0;
 
   @override
   Future<ApiResponse<void>> saveWorkoutSessionPayload(
@@ -358,6 +387,12 @@ class _FakeWorkoutPageService extends WorkoutPageService {
     Map<String, dynamic> commandPayload,
   ) async {
     patchCalls += 1;
+    return ApiResponse.success();
+  }
+
+  @override
+  Future<ApiResponse<void>> deleteWorkout(String workoutId) async {
+    deleteCalls += 1;
     return ApiResponse.success();
   }
 }

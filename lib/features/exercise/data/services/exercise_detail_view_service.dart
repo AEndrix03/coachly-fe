@@ -27,7 +27,7 @@ class ApiExerciseDetailViewService implements ExerciseDetailViewService {
       throw StateError(response.message ?? 'Impossibile caricare l’esercizio');
     }
 
-    return _toViewData(exercise, exerciseId, locale);
+    return toViewData(exercise, exerciseId, locale);
   }
 
   @override
@@ -47,11 +47,11 @@ class ApiExerciseDetailViewService implements ExerciseDetailViewService {
       throw StateError(response.message ?? 'Impossibile caricare gli esercizi');
     }
     return exercises
-        .map((exercise) => _toViewData(exercise, exercise.id, locale))
+        .map((exercise) => toViewData(exercise, exercise.id, locale))
         .toList(growable: false);
   }
 
-  static ExerciseDetailViewData _toViewData(
+  static ExerciseDetailViewData toViewData(
     ExerciseDetailApiDto exercise,
     String requestedId,
     Locale locale,
