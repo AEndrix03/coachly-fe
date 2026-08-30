@@ -1,4 +1,4 @@
-import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
+import 'package:coachly/features/exercise/domain/exercise_detail_view_data.dart';
 import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/coachly_concept_guide_page.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_info_sheet.dart';

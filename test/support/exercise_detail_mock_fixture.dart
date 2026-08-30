@@ -1,4 +1,4 @@
-import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
+import 'package:coachly/features/exercise/domain/exercise_detail_view_data.dart';
 
 const latPulldownExerciseFixture = ExerciseDetailViewData(
   id: 'lat-pulldown',

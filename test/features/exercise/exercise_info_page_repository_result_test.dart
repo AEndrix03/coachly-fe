@@ -1,16 +1,16 @@
 import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/result/result.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_filter_model/exercise_filter_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_filter_model/exercise_filter_model.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/core/database/app_database.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/local/custom_exercise_dao.dart';
+import 'package:coachly/features/exercise/data/local/custom_exercise_dao.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/time/clock.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/local/exercise_catalog_dao.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_info_page_service.dart';
+import 'package:coachly/features/exercise/data/local/exercise_catalog_dao.dart';
+import 'package:coachly/features/exercise/data/repositories/exercise_info_page_repository_impl.dart';
+import 'package:coachly/features/exercise/data/services/exercise_info_page_service.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 

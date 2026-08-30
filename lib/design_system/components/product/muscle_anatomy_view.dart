@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:coachly/design_system/theme/exercise_theme.dart';
-import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
+import 'package:coachly/features/exercise/domain/exercise_detail_view_data.dart';
 import 'package:flutter/material.dart';
 
 /// Mappa anatomica interattiva con evidenziazione dei muscoli coinvolti.

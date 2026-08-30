@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:coachly/core/network/api_client.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_detail_view_service.dart';
-import 'package:coachly/features/exercise/exercise_info_page/domain/exercise_detail_view_data.dart';
+import 'package:coachly/features/exercise/data/services/exercise_detail_view_service.dart';
+import 'package:coachly/features/exercise/domain/exercise_detail_view_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

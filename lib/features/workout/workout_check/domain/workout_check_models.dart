@@ -1,4 +1,4 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 
 enum WorkoutCheckSeverity { positive, information, review, insufficientData }

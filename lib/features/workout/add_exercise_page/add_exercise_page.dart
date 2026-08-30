@@ -1,12 +1,12 @@
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:async';
 
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_model/exercise_model.dart';
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
+import 'package:coachly/features/workout/data/models/workout_programming_model.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_surface.dart';

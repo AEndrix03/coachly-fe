@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:coachly/features/sessions/data/dto/workout_session_write_command.dart';
-import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
+import 'package:coachly/features/workout/data/dto/workout_write_command.dart';
 
 class WorkoutSessionWriteCommandMapper {
   const WorkoutSessionWriteCommandMapper._();

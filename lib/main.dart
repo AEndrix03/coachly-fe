@@ -48,7 +48,8 @@ class CoachlyApplication extends ConsumerWidget {
       child: _AppSyncBootstrap(
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: context.l10n.commonAppName,
+          onGenerateTitle: (localizedContext) =>
+              localizedContext.l10n.commonAppName,
           scaffoldMessengerKey: appScaffoldMessengerKey,
           theme: AppThemeScheme.lightTheme,
           darkTheme: AppThemeScheme.darkTheme,

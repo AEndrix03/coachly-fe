@@ -1,4 +1,4 @@
-import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
+import 'package:coachly/features/workout/data/models/workout_programming_model.dart';
 
 sealed class RepTarget {
   const RepTarget();

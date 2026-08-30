@@ -1,10 +1,10 @@
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/result/result.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_model/exercise_model.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/repositories/exercise_info_page_repository_impl.dart'
+import 'package:coachly/features/exercise/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_model/exercise_model.dart';
+import 'package:coachly/features/exercise/data/repositories/exercise_info_page_repository_impl.dart'
     show exerciseInfoPageRepositoryProvider;
-import 'package:coachly/features/exercise/exercise_info_page/data/services/exercise_info_page_service.dart';
+import 'package:coachly/features/exercise/data/services/exercise_info_page_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'exercise_info_provider.g.dart';

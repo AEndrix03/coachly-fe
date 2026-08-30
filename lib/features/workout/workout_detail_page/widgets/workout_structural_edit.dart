@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
+import 'package:coachly/features/workout/data/models/workout_programming_model.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_surface.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';

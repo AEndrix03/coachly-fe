@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:coachly/core/ids/id_generator.dart';
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
-import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
-import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
+import 'package:coachly/features/workout/data/mappers/workout_write_command_mapper.dart';
+import 'package:coachly/features/workout/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/features/workout/data/models/workout_programming_model.dart';
+import 'package:coachly/features/workout/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

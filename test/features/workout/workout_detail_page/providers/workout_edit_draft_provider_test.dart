@@ -1,8 +1,8 @@
-import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_detail_model/exercise_detail_model.dart';
 import 'package:coachly/features/workout/workout_detail_page/providers/workout_edit_draft_provider.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_programming_model.dart';
+import 'package:coachly/features/workout/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/features/workout/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/data/models/workout_programming_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

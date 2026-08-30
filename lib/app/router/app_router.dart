@@ -3,7 +3,7 @@ import 'package:coachly/core/flags/feature_flags.dart';
 import 'package:coachly/core/observability/debug_screen.dart';
 import 'package:coachly/features/auth/pages/loading_page/loading_page.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
-import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workout/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/workout_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
