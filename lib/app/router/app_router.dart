@@ -20,8 +20,8 @@ import 'package:coachly/features/exercise/exercise_info_page/presentation/pages/
 import 'package:coachly/features/exercise/personal_exercises_page/personal_exercises_page.dart';
 import 'package:coachly/features/home/home.dart';
 import 'package:coachly/features/profile/profile_page.dart';
-import 'package:coachly/features/workout/workout_active_page/workout_active_page.dart';
-import 'package:coachly/features/workout/workout_active_page/presentation/workout_completion_page.dart';
+import 'package:coachly/features/active_workout/presentation/pages/workout_active_page.dart';
+import 'package:coachly/features/active_workout/presentation/pages/workout_completion_page.dart';
 import 'package:coachly/features/workout/workout_builder/create_workout_flow.dart';
 import 'package:coachly/features/workout/workout_builder/domain/workout_draft.dart';
 import 'package:coachly/features/workout/workout_check/workout_check_page.dart';
