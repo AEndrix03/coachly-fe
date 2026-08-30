@@ -119,5 +119,7 @@ Restano, in ordine:
 2. **Event log delle sessioni** (fase 3.5) — oggi `sessions` salva lo stato
    finale mergiato in un `payload` JSON. È il dataset che giustifica
    l'esistenza del backend, e non viene prodotto.
-3. **Struttura per dominio invece che per schermata** — vedi la coda di
-   `02-project-structure.md`. È il gap più grosso e l'unico non tracciato.
+3. **Presentazione per dominio invece che per schermata** — il data layer è
+   stato riorganizzato per aggregato (`02-project-structure.md`); resta la
+   presentazione, che va spostata mentre si lavora alle schermate, non in
+   un'unica passata.

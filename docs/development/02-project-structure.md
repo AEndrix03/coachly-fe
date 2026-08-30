@@ -138,25 +138,47 @@ appartiene a un controller. Lo stato attuale — `workout_builder_widgets.dart` 
 
 `flutter analyze` è passato da 163 issue a **zero**, e la CI lo tiene lì.
 
-## Quello che resta, ed è il pezzo grosso
+## Il data layer è per aggregato — fatto
 
-Le feature non sono organizzate per dominio ma **per schermata**:
+I data layer vivevano dentro cartelle di **schermata**: sei `data/` sparsi, e
+`workout_page/data/` conteneva insieme schede, sessioni e outbox. Ora sono
+**cinque, uno per aggregato**:
 
 ```
-features/workout/workout_page/{data,application,presentation}
-features/workout/workout_edit_page/data
-features/workout/workout_detail_page/domain
-features/workout/workout_builder/domain
+features/
+├── auth/data/
+├── exercise/data/      ← era exercise_info_page/data/
+├── sessions/data/      ← era dentro workout_page/data/
+├── sync/data/          ← l'outbox: e' trasversale, implementa core/sync
+└── workout/data/       ← assorbe workout_check, workout_edit_page,
+                          workout_active_page e il resto di workout_page
 ```
 
-Otto sottocartelle `workout_*_page`, diverse con un proprio data layer. È la
-violazione della regola "una feature non ha più di un repository per
-aggregato": `workout_page_repository`, `workout_check_repository`,
-`exercise_info_page_repository`, `exercise_detail_view_repository` sono nomi di
-schermate, non di aggregati.
+Due estrazioni meritano una riga di spiegazione, perché non sono meccaniche.
 
-Non è nel piano di migrazione, e va deciso esplicitamente: o si aggiunge una
-fase che riorganizza `features/` per dominio, o si aggiorna questo documento
-alla struttura reale. Lo stato attuale — un documento *Costituzione* che il
-90% delle feature non rispetta, senza che il piano lo menzioni — è la
-situazione che `20-conventions-and-enforcement.md` definisce fallimentare.
+**L'outbox non appartiene ai workout.** Ci finiscono sessioni, schede ed
+esercizi personali (`05-sync-and-offline.md`): stava sotto `workout_page`
+solo perché è lì che è stato scritto per primo. `core/sync` ne dichiara
+l'interfaccia, `features/sync` la implementa, `app/bootstrap` le collega.
+
+**Le sessioni sono un aggregato, non un dettaglio delle schede.** Sono *il
+prodotto* — ciò che l'utente ha davvero fatto — e il doc 04 le vuole come
+event log append-only. Tenerle dentro la feature delle schede rendeva quel
+passo più difficile di quanto sia.
+
+Prima di questo giro `features/voice/` è stata estratta allo stesso modo, e poi
+rimossa del tutto perché non era cablata (vedi `23-voice.md`).
+
+## Quello che resta
+
+**La presentazione è ancora per schermata.** `workout/` contiene otto cartelle
+`workout_*_page`, ognuna con le proprie `providers/`, `widgets/` e a volte
+`domain/`. Non è più il problema che era — non ci sono più data layer
+duplicati né repository che portano il nome di una schermata — ma non è ancora
+la struttura del documento.
+
+È lavoro diverso da quello appena fatto: spostare un DAO non cambia niente per
+l'utente, mentre riorganizzare la presentazione tocca i file più grandi del
+repository (`adaptive_workout_workspace.dart` a 3.854 righe) e va fatto mentre
+si lavora a quelle schermate, non in un'unica passata.
+
