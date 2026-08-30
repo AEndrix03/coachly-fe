@@ -14,7 +14,7 @@ import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_
 import 'package:coachly/features/exercise/providers/exercise_list_provider.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
+import 'package:coachly/features/sessions/data/services/workout_session_sync_service.dart';
 import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';

@@ -9,21 +9,21 @@ import 'package:coachly/core/result/api_response_result.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
+import 'package:coachly/features/sessions/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
-import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
-import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
+import 'package:coachly/features/sync/data/local/outbox_dao.dart';
+import 'package:coachly/features/sessions/data/local/session_dao.dart';
 import 'package:coachly/features/workout/workout_page/data/local/workout_dao.dart';
-import 'package:coachly/features/workout/workout_page/data/mappers/workout_session_write_command_mapper.dart';
+import 'package:coachly/features/sessions/data/mappers/workout_session_write_command_mapper.dart';
 import 'package:coachly/features/workout/workout_page/data/mappers/workout_write_command_mapper.dart';
-import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
+import 'package:coachly/features/sessions/data/models/local_workout_session_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/structured_workout_snapshot_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_stats_model/workout_stats_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
+import 'package:coachly/features/sessions/data/services/workout_session_sync_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// `keepAlive`: il repository e' il confine dei dati e vive quanto il

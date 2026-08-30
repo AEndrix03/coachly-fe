@@ -10,7 +10,7 @@ import 'package:coachly/features/workout/workout_active_page/coach/providers/wor
 import 'package:coachly/features/workout/workout_active_page/providers/active_workout_state.dart';
 import 'package:coachly/features/workout/workout_active_page/providers/rest_timer_provider.dart';
 import 'package:coachly/features/exercise/exercise_info_page/data/models/new/exercise_detail_model/exercise_detail_model.dart';
-import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
+import 'package:coachly/features/sessions/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_exercise_model/workout_exercise_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/repositories/workout_page_repository_impl.dart';

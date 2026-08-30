@@ -1,6 +1,6 @@
-import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
+import 'package:coachly/features/sessions/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
-import 'package:coachly/features/workout/workout_page/data/mappers/workout_session_write_command_mapper.dart';
+import 'package:coachly/features/sessions/data/mappers/workout_session_write_command_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

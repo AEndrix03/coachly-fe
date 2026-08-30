@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/time/clock.dart';
-import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
+import 'package:coachly/features/sync/data/local/outbox_dao.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 

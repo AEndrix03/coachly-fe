@@ -4,17 +4,17 @@ import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/time/clock.dart';
-import 'package:coachly/features/workout/workout_page/data/local/outbox_dao.dart';
-import 'package:coachly/features/workout/workout_page/data/local/session_dao.dart';
+import 'package:coachly/features/sync/data/local/outbox_dao.dart';
+import 'package:coachly/features/sessions/data/local/session_dao.dart';
 import 'package:coachly/features/workout/workout_page/data/local/workout_dao.dart';
-import 'package:coachly/features/workout/workout_page/data/models/local_workout_session_model.dart';
+import 'package:coachly/features/sessions/data/models/local_workout_session_model.dart';
 import 'package:coachly/features/workout/workout_page/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
-import 'package:coachly/features/workout/workout_page/data/services/workout_session_sync_service.dart';
+import 'package:coachly/features/sessions/data/services/workout_session_sync_service.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../../../core/network/fake_dio.dart';
+import '../../../../core/network/fake_dio.dart';
 
 void main() {
   late AppDatabase db;

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:coachly/core/network/api_client.dart';
-import 'package:coachly/features/workout/workout_page/data/dto/workout_session_write_command.dart';
+import 'package:coachly/features/sessions/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/dto/workout_write_command.dart';
 import 'package:coachly/features/workout/workout_page/data/services/workout_page_service.dart';
 import 'package:flutter_test/flutter_test.dart';
