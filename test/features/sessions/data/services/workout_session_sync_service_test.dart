@@ -4,6 +4,10 @@ import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/time/clock.dart';
+import 'package:coachly/core/logging/app_logger.dart';
+import 'package:coachly/features/exercise/data/local/custom_exercise_dao.dart';
+import 'package:coachly/features/exercise/data/models/new/exercise_detail_model/exercise_detail_model.dart';
+import 'package:coachly/features/exercise/data/services/exercise_info_page_service.dart';
 import 'package:coachly/features/sync/data/local/outbox_dao.dart';
 import 'package:coachly/features/sessions/data/local/session_dao.dart';
 import 'package:coachly/features/workout/data/local/workout_dao.dart';
@@ -23,6 +27,8 @@ void main() {
   late SessionDao sessionDao;
   late OutboxDao outboxDao;
   late _FakeWorkoutPageService fakeWorkoutPageService;
+  late _FakeExerciseService fakeExerciseService;
+  late CustomExerciseDao customExerciseDao;
 
   final frozenNow = DateTime.utc(2026, 3, 18, 11);
 
@@ -33,6 +39,8 @@ void main() {
     sessionDao = SessionDao(db);
     outboxDao = OutboxDao(db, clock: clock, random: Random(11));
     fakeWorkoutPageService = _FakeWorkoutPageService();
+    fakeExerciseService = _FakeExerciseService();
+    customExerciseDao = CustomExerciseDao(db, clock, const SilentAppLogger());
   });
 
   tearDown(() => db.close());
@@ -43,6 +51,8 @@ void main() {
       workoutDao: workoutDao,
       outboxDao: outboxDao,
       workoutPageService: fakeWorkoutPageService,
+      exerciseService: fakeExerciseService,
+      customExerciseDao: customExerciseDao,
       isAuthenticatedReader: () => true,
       isOnlineOverride: () async => online,
       clock: clock,
@@ -158,6 +168,84 @@ void main() {
 
     service.dispose();
   });
+
+  test('workout create sale e pulisce dirty', () async {
+    final service = buildService(online: true);
+    const workoutId = '22222222-2222-4222-8222-222222222222';
+    await workoutDao.upsert(_buildWorkout(id: workoutId, dirty: true));
+    await outboxDao.enqueue(
+      id: 'o1',
+      entityType: 'workout',
+      entityId: workoutId,
+      operation: 'create',
+      payload: '{"id":"$workoutId","name":"Offline","blocks":[]}',
+    );
+
+    await service.syncPendingSessions(trigger: 'test_workout_create');
+
+    expect(fakeWorkoutPageService.createCalls, 1);
+    expect((await workoutDao.getWorkout(workoutId))!.dirty, isFalse);
+    expect(
+      OutboxStatus.fromValue((await outboxDao.getById('o1'))!.status),
+      OutboxStatus.sent,
+    );
+    service.dispose();
+  });
+
+  test('workout delete viene purgato solo dopo la conferma remota', () async {
+    final service = buildService(online: true);
+    await workoutDao.upsert(_buildWorkout(id: 'workout-1', dirty: true));
+    await outboxDao.enqueue(
+      id: 'o1',
+      entityType: 'workout',
+      entityId: 'workout-1',
+      operation: 'delete',
+      payload: '{}',
+    );
+
+    await service.syncPendingSessions(trigger: 'test_workout_delete');
+
+    expect(fakeWorkoutPageService.deleteCalls, 1);
+    expect(await workoutDao.getWorkout('workout-1'), isNull);
+    service.dispose();
+  });
+
+  test(
+    'custom exercise create e delete convergono dalla stessa coda',
+    () async {
+      final service = buildService(online: true);
+      const exerciseId = '33333333-3333-4333-8333-333333333333';
+      await customExerciseDao.upsert(
+        const ExerciseDetailModel(
+          id: exerciseId,
+          isPersonal: true,
+          nameI18n: {'it': 'Offline'},
+        ),
+      );
+      await outboxDao.enqueue(
+        id: 'o1',
+        entityType: 'custom_exercise',
+        entityId: exerciseId,
+        operation: 'create',
+        payload: '{"id":"$exerciseId","nameI18n":{"it":"Offline"}}',
+      );
+      clock.advance(const Duration(seconds: 1));
+      await outboxDao.enqueue(
+        id: 'o2',
+        entityType: 'custom_exercise',
+        entityId: exerciseId,
+        operation: 'delete',
+        payload: '{}',
+      );
+
+      await service.syncPendingSessions(trigger: 'test_exercise_lifecycle');
+
+      expect(fakeExerciseService.createCalls, 1);
+      expect(fakeExerciseService.deleteCalls, 1);
+      expect(await db.select(db.customExercises).get(), isEmpty);
+      service.dispose();
+    },
+  );
 }
 
 LocalWorkoutSession _buildLocalSession({
@@ -218,10 +306,26 @@ class _FakeWorkoutPageService extends WorkoutPageService {
 
   int uploadCalls = 0;
   int patchCalls = 0;
+  int createCalls = 0;
+  int deleteCalls = 0;
   final List<String> callSequence = [];
 
   ApiResponse<void> uploadResponse = ApiResponse.success();
   ApiResponse<void> patchResponse = ApiResponse.success();
+
+  @override
+  Future<ApiResponse<void>> createWorkoutPayload(
+    Map<String, dynamic> commandPayload,
+  ) async {
+    createCalls += 1;
+    return ApiResponse.success();
+  }
+
+  @override
+  Future<ApiResponse<void>> deleteWorkout(String workoutId) async {
+    deleteCalls += 1;
+    return ApiResponse.success();
+  }
 
   @override
   Future<ApiResponse<void>> saveWorkoutSessionPayload(
@@ -249,5 +353,29 @@ class _FakeWorkoutPageService extends WorkoutPageService {
     return ApiResponse.success(
       data: [_buildWorkout(id: 'workout-1', dirty: false)],
     );
+  }
+}
+
+class _FakeExerciseService extends ExerciseInfoPageService {
+  _FakeExerciseService()
+    : super(
+        ApiClient(dio: fakeDio(FakeDioAdapter()), baseUrl: 'https://localhost'),
+      );
+
+  int createCalls = 0;
+  int deleteCalls = 0;
+
+  @override
+  Future<ApiResponse<void>> createPersonalExercisePayload(
+    Map<String, dynamic> body,
+  ) async {
+    createCalls += 1;
+    return ApiResponse.success();
+  }
+
+  @override
+  Future<ApiResponse<void>> deletePersonalExercise(String exerciseId) async {
+    deleteCalls += 1;
+    return ApiResponse.success();
   }
 }

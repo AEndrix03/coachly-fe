@@ -178,6 +178,15 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
         if (detail case Ok(:final value)) details.add(value);
       }
       for (final detail in details) {
+        final id = detail.id;
+        if (id != null &&
+            await _outbox?.hasPendingForEntity(
+                  entityType: 'custom_exercise',
+                  entityId: id,
+                ) ==
+                true) {
+          continue;
+        }
         await _customExercises.upsert(detail);
       }
     }

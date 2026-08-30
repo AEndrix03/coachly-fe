@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:coachly/features/exercise/data/repositories/exercise_info_page_repository_impl.dart';
 import 'package:coachly/core/config/app_config.dart';
 import 'package:coachly/core/database/app_database.dart';
@@ -97,8 +95,10 @@ class AppDataSyncService {
       return;
     }
 
-    unawaited(
-      _sessionSyncService.syncPendingSessions(trigger: 'authenticated_access'),
+    // Push prima del pull: evita che una risposta remota vecchia attraversi
+    // la finestra tra la scrittura locale e lo svuotamento dell'outbox.
+    await _sessionSyncService.syncPendingSessions(
+      trigger: 'authenticated_access',
     );
 
     final operation = _runFullSync();

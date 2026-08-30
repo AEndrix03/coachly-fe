@@ -87,7 +87,7 @@ class WorkoutSessionSyncService {
   final void Function() _invalidateWorkoutCaches;
   final Future<bool> Function()? _isOnlineOverride;
 
-  bool _isSyncing = false;
+  Future<void>? _activeSync;
   Timer? _retryTimer;
 
   WorkoutSessionSyncService({
@@ -117,9 +117,8 @@ class WorkoutSessionSyncService {
   static void _noop() {}
 
   Future<void> syncPendingSessions({String trigger = 'manual'}) async {
-    if (_isSyncing) {
-      return;
-    }
+    final running = _activeSync;
+    if (running != null) return running;
 
     if (!_isAuthenticatedReader()) {
       _logger.debug(
@@ -138,32 +137,32 @@ class WorkoutSessionSyncService {
       return;
     }
 
-    _isSyncing = true;
+    final operation = _drainPending();
+    _activeSync = operation;
     try {
-      // FIFO: l'ordine di creazione e' l'ordine di invio.
-      final rows = await _outboxDao.pendingOrdered();
-      final now = _clock.nowUtc();
-
-      for (final row in rows) {
-        final nextAttemptAt = row.nextAttemptAt;
-        if (nextAttemptAt != null && nextAttemptAt.isAfter(now)) {
-          continue;
-        }
-
-        final outcome = await switch (row.entityType) {
-          sessionEntityType => _syncSessionRow(row),
-          'workout' => _syncWorkoutRow(row),
-          'custom_exercise' => _syncCustomExerciseRow(row),
-          _ => _markUnsupported(row),
-        };
-        if (outcome == _SyncOutcome.transientFailure) {
-          // FIFO semantics: stop and retry later.
-          break;
-        }
-      }
+      await operation;
     } finally {
-      _isSyncing = false;
+      if (identical(_activeSync, operation)) _activeSync = null;
       await scheduleRetryIfNeeded();
+    }
+  }
+
+  Future<void> _drainPending() async {
+    // FIFO: l'ordine di creazione e' l'ordine di invio.
+    final rows = await _outboxDao.pendingOrdered();
+    final now = _clock.nowUtc();
+
+    for (final row in rows) {
+      final nextAttemptAt = row.nextAttemptAt;
+      if (nextAttemptAt != null && nextAttemptAt.isAfter(now)) continue;
+
+      final outcome = await switch (row.entityType) {
+        sessionEntityType => _syncSessionRow(row),
+        'workout' => _syncWorkoutRow(row),
+        'custom_exercise' => _syncCustomExerciseRow(row),
+        _ => _markUnsupported(row),
+      };
+      if (outcome == _SyncOutcome.transientFailure) break;
     }
   }
 
@@ -262,10 +261,15 @@ class WorkoutSessionSyncService {
 
     await _setSessionState(currentSession, LocalWorkoutSessionSyncState.synced);
     await _outboxDao.markSent(row.id);
-    await _workoutDao.markSynced(
-      currentSession.workoutId,
-      updatedAt: _clock.nowUtc(),
-    );
+    if (!await _outboxDao.hasPendingForEntity(
+      entityType: 'workout',
+      entityId: currentSession.workoutId,
+    )) {
+      await _workoutDao.markSynced(
+        currentSession.workoutId,
+        updatedAt: _clock.nowUtc(),
+      );
+    }
     await _refreshWorkoutCacheFromRemote();
     return _SyncOutcome.success;
   }
@@ -288,7 +292,11 @@ class WorkoutSessionSyncService {
     }
     if (row.operation == 'delete') {
       await _workoutDao.deleteWorkout(row.entityId);
-    } else {
+    } else if (!await _outboxDao.hasPendingForEntity(
+      entityType: 'workout',
+      entityId: row.entityId,
+      excludingId: row.id,
+    )) {
       await _workoutDao.markSynced(row.entityId, updatedAt: _clock.nowUtc());
     }
     await _outboxDao.markSent(row.id);

@@ -124,6 +124,27 @@ class OutboxDao extends DatabaseAccessor<AppDatabase> with _$OutboxDaoMixin {
     return query.getSingleOrNull();
   }
 
+  Future<bool> hasPendingForEntity({
+    required String entityType,
+    required String entityId,
+    String? excludingId,
+  }) async {
+    final query = select(outbox)
+      ..where(
+        (row) =>
+            row.entityType.equals(entityType) &
+            row.entityId.equals(entityId) &
+            row.status.isIn([
+              OutboxStatus.pending.value,
+              OutboxStatus.sending.value,
+            ]),
+      );
+    if (excludingId != null) {
+      query.where((row) => row.id.equals(excludingId).not());
+    }
+    return (await query.get()).isNotEmpty;
+  }
+
   /// L'istante piu' vicino in cui vale la pena ritentare, se esiste.
   Future<DateTime?> earliestNextAttemptAt() async {
     final rows = await pendingOrdered();
