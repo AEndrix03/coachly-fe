@@ -7,17 +7,17 @@ import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/auth/providers/auth_provider.dart';
-import 'package:coachly/features/exercise/data/local/custom_exercise_dao.dart';
-import 'package:coachly/features/exercise/data/services/exercise_info_page_service.dart';
-import 'package:coachly/features/exercise/exercise_info_page/providers/exercise_info_provider/exercise_info_provider.dart'
+import 'package:coachly/features/exercises/data/local/custom_exercise_dao.dart';
+import 'package:coachly/features/exercises/data/services/exercise_info_page_service.dart';
+import 'package:coachly/features/exercises/application/exercise_info_provider.dart'
     show exerciseInfoPageServiceProvider;
 import 'package:coachly/features/sync/data/local/outbox_dao.dart';
 import 'package:coachly/features/sessions/data/local/session_dao.dart';
-import 'package:coachly/features/workout/data/local/workout_dao.dart';
+import 'package:coachly/features/workouts/data/local/workout_dao.dart';
 import 'package:coachly/features/sessions/data/models/local_workout_session_model.dart';
-import 'package:coachly/features/workout/data/services/workout_page_service.dart';
-import 'package:coachly/features/workout/workout_page/providers/workout_list_provider/workout_list_provider.dart';
-import 'package:coachly/features/workout/workout_page/providers/workout_stats_provider/workout_stats_provider.dart';
+import 'package:coachly/features/workouts/data/services/workout_page_service.dart';
+import 'package:coachly/features/workouts/application/workout_list_provider.dart';
+import 'package:coachly/features/workouts/application/workout_stats_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,5 +1,5 @@
-import 'package:coachly/features/workout/data/models/workout_exercise_model/workout_exercise_model.dart';
-import 'package:coachly/features/workout/data/models/workout_model/workout_model.dart';
+import 'package:coachly/features/workouts/data/models/workout_exercise_model/workout_exercise_model.dart';
+import 'package:coachly/features/workouts/data/models/workout_model/workout_model.dart';
 import 'package:coachly/features/active_workout/domain/set_input_configuration.dart';
 
 enum ActiveWorkoutStatus { loading, active, saving, saved, error }

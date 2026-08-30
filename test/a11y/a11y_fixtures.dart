@@ -1,4 +1,4 @@
-import 'package:coachly/features/workout/workout_detail_page/domain/workout_detail_view_data.dart';
+import 'package:coachly/features/workouts/domain/workout_detail_view_data.dart';
 
 /// Una scheda realistica: due sezioni, un superset, note e prescrizioni.
 ///
