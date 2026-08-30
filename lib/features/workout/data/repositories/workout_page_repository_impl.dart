@@ -88,11 +88,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
 
   @override
   Future<Result<List<WorkoutModel>, Failure>> getWorkouts() async {
-    final localWorkouts = await _workoutDao.getWorkouts();
-    if (localWorkouts.isNotEmpty) {
-      return Ok(localWorkouts);
-    }
-    return _performRefreshFromRemote();
+    return Ok(await _workoutDao.getWorkouts());
   }
 
   @override
@@ -146,11 +142,7 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
   @override
   Future<Result<WorkoutModel?, Failure>> getWorkout(String workoutId) async {
     try {
-      var workout = await _workoutDao.getWorkout(workoutId);
-      if (workout == null) {
-        await refreshFromRemote();
-        workout = await _workoutDao.getWorkout(workoutId);
-      }
+      final workout = await _workoutDao.getWorkout(workoutId);
 
       if (workout != null) return Ok(workout);
       return const Err(NotFoundFailure('Workout not in local cache'));
@@ -302,7 +294,19 @@ class WorkoutPageRepositoryImpl implements IWorkoutPageRepository {
     // [updateWorkout]. Questo metodo resta come ponte per i chiamanti durante
     // la migrazione e si limita a sollecitare la coda.
     await _sessionSyncService.syncPendingSessions(trigger: 'patch_workout');
-    return const Ok(null);
+    final latest = await _outboxDao.latestForEntity(
+      entityType: 'workout',
+      entityId: workoutId,
+    );
+    return switch (OutboxStatus.fromValue(latest?.status)) {
+      OutboxStatus.sent => const Ok(null),
+      OutboxStatus.failedPermanent => const Err(
+        ServerFailure('Workout sync failed permanently'),
+      ),
+      _ => const Err(
+        NotAvailableOfflineFailure('Workout saved locally and queued'),
+      ),
+    };
   }
 
   @override

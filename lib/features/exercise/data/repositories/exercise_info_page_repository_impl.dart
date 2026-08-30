@@ -443,10 +443,10 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
   /// Ritorna un `Result` invece di lanciare: il fallimento del riempimento è
   /// il fallimento della lettura che lo ha richiesto.
   Future<Result<void, Failure>> _ensureLocalCache() async {
-    if (!await _catalog.isEmpty()) return const Ok(null);
-
-    final refreshed = await refreshFromRemoteResult();
-    return refreshed.map((_) {});
+    // Le letture non aprono mai una richiesta HTTP. Il bootstrap applicativo
+    // aggiorna il catalogo esplicitamente; nel frattempo una cache vuota e'
+    // uno stato locale valido, non un motivo per bloccare la UI sulla rete.
+    return const Ok(null);
   }
 }
 

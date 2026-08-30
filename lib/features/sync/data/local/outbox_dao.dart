@@ -124,6 +124,23 @@ class OutboxDao extends DatabaseAccessor<AppDatabase> with _$OutboxDaoMixin {
     return query.getSingleOrNull();
   }
 
+  Future<OutboxRow?> latestForEntity({
+    required String entityType,
+    required String entityId,
+  }) {
+    final query = select(outbox)
+      ..where(
+        (row) =>
+            row.entityType.equals(entityType) & row.entityId.equals(entityId),
+      )
+      ..orderBy([
+        (row) => OrderingTerm.desc(row.createdAt),
+        (row) => OrderingTerm.desc(row.id),
+      ])
+      ..limit(1);
+    return query.getSingleOrNull();
+  }
+
   Future<bool> hasPendingForEntity({
     required String entityType,
     required String entityId,

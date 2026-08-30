@@ -93,14 +93,6 @@ void main() {
   const detail = ExerciseDetailModel(id: 'squat');
   const summary = ExerciseModel(id: 'squat');
 
-  /// Ciò che il catalogo restituisce dopo un giro dal database: i campi
-  /// booleani filtrabili hanno un default di colonna, non restano `null`.
-  const storedSummary = ExerciseModel(
-    id: 'squat',
-    isUnilateral: false,
-    isBodyweight: false,
-  );
-
   setUp(() {
     service = _FakeService();
     db = AppDatabase(NativeDatabase.memory());
@@ -230,28 +222,26 @@ void main() {
   });
 
   group('letture di catalogo', () {
-    test('la cache vuota viene popolata dalla rete', () async {
+    test('la cache vuota risponde subito senza rete', () async {
       service.allExercisesResponse = ApiResponse.success(data: [summary]);
 
       final result = await repository.getExerciseSummariesResult();
 
-      expect(result.valueOrNull, [storedSummary]);
-      expect(service.allExercisesCalls, 1);
+      expect(result.valueOrNull, isEmpty);
+      expect(service.allExercisesCalls, 0);
     });
 
-    test(
-      'il fallimento del riempimento e il fallimento della lettura',
-      () async {
-        service.allExercisesResponse = ApiResponse.error(
-          message: 'down',
-          statusCode: 503,
-        );
+    test('un errore remoto non entra nel percorso di lettura', () async {
+      service.allExercisesResponse = ApiResponse.error(
+        message: 'down',
+        statusCode: 503,
+      );
 
-        final result = await repository.getExerciseSummariesResult();
+      final result = await repository.getExerciseSummariesResult();
 
-        expect(result.failureOrNull, isA<ServerFailure>());
-      },
-    );
+      expect(result.valueOrNull, isEmpty);
+      expect(service.allExercisesCalls, 0);
+    });
 
     test('refreshFromRemoteResult propaga il Failure di rete', () async {
       service.allExercisesResponse = ApiResponse.error(
@@ -283,10 +273,11 @@ void main() {
       isBodyweight: true,
     );
 
-    setUp(() {
+    setUp(() async {
       service.allExercisesResponse = ApiResponse.success(
         data: const [barbellRow, bodyweightRow],
       );
+      await catalog.upsertSummaries(const [barbellRow, bodyweightRow]);
     });
 
     test('con la cache attiva un filtro non testuale trova comunque', () async {
@@ -297,8 +288,8 @@ void main() {
       );
 
       expect(result.valueOrNull?.map((exercise) => exercise.id), ['push-up']);
-      // La rete è stata toccata una volta sola, per riempire la cache vuota.
-      expect(service.allExercisesCalls, 1);
+      // Le letture filtrate non toccano la rete: il refresh e' del bootstrap.
+      expect(service.allExercisesCalls, 0);
     });
 
     test('il filtro per difficoltà restringe la lista', () async {
