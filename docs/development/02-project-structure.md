@@ -107,9 +107,20 @@ Un file oltre le **400 righe** richiede una motivazione nel PR; oltre le **800**
 va diviso.
 
 Non è estetica: è il segnale più affidabile che un widget ha assorbito logica che
-appartiene a un controller. Lo stato attuale — `workout_builder_widgets.dart` a
-2495 righe, `exercise_info_page.dart` a 1530, `exercise_picker_sheet.dart` a 1443
-— è la lista dei posti dove questa architettura non esiste ancora.
+appartiene a un controller.
+
+La regola è enunciata dal primo giorno e **non è mai stata controllata**. Il
+risultato è quello prevedibile: i tre file citati qui come esempio sono
+diventati **tredici**, e due dei tre sono cresciuti nel frattempo. Il peggiore
+è `adaptive_workout_workspace.dart`, 3909 righe e 46 classi — la schermata che
+cambia più spesso di tutte.
+
+Da ora `test/tooling/file_size_test.dart` la verifica, con l'elenco dei tredici
+dichiarato riga per riga. Il test non chiude il debito: chiuderlo è lavoro di
+design, un file per volta, ed è giusto che avvenga quando quel file si tocca.
+Fa la cosa che serviva di più — **impedisce che cresca di nascosto**. Un file
+nuovo oltre soglia fallisce; e un file dell'elenco che scende sotto soglia
+fallisce a sua volta, così l'elenco non sopravvive al debito che descriveva.
 
 ## Cartelle vietate
 

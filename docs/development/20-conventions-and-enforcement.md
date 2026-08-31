@@ -75,12 +75,35 @@ invece di essere contata. Il job ora blocca.
 | `no_cross_feature_presentation` | 0 | 10 | 01 D4 |
 | `no_data_layer_in_presentation` | 0 | 3 → 23 | 01 D1 |
 | `no_side_effects_in_build` | 0 | 0 | 03 |
-| `no_raw_datetime_now` | 0 | — | 19 |
+| `no_raw_datetime_now` | 0 (5 con `ignore` motivato) | — | 19 |
 | `no_material_in_application` | 0 | 1 | 01 D2 |
 | `no_data_source_outside_repository` | 0 | — | 01 D6 |
 | `no_non_material_icons` | 0 | 2 | 12, ADR-003 |
 | `no_manual_uuid` | 0 | 3 | 05 |
 | `no_literal_text_style` | 0 (4 con `ignore` motivato) | 188 | 09 |
+
+### Due regole che non potevano fallire
+
+Prima di fidarsi di uno zero conviene chiedersi se la regola *può* fallire.
+Due non potevano:
+
+- `no_raw_datetime_now` ascoltava solo `addMethodInvocation`. Ma
+  `DateTime.now()` è un **costruttore con nome**: nell'AST è una
+  `InstanceCreationExpression`. La regola riportava zero violazioni con
+  trentacinque `DateTime.now()` nel codice.
+- `no_side_effects_in_build` aveva lo stesso difetto: `Future.microtask(...)`
+  e `Future.delayed(...)` sono costruttori factory. Degli esempi citati
+  testualmente in `03-state-riverpod.md` non ne intercettava nessuno; restava
+  viva solo la parte su `unawaited`.
+
+Entrambe riparate, ed entrambe verificate iniettando una violazione finta e
+controllando che venisse segnalata — perché il modo in cui questo difetto è
+nato è appunto non averlo mai fatto.
+
+Le trentacinque letture dell'orologio che la prima nascondeva sono ora
+`Clock` iniettabile, oppure `UuidIdGenerator` dove servivano solo a fabbricare
+un id. Ne restano cinque, tutte ripieghi per un payload senza timestamp, tutte
+con `ignore` e motivo scritto.
 
 Come ci si è arrivati, in ordine di resa:
 

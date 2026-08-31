@@ -40,9 +40,22 @@ esatto da lanciare.
   Dio, `core/time/Clock`, `core/ids`, `Result<T, Failure>`, `AppLogger`, il
   `RequestCoalescer`, l'outbox, `core/flags`, `core/analytics`,
   `core/observability` (con debug screen su `/debug`), i file ARB con
-  `context.l10n`. **Non** esistono ancora: `context.colors`, il catalogo
-  pre-seeded, l'event log delle sessioni.
-- Il debito di lint residuo è `no_literal_text_style`, 188 occorrenze, e si
-  assorbe schermata per schermata.
+  `context.l10n`, e il componente unico dell'attesa
+  (`CoachlyLoading`, `docs/development/27-loading.md`). **Non** esistono ancora:
+  `context.colors`, il catalogo pre-seeded, l'event log delle sessioni.
+- **`custom_lint` è a 0 su tutto il repository**, e il job di CI che lo
+  misurava ora blocca. Attenzione: due regole erano scritte male e non
+  scattavano mai — `no_raw_datetime_now` e `no_side_effects_in_build`
+  guardavano `MethodInvocation`, ma `DateTime.now()` e `Future.microtask()`
+  sono costruttori. Riparate, e le violazioni che nascondevano sono chiuse.
+- Le feature seguono i quattro livelli (`application`, `data`, `domain`,
+  `presentation`): non esistono più `pages/`, `providers/` o `<schermata>_page/`
+  a livello di feature.
+- **Debito dichiarato**: tredici file superano le 800 righe di
+  `02-project-structure.md`. Sono elencati in `test/tooling/file_size_test.dart`,
+  che impedisce che l'elenco cresca ma non lo chiude: si chiude dividendo un
+  file per volta, quando lo si tocca.
+- La documentazione di prodotto — cosa fa ogni schermata e perché — sta in
+  `docs/product/`.
 - `docs/` è escluso dal `.gitignore` globale dell'utente e ri-abilitato dal
   `.gitignore` di questo repository.
