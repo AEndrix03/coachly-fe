@@ -35,6 +35,21 @@ class NoRawDateTimeNow extends DartLintRule {
     if (isGenerated(path) || isTest(path)) return;
     if (path.replaceAll(r'\', '/').contains('/lib/core/time/')) return;
 
+    // `DateTime.now()` e' un costruttore con nome, non una chiamata di
+    // metodo: nell'AST e' una `InstanceCreationExpression`. Ascoltare solo
+    // `addMethodInvocation` — come faceva la prima versione di questa regola —
+    // significa non trovare mai niente, ed e' esattamente quello che e'
+    // successo: il lint riportava zero violazioni con venti `DateTime.now()`
+    // nel codice. Una regola che non puo' fallire non e' una regola.
+    context.registry.addInstanceCreationExpression((node) {
+      final type = node.constructorName.type.name2.lexeme;
+      final name = node.constructorName.name?.name;
+      if (type == 'DateTime' && name == 'now') {
+        reporter.atNode(node, _code);
+      }
+    });
+
+    // Resta per i casi in cui `now` arriva da un alias o da un'estensione.
     context.registry.addMethodInvocation((node) {
       if (node.methodName.name != 'now') return;
       final target = node.target;

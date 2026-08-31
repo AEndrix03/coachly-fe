@@ -1,6 +1,6 @@
 import 'package:coachly/features/auth/data/models/user_model/user_model.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
-import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user_provider.g.dart';

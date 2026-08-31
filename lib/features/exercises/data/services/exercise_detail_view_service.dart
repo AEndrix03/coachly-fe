@@ -2,7 +2,9 @@ import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/features/exercises/data/models/exercise_detail_api_dto.dart';
 import 'package:coachly/features/exercises/domain/exercise_detail_view_data.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
-import 'package:flutter/material.dart';
+// `Locale` vive in `dart:ui`: il data layer non dipende da Flutter
+// (`docs/development/01-principles.md`, dependency rule D2).
+import 'dart:ui' show Locale;
 
 abstract interface class ExerciseDetailViewService {
   Future<ExerciseDetailViewData> fetch(String exerciseId, Locale locale);

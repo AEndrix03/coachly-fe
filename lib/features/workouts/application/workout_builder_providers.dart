@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/features/user_settings/application/settings_provider.dart';
 import 'package:coachly/features/workouts/domain/workout_draft.dart';
 import 'package:coachly/features/workouts/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
@@ -440,7 +440,6 @@ class CreateWorkoutController extends _$CreateWorkoutController
       return null;
     }
     state = state.copyWith(isSaving: false, baseline: state.draft);
-    ref.invalidate(workoutListProvider);
     return workout;
   }
 }

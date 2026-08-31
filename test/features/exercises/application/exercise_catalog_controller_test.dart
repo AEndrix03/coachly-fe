@@ -12,10 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// questi test lo dicono subito.
 void main() {
   test('inoltra la lettura locale senza toccarla', () async {
-    final detail = ExerciseDetailModel(
-      id: 'e1',
-      nameI18n: const {'it': 'Squat'},
-    );
+    const detail = ExerciseDetailModel(id: 'e1', nameI18n: {'it': 'Squat'});
     final repository = _RecordingRepository(downloaded: [detail]);
     final controller = ExerciseCatalogController(repository);
 
@@ -63,7 +60,7 @@ class _RecordingRepository implements IExerciseInfoPageRepository {
     Result<ExerciseDetailModel, Failure>? detail,
   }) : _detail =
            detail ??
-           Ok(ExerciseDetailModel(id: 'e1', nameI18n: const {'it': 'Squat'}));
+           const Ok(ExerciseDetailModel(id: 'e1', nameI18n: {'it': 'Squat'}));
 
   final List<ExerciseDetailModel> downloaded;
   final Result<ExerciseDetailModel, Failure> _detail;

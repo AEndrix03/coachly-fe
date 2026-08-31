@@ -8,7 +8,7 @@ import 'package:coachly/features/exercises/data/repositories/exercise_info_page_
 import 'package:coachly/features/exercises/data/repositories/exercise_detail_view_repository.dart';
 import 'package:coachly/features/exercises/data/services/exercise_detail_view_service.dart';
 import 'package:coachly/features/exercises/domain/exercise_detail_view_data.dart';
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/features/user_settings/application/settings_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final exerciseDetailViewRepositoryProvider =

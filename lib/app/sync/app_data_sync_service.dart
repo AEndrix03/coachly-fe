@@ -5,7 +5,7 @@ import 'package:coachly/core/time/clock.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
 import 'package:coachly/features/auth/data/utils/jwt_validator.dart';
-import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository.dart';
 import 'package:coachly/features/exercises/application/exercise_detail_view_provider.dart';
 import 'package:coachly/features/exercises/application/exercise_info_provider.dart';
@@ -13,7 +13,6 @@ import 'package:coachly/features/exercises/application/exercise_list_provider.da
 import 'package:coachly/features/workouts/data/repositories/workout_page_repository.dart';
 import 'package:coachly/features/workouts/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/sessions/data/services/workout_session_sync_service.dart';
-import 'package:coachly/features/workouts/application/workout_list_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -121,8 +120,9 @@ class AppDataSyncService {
         _lastSyncKey,
         _clock.nowUtc().toIso8601String(),
       );
-      _ref.invalidate(workoutListProvider);
-      _ref.invalidate(recentWorkoutsProvider);
+      // La lista schede non si invalida: la sync ha scritto su Drift e lo
+      // stream riemette da solo. Il catalogo esercizi si', perche' i suoi
+      // provider sono ancora letture una-tantum su un servizio.
       _ref.invalidate(exerciseInfoProvider);
       _ref.invalidate(exerciseDetailCatalogProvider);
       _ref.invalidate(exerciseListProvider);

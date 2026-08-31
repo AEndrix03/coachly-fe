@@ -1,7 +1,7 @@
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
-import 'package:coachly/features/auth/providers/auth_provider.dart';
-import 'package:coachly/features/auth/providers/user_provider.dart';
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/features/auth/application/auth_provider.dart';
+import 'package:coachly/features/auth/application/user_provider.dart';
+import 'package:coachly/features/user_settings/application/settings_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:coachly/shared/widgets/app_dialogs.dart';
 import 'package:coachly/shared/widgets/headers/page_header.dart';

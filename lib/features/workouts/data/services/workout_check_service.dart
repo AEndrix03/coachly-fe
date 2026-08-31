@@ -1,3 +1,4 @@
+import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
 import 'package:coachly/features/workouts/domain/workout_draft.dart';
@@ -8,7 +9,13 @@ class WorkoutCheckService {
   final IExerciseInfoPageRepository exerciseCache;
   final List<WorkoutCheckRule> rules;
 
-  WorkoutCheckService(this.exerciseCache)
+  /// Il report dichiara *quando* e' stato calcolato, e quel timestamp e' parte
+  /// del suo significato: un rilievo vale per una revisione precisa della
+  /// bozza in un momento preciso. Con l'orologio di sistema cablato non era
+  /// verificabile (`docs/development/19-testing.md`).
+  final Clock clock;
+
+  WorkoutCheckService(this.exerciseCache, {this.clock = const SystemClock()})
     : rules = [
         MuscleCoverageRule(),
         MovementPatternRule(),
@@ -51,7 +58,7 @@ class WorkoutCheckService {
           : details.isEmpty
           ? WorkoutCheckDataQuality.insufficient
           : WorkoutCheckDataQuality.partial,
-      generatedAt: DateTime.now(),
+      generatedAt: clock.now(),
       draftRevision:
           '${draft.exerciseCount}-${draft.workingSets}-${draft.sections.length}',
       muscleSetExposure: exposure,

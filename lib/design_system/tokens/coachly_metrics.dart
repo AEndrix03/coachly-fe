@@ -126,6 +126,21 @@ class CoachlyMotion {
   final Duration deliberate;
   final Duration confirmHold;
 
+  /// Quanto si aspetta prima di ammettere che si sta caricando.
+  ///
+  /// Sotto questa soglia un indicatore fa piu' danno che informazione: appare
+  /// e sparisce, e l'occhio legge il lampo come un errore. In una app
+  /// local-first la maggior parte delle letture finisce prima
+  /// (`docs/development/04-local-first.md`), quindi nel caso normale un
+  /// indicatore non deve proprio comparire.
+  final Duration loadingDelay;
+
+  /// Quanto resta visibile, una volta comparso.
+  ///
+  /// Senza questo, un'attesa di 310 ms mostrerebbe l'indicatore per 10 ms:
+  /// il lampo che `loadingDelay` serviva a evitare, spostato piu' in la'.
+  final Duration loadingMinimum;
+
   final Curve enter;
   final Curve exit;
   final Curve standardCurve;
@@ -138,6 +153,8 @@ class CoachlyMotion {
     this.slow = const Duration(milliseconds: 280),
     this.deliberate = const Duration(milliseconds: 500),
     this.confirmHold = const Duration(seconds: 2),
+    this.loadingDelay = const Duration(milliseconds: 300),
+    this.loadingMinimum = const Duration(milliseconds: 450),
     this.enter = Curves.easeOutCubic,
     this.exit = Curves.easeInCubic,
     this.standardCurve = Curves.easeOutCubic,

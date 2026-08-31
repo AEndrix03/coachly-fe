@@ -423,7 +423,6 @@ class WorkoutEditDraft extends _$WorkoutEditDraft {
       savedOffline: true,
       clearError: true,
     );
-    ref.invalidate(workoutListProvider);
     unawaited(_sync(updated));
     return updated;
   }
@@ -433,7 +432,6 @@ class WorkoutEditDraft extends _$WorkoutEditDraft {
     final command = WorkoutWriteCommandMapper.fromWorkoutModel(updated);
     final response = await repository.patchWorkout(updated.id, command);
     if (response.isOk) {
-      ref.invalidate(workoutListProvider);
       if (state.source?.id == updated.id) {
         state = state.copyWith(savedOffline: false);
       }

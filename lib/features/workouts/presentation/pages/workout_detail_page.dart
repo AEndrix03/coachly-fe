@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/features/user_settings/application/settings_provider.dart';
 import 'package:coachly/features/workouts/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workouts/application/workout_edit_draft_provider.dart';
 import 'package:coachly/features/workouts/application/workout_detail_view_provider.dart';
@@ -224,7 +224,6 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
     if (!mounted || updated == null) return;
     setState(() => _latestWorkout = updated);
     _showSaveConfirmation();
-    ref.invalidate(workoutListProvider);
   }
 
   Future<void> _saveAndFinish() async {

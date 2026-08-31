@@ -6,7 +6,7 @@ import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/core/time/clock.dart';
-import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:coachly/features/exercises/data/local/custom_exercise_dao.dart';
 import 'package:coachly/features/exercises/data/services/exercise_info_page_service.dart';
 import 'package:coachly/features/exercises/application/exercise_info_provider.dart'
@@ -16,8 +16,6 @@ import 'package:coachly/features/sessions/data/local/session_dao.dart';
 import 'package:coachly/features/workouts/data/local/workout_dao.dart';
 import 'package:coachly/features/sessions/domain/models/local_workout_session_model.dart';
 import 'package:coachly/features/workouts/data/services/workout_page_service.dart';
-import 'package:coachly/features/workouts/application/workout_list_provider.dart';
-import 'package:coachly/features/workouts/application/workout_stats_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,11 +35,6 @@ final workoutSessionSyncServiceProvider = Provider<WorkoutSessionSyncService>((
       final authState = ref.read(authProvider).asData?.value;
       return authState?.isAuthenticated == true &&
           authState?.isTokenValid == true;
-    },
-    invalidateWorkoutCaches: () {
-      ref.invalidate(workoutListProvider);
-      ref.invalidate(recentWorkoutsProvider);
-      ref.invalidate(workoutStatsProvider);
     },
   );
 
@@ -84,7 +77,6 @@ class WorkoutSessionSyncService {
   final Clock _clock;
   final AppLogger _logger;
   final bool Function() _isAuthenticatedReader;
-  final void Function() _invalidateWorkoutCaches;
   final Future<bool> Function()? _isOnlineOverride;
 
   Future<void>? _activeSync;
@@ -98,7 +90,6 @@ class WorkoutSessionSyncService {
     ExerciseInfoPageService? exerciseService,
     CustomExerciseDao? customExerciseDao,
     required bool Function() isAuthenticatedReader,
-    void Function()? invalidateWorkoutCaches,
     Clock clock = const SystemClock(),
     AppLogger logger = const ConsoleAppLogger(),
     Future<bool> Function()? isOnlineOverride,
@@ -111,10 +102,7 @@ class WorkoutSessionSyncService {
        _clock = clock,
        _logger = logger,
        _isAuthenticatedReader = isAuthenticatedReader,
-       _invalidateWorkoutCaches = (invalidateWorkoutCaches ?? _noop),
        _isOnlineOverride = isOnlineOverride;
-
-  static void _noop() {}
 
   Future<void> syncPendingSessions({String trigger = 'manual'}) async {
     final running = _activeSync;
@@ -300,7 +288,6 @@ class WorkoutSessionSyncService {
       await _workoutDao.markSynced(row.entityId, updatedAt: _clock.nowUtc());
     }
     await _outboxDao.markSent(row.id);
-    _invalidateWorkoutCaches();
     return _SyncOutcome.success;
   }
 
@@ -448,7 +435,6 @@ class WorkoutSessionSyncService {
       refreshResponse.data!,
       updatedAt: _clock.nowUtc(),
     );
-    _invalidateWorkoutCaches();
   }
 
   String _buildErrorMessage(ApiResponse<void> response) {

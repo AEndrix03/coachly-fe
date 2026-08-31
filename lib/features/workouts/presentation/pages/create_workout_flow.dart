@@ -1,3 +1,4 @@
+import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:async';
 
@@ -1467,4 +1468,4 @@ class _BottomAction extends StatelessWidget {
   );
 }
 
-String _localId() => 'entry_${DateTime.now().microsecondsSinceEpoch}';
+String _localId() => 'entry_${const UuidIdGenerator().newId()}';

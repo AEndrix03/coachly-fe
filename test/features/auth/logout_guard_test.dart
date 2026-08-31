@@ -4,7 +4,7 @@ import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/core/sync/sync_queue.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/services/auth_service.dart';
-import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

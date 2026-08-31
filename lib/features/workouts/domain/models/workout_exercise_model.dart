@@ -1,3 +1,4 @@
+import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -36,9 +37,7 @@ abstract class WorkoutExerciseModel with _$WorkoutExerciseModel {
       final fallbackLoadUnit = _asString(json['loadUnit']) ?? 'kg';
 
       return WorkoutExerciseModel(
-        id:
-            _asString(json['id']) ??
-            'entry_${DateTime.now().microsecondsSinceEpoch}',
+        id: _asString(json['id']) ?? 'entry_${const UuidIdGenerator().newId()}',
         exercise: fallbackExercise,
         sets:
             _asString(json['sets']) ??

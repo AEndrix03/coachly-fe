@@ -63,22 +63,33 @@ class NoDataLayerInPresentation extends _ImportRule {
       uri.startsWith('package:http');
 }
 
-/// D2 — la logica applicativa non conosce Flutter.
+/// D2 — sotto la presentazione, Flutter non esiste.
+///
+/// La regola nasce sui controller, ma il confine e' piu' largo: valeva gia'
+/// per `data/` e `domain/`, e non era controllata li'. Il risultato era che
+/// tre file del data layer importavano tutto Material per usare `Locale`, che
+/// vive in `dart:ui` — un import da mezzo framework per un tipo di venti
+/// righe, in codice che deve poter girare in un test senza binding Flutter.
 class NoMaterialInApplication extends _ImportRule {
   const NoMaterialInApplication() : super(_code);
 
   static const _code = LintCode(
     name: 'no_material_in_application',
-    problemMessage: 'Un controller non importa Flutter Material.',
+    problemMessage:
+        'Sotto la presentazione non si importa Flutter Material.',
     correctionMessage:
-        'Se ti serve un tipo di Flutter (Locale, Color), o appartiene alla '
-        'presentazione o va modellato nel dominio. '
+        'Se ti serve solo Locale, importa `dart:ui` show Locale. Se ti serve '
+        'altro (Color, Widget), o appartiene alla presentazione o va '
+        'modellato nel dominio. '
         'Vedi la dependency rule D2 in docs/development/01-principles.md.',
     errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
-  bool appliesTo(String path) => isApplication(path);
+  bool appliesTo(String path) =>
+      isApplication(path) ||
+      isDataLayer(path) ||
+      isInLayer(path, 'domain');
 
   @override
   bool isForbidden(String uri, String path) =>

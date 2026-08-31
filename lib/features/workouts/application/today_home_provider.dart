@@ -1,7 +1,8 @@
 import 'dart:ui' show Locale;
 import 'package:coachly/core/assets/app_assets.dart';
 import 'package:coachly/core/network/connectivity_provider.dart';
-import 'package:coachly/features/auth/providers/user_provider.dart';
+import 'package:coachly/core/time/clock.dart';
+import 'package:coachly/features/auth/application/user_provider.dart';
 import 'package:coachly/features/workouts/data/repositories/workout_page_repository_impl.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/presentation/models/today_home_view_data.dart';
@@ -34,7 +35,7 @@ final todayHomeViewDataProvider =
           : items.any((item) => item.dirty)
           ? HomeSyncState.syncing
           : HomeSyncState.synced;
-      final now = DateTime.now();
+      final now = ref.watch(clockProvider).now();
       final displayedMonth = DateTime(now.year, now.month);
       final firstWeekDay = now.subtract(
         Duration(days: now.weekday - DateTime.monday),
@@ -99,7 +100,7 @@ final todayHomeViewDataProvider =
               title: workout.titleI18n?.fromI18n(locale) ?? workout.id,
               exerciseCount: workout.exercises,
               durationMinutes: workout.durationMinutes,
-              lastUsed: workout.lastUsed,
+              daysSinceLastUse: now.difference(workout.lastUsed).inDays,
             ),
           )
           .toList();
@@ -127,7 +128,7 @@ final todayHomeViewDataProvider =
               kind: HomeTrainingStateKind.activeWorkout,
               workoutId: openWorkout.id,
               title: openWorkoutTitle,
-              durationMinutes: DateTime.now()
+              durationMinutes: now
                   .difference(openSession.startedAt!)
                   .inMinutes
                   .clamp(0, 999)

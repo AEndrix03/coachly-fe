@@ -114,7 +114,7 @@ class HomeCalendarPreviewViewData {
     this.nextWorkoutTitle,
     this.nextWorkoutWhen,
   });
-  final DateTime? displayedMonth;
+  final DateTime displayedMonth;
   final List<HomeCalendarDayViewData> days;
   final String? nextWorkoutTitle;
   final String? nextWorkoutWhen;
@@ -189,11 +189,18 @@ class HomeRoutineViewData {
     required this.title,
     required this.exerciseCount,
     required this.durationMinutes,
-    required this.lastUsed,
+    required this.daysSinceLastUse,
   });
   final String id;
   final String title;
   final int exerciseCount;
   final int durationMinutes;
-  final DateTime lastUsed;
+
+  /// Giorni dall'ultima esecuzione, gia' calcolati.
+  ///
+  /// Era una `DateTime` che il widget confrontava con `DateTime.now()`: una
+  /// derivazione fatta in `presentation/`, quindi non testabile e legata
+  /// all'orologio di sistema. Il calcolo sta dove sta l'orologio iniettato
+  /// (`docs/development/03-state-riverpod.md`).
+  final int daysSinceLastUse;
 }

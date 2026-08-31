@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
 import 'package:coachly/features/exercises/application/exercise_list_provider.dart';
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/features/user_settings/application/settings_provider.dart';
 import 'package:coachly/features/workouts/application/workout_edit_draft_provider.dart';
 import 'package:coachly/features/workouts/domain/models/workout_programming_model.dart';
 import 'package:coachly/features/workouts/application/workout_list_provider.dart';

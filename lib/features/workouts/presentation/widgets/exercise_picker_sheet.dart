@@ -1,3 +1,4 @@
+import 'package:coachly/core/ids/id_generator.dart';
 import 'dart:async';
 import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
 import 'package:coachly/features/workouts/application/workout_access_controller.dart';
@@ -9,7 +10,7 @@ import 'package:coachly/features/exercises/domain/models/exercise_filter_model.d
 import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/exercises/application/exercise_list_provider.dart';
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/features/user_settings/application/settings_provider.dart';
 import 'package:coachly/features/workouts/domain/models/editable_exercise_model.dart';
 import 'package:coachly/features/sessions/domain/models/local_workout_session_model.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
@@ -157,7 +158,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
         created.nameI18n?.fromI18n(locale) ?? created.id ?? 'Esercizio';
     widget.onExerciseSelected(
       EditableExerciseModel(
-        id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${created.id}',
+        id: 'ex_${const UuidIdGenerator().newId()}_${created.id}',
         exerciseId: created.id ?? '',
         number: 0,
         name: name,
@@ -1122,7 +1123,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     final defaults = _lastSessionDefaults(exercise.id ?? '');
     widget.onExerciseSelected(
       EditableExerciseModel(
-        id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
+        id: 'ex_${const UuidIdGenerator().newId()}_${exercise.id}',
         exerciseId: exercise.id ?? '',
         number: 0,
         name: name,

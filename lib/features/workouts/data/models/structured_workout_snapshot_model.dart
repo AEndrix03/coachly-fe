@@ -17,6 +17,8 @@ class StructuredWorkoutSnapshot {
       workoutWriteCommandJson:
           json['workoutWriteCommandJson'] as String? ?? '{}',
       sourceUpdatedAt: _parseDateTime(json['sourceUpdatedAt'] as String?),
+      // Ripiego per uno snapshot senza timestamp: dato corrotto, non caso d'uso.
+      // ignore: no_raw_datetime_now
       updatedAt: _parseDateTime(json['updatedAt'] as String?) ?? DateTime.now(),
     );
   }

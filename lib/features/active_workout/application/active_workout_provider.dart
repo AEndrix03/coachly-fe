@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:coachly/core/ids/id_generator.dart';
+import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository_impl.dart';
 import 'package:coachly/features/active_workout/domain/workout_execution_resolver.dart';
 import 'package:coachly/features/active_workout/data/services/active_workout_draft_service.dart';
@@ -14,8 +15,6 @@ import 'package:coachly/features/sessions/data/dto/workout_session_write_command
 import 'package:coachly/features/workouts/domain/models/workout_exercise_model.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/data/repositories/workout_page_repository_impl.dart';
-import 'package:coachly/features/workouts/application/workout_list_provider.dart';
-import 'package:coachly/features/workouts/application/workout_stats_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'active_workout_provider.g.dart';
@@ -26,6 +25,14 @@ class ActiveWorkout extends _$ActiveWorkout {
 
   /// Unica sorgente di id del client (`core/ids`), non `Uuid()` diretto.
   static const _uuid = UuidIdGenerator();
+
+  /// Unica sorgente del tempo (`core/time`), non `_clock.now()` diretto.
+  ///
+  /// Qui non e' pulizia: l'allenamento a cavallo della mezzanotte, il cambio
+  /// di fuso e l'ora legale sono casi che questa classe attraversa davvero, e
+  /// con l'orologio di sistema cablato non erano scrivibili come test
+  /// (`docs/development/19-testing.md`).
+  Clock get _clock => ref.read(clockProvider);
   int _loadToken = 0;
 
   @override
@@ -78,12 +85,11 @@ class ActiveWorkout extends _$ActiveWorkout {
       state = state.copyWith(
         status: ActiveWorkoutStatus.active,
         sessionId:
-            draft?['sessionId'] as String? ??
-            '$workoutId:${DateTime.now().microsecondsSinceEpoch}',
+            draft?['sessionId'] as String? ?? '$workoutId:${_uuid.newId()}',
         workout: workout,
         startedAt:
             DateTime.tryParse(draft?['startedAt'] as String? ?? '') ??
-            DateTime.now(),
+            _clock.now(),
         exercises: exercises,
         groups: groups,
         sessionChanges:
@@ -325,7 +331,7 @@ class ActiveWorkout extends _$ActiveWorkout {
             .read(activeWorkoutDraftServiceProvider)
             .saveRest(
               workoutId: workoutId,
-              endsAt: DateTime.now().add(Duration(seconds: restSeconds)),
+              endsAt: _clock.now().add(Duration(seconds: restSeconds)),
               initialSeconds: restSeconds,
             ),
       );
@@ -360,7 +366,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       sessionStatus: next == null
           ? WorkoutSessionStatus.completed
           : WorkoutSessionStatus.active,
-      lastSetCompletedAt: DateTime.now(),
+      lastSetCompletedAt: _clock.now(),
     );
     _persistDraft();
     final exerciseId = coachContext.currentExercise?.exercise.exercise.id;
@@ -369,7 +375,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       coach.observe(
         SetCompleted(
           sessionId: state.sessionId,
-          occurredAt: DateTime.now(),
+          occurredAt: _clock.now(),
           exerciseId: exerciseId,
           setId: setId,
         ),
@@ -538,7 +544,7 @@ class ActiveWorkout extends _$ActiveWorkout {
 
   void createExerciseGroup(List<String> exerciseIds, ExerciseGroupType type) {
     if (exerciseIds.length < 2) return;
-    final id = 'group:${DateTime.now().microsecondsSinceEpoch}';
+    final id = 'group:${_uuid.newId()}';
     final group = ActiveExerciseGroup(
       id: id,
       type: type,
@@ -609,7 +615,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     final ex = exercises[exerciseIdx];
     final last = ex.sets.isNotEmpty ? ex.sets.last : null;
     final newSet = ActiveSetState(
-      id: '${ex.exercise.id}:set:${DateTime.now().microsecondsSinceEpoch}',
+      id: '${ex.exercise.id}:set:${_uuid.newId()}',
       position: ex.sets.length,
       setType: last?.setType ?? 'Normale',
       weight: last?.weight ?? 0,
@@ -778,7 +784,7 @@ class ActiveWorkout extends _$ActiveWorkout {
     final ex = exercises[exerciseIdx];
     final sets = [...ex.sets];
     final copy = sets[setIdx].copyWith(
-      id: '${ex.exercise.id}:set:${DateTime.now().microsecondsSinceEpoch}',
+      id: '${ex.exercise.id}:set:${_uuid.newId()}',
       position: sets.length,
       completed: false,
     );
@@ -867,7 +873,7 @@ class ActiveWorkout extends _$ActiveWorkout {
       currentSet: currentSet,
       elapsedSessionTime: startedAt == null
           ? Duration.zero
-          : DateTime.now().difference(startedAt),
+          : _clock.now().difference(startedAt),
       remainingSetCount: state.totalSetCount - state.completedSetCount,
       expectedSessionDuration: state.workout == null
           ? null
@@ -912,9 +918,8 @@ class ActiveWorkout extends _$ActiveWorkout {
 
     if (response.isOk) {
       await ref.read(activeWorkoutDraftServiceProvider).delete(workoutId);
-      ref.invalidate(workoutListProvider);
-      ref.invalidate(recentWorkoutsProvider);
-      ref.invalidate(workoutStatsProvider);
+      // Nessun invalidate: la sessione e' stata scritta su Drift, e chi
+      // legge la lista legge uno stream (`03-state-riverpod.md`).
       state = state.copyWith(status: ActiveWorkoutStatus.saved);
       return true;
     } else {
@@ -955,7 +960,7 @@ class ActiveWorkout extends _$ActiveWorkout {
 
     return WorkoutSessionWriteCommand(
       startedAt: startedAt,
-      completedAt: DateTime.now(),
+      completedAt: _clock.now(),
       notes: null,
       entries: entries,
     );
@@ -1038,7 +1043,7 @@ class ActiveWorkout extends _$ActiveWorkout {
   void _restoreRestTimer(Map<String, dynamic>? draft) {
     final restEndsAt = DateTime.tryParse(draft?['restEndsAt'] as String? ?? '');
     if (restEndsAt == null) return;
-    final remaining = restEndsAt.difference(DateTime.now()).inSeconds;
+    final remaining = restEndsAt.difference(_clock.now()).inSeconds;
     if (remaining > 0) {
       ref.read(restTimerProvider.notifier).startTimer(remaining);
     } else {

@@ -1,7 +1,11 @@
 import 'dart:async';
 
 import 'package:coachly/shared/i18n/app_strings.dart';
-import 'package:flutter/material.dart';
+// `Locale` vive in `dart:ui`: un controller non importa Flutter
+// (`docs/development/01-principles.md`, dependency rule D2).
+import 'dart:ui' show Locale;
+
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

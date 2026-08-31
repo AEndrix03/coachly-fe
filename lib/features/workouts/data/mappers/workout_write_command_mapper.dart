@@ -5,7 +5,9 @@ import 'package:coachly/features/workouts/data/dto/workout_write_command.dart';
 import 'package:coachly/features/workouts/domain/models/workout_exercise_model.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/domain/models/workout_programming_model.dart';
-import 'package:flutter/material.dart';
+// `Locale` vive in `dart:ui`: il data layer non dipende da Flutter
+// (`docs/development/01-principles.md`, dependency rule D2).
+import 'dart:ui' show Locale;
 
 class WorkoutWriteCommandMapper {
   static final RegExp _uuidPattern = RegExp(

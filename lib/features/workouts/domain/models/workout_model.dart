@@ -1,3 +1,4 @@
+import 'package:coachly/core/ids/id_generator.dart';
 import 'dart:convert';
 
 import 'package:coachly/features/workouts/data/models/tag_dto/tag_dto.dart';
@@ -53,8 +54,7 @@ abstract class WorkoutModel with _$WorkoutModel {
 Map<String, dynamic> _sanitizeWorkoutJson(Map<String, dynamic> rawJson) {
   final normalized = Map<String, dynamic>.from(rawJson);
   final workoutId =
-      _asString(rawJson['id']) ??
-      'workout_${DateTime.now().microsecondsSinceEpoch}';
+      _asString(rawJson['id']) ?? 'workout_${const UuidIdGenerator().newId()}';
   final status = _asString(rawJson['status'])?.toLowerCase();
   final isArchived = status == 'archived';
 
@@ -96,6 +96,8 @@ Map<String, dynamic> _sanitizeWorkoutJson(Map<String, dynamic> rawJson) {
       _normalizeDateString(rawJson['lastUsed']) ??
       _normalizeDateString(rawJson['updatedAt']) ??
       _normalizeDateString(rawJson['createdAt']) ??
+      // Ultimo ripiego quando il server non manda nessuna delle tre date.
+      // ignore: no_raw_datetime_now
       DateTime.now().toIso8601String();
   normalized['durationMinutes'] =
       _asInt(rawJson['durationMinutes']) ?? _asInt(rawJson['duration']) ?? 0;

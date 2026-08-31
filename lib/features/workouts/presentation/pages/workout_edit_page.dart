@@ -1,3 +1,4 @@
+import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:async';
 
@@ -389,7 +390,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
       builder: (_) => ExercisePickerSheet(
         onExerciseSelected: (selected) {
           picked = WorkoutExerciseDraft(
-            localId: 'entry_${DateTime.now().microsecondsSinceEpoch}',
+            localId: 'entry_${const UuidIdGenerator().newId()}',
             exerciseId: selected.exerciseId,
             name: selected.name,
           );

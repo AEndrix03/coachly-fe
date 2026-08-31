@@ -1,8 +1,8 @@
 import 'package:coachly/app/router/routes.dart';
 import 'package:coachly/core/flags/feature_flags.dart';
 import 'package:coachly/core/observability/debug_screen.dart';
-import 'package:coachly/features/auth/pages/loading_page/loading_page.dart';
-import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/auth/presentation/pages/loading_page.dart';
+import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/presentation/pages/workout_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:coachly/features/auth/pages/login_page/login_page.dart';
+import 'package:coachly/features/auth/presentation/pages/login_page.dart';
 import 'package:coachly/app/navigation/navigation_bar.dart';
 import 'package:coachly/features/exercises/presentation/pages/exercise_create_page.dart';
 import 'package:coachly/features/exercises/presentation/pages/exercise_info_page.dart';
@@ -18,8 +18,8 @@ import 'package:coachly/features/exercises/presentation/pages/exercise_biomechan
 import 'package:coachly/features/exercises/presentation/pages/exercise_muscles_page.dart';
 import 'package:coachly/features/exercises/presentation/pages/exercise_variants_page.dart';
 import 'package:coachly/features/exercises/presentation/pages/personal_exercises_page.dart';
-import 'package:coachly/features/home/home.dart';
-import 'package:coachly/features/profile/profile_page.dart';
+import 'package:coachly/features/home/presentation/pages/home_page.dart';
+import 'package:coachly/features/profile/presentation/pages/profile_page.dart';
 import 'package:coachly/features/active_workout/presentation/pages/workout_active_page.dart';
 import 'package:coachly/features/active_workout/presentation/pages/workout_completion_page.dart';
 import 'package:coachly/features/workouts/presentation/pages/create_workout_flow.dart';

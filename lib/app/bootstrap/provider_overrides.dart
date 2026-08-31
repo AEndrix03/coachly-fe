@@ -2,7 +2,7 @@ import 'package:coachly/core/network/session_gateway.dart';
 import 'package:coachly/features/sync/data/local/outbox_dao.dart';
 import 'package:coachly/core/sync/sync_queue.dart';
 import 'package:coachly/features/auth/data/services/auth_session_gateway.dart';
-import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

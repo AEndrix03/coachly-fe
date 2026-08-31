@@ -410,10 +410,11 @@ class CalendarFeatureCard extends StatelessWidget {
   final HomeCalendarPreviewViewData data;
   @override
   Widget build(BuildContext context) {
-    final displayedMonth =
-        data.displayedMonth ??
-        DateTime(DateTime.now().year, DateTime.now().month);
-    final days = _resolvedWeekDays();
+    // `todayHomeViewDataProvider` fornisce sempre mese e sette giorni. I
+    // fallback che stavano qui ricalcolavano "oggi" nel widget: codice difensivo
+    // mai eseguito, e l'unico punto della presentation che leggeva l'orologio.
+    final displayedMonth = data.displayedMonth;
+    final days = data.days;
     return _FeatureSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -471,38 +472,6 @@ class CalendarFeatureCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  List<HomeCalendarDayViewData> _resolvedWeekDays() {
-    if (data.days.length == DateTime.daysPerWeek) return data.days;
-
-    final now = DateTime.now();
-    final firstWeekDay = now.subtract(
-      Duration(days: now.weekday - DateTime.monday),
-    );
-    return List.generate(DateTime.daysPerWeek, (index) {
-      final date = firstWeekDay.add(Duration(days: index));
-      HomeCalendarDayViewData? existing;
-      for (final day in data.days) {
-        if (day.date.year == date.year &&
-            day.date.month == date.month &&
-            day.date.day == date.day) {
-          existing = day;
-          break;
-        }
-      }
-      return HomeCalendarDayViewData(
-        date: date,
-        isInDisplayedMonth: true,
-        isToday:
-            existing?.isToday ??
-            (date.year == DateTime.now().year &&
-                date.month == DateTime.now().month &&
-                date.day == DateTime.now().day),
-        isComplete: existing?.isComplete ?? false,
-        hasTraining: existing?.hasTraining ?? false,
-      );
-    });
   }
 }
 
@@ -1074,7 +1043,7 @@ class RoutineCard extends StatelessWidget {
     ),
   );
   String _lastUsed(BuildContext context) {
-    final days = DateTime.now().difference(data.lastUsed).inDays;
+    final days = data.daysSinceLastUse;
     return context.tr(
       days <= 1 ? 'home.routines.last_yesterday' : 'home.routines.last_days',
       params: {'days': '$days'},

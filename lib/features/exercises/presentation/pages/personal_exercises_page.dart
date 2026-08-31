@@ -1,7 +1,7 @@
 import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/features/user_settings/application/settings_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';

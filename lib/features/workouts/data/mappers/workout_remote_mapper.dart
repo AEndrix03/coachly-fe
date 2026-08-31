@@ -1,3 +1,4 @@
+import 'package:coachly/core/ids/id_generator.dart';
 import 'dart:convert';
 
 import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
@@ -35,9 +36,7 @@ class WorkoutRemoteMapper {
         _asBool(json['active']) ?? (status == null ? true : status == 'active');
 
     return WorkoutModel(
-      id:
-          _asString(json['id']) ??
-          'workout_${DateTime.now().microsecondsSinceEpoch}',
+      id: _asString(json['id']) ?? 'workout_${const UuidIdGenerator().newId()}',
       titleI18n: titleI18n,
       descriptionI18n: descriptionI18n,
       coachId:
@@ -53,6 +52,8 @@ class WorkoutRemoteMapper {
           _parseDateTime(_asString(json['lastUsed'])) ??
           _parseDateTime(_asString(json['updatedAt'])) ??
           _parseDateTime(_asString(json['createdAt'])) ??
+          // Ultimo ripiego quando il server non manda nessuna delle tre date.
+          // ignore: no_raw_datetime_now
           DateTime.now(),
       muscleTags: _parseMuscleTags(json),
       exercises: _asInt(json['exercises']) ?? workoutExercises.length,

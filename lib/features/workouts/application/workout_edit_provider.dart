@@ -1,10 +1,10 @@
-import 'package:coachly/features/user_settings/providers/settings_provider.dart';
+import 'package:coachly/core/ids/id_generator.dart';
+import 'package:coachly/features/user_settings/application/settings_provider.dart';
 import 'package:coachly/features/workouts/domain/models/editable_exercise_model.dart';
 import 'package:coachly/features/workouts/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workouts/domain/models/workout_exercise_model.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/data/repositories/workout_page_repository_impl.dart';
-import 'package:coachly/features/workouts/application/workout_list_provider.dart';
 import 'package:coachly/shared/extensions/i18n_extension.dart'; // Required for fromI18n
 import 'package:coachly/shared/i18n/app_strings.dart';
 // `Locale` vive in dart:ui. Un controller non importa Material
@@ -143,7 +143,7 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
     final exercise = workoutExercise.exercise;
     final na = AppStrings.translate('common.na', locale: locale);
     return EditableExerciseModel(
-      id: 'ex_${DateTime.now().millisecondsSinceEpoch}_${exercise.id}',
+      id: 'ex_${const UuidIdGenerator().newId()}_${exercise.id}',
       exerciseId: exercise.id ?? '',
       number: number,
       name: exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? na,
@@ -238,8 +238,6 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
 
       if (response.isOk) {
         state = state.copyWith(isLoading: false, isDirty: false);
-        // After saving, invalidate the list to show the updated item.
-        ref.invalidate(workoutListProvider);
         return true;
       } else {
         state = state.copyWith(

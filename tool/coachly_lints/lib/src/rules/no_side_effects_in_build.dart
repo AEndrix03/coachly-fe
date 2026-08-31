@@ -53,6 +53,21 @@ class _SideEffectVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitFunctionExpression(FunctionExpression node) {}
 
+  /// `Future.microtask(...)` e `Future.delayed(...)` sono costruttori factory:
+  /// nell'AST sono `InstanceCreationExpression`, non `MethodInvocation`. La
+  /// prima versione della regola guardava solo le seconde, quindi degli
+  /// esempi citati testualmente in `03-state-riverpod.md` non ne intercettava
+  /// nessuno — restava viva solo la parte su `unawaited`.
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final type = node.constructorName.type.name2.lexeme;
+    final name = node.constructorName.name?.name;
+    if (type == 'Future' && _forbidden.contains(name)) {
+      _reporter.atNode(node, _code);
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final name = node.methodName.name;

@@ -212,7 +212,11 @@ class LocalWorkoutSession {
       retryCount: (json['retryCount'] as num?)?.toInt() ?? 0,
       nextRetryAt: _parseDateTime(json['nextRetryAt'] as String?),
       lastError: json['lastError'] as String?,
+      // Ripiego per un payload senza timestamp: le righe scritte dal client
+      // li hanno sempre, quindi qui si arriva solo con dati corrotti.
+      // ignore: no_raw_datetime_now
       createdAt: _parseDateTime(json['createdAt'] as String?) ?? DateTime.now(),
+      // ignore: no_raw_datetime_now
       updatedAt: _parseDateTime(json['updatedAt'] as String?) ?? DateTime.now(),
     );
   }

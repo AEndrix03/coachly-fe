@@ -1,6 +1,6 @@
 import 'package:coachly/core/assets/app_assets.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
-import 'package:coachly/features/auth/providers/auth_provider.dart';
+import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
