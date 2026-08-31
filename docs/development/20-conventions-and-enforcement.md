@@ -80,6 +80,7 @@ invece di essere contata. Il job ora blocca.
 | `no_data_source_outside_repository` | 0 | — | 01 D6 |
 | `no_non_material_icons` | 0 | 2 | 12, ADR-003 |
 | `no_manual_uuid` | 0 | 3 | 05 |
+| `no_go_to_tab` | 0 | 1 | 08 R1 |
 | `no_literal_text_style` | 0 (4 con `ignore` motivato) | 188 | 09 |
 
 ### Due regole che non potevano fallire
@@ -99,6 +100,23 @@ Due non potevano:
 Entrambe riparate, ed entrambe verificate iniettando una violazione finta e
 controllando che venisse segnalata — perché il modo in cui questo difetto è
 nato è appunto non averlo mai fatto.
+
+Poi la stessa prova è stata fatta su **tutte e undici** le regole, una per una,
+con un file di violazioni buttato in `lib/` e cancellato subito dopo. Ne è
+uscita una terza falla, più stretta: `no_non_material_icons` guardava gli
+import vietati e `CupertinoIcons`, quindi un `IconData(0xe900, fontFamily:
+'Custom')` costruito a mano passava — nessun import vietato, e un font di icone
+tutto suo. In `lib/` non ce n'era nessuno; ora la strada è chiusa prima del
+primo.
+
+**Uno zero vale quanto la prova che la regola può fallire.** Tre regole su
+undici non ce l'avevano.
+
+Alla dodicesima regola si è arrivati dal lato opposto: il divieto 14 —
+«`context.go` per cambiare tab, mai» — non aveva nessun lint, e infatti una
+schermata lo aggirava già. Il difetto non si vede provando la app: `go` porta
+sul tab giusto. Si vede al ritorno, perché azzera lo stack del ramo. Ora c'è
+`context.goToTab(AppTab.…)` e `no_go_to_tab` che impedisce l'alternativa.
 
 Le trentacinque letture dell'orologio che la prima nascondeva sono ora
 `Clock` iniettabile, oppure `UuidIdGenerator` dove servivano solo a fabbricare

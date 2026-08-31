@@ -75,8 +75,7 @@ class NoMaterialInApplication extends _ImportRule {
 
   static const _code = LintCode(
     name: 'no_material_in_application',
-    problemMessage:
-        'Sotto la presentazione non si importa Flutter Material.',
+    problemMessage: 'Sotto la presentazione non si importa Flutter Material.',
     correctionMessage:
         'Se ti serve solo Locale, importa `dart:ui` show Locale. Se ti serve '
         'altro (Color, Widget), o appartiene alla presentazione o va '
@@ -87,9 +86,7 @@ class NoMaterialInApplication extends _ImportRule {
 
   @override
   bool appliesTo(String path) =>
-      isApplication(path) ||
-      isDataLayer(path) ||
-      isInLayer(path, 'domain');
+      isApplication(path) || isDataLayer(path) || isInLayer(path, 'domain');
 
   @override
   bool isForbidden(String uri, String path) =>

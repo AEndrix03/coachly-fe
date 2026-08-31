@@ -50,6 +50,16 @@ class NoNonMaterialIcons extends DartLintRule {
     // `package:flutter/cupertino.dart` non e' vietato: espone anche
     // `CupertinoPage`, che e' una transizione, non un'icona. Vietato e' il
     // glifo.
+    // Un `IconData` costruito a mano e' il modo per rientrare da una porta
+    // laterale: nessun import vietato, nessun `CupertinoIcons`, e un font di
+    // icone tutto suo. Oggi in `lib/` non ce n'e' nessuno, ed e' il momento
+    // giusto per chiudere la strada — dopo il primo si discute.
+    context.registry.addInstanceCreationExpression((node) {
+      if (node.constructorName.type.name2.lexeme == 'IconData') {
+        reporter.atNode(node, _code);
+      }
+    });
+
     context.registry.addPrefixedIdentifier((node) {
       if (node.prefix.name == 'CupertinoIcons') reporter.atNode(node, _code);
     });

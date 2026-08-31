@@ -1,3 +1,5 @@
+import 'package:coachly/app/navigation/tab_navigation.dart';
+import 'package:coachly/app/router/routes.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/presentation/models/today_home_view_data.dart';
@@ -52,7 +54,7 @@ class WorkoutPage extends ConsumerWidget {
                         content: Text(context.l10n.workoutNotificationsSoon),
                       ),
                     ),
-                onSettings: () => context.go('/profile'),
+                onSettings: () => context.goToTab(AppTab.profile),
               ),
             ),
           ),

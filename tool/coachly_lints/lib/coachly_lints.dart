@@ -1,6 +1,7 @@
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'src/rules/layer_imports.dart';
+import 'src/rules/no_go_to_tab.dart';
 import 'src/rules/no_hardcoded_strings.dart';
 import 'src/rules/no_literal_colors.dart';
 import 'src/rules/no_literal_text_style.dart';
@@ -33,6 +34,8 @@ class _CoachlyLints extends PluginBase {
     NoNonMaterialIcons(),
     // docs/development/05-sync-and-offline.md
     NoManualUuid(),
+    // docs/development/08-routing-navigation.md — R1
+    NoGoToTab(),
     // docs/development/19-testing.md
     NoRawDateTimeNow(),
     // docs/development/03-state-riverpod.md
