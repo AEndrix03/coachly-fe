@@ -42,7 +42,10 @@ esatto da lanciare.
   `core/observability` (con debug screen su `/debug`), i file ARB con
   `context.l10n`, e il componente unico dell'attesa
   (`CoachlyLoading`, `docs/development/27-loading.md`). **Non** esistono ancora:
-  `context.colors`, il catalogo pre-seeded, l'event log delle sessioni.
+  il catalogo pre-seeded e l'event log delle sessioni. `context.colors`
+  **esiste** e ha 53 usi: la riga che diceva il contrario era vecchia, ed era
+  l'errore B che la rule vieta — un documento di stato che mente su cosa
+  esiste fa scrivere codice sbagliato al prossimo che lo legge.
 - **`custom_lint` è a 0 su tutto il repository**, e il job di CI che lo
   misurava ora blocca. Attenzione: due regole erano scritte male e non
   scattavano mai — `no_raw_datetime_now` e `no_side_effects_in_build`

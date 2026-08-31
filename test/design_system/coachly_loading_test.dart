@@ -83,7 +83,9 @@ void main() {
         home: const CoachlyLoadingSection(sceneKey: 'test', message: 'Carico'),
       ),
     );
-    await tester.pump();
+    // La sezione aspetta `loadingDelay` da sola: prima della soglia non c'e'
+    // niente da annunciare, ed e' il comportamento voluto.
+    await tester.pump(const Duration(milliseconds: 301));
 
     expect(
       tester.getSemantics(find.bySemanticsLabel('Carico')),

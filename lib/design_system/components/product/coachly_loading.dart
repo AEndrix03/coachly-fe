@@ -127,6 +127,16 @@ class CoachlyLoadingScreen extends StatelessWidget {
 
 /// L'attesa di una porzione di schermata, quando il resto della pagina esiste
 /// gia' ed e' utile.
+///
+/// **Aspetta da sola.** Il cancello e' dentro il componente, non a carico di
+/// chi lo usa: una schermata che scrive `isLoading ? Section : content` ha
+/// gia' fatto la cosa giusta, e la soglia non si puo' dimenticare. La prima
+/// versione lasciava il cancello fuori — costruito, testato, e usato da
+/// nessuno, cioe' l'attesa lampeggiava esattamente come prima.
+///
+/// `CoachlyLoadingScreen` invece compare subito, ed e' voluto: l'avvio non e'
+/// un'attesa che potrebbe finire in 50 ms, e uno schermo vuoto per 300 ms
+/// all'apertura della app si legge come un blocco.
 class CoachlyLoadingSection extends StatelessWidget {
   const CoachlyLoadingSection({
     super.key,
@@ -140,15 +150,21 @@ class CoachlyLoadingSection extends StatelessWidget {
   final double minHeight;
 
   @override
-  Widget build(BuildContext context) => ConstrainedBox(
-    constraints: BoxConstraints(minHeight: minHeight),
-    child: Center(
-      child: _LoadingBody(
-        scene: CoachlyLoadingScenes.forKey(sceneKey),
-        message: message,
-        compact: true,
+  Widget build(BuildContext context) => CoachlyLoadingGate(
+    isLoading: true,
+    loading: ConstrainedBox(
+      constraints: BoxConstraints(minHeight: minHeight),
+      child: Center(
+        child: _LoadingBody(
+          scene: CoachlyLoadingScenes.forKey(sceneKey),
+          message: message,
+          compact: true,
+        ),
       ),
     ),
+    // Il posto resta occupato mentre il cancello e' chiuso, cosi' la comparsa
+    // dell'illustrazione non sposta il resto della pagina.
+    child: SizedBox(height: minHeight),
   );
 }
 
