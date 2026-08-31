@@ -189,7 +189,9 @@ class _LoadingBody extends StatelessWidget {
             child: Text(
               label,
               textAlign: TextAlign.center,
-              style: TextStyle(color: context.colors.textSecondary),
+              style: context.scale.body.copyWith(
+                color: context.colors.textSecondary,
+              ),
             ),
           ),
         ],
