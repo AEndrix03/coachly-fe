@@ -200,6 +200,30 @@ abstract class AppLocalizations {
   /// **'Finish workout'**
   String get workoutActiveFinish;
 
+  /// No description provided for @workoutActiveExitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause this workout?'**
+  String get workoutActiveExitTitle;
+
+  /// No description provided for @workoutActiveExitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress is already saved on this device and will not be lost.'**
+  String get workoutActiveExitBody;
+
+  /// No description provided for @workoutActiveSaveAndExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and exit'**
+  String get workoutActiveSaveAndExit;
+
+  /// No description provided for @workoutActiveKeepTraining.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep training'**
+  String get workoutActiveKeepTraining;
+
   /// Migrated from exercise.biomechanics.title
   ///
   /// In en, this message translates to:
@@ -4182,6 +4206,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{No exercises} =1{1 exercise} other{{count} exercises}}'**
   String exercisesInWorkoutCount(int count);
+
+  /// Mostrato al posto del nome quando il catalogo locale non ha ancora quell'esercizio. Non si mostra mai l'id: per chi legge non e' un nome, e' rumore.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise not downloaded yet'**
+  String get exerciseNamePlaceholder;
 }
 
 class _AppLocalizationsDelegate

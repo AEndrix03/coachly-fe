@@ -1,3 +1,4 @@
+import 'package:coachly/features/workouts/presentation/widgets/exercise_display_name.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/workouts/domain/workout_detail_view_data.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
@@ -82,7 +83,7 @@ class _WorkoutExerciseCardState extends State<WorkoutExerciseCard>
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final rest = exercise.prescription.primaryRestSeconds;
     final intensity = exercise.prescription.compactIntensity;
-    final displayName = _displayName(context, exercise);
+    final displayName = exerciseDisplayName(context, exercise);
     final semantics = [
       context.l10n.workoutDetailExerciseSemanticsPosition(widget.indexLabel),
       displayName,
@@ -499,16 +500,6 @@ class _ExerciseThumbnail extends StatelessWidget {
       ),
     );
   }
-}
-
-String _displayName(BuildContext context, WorkoutExerciseViewData exercise) {
-  if (exercise.isMissing) {
-    return context.l10n.workoutDetailExerciseUnavailable;
-  }
-  if (exercise.name.trim().isEmpty || exercise.name == 'Exercise') {
-    return context.l10n.workoutDetailExerciseFallback;
-  }
-  return exercise.name;
 }
 
 String _duration(int seconds) {

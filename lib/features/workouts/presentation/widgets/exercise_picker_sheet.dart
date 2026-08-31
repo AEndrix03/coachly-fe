@@ -155,8 +155,11 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
     );
     if (created == null || !mounted) return;
     final locale = ref.read(languageProvider);
+    // L'esercizio appena creato ha sempre un nome: se manca e' un difetto
+    // nostro, e mostrare l'id lo travestirebbe da dato.
     final name =
-        created.nameI18n?.fromI18n(locale) ?? created.id ?? 'Esercizio';
+        created.nameI18n?.fromI18n(locale) ??
+        context.l10n.exerciseNamePlaceholder;
     widget.onExerciseSelected(
       EditableExerciseModel(
         id: 'ex_${const UuidIdGenerator().newId()}_${created.id}',
@@ -968,7 +971,9 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   Widget _buildCard(ExerciseModel exercise) {
     final locale = ref.watch(languageProvider);
     final na = context.l10n.commonNa;
-    final name = exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? na;
+    final name =
+        exercise.nameI18n?.fromI18n(locale) ??
+        context.l10n.exerciseNamePlaceholder;
     final isBodyweight = exercise.isBodyweight ?? false;
 
     Future<void> openDetail() async {
@@ -979,8 +984,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       if (selectedExercise == null) return;
       final selectedName =
           selectedExercise.nameI18n?.fromI18n(locale) ??
-          selectedExercise.id ??
-          na;
+          context.l10n.exerciseNamePlaceholder;
       _addExercise(selectedExercise, selectedName, locale, na);
     }
 

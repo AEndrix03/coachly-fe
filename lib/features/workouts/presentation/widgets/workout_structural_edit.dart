@@ -1,3 +1,4 @@
+import 'package:coachly/features/workouts/presentation/widgets/exercise_display_name.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:math';
 
@@ -309,7 +310,10 @@ class WorkoutStructuralEdit extends ConsumerWidget {
                             return CheckboxListTile(
                               value: selected.contains(entry.id),
                               title: Text(
-                                exercises[entry.id]?.name ?? entry.exerciseId,
+                                exerciseDisplayName(
+                                  context,
+                                  exercises[entry.id],
+                                ),
                                 style: const TextStyle(
                                   color: CoachlyAthleteTheme.textPrimary,
                                 ),
@@ -394,7 +398,7 @@ class _EditableBlock extends StatelessWidget {
       return _EditableBlockSkeleton(index: index, dragHandle: dragHandle);
     }
     final names = block.entries
-        .map((entry) => exercises[entry.id]?.name ?? entry.exerciseId)
+        .map((entry) => exerciseDisplayName(context, exercises[entry.id]))
         .join(' · ');
     final group = block.groupType == 'superset' || block.groupType == 'circuit';
     return CoachlySurface(
@@ -663,7 +667,7 @@ class _WorkoutExerciseQuickEditSheetState
                     ),
                   ),
                   Text(
-                    widget.exercise?.name ?? widget.entry.exerciseId,
+                    exerciseDisplayName(context, widget.exercise),
                     style: const TextStyle(
                       color: CoachlyAthleteTheme.textSecondary,
                     ),

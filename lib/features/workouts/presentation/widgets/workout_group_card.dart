@@ -1,3 +1,4 @@
+import 'package:coachly/features/workouts/presentation/widgets/exercise_display_name.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/workouts/domain/workout_detail_view_data.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
@@ -45,7 +46,9 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
         typeLabel,
         exerciseCount,
         roundCount,
-        group.exercises.map((exercise) => exercise.name).join(', '),
+        group.exercises
+            .map((exercise) => exerciseDisplayName(context, exercise))
+            .join(', '),
         context.tr(
           _expanded
               ? 'workout.detail.collapse_group'
@@ -187,7 +190,7 @@ class _WorkoutGroupCardState extends State<WorkoutGroupCard> {
         ),
         CoachlyInfoSection(
           context.l10n.workoutDetailHowToRead,
-          '${_roundCountLabel(context, widget.group.rounds)} · ${widget.group.exercises.map((e) => e.name).join(' → ')}',
+          '${_roundCountLabel(context, widget.group.rounds)} · ${widget.group.exercises.map((e) => exerciseDisplayName(context, e)).join(' → ')}',
         ),
       ],
     );
@@ -248,7 +251,7 @@ class _GroupExerciseRow extends StatelessWidget {
     final targetLoad = detailed ? _targetLoad(exercise) : null;
     return Semantics(
       button: onTap != null,
-      label: '$label, ${exercise.name}, $target',
+      label: '$label, ${exerciseDisplayName(context, exercise)}, $target',
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(CoachlyAthleteTheme.compactRadius),
@@ -268,9 +271,7 @@ class _GroupExerciseRow extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  exercise.isMissing
-                      ? context.l10n.workoutDetailExerciseUnavailable
-                      : exercise.name,
+                  exerciseDisplayName(context, exercise),
                   style: context.scale.body.bold.copyWith(
                     color: CoachlyAthleteTheme.textPrimary,
                   ),

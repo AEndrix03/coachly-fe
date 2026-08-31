@@ -61,6 +61,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get workoutActiveFinish => 'Termina allenamento';
 
   @override
+  String get workoutActiveExitTitle => 'Mettere in pausa l’allenamento?';
+
+  @override
+  String get workoutActiveExitBody =>
+      'I progressi sono già salvati su questo dispositivo e non andranno persi.';
+
+  @override
+  String get workoutActiveSaveAndExit => 'Salva ed esci';
+
+  @override
+  String get workoutActiveKeepTraining => 'Continua ad allenarti';
+
+  @override
   String get exerciseBiomechanicsTitle => 'Biomeccanica';
 
   @override
@@ -2304,4 +2317,7 @@ class AppLocalizationsIt extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get exerciseNamePlaceholder => 'Esercizio non ancora scaricato';
 }

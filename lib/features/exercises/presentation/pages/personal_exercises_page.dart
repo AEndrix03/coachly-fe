@@ -187,9 +187,9 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
                 final exercise = _exercises[index];
                 return ListTile(
                   title: Text(
+                    // Mai l'id: se il nome manca si dice che manca.
                     exercise.nameI18n?.fromI18n(locale) ??
-                        exercise.id ??
-                        context.l10n.commonNa,
+                        context.l10n.exerciseNamePlaceholder,
                   ),
                   subtitle: Text(
                     exercise.descriptionI18n?.fromI18n(locale) ??

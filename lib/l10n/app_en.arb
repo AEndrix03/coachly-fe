@@ -68,6 +68,10 @@
   "@workoutActiveFinish": {
     "description": "Migrated from workout.active.finish"
   },
+  "workoutActiveExitTitle": "Pause this workout?",
+  "workoutActiveExitBody": "Your progress is already saved on this device and will not be lost.",
+  "workoutActiveSaveAndExit": "Save and exit",
+  "workoutActiveKeepTraining": "Keep training",
   "exerciseBiomechanicsTitle": "Biomechanics",
   "@exerciseBiomechanicsTitle": {
     "description": "Migrated from exercise.biomechanics.title"
@@ -3081,5 +3085,9 @@
         "type": "int"
       }
     }
+  },
+  "exerciseNamePlaceholder": "Exercise not downloaded yet",
+  "@exerciseNamePlaceholder": {
+    "description": "Mostrato al posto del nome quando il catalogo locale non ha ancora quell'esercizio. Non si mostra mai l'id: per chi legge non e' un nome, e' rumore."
   }
 }

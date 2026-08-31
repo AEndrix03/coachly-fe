@@ -17,6 +17,10 @@
   "workoutActiveSaving": "Salvataggio…",
   "workoutActiveSaved": "Salvato",
   "workoutActiveFinish": "Termina allenamento",
+  "workoutActiveExitTitle": "Mettere in pausa l’allenamento?",
+  "workoutActiveExitBody": "I progressi sono già salvati su questo dispositivo e non andranno persi.",
+  "workoutActiveSaveAndExit": "Salva ed esci",
+  "workoutActiveKeepTraining": "Continua ad allenarti",
   "exerciseBiomechanicsTitle": "Biomeccanica",
   "exerciseBiomechanicsMainPattern": "Pattern principale",
   "exerciseBiomechanicsUpdating": "Dati in aggiornamento",
@@ -679,5 +683,6 @@
   "homeErrorTitle": "Non è stato possibile aprire i dati locali",
   "homeErrorBody": "Trascina verso il basso per riprovare.",
   "setsCompletedCount": "{count, plural, =0{Nessuna serie completata} =1{1 serie completata} other{{count} serie completate}}",
-  "exercisesInWorkoutCount": "{count, plural, =0{Nessun esercizio} =1{1 esercizio} other{{count} esercizi}}"
+  "exercisesInWorkoutCount": "{count, plural, =0{Nessun esercizio} =1{1 esercizio} other{{count} esercizi}}",
+  "exerciseNamePlaceholder": "Esercizio non ancora scaricato"
 }
