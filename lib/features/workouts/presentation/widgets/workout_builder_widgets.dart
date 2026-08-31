@@ -1,3 +1,4 @@
+import 'package:coachly/features/workouts/presentation/widgets/exercise_display_name.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:async';
 
@@ -1164,7 +1165,8 @@ class _DraftItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: Semantics(
         label:
-            '${exercise.name}, ${context.l10n.workoutBuilderPosition('${index + 1}')}',
+            '${exerciseNameOrPlaceholder(context, exercise.name)}, '
+            '${context.l10n.workoutBuilderPosition('${index + 1}')}',
         child: InkWell(
           onLongPress: editable
               ? () => _showItemActions(
@@ -1255,7 +1257,7 @@ class _ExerciseLine extends StatelessWidget {
                 Semantics(
                   button: true,
                   label: context.l10n.workoutBuilderOpenExerciseDetails(
-                    exercise.name,
+                    exerciseNameOrPlaceholder(context, exercise.name),
                   ),
                   child: InkWell(
                     onTap: onOpen,
@@ -1268,7 +1270,7 @@ class _ExerciseLine extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              exercise.name,
+                              exerciseNameOrPlaceholder(context, exercise.name),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -1305,7 +1307,7 @@ class _ExerciseLine extends StatelessWidget {
           Semantics(
             button: true,
             label: context.l10n.workoutBuilderOpenExerciseDetails(
-              exercise.name,
+              exerciseNameOrPlaceholder(context, exercise.name),
             ),
             child: InkWell(
               onTap: onOpen,

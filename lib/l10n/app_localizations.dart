@@ -4212,6 +4212,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exercise not downloaded yet'**
   String get exerciseNamePlaceholder;
+
+  /// No description provided for @workoutTitlePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled workout'**
+  String get workoutTitlePlaceholder;
 }
 
 class _AppLocalizationsDelegate

@@ -276,7 +276,8 @@ class WorkoutDetailAdapter {
           );
     final withoutDuration = WorkoutDetailViewData(
       id: workout.id,
-      title: workout.titleI18n?.fromI18n(locale) ?? workout.id,
+      // Vuoto se il titolo manca: lo dice la schermata, non l'id.
+      title: workout.titleI18n?.fromI18n(locale) ?? '',
       goal: _nonBlank(workout.descriptionI18n?.fromI18n(locale)),
       focus: _nonBlank(workout.type),
       sections: sections,

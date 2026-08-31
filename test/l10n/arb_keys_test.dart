@@ -17,6 +17,8 @@ const _icuOnlyKeys = <String>{
   'exercisesInWorkoutCount',
   // Mostrato invece dell'id quando il catalogo locale non ha l'esercizio.
   'exerciseNamePlaceholder',
+  // Titolo di ripiego per una scheda senza titolo.
+  'workoutTitlePlaceholder',
   // Metadati della scheda di oggi, in home.
   'homeTodayTrainingMetadata',
   // Conferma di uscita dall'allenamento attivo.

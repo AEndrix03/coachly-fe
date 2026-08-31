@@ -540,7 +540,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
           () => _Option(
             id: id,
             label:
-                (cat.nameI18n as Map<String, String>?)?.fromI18n(locale) ?? id,
+                (cat.nameI18n as Map<String, String>?)?.fromI18n(locale) ??
+                context.l10n.exerciseNamePlaceholder,
             isPrimary: cat.isPrimary ?? false,
           ),
         );

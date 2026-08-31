@@ -2299,4 +2299,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exerciseNamePlaceholder => 'Exercise not downloaded yet';
+
+  @override
+  String get workoutTitlePlaceholder => 'Untitled workout';
 }

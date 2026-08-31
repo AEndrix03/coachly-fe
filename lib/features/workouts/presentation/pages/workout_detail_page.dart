@@ -1,3 +1,4 @@
+import 'package:coachly/features/workouts/presentation/widgets/workout_title.dart';
 import 'dart:async';
 
 import 'dart:math' as math;
@@ -145,7 +146,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
                   WorkoutDetailAppBar(
                     title: _editing
                         ? context.l10n.workoutDetailEditSession
-                        : viewData.title,
+                        : workoutTitleOrPlaceholder(context, viewData.title),
                     editing: _editing,
                     saving: draft.isSaving,
                     scrollOffset: _scrollOffset,
@@ -177,7 +178,7 @@ class _WorkoutDetailPageState extends ConsumerState<WorkoutDetailPage>
                       child: WorkoutStartButton(
                         enabled: viewData.exerciseCount > 0,
                         onPressed: () => context.go(
-                          '/workouts/workout/${resolved.id}/active',
+                          '/workouts/workout/${resolved.id}/active?resume=false',
                           extra: resolved,
                         ),
                       ),

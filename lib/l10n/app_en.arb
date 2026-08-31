@@ -3089,5 +3089,6 @@
   "exerciseNamePlaceholder": "Exercise not downloaded yet",
   "@exerciseNamePlaceholder": {
     "description": "Mostrato al posto del nome quando il catalogo locale non ha ancora quell'esercizio. Non si mostra mai l'id: per chi legge non e' un nome, e' rumore."
-  }
+  },
+  "workoutTitlePlaceholder": "Untitled workout"
 }

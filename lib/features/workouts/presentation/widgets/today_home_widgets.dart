@@ -1,3 +1,4 @@
+import 'package:coachly/features/workouts/presentation/widgets/workout_title.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/design_system/coachly_surface.dart';
@@ -739,7 +740,7 @@ class InsightCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            data.title,
+            workoutTitleOrPlaceholder(context, data.title),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: context.scale.title.heavy.copyWith(
@@ -972,7 +973,7 @@ class RoutineCard extends StatelessWidget {
     width: 285,
     child: CoachlyPressable(
       onTap: onTap,
-      semanticLabel: data.title,
+      semanticLabel: workoutTitleOrPlaceholder(context, data.title),
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
@@ -1002,7 +1003,7 @@ class RoutineCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    data.title,
+                    workoutTitleOrPlaceholder(context, data.title),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

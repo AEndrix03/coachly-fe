@@ -2320,4 +2320,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get exerciseNamePlaceholder => 'Esercizio non ancora scaricato';
+
+  @override
+  String get workoutTitlePlaceholder => 'Scheda senza titolo';
 }

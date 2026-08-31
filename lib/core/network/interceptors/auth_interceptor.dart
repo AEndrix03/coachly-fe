@@ -1,4 +1,6 @@
+import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/network/api_endpoints.dart';
+import 'package:coachly/core/network/interceptors/network_log_interceptor.dart';
 import 'package:coachly/core/network/session_gateway.dart';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -11,7 +13,14 @@ part 'auth_interceptor.g.dart';
 /// perche' `authDio` le aggancia un interceptor: un Dio ricreato in silenzio
 /// significa un interceptor riagganciato in silenzio.
 @Riverpod(keepAlive: true)
-Dio dioClient(Ref ref) => Dio();
+Dio dioClient(Ref ref) {
+  final dio = Dio();
+  // Il log sta qui e non su `authDio` perche' deve vedere **tutte** le
+  // chiamate, comprese quelle che non passano dall'autenticazione: erano
+  // proprio quelle a essere invisibili.
+  dio.interceptors.add(NetworkLogInterceptor(ref.watch(appLoggerProvider)));
+  return dio;
+}
 
 /// Il Dio con l'autenticazione agganciata.
 ///
@@ -24,7 +33,12 @@ Dio authDio(Ref ref) {
   // Rimpiazza, non accumula: se questo provider viene ricostruito, aggiungere
   // un secondo interceptor raddoppierebbe ogni header e ogni retry.
   dio.interceptors.removeWhere((i) => i is AuthInterceptor);
-  dio.interceptors.add(AuthInterceptor(ref.watch(sessionGatewayProvider), dio));
+  // Prima del log, cosi' l'header aggiunto non cambia cio' che viene scritto
+  // (e il log non lo scrive comunque).
+  dio.interceptors.insert(
+    0,
+    AuthInterceptor(ref.watch(sessionGatewayProvider), dio),
+  );
   return dio;
 }
 

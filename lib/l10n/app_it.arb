@@ -684,5 +684,6 @@
   "homeErrorBody": "Trascina verso il basso per riprovare.",
   "setsCompletedCount": "{count, plural, =0{Nessuna serie completata} =1{1 serie completata} other{{count} serie completate}}",
   "exercisesInWorkoutCount": "{count, plural, =0{Nessun esercizio} =1{1 esercizio} other{{count} esercizi}}",
-  "exerciseNamePlaceholder": "Esercizio non ancora scaricato"
+  "exerciseNamePlaceholder": "Esercizio non ancora scaricato",
+  "workoutTitlePlaceholder": "Scheda senza titolo"
 }

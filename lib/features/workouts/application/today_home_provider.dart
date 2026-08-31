@@ -97,7 +97,8 @@ final todayHomeViewDataProvider =
           .map(
             (workout) => HomeRoutineViewData(
               id: workout.id,
-              title: workout.titleI18n?.fromI18n(locale) ?? workout.id,
+              // Vuoto se il titolo manca: lo dice la schermata, non l'id.
+              title: workout.titleI18n?.fromI18n(locale) ?? '',
               exerciseCount: workout.exercises,
               durationMinutes: workout.durationMinutes,
               daysSinceLastUse: now.difference(workout.lastUsed).inDays,

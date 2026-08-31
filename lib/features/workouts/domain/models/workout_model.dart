@@ -213,14 +213,27 @@ Map<String, dynamic> _sanitizeWorkoutExerciseJson({
       _asString(exercise['id']) ??
       'exercise_${index + 1}';
   final exerciseNameI18n = _toStringMap(exercise['nameI18n']);
-  final exerciseName = _asString(exercise['name']) ?? exerciseId;
+  // Nessun nome inventato dall'id.
+  //
+  // Qui stava il difetto piu' profondo dei nomi mancanti: quando il payload
+  // non portava ne' `nameI18n` ne' `name`, il modello scriveva l'id **dentro**
+  // il nome. Da quel momento l'id era un nome a tutti gli effetti, e nessuna
+  // schermata poteva piu' distinguerlo da uno vero — nessun ripiego in
+  // presentation poteva rimediare, perche' il dato era gia' corrotto.
+  //
+  // Assente e' l'unica rappresentazione onesta di «non lo so»: chi legge sa
+  // che deve risolverlo dal catalogo o mostrare un testo tradotto.
+  final exerciseName = _asString(exercise['name']);
 
   return {
     'id': _asString(rawExercise['id']) ?? '${workoutId}_entry_${index + 1}',
     'exercise': {
       ...exercise,
       'id': exerciseId,
-      'nameI18n': exerciseNameI18n ?? {'it': exerciseName, 'en': exerciseName},
+      if (exerciseNameI18n != null)
+        'nameI18n': exerciseNameI18n
+      else if (exerciseName != null)
+        'nameI18n': {'it': exerciseName, 'en': exerciseName},
     },
     'sets': _asString(rawExercise['sets']) ?? '1x',
     'rest': _asString(rawExercise['rest']) ?? '-',

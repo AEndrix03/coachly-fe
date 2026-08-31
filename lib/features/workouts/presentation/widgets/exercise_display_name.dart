@@ -33,3 +33,17 @@ String exerciseDisplayName(
   }
   return name;
 }
+
+/// Lo stesso, per un nome già estratto (bozze e voci in costruzione).
+///
+/// Le bozze portano il nome come `String`, non come view data: quando il
+/// catalogo locale non conosce ancora l'esercizio quel campo è **vuoto**, ed
+/// era vuoto per una ragione — l'alternativa che c'era prima era scriverci
+/// l'id.
+String exerciseNameOrPlaceholder(BuildContext context, String? name) {
+  final trimmed = name?.trim() ?? '';
+  if (trimmed.isEmpty || trimmed == 'Exercise') {
+    return context.l10n.exerciseNamePlaceholder;
+  }
+  return trimmed;
+}

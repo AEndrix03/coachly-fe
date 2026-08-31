@@ -146,7 +146,9 @@ class WorkoutEditPageNotifier extends _$WorkoutEditPageNotifier {
       id: 'ex_${const UuidIdGenerator().newId()}_${exercise.id}',
       exerciseId: exercise.id ?? '',
       number: number,
-      name: exercise.nameI18n?.fromI18n(locale) ?? exercise.id ?? na,
+      // Vuoto quando il nome non si conosce: la schermata mostra un testo
+      // tradotto, non l'id (`exercise_display_name.dart`).
+      name: exercise.nameI18n?.fromI18n(locale) ?? '',
       muscles: (exercise.muscles ?? const [])
           .map((m) => m.muscle?.nameI18n.fromI18n(locale) ?? na)
           .toList(),

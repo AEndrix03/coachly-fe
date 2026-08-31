@@ -565,8 +565,7 @@ String _compactLoad(double value) => value == value.roundToDouble()
 WorkoutDraft _fromWorkout(WorkoutModel workout, dynamic locale) {
   final names = {
     for (final item in workout.workoutExercises)
-      item.id:
-          item.exercise.nameI18n?.fromI18n(locale) ?? item.exercise.id ?? '',
+      item.id: item.exercise.nameI18n?.fromI18n(locale) ?? '',
   };
   final blocks = workout.programmingBlocks.isNotEmpty
       ? workout.programmingBlocks
@@ -624,7 +623,7 @@ WorkoutDraft _fromWorkout(WorkoutModel workout, dynamic locale) {
           return WorkoutExerciseDraft(
             localId: entry.id,
             exerciseId: entry.exerciseId,
-            name: names[entry.id] ?? entry.exerciseId,
+            name: names[entry.id] ?? '',
             sets: entry.sets.isEmpty ? 1 : entry.sets.length,
             repTarget: min == max
                 ? RepTarget.fixed(min)

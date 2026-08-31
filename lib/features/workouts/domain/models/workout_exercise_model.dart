@@ -68,8 +68,8 @@ ExerciseDetailModel _parseFallbackExercise(
     return ExerciseDetailModel.fromJson(exerciseJson);
   } catch (_) {
     final exerciseId = _asString(exerciseJson['id']) ?? fallbackExerciseId;
-    final exerciseName = _asString(exerciseJson['name']);
-    final fallbackName = exerciseName ?? exerciseId;
+    // Mai l'id come nome: vedi `workout_model.dart`, stessa ragione.
+    final fallbackName = _asString(exerciseJson['name']);
 
     return ExerciseDetailModel(
       id: exerciseId,
