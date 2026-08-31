@@ -1067,30 +1067,39 @@ class _ExerciseCard extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    InkWell(
-                      key: const Key('active-exercise-detail-link'),
-                      onTap: onInfo,
-                      borderRadius: BorderRadius.circular(
-                        context.radii.compact,
-                      ),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: context.sizes.touchTarget,
+                    // `Flexible` con due righe e ellissi: a 30px in w800 un
+                    // nome come «Squat con bilanciere» misura piu' della
+                    // larghezza disponibile, e senza vincolo sforava di 284px
+                    // — cioe' il nome dell'esercizio era in parte invisibile.
+                    // I nomi lunghi sono la norma, non il caso limite.
+                    Flexible(
+                      child: InkWell(
+                        key: const Key('active-exercise-detail-link'),
+                        onTap: onInfo,
+                        borderRadius: BorderRadius.circular(
+                          context.radii.compact,
                         ),
-                        child: Center(
-                          child: Text(
-                            exercise.displayName,
-                            // Parte da `titleLarge` per ereditare famiglia e
-                            // colore dal tema Material: sostituirla con un token
-                            // scarterebbe proprio cio' che questa riga prende.
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(
-                                  // ignore: no_literal_text_style
-                                  fontSize: 30,
-                                  height: 1.05,
-                                  letterSpacing: -.7,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: context.sizes.touchTarget,
+                          ),
+                          child: Center(
+                            child: Text(
+                              exercise.displayName,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              // Parte da `titleLarge` per ereditare famiglia e
+                              // colore dal tema Material: sostituirla con un
+                              // token scarterebbe proprio cio' che prende.
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(
+                                    // ignore: no_literal_text_style
+                                    fontSize: 30,
+                                    height: 1.05,
+                                    letterSpacing: -.7,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                            ),
                           ),
                         ),
                       ),
@@ -1976,13 +1985,23 @@ class _SetTechniqueActions extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Row(
       children: [
-        TextButton.icon(
-          onPressed: onAddDrop,
-          style: TextButton.styleFrom(
-            backgroundColor: scheme.surface.withValues(alpha: 0),
+        // `Flexible` sul bottone di sinistra: la riga sforava di 20px su uno
+        // schermo da 390, e i due interruttori a destra sono bersagli da
+        // toccare — restringere loro non e' un'opzione, cedere spazio
+        // all'etichetta di sinistra si'.
+        Flexible(
+          child: TextButton.icon(
+            onPressed: onAddDrop,
+            style: TextButton.styleFrom(
+              backgroundColor: scheme.surface.withValues(alpha: 0),
+            ),
+            icon: const Icon(Icons.add_rounded, size: 18),
+            label: Text(
+              context.activeTr('addDrop'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          icon: const Icon(Icons.add_rounded, size: 18),
-          label: Text(context.activeTr('addDrop')),
         ),
         const Spacer(),
         _TechniqueToggle(
