@@ -63,11 +63,12 @@ jobs:
         # il codice. Vedi `dart_test.yaml`.
         run: bash tool/check_tests.sh --exclude-tags golden
 
-  debt:
-    # Non blocca: misura. `docs/development/20` distingue il gate (bloccante,
-    # sui file toccati) dalla misura del debito (informativa, su tutto).
+  lint:
+    # Blocca. Ha smesso di essere una misura il giorno in cui il debito e'
+    # arrivato a zero: da li' in poi ogni violazione e' nuova, e una
+    # violazione nuova va fermata dove nasce, non contata.
+    # `docs/development/20-conventions-and-enforcement.md`.
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -78,5 +79,5 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - name: Debito custom_lint su tutto il repository
-        run: dart run custom_lint --no-fatal-infos || true
+      - name: custom_lint su tutto il repository
+        run: dart run custom_lint

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository_impl.dart';
+import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
 import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/active_workout/presentation/widgets/adaptive_workout_workspace.dart';
 import 'package:coachly/features/active_workout/application/active_workout_provider.dart';
@@ -200,8 +200,8 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
 
   Future<void> _showAddExerciseSheet() async {
     final catalog = await ref
-        .read(exerciseInfoPageRepositoryProvider)
-        .getDownloadedDetails();
+        .read(exerciseCatalogControllerProvider)
+        .downloadedDetails();
     if (!mounted) return;
     await showModalBottomSheet<void>(
       context: context,
@@ -219,8 +219,8 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
 
   Future<({String id, String name})?> _addExerciseForBlock() async {
     final catalog = await ref
-        .read(exerciseInfoPageRepositoryProvider)
-        .getDownloadedDetails();
+        .read(exerciseCatalogControllerProvider)
+        .downloadedDetails();
     if (!mounted) return null;
     final exercise = await showModalBottomSheet<ExerciseDetailModel>(
       context: context,

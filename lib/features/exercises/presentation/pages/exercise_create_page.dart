@@ -1,4 +1,4 @@
-import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository_impl.dart';
+import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
@@ -61,8 +61,8 @@ class _ExerciseCreatePageState extends ConsumerState<ExerciseCreatePage> {
     final names = <String, String>{'it': _nameIt.text.trim()};
     if (_nameEn.text.trim().isNotEmpty) names['en'] = _nameEn.text.trim();
     final result = await ref
-        .read(exerciseInfoPageRepositoryProvider)
-        .createPersonalExerciseResult(
+        .read(exerciseCatalogControllerProvider)
+        .createPersonal(
           nameI18n: names,
           descriptionI18n: _descriptionIt.text.trim().isEmpty
               ? null

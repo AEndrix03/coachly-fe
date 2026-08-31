@@ -204,13 +204,29 @@ sempre:
   sono rimasti in `data/`, ed è la distinzione che il documento chiede.
 - 1 era un controller che importava Material per un `Locale`, che vive in
   `dart:ui`.
-- **7 restano**, e non si chiudono spostando file: sono pagine e widget che
-  importano `*_repository_impl.dart` per raggiungere il provider del
-  repository. La composizione sta giustamente accanto al repository (D6: è
-  l'unico autorizzato a conoscere i DAO), quindi il rimedio non è un altro
-  import — è un controller in `application/` fra la schermata e il dato.
-  Riguarda `exercise_picker_sheet`, `workout_detail_page`, `workout_edit_page`,
-  `workout_active_page`, `exercise_create_page`, `personal_exercises_page`.
+- 7 non si chiudevano spostando file: erano pagine e widget che importavano
+  `*_repository_impl.dart` per raggiungere il provider del repository. La
+  composizione sta giustamente accanto al repository (D6: è l'unico
+  autorizzato a conoscere i DAO), quindi il rimedio non era un altro import —
+  era un controller in `application/` fra la schermata e il dato.
 
-Sono la fase 4.5 del piano di migrazione, e ora il lint le vede: bloccano i PR
-che toccano quei file.
+## Fase 4.5 — i due controller
+
+`ExerciseCatalogController` e `WorkoutAccessController` chiudono quei 7 punti.
+Sono deliberatamente sottili: inoltrano al repository e basta. **La loro
+utilità è dove vivono, non cosa fanno** — sono il posto che già esiste per il
+giorno in cui una di quelle schermate avrà bisogno di stato (una cache, un
+debounce, un aggiornamento ottimistico) e altrimenti lo metterebbe in un
+`setState`.
+
+Coprono solo le letture *una tantum*. I flussi continui — la lista schede, le
+statistiche — restano i provider che erano già in `application/`: duplicarli
+nel controller creerebbe due sorgenti di verità per lo stesso dato.
+
+Poiché non contengono logica, i loro test non verificano logica: verificano il
+contratto. Che un `Err` non diventi una lista vuota, che un `Ok(null)` resti
+distinguibile da un errore, che nessun parametro opzionale si perda
+nell'inoltro — tre modi di rompere l'inoltro che il compilatore non vede.
+
+Con questo il debito `custom_lint` è **0 su tutto il repository**, e il job di
+CI che lo misurava è diventato bloccante.

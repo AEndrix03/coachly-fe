@@ -8,7 +8,7 @@ import 'package:coachly/features/workouts/presentation/widgets/workout_builder_w
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/features/workouts/presentation/widgets/exercise_picker_sheet.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
-import 'package:coachly/features/workouts/data/repositories/workout_page_repository_impl.dart';
+import 'package:coachly/features/workouts/application/workout_access_controller.dart';
 import 'package:coachly/shared/design_system/coachly_athlete_theme.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +38,8 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
     var source = _source;
     if (source == null) {
       final response = await ref
-          .read(workoutPageRepositoryProvider)
-          .getWorkout(widget.workoutId);
+          .read(workoutAccessControllerProvider)
+          .workout(widget.workoutId);
       source = response.valueOrNull;
     }
     if (!mounted || source == null) return;

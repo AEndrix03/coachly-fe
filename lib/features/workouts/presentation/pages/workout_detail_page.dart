@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'dart:math' as math;
 
-import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository_impl.dart';
+import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
 import 'package:coachly/features/workouts/domain/workout_detail_view_data.dart';
 import 'package:coachly/features/workouts/application/workout_edit_draft_provider.dart';
@@ -371,10 +371,10 @@ class _WorkoutSavedBorderPainter extends CustomPainter {
 
 final _exerciseNameProvider = FutureProvider.autoDispose
     .family<String?, String>((ref, argument) async {
-      final repository = ref.watch(exerciseInfoPageRepositoryProvider);
+      final catalog = ref.watch(exerciseCatalogControllerProvider);
       final parts = argument.split('|');
       final locale = parts.first;
-      final result = await repository.getExerciseDetailResult(parts.last);
+      final result = await catalog.detail(parts.last);
       final translations = result.valueOrNull?.nameI18n;
       return translations?[locale] ??
           translations?.values.firstWhere(

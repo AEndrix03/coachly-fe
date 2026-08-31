@@ -58,16 +58,22 @@ Implementati in `tool/coachly_lints/`, agganciati via
 `analyzer: plugins: [custom_lint]`. Ogni regola implementa una riga di
 `01-principles.md`.
 
-**Stato attuale — 7 violazioni** (erano 170 alla prima esecuzione, poi 0, poi
+**Stato attuale — 0 violazioni** (erano 170 alla prima esecuzione, poi 0, poi
 24 quando la struttura per livelli ha reso i lint finalmente applicabili — vedi
-`02-project-structure.md`):
+`02-project-structure.md`, e infine 0 con i controller della fase 4.5).
+
+Da qui la CI cambia natura: il job che girava su tutto il repository era
+`continue-on-error` perché misurava un debito, e un debito che non puoi
+azzerare in un PR non può bloccare. A zero quella cautela non serve più —
+ogni violazione che comparirà da adesso è **nuova**, e va fermata dove nasce
+invece di essere contata. Il job ora blocca.
 
 | Regola | Residue | Iniziali | Doc |
 |---|---|---|---|
 | `no_literal_colors` | 0 | 142 | 09 |
 | `no_features_in_core` | 0 | 15 | 01 D5 |
 | `no_cross_feature_presentation` | 0 | 10 | 01 D4 |
-| `no_data_layer_in_presentation` | 7 | 3 → 23 | 01 D1 |
+| `no_data_layer_in_presentation` | 0 | 3 → 23 | 01 D1 |
 | `no_side_effects_in_build` | 0 | 0 | 03 |
 | `no_raw_datetime_now` | 0 | — | 19 |
 | `no_material_in_application` | 0 | 1 | 01 D2 |

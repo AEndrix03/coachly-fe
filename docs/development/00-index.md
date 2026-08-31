@@ -119,6 +119,6 @@ Restano, in ordine:
 2. **Event log delle sessioni** (fase 3.5) — oggi `sessions` salva lo stato
    finale mergiato in un `payload` JSON. È il dataset che giustifica
    l'esistenza del backend, e non viene prodotto.
-3. **Controller fra schermate e repository** (fase 4.5) — la struttura per
-   livelli è arrivata e ha reso visibili 7 punti in cui una schermata parla
-   direttamente al repository. Il lint ora li blocca sui file toccati.
+3. ~~**Controller fra schermate e repository** (fase 4.5)~~ — fatto:
+   `ExerciseCatalogController` e `WorkoutAccessController`. Il debito
+   `custom_lint` è a 0 e il job che lo misurava ora blocca.

@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository_impl.dart';
-import 'package:coachly/features/workouts/data/repositories/workout_page_repository_impl.dart';
+import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
+import 'package:coachly/features/workouts/application/workout_access_controller.dart';
 import 'package:coachly/features/workouts/presentation/widgets/polite_text_input_formatter.dart';
 import 'package:coachly/features/workouts/presentation/widgets/debouncer.dart';
 import 'package:coachly/core/result/result.dart';
@@ -78,9 +78,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   }
 
   Future<void> _loadSessions() async {
-    final sessions = await ref
-        .read(workoutPageRepositoryProvider)
-        .getAllSessions();
+    final sessions = await ref.read(workoutAccessControllerProvider).sessions();
     if (!mounted) return;
     setState(() => _sessions = sessions);
   }
@@ -244,8 +242,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       return;
     }
 
-    final repository = ref.read(exerciseInfoPageRepositoryProvider);
-    final response = await repository.createPersonalExerciseResult(
+    final catalog = ref.read(exerciseCatalogControllerProvider);
+    final response = await catalog.createPersonal(
       nameI18n: {lang: name},
       descriptionI18n: description.isNotEmpty ? {lang: description} : null,
       tipsI18n: const {},
@@ -1100,8 +1098,8 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
   ) async {
     final id = exercise.id;
     if (id == null || id.isEmpty) return;
-    final repository = ref.read(exerciseInfoPageRepositoryProvider);
-    final result = await repository.getExerciseDetailResult(id);
+    final catalog = ref.read(exerciseCatalogControllerProvider);
+    final result = await catalog.detail(id);
     if (!mounted) return;
     switch (result) {
       // Il messaggio del Failure e' diagnostico: all'utente si mostra un testo

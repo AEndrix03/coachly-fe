@@ -1,4 +1,4 @@
-import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository_impl.dart';
+import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
 import 'package:coachly/features/user_settings/providers/settings_provider.dart';
@@ -31,8 +31,8 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
       _isLoading = true;
       _error = null;
     });
-    final repository = ref.read(exerciseInfoPageRepositoryProvider);
-    final result = await repository.getMyExercisesResult();
+    final catalog = ref.read(exerciseCatalogControllerProvider);
+    final result = await catalog.myExercises();
     if (!mounted) {
       return;
     }
@@ -103,7 +103,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
       return;
     }
 
-    final repository = ref.read(exerciseInfoPageRepositoryProvider);
+    final catalog = ref.read(exerciseCatalogControllerProvider);
     final name = nameController.text.trim();
     final description = descriptionController.text.trim();
     if (name.isEmpty) {
@@ -111,7 +111,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
     }
 
     if (editing == null) {
-      await repository.createPersonalExerciseResult(
+      await catalog.createPersonal(
         nameI18n: {locale: name},
         descriptionI18n: description.isNotEmpty ? {locale: description} : null,
         tipsI18n: const {},
@@ -121,7 +121,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
         isUnilateral: false,
       );
     } else {
-      await repository.updatePersonalExerciseResult(
+      await catalog.updatePersonal(
         editing.id!,
         nameI18n: {locale: name},
         descriptionI18n: description.isNotEmpty ? {locale: description} : null,
@@ -159,8 +159,8 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
       return;
     }
     await ref
-        .read(exerciseInfoPageRepositoryProvider)
-        .deletePersonalExerciseResult(exercise.id!);
+        .read(exerciseCatalogControllerProvider)
+        .deletePersonal(exercise.id!);
     await _loadExercises();
   }
 
