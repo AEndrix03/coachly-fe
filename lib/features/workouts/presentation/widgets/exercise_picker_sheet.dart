@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/components/product/coachly_loading.dart';
 import 'package:coachly/core/ids/id_generator.dart';
 import 'dart:async';
 import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
@@ -832,12 +833,7 @@ class _ExercisePickerSheetState extends ConsumerState<ExercisePickerSheet> {
       builder: (context, ref, _) {
         final value = ref.watch(exerciseListProvider);
         return value.when(
-          loading: () => Center(
-            child: CircularProgressIndicator(
-              color: context.exerciseTheme.primary,
-              strokeWidth: 2,
-            ),
-          ),
+          loading: () => const CoachlyLoadingSection(sceneKey: 'catalog'),
           error: (err, _) => Center(
             child: Text(
               err.toString(),

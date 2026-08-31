@@ -149,7 +149,8 @@ incompleta e va rifatta.
 | Provider, controller, stato, Riverpod | `03-state-riverpod.md` |
 | **Leggere o salvare qualsiasi dato** | `04-data-layer.md` **e** `05-sync-and-offline.md` |
 | Chiamate HTTP, API, endpoint | `04-data-layer.md`, `05-sync-and-offline.md`, `06-networking.md` |
-| Errori, toast, messaggi, stati di caricamento | `07-errors-and-feedback.md` |
+| Errori, toast, messaggi | `07-errors-and-feedback.md` |
+| Stati di caricamento, spinner, attesa | `27-loading.md` |
 | Rotte, navigazione, navbar, deep link | `08-routing-navigation.md` |
 | Colori, temi, spaziature, font, ombre | `09-design-tokens.md` |
 | Creare o modificare un widget | `10-components.md` |

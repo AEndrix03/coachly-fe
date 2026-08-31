@@ -68,6 +68,7 @@ codice ne contiene 216.
 | 13 | [Localizzazione, formati e unità](13-i18n.md) | Costituzione |
 | 14 | [Accessibilità](14-accessibility.md) | Costituzione |
 | 15 | [Performance](15-performance.md) | Standard |
+| 27 | [Attesa](27-loading.md) | Standard |
 
 ### Trasversali
 
@@ -88,6 +89,13 @@ codice ne contiene 216.
 |---|---|---|
 | 26 | [Piano di migrazione](26-migration-plan.md) | Riferimento |
 | — | [Architecture Decision Records](adr/README.md) | Costituzione |
+
+## Documentazione di prodotto
+
+`docs/development/` dice come è fatta la app. `docs/product/` dice cosa fa e
+perché: schermata per schermata, l'intento prima dell'implementazione. Chi
+deve decidere *dove va questo bottone* parte da lì, non da qui — l'indice è
+[`docs/product/00-index.md`](../product/00-index.md).
 
 ## Decisioni prese
 

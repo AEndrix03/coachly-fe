@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/components/product/coachly_loading.dart';
 import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
 import 'package:coachly/core/result/result.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
@@ -174,7 +175,7 @@ class _PersonalExercisesPageState extends ConsumerState<PersonalExercisesPage> {
         child: const Icon(Icons.add),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const CoachlyLoadingSection(sceneKey: 'personal-exercises')
           : _error != null
           ? Center(child: Text(_error!))
           : _exercises.isEmpty

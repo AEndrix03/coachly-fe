@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:coachly/design_system/components/product/coachly_loading.dart';
 import 'package:coachly/app/bootstrap/provider_overrides.dart';
 import 'package:coachly/core/analytics/analytics_event.dart';
 import 'package:coachly/core/analytics/analytics_tracker.dart';
@@ -63,6 +65,14 @@ class CoachlyApplication extends ConsumerWidget {
             GlobalWidgetsLocalizations.delegate,
           ],
           routerConfig: router,
+          builder: (context, child) {
+            // Le illustrazioni dell'attesa si decodificano qui, dove il
+            // context ha gia' `MediaQuery` e `Directionality`. Caricarle nel
+            // momento in cui servono le farebbe arrivare *dopo* l'attesa che
+            // devono coprire (`docs/development/27-loading.md`).
+            unawaited(CoachlyLoadingScenes.precache(context));
+            return child ?? const SizedBox.shrink();
+          },
         ),
       ),
     );

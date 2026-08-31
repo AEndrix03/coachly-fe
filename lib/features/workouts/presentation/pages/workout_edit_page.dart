@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/components/product/coachly_loading.dart';
 import 'package:coachly/core/ids/id_generator.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'dart:async';
@@ -88,7 +89,7 @@ class _WorkoutEditPageState extends ConsumerState<WorkoutEditPage> {
             ],
           ),
           body: _source == null
-              ? const Center(child: CircularProgressIndicator())
+              ? const CoachlyLoadingSection(sceneKey: 'workout-edit')
               : SafeArea(
                   top: false,
                   child: Column(

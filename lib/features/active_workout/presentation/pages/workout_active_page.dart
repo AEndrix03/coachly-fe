@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/components/product/coachly_loading.dart';
 import 'dart:async';
 
 import 'package:coachly/features/exercises/application/exercise_catalog_controller.dart';
@@ -63,8 +64,8 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
           backgroundColor: context.exerciseTheme.background,
           body: SafeArea(
             child: switch (state.status) {
-              ActiveWorkoutStatus.loading => const Center(
-                child: CircularProgressIndicator(),
+              ActiveWorkoutStatus.loading => const CoachlyLoadingSection(
+                sceneKey: 'active-workout',
               ),
               ActiveWorkoutStatus.error => _ErrorState(
                 message: state.errorMessage,

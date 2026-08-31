@@ -1,3 +1,4 @@
+import 'package:coachly/design_system/components/product/coachly_loading.dart';
 import 'package:coachly/features/exercises/domain/exercise_detail_view_data.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
 import 'package:coachly/design_system/components/product/muscle_anatomy_view.dart';
@@ -43,11 +44,8 @@ class WorkoutCheckPage extends ConsumerWidget {
         body: draft.exerciseCount == 0
             ? _EmptyWorkoutCheck(onAddExercise: () => context.pop(true))
             : report.when(
-                loading: () => Center(
-                  child: CircularProgressIndicator(
-                    color: context.exerciseTheme.primary,
-                  ),
-                ),
+                loading: () =>
+                    const CoachlyLoadingSection(sceneKey: 'workout-check'),
                 error: (_, _) => _CheckUnavailable(
                   onRetry: () => ref.invalidate(workoutCheckProvider(draft)),
                 ),
