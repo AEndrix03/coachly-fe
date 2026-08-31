@@ -115,8 +115,23 @@ diventati **tredici**, e due dei tre sono cresciuti nel frattempo. Il peggiore
 è `adaptive_workout_workspace.dart`, 3909 righe e 46 classi — la schermata che
 cambia più spesso di tutte.
 
-Da ora `test/tooling/file_size_test.dart` la verifica, con l'elenco dei tredici
-dichiarato riga per riga. Il test non chiude il debito: chiuderlo è lavoro di
+Da ora `test/tooling/file_size_test.dart` la verifica, con l'elenco dichiarato
+riga per riga. Il peggiore è stato chiuso subito:
+`adaptive_workout_workspace.dart` è passato da **3909 righe a 549**,
+distribuite in `presentation/widgets/workspace/` — sedici componenti divisi
+lungo le giunture del grafo di dipendenza, non a fette uguali.
+
+Le 44 classi private sono diventate pubbliche, e non è un effetto collaterale:
+la privacy di libreria era esattamente ciò che le teneva in un file solo.
+Diventare pubbliche è il punto — sono componenti.
+
+**La divisione è stata fatta dopo aver scritto i golden, non prima.** Dividere
+senza baseline è un rifacimento a occhio. Scrivendoli sono usciti due overflow
+veri che nessuno vedeva: il nome dell'esercizio sforava di 284px a 30px in w800
+(«Squat con bilanciere» è un nome normale, quindi il nome era in parte
+invisibile) e la riga delle tecniche di 20px su uno schermo da 390. Corretti
+prima di fissare la baseline; dopo la divisione i sette golden sono identici
+byte per byte. Il test non chiude il debito: chiuderlo è lavoro di
 design, un file per volta, ed è giusto che avvenga quando quel file si tocca.
 Fa la cosa che serviva di più — **impedisce che cresca di nascosto**. Un file
 nuovo oltre soglia fallisce; e un file dell'elenco che scende sotto soglia

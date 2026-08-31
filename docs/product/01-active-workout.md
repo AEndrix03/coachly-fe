@@ -164,10 +164,19 @@ inserite.
 - **Non impone l'ordine.** Si può saltare avanti e tornare indietro; il rack
   occupato è un fatto, non un'eccezione.
 
-## Debito noto
+## Struttura del codice
 
-`adaptive_workout_workspace.dart` è un file solo da ~3900 righe con 46 classi,
-e `AdaptiveWorkoutWorkspace` riceve **33 parametri**. Supera di molto il limite
-delle 800 righe di `docs/development/02-project-structure.md`, ed è la
-schermata dove la separazione in componenti serve di più, perché è quella che
-cambia più spesso. Vedi `docs/development/26-migration-plan.md`.
+I componenti stanno in `presentation/widgets/workspace/`, uno per pezzo di
+schermata: testata, navigatore di sessione, scheda dell'esercizio, editor della
+serie, scatti, ruolo, tecnica, drop set, foglio numerico, nota rapida, barra di
+recupero, dock. `adaptive_workout_workspace.dart` resta come orchestratore, 549
+righe.
+
+Era un file solo da 3909 righe con 46 classi. `AdaptiveWorkoutWorkspace` riceve
+ancora **33 parametri**: è il segnale che resta: l'orchestratore fa da centralino
+fra la pagina e i componenti, e quella lista andrebbe raccolta in un oggetto di
+callback. Non è urgente come la divisione, ed è la prossima cosa da fare qui.
+
+I tre golden in `test/features/active_workout/goldens/` fissano la forma. Sono
+nati per rendere verificabile la divisione, e nel farlo hanno trovato due
+overflow veri — vedi `docs/development/02-project-structure.md`.

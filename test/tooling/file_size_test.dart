@@ -28,10 +28,6 @@ void main() {
   /// sappiamo perché». Togliere una riga da questo elenco è il modo in cui il
   /// debito si chiude.
   const declared = <String, int>{
-    // La schermata dell'allenamento: 46 classi in un file. È quella che
-    // cambia più spesso, quindi è quella dove la divisione serve di più.
-    'lib/features/active_workout/presentation/widgets/adaptive_workout_workspace.dart':
-        3909,
     'lib/features/workouts/presentation/widgets/workout_builder_widgets.dart':
         2449,
     // Ponte verso gli ARB: è una mappa, non logica. Sparisce con l'ultimo
