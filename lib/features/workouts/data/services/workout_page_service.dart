@@ -3,7 +3,6 @@ import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/features/sessions/data/dto/workout_session_write_command.dart';
 import 'package:coachly/features/workouts/data/dto/workout_write_command.dart';
 import 'package:coachly/features/workouts/data/mappers/workout_remote_mapper.dart';
-import 'package:coachly/features/workouts/data/mappers/workout_write_command_mapper.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/domain/models/workout_stats_model.dart';
 import 'package:coachly/core/logging/app_logger.dart';
@@ -72,22 +71,6 @@ class WorkoutPageService {
         currentStreak: 7,
         weeklyWorkouts: 3,
       ),
-    );
-  }
-
-  // Sincronizza workout dirty con il BE
-  Future<ApiResponse<void>> syncDirtyWorkouts(
-    List<WorkoutModel> dirtyWorkouts,
-  ) async {
-    final commands = dirtyWorkouts
-        .map(WorkoutWriteCommandMapper.fromWorkoutModel)
-        .map((command) => command.toJson())
-        .toList();
-
-    return await _apiClient.post<void>(
-      '/workouts/sync',
-      body: {'workouts': commands},
-      fromJson: (_) {},
     );
   }
 
