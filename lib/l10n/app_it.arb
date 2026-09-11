@@ -685,5 +685,9 @@
   "setsCompletedCount": "{count, plural, =0{Nessuna serie completata} =1{1 serie completata} other{{count} serie completate}}",
   "exercisesInWorkoutCount": "{count, plural, =0{Nessun esercizio} =1{1 esercizio} other{{count} esercizi}}",
   "exerciseNamePlaceholder": "Esercizio non ancora scaricato",
-  "workoutTitlePlaceholder": "Scheda senza titolo"
+  "workoutTitlePlaceholder": "Scheda senza titolo",
+  "updateRequiredTitle": "Aggiorna Coachly per continuare",
+  "updateRequiredBody": "Questa versione non può più sincronizzare con il server. I tuoi allenamenti sono al sicuro su questo dispositivo e saliranno dopo l''aggiornamento.",
+  "updateRequiredAction": "Riprova",
+  "updateRecommendedMessage": "È disponibile una nuova versione di Coachly."
 }

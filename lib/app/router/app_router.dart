@@ -2,6 +2,9 @@ import 'package:coachly/app/router/routes.dart';
 import 'package:coachly/core/flags/feature_flags.dart';
 import 'package:coachly/core/observability/debug_screen.dart';
 import 'package:coachly/features/auth/presentation/pages/loading_page.dart';
+import 'package:coachly/features/app_update/application/app_update_provider.dart';
+import 'package:coachly/features/app_update/domain/app_update_status.dart';
+import 'package:coachly/features/app_update/presentation/pages/update_required_page.dart';
 import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
 import 'package:coachly/features/workouts/presentation/pages/workout_page.dart';
@@ -36,6 +39,11 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 @riverpod
 GoRouter router(Ref ref) {
   final authState = ref.watch(authProvider);
+  // Lo stato e' gia' disponibile: il redirect non fa rete e non attende
+  // (`08-routing-navigation.md`, R5). Finche' la verifica non ha risposto vale
+  // `upToDate`, quindi la app parte normalmente anche offline.
+  final updateStatus =
+      ref.watch(appUpdateProvider).value ?? AppUpdateStatus.upToDate;
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -44,6 +52,15 @@ GoRouter router(Ref ref) {
       // La diagnostica deve restare raggiungibile anche — soprattutto — quando
       // e' l'autenticazione a non funzionare (`18-observability.md`).
       if (state.matchedLocation == DebugScreen.routePath) return null;
+
+      // Prima dell'autenticazione: un client sotto la versione minima non deve
+      // nemmeno provare a parlare col backend.
+      final isOnUpdateRequired =
+          state.matchedLocation == UpdateRequiredPage.routePath;
+      if (updateStatus == AppUpdateStatus.updateRequired) {
+        return isOnUpdateRequired ? null : UpdateRequiredPage.routePath;
+      }
+      if (isOnUpdateRequired) return AppTab.workouts.path;
 
       final isLoading = authState.isLoading;
       final canAccessApp = authState.value?.canAccessApp == true;
@@ -70,6 +87,10 @@ GoRouter router(Ref ref) {
         builder: (context, state) => const LoadingPage(),
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: UpdateRequiredPage.routePath,
+        builder: (context, state) => const UpdateRequiredPage(),
+      ),
       // Non compare in nessuna navigazione: si raggiunge digitando la rotta.
       // Nelle build release il flag e' spento e la rotta non esiste.
       if (FeatureFlags.isEnabled(FeatureFlag.debugScreen))

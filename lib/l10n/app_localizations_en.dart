@@ -2302,4 +2302,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workoutTitlePlaceholder => 'Untitled workout';
+
+  @override
+  String get updateRequiredTitle => 'Update Coachly to continue';
+
+  @override
+  String get updateRequiredBody =>
+      'This version can no longer sync with the server. Your workouts are safe on this device and will upload once you update.';
+
+  @override
+  String get updateRequiredAction => 'Check again';
+
+  @override
+  String get updateRecommendedMessage =>
+      'A new version of Coachly is available.';
 }

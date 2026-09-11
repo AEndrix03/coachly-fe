@@ -2323,4 +2323,18 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get workoutTitlePlaceholder => 'Scheda senza titolo';
+
+  @override
+  String get updateRequiredTitle => 'Aggiorna Coachly per continuare';
+
+  @override
+  String get updateRequiredBody =>
+      'Questa versione non può più sincronizzare con il server. I tuoi allenamenti sono al sicuro su questo dispositivo e saliranno dopo l\'aggiornamento.';
+
+  @override
+  String get updateRequiredAction => 'Riprova';
+
+  @override
+  String get updateRecommendedMessage =>
+      'È disponibile una nuova versione di Coachly.';
 }

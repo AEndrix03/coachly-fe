@@ -3090,5 +3090,21 @@
   "@exerciseNamePlaceholder": {
     "description": "Mostrato al posto del nome quando il catalogo locale non ha ancora quell'esercizio. Non si mostra mai l'id: per chi legge non e' un nome, e' rumore."
   },
-  "workoutTitlePlaceholder": "Untitled workout"
+  "workoutTitlePlaceholder": "Untitled workout",
+  "updateRequiredTitle": "Update Coachly to continue",
+  "@updateRequiredTitle": {
+    "description": "Titolo della schermata bloccante mostrata quando la versione installata e' sotto minSupportedVersion."
+  },
+  "updateRequiredBody": "This version can no longer sync with the server. Your workouts are safe on this device and will upload once you update.",
+  "@updateRequiredBody": {
+    "description": "Corpo della schermata bloccante. Dice esplicitamente che i dati locali non sono persi: e' la prima paura dell'utente davanti a un blocco."
+  },
+  "updateRequiredAction": "Check again",
+  "@updateRequiredAction": {
+    "description": "Azione che rifa' la verifica della versione."
+  },
+  "updateRecommendedMessage": "A new version of Coachly is available.",
+  "@updateRecommendedMessage": {
+    "description": "Avviso non bloccante mostrato quando la versione e' sotto recommendedVersion."
+  }
 }

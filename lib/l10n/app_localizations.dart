@@ -4218,6 +4218,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Untitled workout'**
   String get workoutTitlePlaceholder;
+
+  /// Titolo della schermata bloccante mostrata quando la versione installata e' sotto minSupportedVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Coachly to continue'**
+  String get updateRequiredTitle;
+
+  /// Corpo della schermata bloccante. Dice esplicitamente che i dati locali non sono persi: e' la prima paura dell'utente davanti a un blocco.
+  ///
+  /// In en, this message translates to:
+  /// **'This version can no longer sync with the server. Your workouts are safe on this device and will upload once you update.'**
+  String get updateRequiredBody;
+
+  /// Azione che rifa' la verifica della versione.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get updateRequiredAction;
+
+  /// Avviso non bloccante mostrato quando la versione e' sotto recommendedVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'A new version of Coachly is available.'**
+  String get updateRecommendedMessage;
 }
 
 class _AppLocalizationsDelegate

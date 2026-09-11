@@ -26,6 +26,11 @@ const _icuOnlyKeys = <String>{
   'workoutActiveExitBody',
   'workoutActiveSaveAndExit',
   'workoutActiveKeepTraining',
+  // Guard di versione minima (`25-release-and-environments.md`).
+  'updateRequiredTitle',
+  'updateRequiredBody',
+  'updateRequiredAction',
+  'updateRecommendedMessage',
 };
 
 Map<String, String> _messages(String path) {

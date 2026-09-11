@@ -83,6 +83,25 @@ abstract final class AppConfig {
     defaultValue: 'info',
   );
 
+  /// Versione del client, nel formato `major.minor.patch` di `pubspec.yaml`
+  /// (`docs/development/25-release-and-environments.md`).
+  ///
+  /// Arriva da `--dart-define` invece che da `package_info_plus` perche' una
+  /// dipendenza nuova richiede un ADR (`.claude/rules/development.md`, divieto
+  /// 16) e perche' la CI conosce gia' la versione che sta costruendo. Il
+  /// default segue `pubspec.yaml` e va tenuto allineato.
+  static const String appVersion = String.fromEnvironment(
+    'APP_VERSION',
+    defaultValue: '1.0.0',
+  );
+
+  /// Numero di build monotono assegnato dalla CI. Non partecipa al confronto
+  /// con le soglie del backend: quelle sono `major.minor.patch`.
+  static const String appBuild = String.fromEnvironment(
+    'APP_BUILD',
+    defaultValue: '1',
+  );
+
   static const String rawCacheMode = String.fromEnvironment(
     'CACHE_MODE',
     defaultValue: 'warm',
@@ -103,6 +122,8 @@ abstract final class AppConfig {
     'cacheMode': cacheMode.wireName,
     'rawCacheMode': rawCacheMode,
     'logLevel': logLevel,
+    'appVersion': appVersion,
+    'appBuild': appBuild,
     'isReleaseBuild': kReleaseMode,
   };
 }
