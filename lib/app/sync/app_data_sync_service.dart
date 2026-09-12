@@ -115,8 +115,17 @@ class AppDataSyncService {
 
   Future<void> _runFullSync() async {
     final workoutResult = await _workoutRepository.refreshFromRemote();
-    final exerciseResult = await _exerciseRepository.refreshFromRemoteResult();
-    final success = workoutResult.isOk && exerciseResult.isOk;
+    // Il catalogo passa dal canale a delta anche all'avvio, non solo al
+    // ritorno in foreground. Prima qui si scaricavano i soli **riepiloghi**:
+    // il dettaglio restava vuoto, e le schermate che leggono i dettagli
+    // scaricati — il selettore di esercizi di una scheda — vedevano soltanto
+    // quelli che l'utente aveva aperto a mano.
+    final exerciseResult = await _catalogSyncRepository.syncIfNeeded();
+    // Gli esercizi personali non passano dal delta: il catalogo e' uguale per
+    // tutti e lo versiona il backend, i personali sono dati dell'utente.
+    final customResult = await _exerciseRepository.refreshCustomExercisesResult();
+    final success =
+        workoutResult.isOk && exerciseResult.isOk && customResult.isOk;
 
     if (success) {
       _hasSyncedCurrentSession = true;

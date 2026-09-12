@@ -42,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'coachly'));
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -79,6 +79,17 @@ class AppDatabase extends _$AppDatabase {
       if (from < 5) {
         // L'impronta del contenuto arriva col canale a delta del catalogo.
         await m.addColumn(catalogExercises, catalogExercises.sha);
+      }
+      if (from < 6) {
+        // Azzera il watermark del catalogo.
+        //
+        // Una versione precedente registrava la versione del catalogo dopo
+        // aver scaricato i soli **riepiloghi**: il dettaglio restava vuoto ma
+        // il client si credeva allineato, e non avrebbe mai piu' chiesto un
+        // delta. Rimettere il watermark a zero forza una riapplicazione
+        // completa, che e' idempotente perche' il delta e' un upsert per
+        // chiave.
+        await customStatement('UPDATE catalog_meta SET version = 0');
       }
     },
     beforeOpen: (details) async {

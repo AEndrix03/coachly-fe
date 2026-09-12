@@ -85,4 +85,12 @@ abstract class IExerciseInfoPageRepository {
   Future<Result<void, Failure>> deletePersonalExerciseResult(String exerciseId);
 
   Future<Result<List<ExerciseDetailModel>, Failure>> refreshFromRemoteResult();
+
+  /// Riallinea gli esercizi **personali** dell'utente.
+  ///
+  /// Sta fuori dal canale a delta del catalogo per costruzione: il catalogo e'
+  /// uguale per tutti e lo versiona il backend, gli esercizi personali sono
+  /// dati dell'utente e hanno il loro percorso
+  /// (`docs/development/04-data-layer.md`, le tre classi di dati).
+  Future<Result<void, Failure>> refreshCustomExercisesResult();
 }

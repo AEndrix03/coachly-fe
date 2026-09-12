@@ -159,7 +159,11 @@ class _Animated3dLogoState extends State<Animated3dLogo>
                 interpolationDecay: 25,
                 // Posa di partenza dell'entrata: lontano, ruotato e visto dal
                 // basso. Il JS la porta a riposo con la prima animazione.
-                cameraOrbit: '-200deg 100deg 300%',
+                cameraOrbit: '-200deg 100deg 173%',
+                // Il limite automatico del raggio si ferma prima della posa di
+                // riposo: senza questo la camera verrebbe riportata avanti e
+                // il marchio tornerebbe grande.
+                maxCameraOrbit: 'Infinity 180deg 1000%',
                 relatedCss: _pageCss,
                 relatedJs: _pageJs,
                 onWebViewCreated: (controller) => _webView = controller,
@@ -235,7 +239,7 @@ model-viewer::part(default-progress-mask) { display: none; }
 
   // phi > 90 guarda leggermente dal basso: compensa l'inclinazione in avanti
   // del modello. radius > 100% lascia margine dentro il palco.
-  var REST = { theta: 0, phi: 92, radius: 229, x: 0, y: 0, scale: 1 };
+  var REST = { theta: 0, phi: 92, radius: 130, x: 0, y: 0, scale: 1 };
   var SWAY_THETA = 5, SWAY_PHI = 2;
   var SPIN_SPEED = 330;      // gradi al secondo a regime: un giro in ~1.1 s
   var SPIN_RAMP = 900;       // ms per arrivare a regime
@@ -267,7 +271,7 @@ model-viewer::part(default-progress-mask) { display: none; }
 
   // ---- Motore -------------------------------------------------------------
 
-  var state = { theta: -200, phi: 100, radius: 300, x: 0, y: 0, scale: 0.6 };
+  var state = { theta: -200, phi: 100, radius: 173, x: 0, y: 0, scale: 0.6 };
   var mode = 'boot';
   var seq = null, drag = null, fling = null;
   var busy = false, busyV = 0, busyT = 0;

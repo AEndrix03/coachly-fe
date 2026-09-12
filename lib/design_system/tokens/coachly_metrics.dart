@@ -136,9 +136,9 @@ class CoachlySizes {
     this.iconLg = 32,
     this.iconXl = 48,
     this.authAction = 64,
-    this.authLogo = 100,
-    this.authLogoStage = 240,
-    this.authLogoGlow = 75,
+    this.authLogo = 135,
+    this.authLogoStage = 176,
+    this.authLogoGlow = 104,
     this.authLogoDrop = 16,
     this.authTitle = 108,
   });

@@ -8,6 +8,62 @@ part of 'auth_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Se l'accesso ha qualche possibilita' di riuscire.
+///
+/// L'accesso passa da un browser: senza rete non c'e' niente da tentare, e la
+/// schermata offre invece l'ingresso offline. Finche' la connettivita' non ha
+/// risposto si assume che ci sia, per non far lampeggiare la scorciatoia.
+
+@ProviderFor(canSignIn)
+const canSignInProvider = CanSignInProvider._();
+
+/// Se l'accesso ha qualche possibilita' di riuscire.
+///
+/// L'accesso passa da un browser: senza rete non c'e' niente da tentare, e la
+/// schermata offre invece l'ingresso offline. Finche' la connettivita' non ha
+/// risposto si assume che ci sia, per non far lampeggiare la scorciatoia.
+
+final class CanSignInProvider extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  /// Se l'accesso ha qualche possibilita' di riuscire.
+  ///
+  /// L'accesso passa da un browser: senza rete non c'e' niente da tentare, e la
+  /// schermata offre invece l'ingresso offline. Finche' la connettivita' non ha
+  /// risposto si assume che ci sia, per non far lampeggiare la scorciatoia.
+  const CanSignInProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'canSignInProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$canSignInHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return canSignIn(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$canSignInHash() => r'd50fd4d09fb8e681b9fefec5c3463e73efae7de2';
 
 @ProviderFor(tokenManager)
 const tokenManagerProvider = TokenManagerProvider._();

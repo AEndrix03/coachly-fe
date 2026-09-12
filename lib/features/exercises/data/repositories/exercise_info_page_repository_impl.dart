@@ -167,6 +167,16 @@ class ExerciseInfoPageRepositoryImpl implements IExerciseInfoPageRepository {
     }
   }
 
+  @override
+  Future<Result<void, Failure>> refreshCustomExercisesResult() async {
+    try {
+      await _refreshCustomExercises();
+      return const Ok(null);
+    } catch (e) {
+      return Err(exceptionToFailure(e));
+    }
+  }
+
   Future<void> _refreshCustomExercises() async {
     final remote = (await _service.fetchMyExercises()).toResult();
     if (remote case Ok(:final value)) {

@@ -1,6 +1,7 @@
 import 'package:coachly/core/database/app_database.dart';
 import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/logging/app_logger.dart';
+import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/models/auth_state/auth_state.dart';
 import 'package:coachly/features/auth/data/repositories/auth_repository.dart';
@@ -25,6 +26,14 @@ extension AuthStatusProjection on AuthState {
     return AuthStatus.idle;
   }
 }
+
+/// Se l'accesso ha qualche possibilita' di riuscire.
+///
+/// L'accesso passa da un browser: senza rete non c'e' niente da tentare, e la
+/// schermata offre invece l'ingresso offline. Finche' la connettivita' non ha
+/// risposto si assume che ci sia, per non far lampeggiare la scorciatoia.
+@riverpod
+bool canSignIn(Ref ref) => ref.watch(isOnlineProvider).value ?? true;
 
 @riverpod
 TokenManager tokenManager(Ref ref) => TokenManager();

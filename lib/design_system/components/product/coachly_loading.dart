@@ -26,6 +26,7 @@
 import 'dart:async';
 
 import 'package:coachly/core/assets/app_assets.dart';
+import 'package:coachly/design_system/components/product/coachly_spinning_mark.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,11 @@ import 'package:flutter/material.dart';
 /// ha sei attese che sembrano sei app.
 @immutable
 class CoachlyLoadingScene {
-  const CoachlyLoadingScene({required this.asset, required this.width});
+  const CoachlyLoadingScene({
+    required this.asset,
+    required this.width,
+    this.model,
+  });
 
   /// Percorso da `AppAssets`, mai una stringa scritta a mano
   /// (`docs/development/16-media.md`).
@@ -45,6 +50,14 @@ class CoachlyLoadingScene {
 
   /// Larghezza a cui l'illustrazione e' disegnata.
   final double width;
+
+  /// Modello tridimensionale della stessa scena, se esiste.
+  ///
+  /// Lo usa **solo** l'attesa a schermo intero: e' una WebView, e una per
+  /// ogni sezione in attesa costerebbe piu' dell'attesa stessa. Le sezioni
+  /// restano sull'immagine, che e' anche la risposta giusta per un'attesa che
+  /// puo' finire in pochi millisecondi.
+  final String? model;
 }
 
 /// Il repertorio condiviso.
@@ -56,7 +69,11 @@ abstract final class CoachlyLoadingScenes {
   const CoachlyLoadingScenes._();
 
   static const List<CoachlyLoadingScene> all = <CoachlyLoadingScene>[
-    CoachlyLoadingScene(asset: AppAssets.logo, width: 96),
+    CoachlyLoadingScene(
+      asset: AppAssets.logo,
+      width: 96,
+      model: AppAssets.logo3d,
+    ),
   ];
 
   /// La scena per una certa attesa, scelta in modo **deterministico**.
@@ -194,7 +211,11 @@ class _LoadingBody extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           ExcludeSemantics(
-            child: _BreathingScene(scene: scene, compact: compact),
+            // Il marchio gira solo a schermo intero, dove l'attesa e' davvero
+            // lunga; una sezione resta sull'immagine che respira.
+            child: compact || scene.model == null
+                ? _BreathingScene(scene: scene, compact: true)
+                : CoachlySpinningMark(size: scene.width * 1.6),
           ),
           if (headline != null) ...[
             SizedBox(height: context.spacing.md),

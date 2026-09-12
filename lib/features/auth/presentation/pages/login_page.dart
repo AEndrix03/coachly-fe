@@ -2,7 +2,6 @@ import 'package:coachly/core/assets/app_assets.dart';
 import 'dart:io';
 
 import 'package:coachly/core/logging/app_logger.dart';
-import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:coachly/features/auth/presentation/widgets/auth_legal_footer.dart';
@@ -21,10 +20,7 @@ class LoginPage extends ConsumerWidget {
       authProvider.select((state) => state.value?.status ?? AuthStatus.loading),
     );
     final isLoading = status == AuthStatus.loading;
-    // Finche' la connettivita' non ha risposto si assume che ci sia: meglio
-    // mostrare i provider per un istante che offrire una scorciatoia che non
-    // serviva.
-    final isOnline = ref.watch(isOnlineProvider).value ?? true;
+    final isOnline = ref.watch(canSignInProvider);
 
     return Scaffold(
       body: Stack(

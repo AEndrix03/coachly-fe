@@ -81,6 +81,28 @@ falso.
 Con «riduci animazioni» attivo l'immagine sta ferma e piena, e resta leggibile:
 l'animazione è l'ornamento, l'informazione è l'immagine (`11-motion.md`).
 
+### L'eccezione: il marchio che gira
+
+A **schermo intero** la regola si rovescia, perché l'affermazione diventa vera:
+l'avvio, la prima idratazione e una rotta ancora vuota sono attese lunghe.
+`CoachlyLoadingScreen` mostra quindi il marchio tridimensionale
+(`CoachlySpinningMark`), che oscilla sull'asse verticale come un pendolo —
+lento, veloce al passaggio centrale, lento, inverte — invece di girare a
+velocità costante, che leggerebbe come un ingranaggio.
+
+Due limiti, entrambi voluti:
+
+- **solo a schermo intero.** Il modello vive in una `WebView`, che è una
+  platform view: una per ogni sezione in attesa costerebbe più dell'attesa. Le
+  sezioni restano sull'immagine che respira, che è anche la risposta giusta per
+  un'attesa che può finire in pochi millisecondi.
+- **il marchio statico resta sotto.** Finché il modello non è pronto — e sempre,
+  se la piattaforma non riesce a disegnarlo — si vede l'immagine. Un modello
+  caricato nel momento in cui serve arriverebbe dopo l'attesa che doveva
+  coprire, lo stesso difetto che il precaricamento delle immagini evita.
+
+Con «riduci animazioni» il modello resta fermo nella posa frontale.
+
 Il blocco è una `liveRegion` con il messaggio come etichetta, così il lettore
 di schermo annuncia l'attesa quando compare invece di lasciarla trovare
 (`14-accessibility.md`). La scena e il testo sono esclusi dalla semantica
