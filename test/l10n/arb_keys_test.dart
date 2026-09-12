@@ -34,6 +34,7 @@ const _icuOnlyKeys = <String>{
   // Schermata di accesso: pill dei provider non ancora attivi e nota legale
   // con i due documenti come segnaposto cliccabili.
   'authSoonBadge',
+  'authContinueOffline',
   'authLegalNotice',
   'authLegalTerms',
   'authLegalPrivacy',

@@ -14,7 +14,12 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthState {
 
- bool get isAuthenticated; bool get isTokenValid; bool get isOfflineMode; bool get isLoading; LoginResponseDto? get tokens; String? get errorMessage;
+ bool get isAuthenticated; bool get isTokenValid; bool get isOfflineMode;/// Chi ha scelto di continuare senza rete e senza account.
+///
+/// Non e' una sessione: non ci sono token, quindi nessuna chiamata
+/// autenticata puo' riuscire. Serve solo a lavorare sul database locale
+/// finche' non si accede davvero.
+ bool get isOfflineGuest; bool get isLoading; LoginResponseDto? get tokens; String? get errorMessage;
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +30,16 @@ $AuthStateCopyWith<AuthState> get copyWith => _$AuthStateCopyWithImpl<AuthState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthState&&(identical(other.isAuthenticated, isAuthenticated) || other.isAuthenticated == isAuthenticated)&&(identical(other.isTokenValid, isTokenValid) || other.isTokenValid == isTokenValid)&&(identical(other.isOfflineMode, isOfflineMode) || other.isOfflineMode == isOfflineMode)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.tokens, tokens) || other.tokens == tokens)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthState&&(identical(other.isAuthenticated, isAuthenticated) || other.isAuthenticated == isAuthenticated)&&(identical(other.isTokenValid, isTokenValid) || other.isTokenValid == isTokenValid)&&(identical(other.isOfflineMode, isOfflineMode) || other.isOfflineMode == isOfflineMode)&&(identical(other.isOfflineGuest, isOfflineGuest) || other.isOfflineGuest == isOfflineGuest)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.tokens, tokens) || other.tokens == tokens)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isAuthenticated,isTokenValid,isOfflineMode,isLoading,tokens,errorMessage);
+int get hashCode => Object.hash(runtimeType,isAuthenticated,isTokenValid,isOfflineMode,isOfflineGuest,isLoading,tokens,errorMessage);
 
 @override
 String toString() {
-  return 'AuthState(isAuthenticated: $isAuthenticated, isTokenValid: $isTokenValid, isOfflineMode: $isOfflineMode, isLoading: $isLoading, tokens: $tokens, errorMessage: $errorMessage)';
+  return 'AuthState(isAuthenticated: $isAuthenticated, isTokenValid: $isTokenValid, isOfflineMode: $isOfflineMode, isOfflineGuest: $isOfflineGuest, isLoading: $isLoading, tokens: $tokens, errorMessage: $errorMessage)';
 }
 
 
@@ -45,7 +50,7 @@ abstract mixin class $AuthStateCopyWith<$Res>  {
   factory $AuthStateCopyWith(AuthState value, $Res Function(AuthState) _then) = _$AuthStateCopyWithImpl;
 @useResult
 $Res call({
- bool isAuthenticated, bool isTokenValid, bool isOfflineMode, bool isLoading, LoginResponseDto? tokens, String? errorMessage
+ bool isAuthenticated, bool isTokenValid, bool isOfflineMode, bool isOfflineGuest, bool isLoading, LoginResponseDto? tokens, String? errorMessage
 });
 
 
@@ -62,11 +67,12 @@ class _$AuthStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isAuthenticated = null,Object? isTokenValid = null,Object? isOfflineMode = null,Object? isLoading = null,Object? tokens = freezed,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isAuthenticated = null,Object? isTokenValid = null,Object? isOfflineMode = null,Object? isOfflineGuest = null,Object? isLoading = null,Object? tokens = freezed,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 isAuthenticated: null == isAuthenticated ? _self.isAuthenticated : isAuthenticated // ignore: cast_nullable_to_non_nullable
 as bool,isTokenValid: null == isTokenValid ? _self.isTokenValid : isTokenValid // ignore: cast_nullable_to_non_nullable
 as bool,isOfflineMode: null == isOfflineMode ? _self.isOfflineMode : isOfflineMode // ignore: cast_nullable_to_non_nullable
+as bool,isOfflineGuest: null == isOfflineGuest ? _self.isOfflineGuest : isOfflineGuest // ignore: cast_nullable_to_non_nullable
 as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,tokens: freezed == tokens ? _self.tokens : tokens // ignore: cast_nullable_to_non_nullable
 as LoginResponseDto?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
@@ -167,10 +173,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isAuthenticated,  bool isTokenValid,  bool isOfflineMode,  bool isLoading,  LoginResponseDto? tokens,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isAuthenticated,  bool isTokenValid,  bool isOfflineMode,  bool isOfflineGuest,  bool isLoading,  LoginResponseDto? tokens,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthState() when $default != null:
-return $default(_that.isAuthenticated,_that.isTokenValid,_that.isOfflineMode,_that.isLoading,_that.tokens,_that.errorMessage);case _:
+return $default(_that.isAuthenticated,_that.isTokenValid,_that.isOfflineMode,_that.isOfflineGuest,_that.isLoading,_that.tokens,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -188,10 +194,10 @@ return $default(_that.isAuthenticated,_that.isTokenValid,_that.isOfflineMode,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isAuthenticated,  bool isTokenValid,  bool isOfflineMode,  bool isLoading,  LoginResponseDto? tokens,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isAuthenticated,  bool isTokenValid,  bool isOfflineMode,  bool isOfflineGuest,  bool isLoading,  LoginResponseDto? tokens,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _AuthState():
-return $default(_that.isAuthenticated,_that.isTokenValid,_that.isOfflineMode,_that.isLoading,_that.tokens,_that.errorMessage);case _:
+return $default(_that.isAuthenticated,_that.isTokenValid,_that.isOfflineMode,_that.isOfflineGuest,_that.isLoading,_that.tokens,_that.errorMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -208,10 +214,10 @@ return $default(_that.isAuthenticated,_that.isTokenValid,_that.isOfflineMode,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isAuthenticated,  bool isTokenValid,  bool isOfflineMode,  bool isLoading,  LoginResponseDto? tokens,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isAuthenticated,  bool isTokenValid,  bool isOfflineMode,  bool isOfflineGuest,  bool isLoading,  LoginResponseDto? tokens,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthState() when $default != null:
-return $default(_that.isAuthenticated,_that.isTokenValid,_that.isOfflineMode,_that.isLoading,_that.tokens,_that.errorMessage);case _:
+return $default(_that.isAuthenticated,_that.isTokenValid,_that.isOfflineMode,_that.isOfflineGuest,_that.isLoading,_that.tokens,_that.errorMessage);case _:
   return null;
 
 }
@@ -223,12 +229,18 @@ return $default(_that.isAuthenticated,_that.isTokenValid,_that.isOfflineMode,_th
 
 
 class _AuthState extends AuthState {
-  const _AuthState({this.isAuthenticated = false, this.isTokenValid = true, this.isOfflineMode = false, this.isLoading = false, this.tokens, this.errorMessage}): super._();
+  const _AuthState({this.isAuthenticated = false, this.isTokenValid = true, this.isOfflineMode = false, this.isOfflineGuest = false, this.isLoading = false, this.tokens, this.errorMessage}): super._();
   
 
 @override@JsonKey() final  bool isAuthenticated;
 @override@JsonKey() final  bool isTokenValid;
 @override@JsonKey() final  bool isOfflineMode;
+/// Chi ha scelto di continuare senza rete e senza account.
+///
+/// Non e' una sessione: non ci sono token, quindi nessuna chiamata
+/// autenticata puo' riuscire. Serve solo a lavorare sul database locale
+/// finche' non si accede davvero.
+@override@JsonKey() final  bool isOfflineGuest;
 @override@JsonKey() final  bool isLoading;
 @override final  LoginResponseDto? tokens;
 @override final  String? errorMessage;
@@ -243,16 +255,16 @@ _$AuthStateCopyWith<_AuthState> get copyWith => __$AuthStateCopyWithImpl<_AuthSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthState&&(identical(other.isAuthenticated, isAuthenticated) || other.isAuthenticated == isAuthenticated)&&(identical(other.isTokenValid, isTokenValid) || other.isTokenValid == isTokenValid)&&(identical(other.isOfflineMode, isOfflineMode) || other.isOfflineMode == isOfflineMode)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.tokens, tokens) || other.tokens == tokens)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthState&&(identical(other.isAuthenticated, isAuthenticated) || other.isAuthenticated == isAuthenticated)&&(identical(other.isTokenValid, isTokenValid) || other.isTokenValid == isTokenValid)&&(identical(other.isOfflineMode, isOfflineMode) || other.isOfflineMode == isOfflineMode)&&(identical(other.isOfflineGuest, isOfflineGuest) || other.isOfflineGuest == isOfflineGuest)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.tokens, tokens) || other.tokens == tokens)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isAuthenticated,isTokenValid,isOfflineMode,isLoading,tokens,errorMessage);
+int get hashCode => Object.hash(runtimeType,isAuthenticated,isTokenValid,isOfflineMode,isOfflineGuest,isLoading,tokens,errorMessage);
 
 @override
 String toString() {
-  return 'AuthState(isAuthenticated: $isAuthenticated, isTokenValid: $isTokenValid, isOfflineMode: $isOfflineMode, isLoading: $isLoading, tokens: $tokens, errorMessage: $errorMessage)';
+  return 'AuthState(isAuthenticated: $isAuthenticated, isTokenValid: $isTokenValid, isOfflineMode: $isOfflineMode, isOfflineGuest: $isOfflineGuest, isLoading: $isLoading, tokens: $tokens, errorMessage: $errorMessage)';
 }
 
 
@@ -263,7 +275,7 @@ abstract mixin class _$AuthStateCopyWith<$Res> implements $AuthStateCopyWith<$Re
   factory _$AuthStateCopyWith(_AuthState value, $Res Function(_AuthState) _then) = __$AuthStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool isAuthenticated, bool isTokenValid, bool isOfflineMode, bool isLoading, LoginResponseDto? tokens, String? errorMessage
+ bool isAuthenticated, bool isTokenValid, bool isOfflineMode, bool isOfflineGuest, bool isLoading, LoginResponseDto? tokens, String? errorMessage
 });
 
 
@@ -280,11 +292,12 @@ class __$AuthStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isAuthenticated = null,Object? isTokenValid = null,Object? isOfflineMode = null,Object? isLoading = null,Object? tokens = freezed,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isAuthenticated = null,Object? isTokenValid = null,Object? isOfflineMode = null,Object? isOfflineGuest = null,Object? isLoading = null,Object? tokens = freezed,Object? errorMessage = freezed,}) {
   return _then(_AuthState(
 isAuthenticated: null == isAuthenticated ? _self.isAuthenticated : isAuthenticated // ignore: cast_nullable_to_non_nullable
 as bool,isTokenValid: null == isTokenValid ? _self.isTokenValid : isTokenValid // ignore: cast_nullable_to_non_nullable
 as bool,isOfflineMode: null == isOfflineMode ? _self.isOfflineMode : isOfflineMode // ignore: cast_nullable_to_non_nullable
+as bool,isOfflineGuest: null == isOfflineGuest ? _self.isOfflineGuest : isOfflineGuest // ignore: cast_nullable_to_non_nullable
 as bool,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,tokens: freezed == tokens ? _self.tokens : tokens // ignore: cast_nullable_to_non_nullable
 as LoginResponseDto?,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable

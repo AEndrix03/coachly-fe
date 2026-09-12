@@ -79,10 +79,7 @@ class _Animated3dLogoState extends State<Animated3dLogo>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
-    _pageJs ??= _choreographyJs(
-      reduceMotion: reduceMotion,
-      drop: context.sizes.authLogoDrop,
-    );
+    _pageJs ??= _choreographyJs(reduceMotion: reduceMotion);
     if (reduceMotion) {
       _glowController.stop();
       _glowController.value = 1;
@@ -121,32 +118,24 @@ class _Animated3dLogoState extends State<Animated3dLogo>
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Il ribasso vale per tutto il marchio: il bagliore e il ripiego lo
-        // seguono in Flutter, il modello dentro la pagina.
-        Transform.translate(
-          offset: Offset(0, sizes.authLogoDrop),
-          child: RepaintBoundary(
-            child: IgnorePointer(
-              child: FadeTransition(
-                opacity: _glow,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: context.colors.brandGlow,
-                  ),
-                  child: SizedBox.square(dimension: sizes.authLogoGlow),
+        RepaintBoundary(
+          child: IgnorePointer(
+            child: FadeTransition(
+              opacity: _glow,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: context.colors.brandGlow,
                 ),
+                child: SizedBox.square(dimension: sizes.authLogoGlow),
               ),
             ),
           ),
         ),
-        Transform.translate(
-          offset: Offset(0, sizes.authLogoDrop),
-          child: AnimatedOpacity(
-            opacity: _isModelReady ? 0 : 1,
-            duration: context.motion.resolve(context, context.motion.slow),
-            child: Image.asset(AppAssets.logo, height: sizes.authLogo),
-          ),
+        AnimatedOpacity(
+          opacity: _isModelReady ? 0 : 1,
+          duration: context.motion.resolve(context, context.motion.slow),
+          child: Image.asset(AppAssets.logo, height: sizes.authLogo),
         ),
         if (!_modelFailed)
           Positioned.fill(
@@ -170,7 +159,7 @@ class _Animated3dLogoState extends State<Animated3dLogo>
                 interpolationDecay: 25,
                 // Posa di partenza dell'entrata: lontano, ruotato e visto dal
                 // basso. Il JS la porta a riposo con la prima animazione.
-                cameraOrbit: '-200deg 100deg 240%',
+                cameraOrbit: '-200deg 100deg 300%',
                 relatedCss: _pageCss,
                 relatedJs: _pageJs,
                 onWebViewCreated: (controller) => _webView = controller,
@@ -228,16 +217,12 @@ model-viewer::part(default-progress-mask) { display: none; }
   /// above 100%) so nothing ever leaves the visible area. With reduce motion
   /// the model is revealed in its rest pose, gestures are off and `busy`
   /// only toggles a CSS opacity pulse.
-  static String _choreographyJs({
-    required bool reduceMotion,
-    required double drop,
-  }) =>
+  static String _choreographyJs({required bool reduceMotion}) =>
       '''
 (function () {
   var mv = document.getElementById('$_viewerId');
   if (!mv) { return; }
   var reduce = ${reduceMotion ? 'true' : 'false'};
-  var DROP = ${drop.toStringAsFixed(1)};
 
   function call(name, arg) {
     var bridge = window.flutter_inappwebview;
@@ -250,7 +235,7 @@ model-viewer::part(default-progress-mask) { display: none; }
 
   // phi > 90 guarda leggermente dal basso: compensa l'inclinazione in avanti
   // del modello. radius > 100% lascia margine dentro il palco.
-  var REST = { theta: 0, phi: 92, radius: 172, x: 0, y: 0, scale: 1 };
+  var REST = { theta: 0, phi: 92, radius: 229, x: 0, y: 0, scale: 1 };
   var SWAY_THETA = 5, SWAY_PHI = 2;
   var SPIN_SPEED = 330;      // gradi al secondo a regime: un giro in ~1.1 s
   var SPIN_RAMP = 900;       // ms per arrivare a regime
@@ -282,7 +267,7 @@ model-viewer::part(default-progress-mask) { display: none; }
 
   // ---- Motore -------------------------------------------------------------
 
-  var state = { theta: -200, phi: 100, radius: 240, x: 0, y: 0, scale: 0.6 };
+  var state = { theta: -200, phi: 100, radius: 300, x: 0, y: 0, scale: 0.6 };
   var mode = 'boot';
   var seq = null, drag = null, fling = null;
   var busy = false, busyV = 0, busyT = 0;
@@ -293,7 +278,7 @@ model-viewer::part(default-progress-mask) { display: none; }
     var orbit = state.theta.toFixed(2) + 'deg ' + state.phi.toFixed(2) + 'deg ' + state.radius.toFixed(2) + '%';
     if (orbit !== lastOrbit) { mv.setAttribute('camera-orbit', orbit); lastOrbit = orbit; }
     var breath = reduce ? 0 : Math.sin(now / 650) * 2.5;
-    mv.style.transform = 'translate3d(' + state.x.toFixed(2) + 'px,' + (state.y + DROP + breath).toFixed(2) + 'px,0) scale(' + state.scale.toFixed(3) + ')';
+    mv.style.transform = 'translate3d(' + state.x.toFixed(2) + 'px,' + (state.y + breath).toFixed(2) + 'px,0) scale(' + state.scale.toFixed(3) + ')';
   }
 
   function enterIdle(now) {

@@ -3883,6 +3883,12 @@ abstract class AppLocalizations {
   /// **'Privacy Policy'**
   String get authLegalPrivacy;
 
+  /// Action shown instead of the sign-in providers when the device has no network
+  ///
+  /// In en, this message translates to:
+  /// **'Continue offline'**
+  String get authContinueOffline;
+
   /// Short pill on a sign-in provider that is announced but not available yet
   ///
   /// In en, this message translates to:

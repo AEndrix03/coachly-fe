@@ -2792,6 +2792,10 @@
   "@authLegalPrivacy": {
     "description": "Name of the privacy document, shown as a link in the legal note"
   },
+  "authContinueOffline": "Continue offline",
+  "@authContinueOffline": {
+    "description": "Action shown instead of the sign-in providers when the device has no network"
+  },
   "authSoonBadge": "SOON",
   "@authSoonBadge": {
     "description": "Short pill on a sign-in provider that is announced but not available yet"

@@ -2,6 +2,7 @@ import 'package:coachly/core/assets/app_assets.dart';
 import 'dart:io';
 
 import 'package:coachly/core/logging/app_logger.dart';
+import 'package:coachly/core/network/connectivity_provider.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/features/auth/application/auth_provider.dart';
 import 'package:coachly/features/auth/presentation/widgets/auth_legal_footer.dart';
@@ -20,6 +21,10 @@ class LoginPage extends ConsumerWidget {
       authProvider.select((state) => state.value?.status ?? AuthStatus.loading),
     );
     final isLoading = status == AuthStatus.loading;
+    // Finche' la connettivita' non ha risposto si assume che ci sia: meglio
+    // mostrare i provider per un istante che offrire una scorciatoia che non
+    // serviva.
+    final isOnline = ref.watch(isOnlineProvider).value ?? true;
 
     return Scaffold(
       body: Stack(
@@ -38,9 +43,14 @@ class LoginPage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const Spacer(flex: 7),
-                        SizedBox(
-                          height: context.sizes.authLogoStage,
-                          child: Animated3dLogo(busy: isLoading),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: context.sizes.authLogoDrop,
+                          ),
+                          child: SizedBox(
+                            height: context.sizes.authLogoStage,
+                            child: Animated3dLogo(busy: isLoading),
+                          ),
                         ),
                         SizedBox(height: context.spacing.xxs),
                         Semantics(
@@ -63,35 +73,59 @@ class LoginPage extends ConsumerWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (Platform.isIOS) ...[
-                                AuthProviderButton(
-                                  type: AuthProviderType.apple,
-                                  label: context.l10n.authLoginDescription,
-                                  badge: context.l10n.authSoonBadge,
-                                  onPressed: null,
-                                  enabled: false,
-                                ),
-                                SizedBox(height: context.spacing.sm),
-                              ],
-                              AuthProviderButton(
-                                type: AuthProviderType.google,
-                                label: context.l10n.authLoginConfigurationHint,
-                                badge: context.l10n.authSoonBadge,
-                                onPressed: null,
-                                enabled: false,
-                              ),
-                              SizedBox(height: context.spacing.sm),
-                              AuthProviderButton(
-                                type: AuthProviderType.coachly,
-                                label: context.l10n.authLoginCta,
-                                onPressed: () {
-                                  ref.read(authProvider.notifier).login();
-                                },
-                                enabled: !isLoading,
-                                loading: isLoading,
-                              ),
-                            ],
+                            children: isOnline
+                                ? [
+                                    if (Platform.isIOS) ...[
+                                      AuthProviderButton(
+                                        type: AuthProviderType.apple,
+                                        label: context
+                                            .l10n
+                                            .authLoginDescription,
+                                        badge: context.l10n.authSoonBadge,
+                                        onPressed: null,
+                                        enabled: false,
+                                      ),
+                                      SizedBox(height: context.spacing.sm),
+                                    ],
+                                    AuthProviderButton(
+                                      type: AuthProviderType.google,
+                                      label: context
+                                          .l10n
+                                          .authLoginConfigurationHint,
+                                      badge: context.l10n.authSoonBadge,
+                                      onPressed: null,
+                                      enabled: false,
+                                    ),
+                                    SizedBox(height: context.spacing.sm),
+                                    AuthProviderButton(
+                                      type: AuthProviderType.coachly,
+                                      label: context.l10n.authLoginCta,
+                                      onPressed: () {
+                                        ref
+                                            .read(authProvider.notifier)
+                                            .login();
+                                      },
+                                      enabled: !isLoading,
+                                      loading: isLoading,
+                                    ),
+                                  ]
+                                : [
+                                    // Senza rete l'accesso non puo' riuscire:
+                                    // passa da un browser. Resta la memoria
+                                    // locale, che e' la sorgente della app.
+                                    AuthProviderButton(
+                                      type: AuthProviderType.offline,
+                                      label: context
+                                          .l10n
+                                          .authContinueOffline,
+                                      onPressed: () {
+                                        ref
+                                            .read(authProvider.notifier)
+                                            .continueOffline();
+                                      },
+                                      enabled: !isLoading,
+                                    ),
+                                  ],
                           ),
                         ),
                         if (status == AuthStatus.failed) ...[

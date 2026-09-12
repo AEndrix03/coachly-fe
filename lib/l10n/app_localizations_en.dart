@@ -2092,6 +2092,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authLegalPrivacy => 'Privacy Policy';
 
   @override
+  String get authContinueOffline => 'Continue offline';
+
+  @override
   String get authSoonBadge => 'SOON';
 
   @override

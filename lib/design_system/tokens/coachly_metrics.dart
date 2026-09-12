@@ -117,8 +117,10 @@ class CoachlySizes {
   final double authLogoStage;
   final double authLogoGlow;
 
-  /// Quanto il marchio 3D scende dentro il suo palco: il modello e' montato
-  /// alto nel file, e questo lo riporta a fuoco ottico con il titolo.
+  /// Quanto il marchio 3D scende rispetto al resto del blocco: il modello e'
+  /// montato alto nel file, e questo lo riporta a fuoco ottico con il titolo.
+  /// E' uno stacco sopra al palco, non una traslazione dentro il viewer: il
+  /// viewer ritaglia tutto cio' che esce dal suo riquadro.
   final double authLogoDrop;
 
   /// Altezza del titolo illustrato sotto il logo (immagine con proporzione 3:1).
@@ -134,9 +136,9 @@ class CoachlySizes {
     this.iconLg = 32,
     this.iconXl = 48,
     this.authAction = 64,
-    this.authLogo = 133,
-    this.authLogoStage = 224,
-    this.authLogoGlow = 100,
+    this.authLogo = 100,
+    this.authLogoStage = 240,
+    this.authLogoGlow = 75,
     this.authLogoDrop = 16,
     this.authTitle = 108,
   });

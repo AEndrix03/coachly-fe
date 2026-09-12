@@ -2,11 +2,14 @@ import 'package:coachly/core/assets/app_assets.dart';
 import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:flutter/material.dart';
 
-/// Sign-in providers offered by the login screen.
+/// Entries of the sign-in column.
 ///
-/// The variant decides surface, content, icon and icon tint: the call site
-/// only says which provider it is, what it is called and whether it works.
-enum AuthProviderType { apple, google, coachly }
+/// The variant decides surface, content, mark and mark tint: the call site
+/// only says which entry it is, what it is called and whether it works.
+/// [AuthProviderType.offline] is not a provider but the way out when the
+/// device has no network, and it takes the same shape so the column never
+/// changes rhythm.
+enum AuthProviderType { apple, google, coachly, offline }
 
 /// Full-width sign-in action of the login screen.
 ///
@@ -25,7 +28,10 @@ enum AuthProviderType { apple, google, coachly }
 ///   a badge. Which identity provider backs it is an
 ///   implementation detail the screen never names.
 ///
-/// The trailing chevron appears only on a provider that can actually be
+/// - [AuthProviderType.offline]: a Material glyph instead of a brand mark,
+///   because nothing is being signed into.
+///
+/// The trailing chevron appears only on an entry that can actually be
 /// pressed, so what works is readable at a glance.
 class AuthProviderButton extends StatelessWidget {
   final AuthProviderType type;
@@ -51,10 +57,11 @@ class AuthProviderButton extends StatelessWidget {
     super.key,
   });
 
-  String get _icon => switch (type) {
+  String? get _markAsset => switch (type) {
     AuthProviderType.apple => AppAssets.appleLogo,
     AuthProviderType.google => AppAssets.googleG,
     AuthProviderType.coachly => AppAssets.coachlyMark,
+    AuthProviderType.offline => null,
   };
 
   @override
@@ -76,8 +83,9 @@ class AuthProviderButton extends StatelessWidget {
     // e' un glifo monocromatico e prende il colore del contenuto.
     final iconTint = switch (type) {
       AuthProviderType.google || AuthProviderType.coachly => null,
-      AuthProviderType.apple => foreground,
+      AuthProviderType.apple || AuthProviderType.offline => foreground,
     };
+    final asset = _markAsset;
 
     return Semantics(
       button: true,
@@ -107,15 +115,21 @@ class AuthProviderButton extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: SizedBox.square(
                   dimension: sizes.iconMd,
-                  child: Image.asset(
-                    _icon,
-                    // I file sono ritagliati sul contenuto e ancorati a
-                    // sinistra: cosi' i tre marchi partono dalla stessa
-                    // colonna qualunque sia la loro proporzione.
-                    fit: BoxFit.contain,
-                    alignment: Alignment.centerLeft,
-                    color: iconTint,
-                  ),
+                  child: asset == null
+                      ? Icon(
+                          Icons.cloud_off_rounded,
+                          size: sizes.iconMd,
+                          color: iconTint,
+                        )
+                      : Image.asset(
+                          asset,
+                          // I file sono ritagliati sul contenuto e ancorati a
+                          // sinistra: cosi' i marchi partono dalla stessa
+                          // colonna qualunque sia la loro proporzione.
+                          fit: BoxFit.contain,
+                          alignment: Alignment.centerLeft,
+                          color: iconTint,
+                        ),
                 ),
               ),
               Padding(

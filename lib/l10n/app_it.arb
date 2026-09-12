@@ -630,6 +630,7 @@
   "authLegalNotice": "Continuando, accetti i {terms} e l''{privacy}.",
   "authLegalTerms": "Termini di servizio",
   "authLegalPrivacy": "Informativa privacy",
+  "authContinueOffline": "Continua offline",
   "authSoonBadge": "PRESTO",
   "homeHeaderGreeting": "Ciao, {name}",
   "homeHeaderGreetingGeneric": "Ciao",

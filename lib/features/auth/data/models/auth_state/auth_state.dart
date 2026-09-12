@@ -9,6 +9,13 @@ abstract class AuthState with _$AuthState {
     @Default(false) bool isAuthenticated,
     @Default(true) bool isTokenValid,
     @Default(false) bool isOfflineMode,
+
+    /// Chi ha scelto di continuare senza rete e senza account.
+    ///
+    /// Non e' una sessione: non ci sono token, quindi nessuna chiamata
+    /// autenticata puo' riuscire. Serve solo a lavorare sul database locale
+    /// finche' non si accede davvero.
+    @Default(false) bool isOfflineGuest,
     @Default(false) bool isLoading,
     LoginResponseDto? tokens,
     String? errorMessage,
@@ -16,7 +23,8 @@ abstract class AuthState with _$AuthState {
 
   const AuthState._();
 
-  bool get canAccessApp => isAuthenticated && (isTokenValid || isOfflineMode);
+  bool get canAccessApp =>
+      isOfflineGuest || (isAuthenticated && (isTokenValid || isOfflineMode));
 
   bool get needsReLogin => isAuthenticated && !isTokenValid && !isOfflineMode;
 

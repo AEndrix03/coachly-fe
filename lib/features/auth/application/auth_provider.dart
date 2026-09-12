@@ -89,6 +89,18 @@ class Auth extends _$Auth {
     state = AsyncData(next);
   }
 
+  /// Entra nella app senza account, con la sola memoria locale.
+  ///
+  /// Offerto quando il dispositivo non ha rete: l'accesso passa da un browser
+  /// e senza rete non puo' riuscire. Non crea nessuna sessione, quindi al
+  /// ritorno della rete l'accesso vero resta da fare.
+  void continueOffline() {
+    ref.read(appLoggerProvider).info('Ingresso offline senza account');
+    state = const AsyncData(
+      AuthState(isTokenValid: false, isOfflineGuest: true),
+    );
+  }
+
   /// Numero di allenamenti registrati e non ancora inviati al backend.
   ///
   /// Il logout cancella il database locale: quei dati sono l'unica copia
