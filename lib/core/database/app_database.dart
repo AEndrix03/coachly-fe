@@ -69,8 +69,12 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         // Event log delle sessioni: e' il dataset che dice *come* si allenano
         // le persone, non solo il risultato finale.
-        // `createTable` crea anche gli indici dichiarati con `@TableIndex`.
         await m.createTable(sessionEvents);
+        // Gli indici dichiarati con `@TableIndex` non vengono creati da
+        // `createTable`: vanno aggiunti a mano, altrimenti il vincolo unico su
+        // `(sessionId, seq)` esisterebbe solo sulle installazioni nuove.
+        await m.create(sessionEventsSessionSeq);
+        await m.create(sessionEventsPending);
       }
     },
     beforeOpen: (details) async {

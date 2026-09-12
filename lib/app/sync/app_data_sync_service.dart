@@ -15,6 +15,7 @@ import 'package:coachly/features/workouts/data/repositories/workout_page_reposit
 import 'package:coachly/features/sessions/data/services/workout_session_sync_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:coachly/core/logging/app_logger.dart';
+import 'package:coachly/features/catalog_sync/data/repositories/catalog_sync_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
@@ -23,6 +24,7 @@ final appDataSyncServiceProvider = Provider<AppDataSyncService>((ref) {
     ref.watch(workoutPageRepositoryProvider),
     ref.watch(workoutSessionSyncServiceProvider),
     ref.watch(exerciseInfoPageRepositoryProvider),
+    ref.watch(catalogSyncRepositoryProvider),
     ref.watch(authServiceProvider),
     ref.watch(appDatabaseProvider),
     ref.watch(clockProvider),
@@ -48,6 +50,7 @@ class AppDataSyncService {
   final IWorkoutPageRepository _workoutRepository;
   final WorkoutSessionSyncService _sessionSyncService;
   final IExerciseInfoPageRepository _exerciseRepository;
+  final CatalogSyncRepository _catalogSyncRepository;
   final AuthService _authService;
   final AppDatabase _database;
   final Clock _clock;
@@ -68,6 +71,7 @@ class AppDataSyncService {
     this._workoutRepository,
     this._sessionSyncService,
     this._exerciseRepository,
+    this._catalogSyncRepository,
     this._authService,
     this._database,
     this._clock,
@@ -150,7 +154,11 @@ class AppDataSyncService {
   }
 
   Future<void> _runExerciseRefresh() async {
-    final result = await _exerciseRepository.refreshFromRemoteResult();
+    // Al ritorno in foreground si confronta la versione del catalogo invece di
+    // riscaricarlo: nel caso normale — «non e' cambiato niente» — non parte
+    // nessun trasferimento (`docs/development/06-networking.md`).
+    final result = await _catalogSyncRepository.syncIfNeeded();
+    if (result.valueOrNull == CatalogSyncOutcome.alreadyCurrent) return;
     if (result.isOk) {
       _ref.invalidate(exerciseInfoProvider);
       _ref.invalidate(exerciseDetailCatalogProvider);
