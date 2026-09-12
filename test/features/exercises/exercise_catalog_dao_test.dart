@@ -99,6 +99,35 @@ void main() {
       expect(await ids(const ExerciseCatalogQuery()), ['squat']);
     });
 
+    test('una lista vuota non svuota il catalogo locale', () async {
+      // La potatura serve a togliere gli esercizi ritirati, ma una lista vuota
+      // quasi mai significa «il backend non ha piu' esercizi»: molto piu'
+      // spesso e' una risposta che non si e' saputa leggere. In una app
+      // local-first lo stato sbagliato sopravvive al riavvio, quindi nel
+      // dubbio si tiene il dato.
+      await dao.upsertSummaries(catalogue);
+
+      await dao.upsertSummaries(const []);
+
+      expect(await ids(const ExerciseCatalogQuery()), [
+        'lunge',
+        'push-up',
+        'squat',
+      ]);
+    });
+
+    test('una lista di soli esercizi senza id non svuota il catalogo', () async {
+      await dao.upsertSummaries(catalogue);
+
+      await dao.upsertSummaries(const [ExerciseModel(), ExerciseModel()]);
+
+      expect(await ids(const ExerciseCatalogQuery()), [
+        'lunge',
+        'push-up',
+        'squat',
+      ]);
+    });
+
     test('un riepilogo non cancella il dettaglio già scaricato', () async {
       await dao.upsertSummaries(catalogue);
       await dao.upsertDetail(

@@ -96,6 +96,17 @@ class ExerciseCatalogDao extends DatabaseAccessor<AppDatabase>
         .toList(growable: false);
     final keptIds = valid.map((exercise) => exercise.id!).toList();
 
+    // Un catalogo vuoto in arrivo non pota il catalogo locale.
+    //
+    // La potatura serve a togliere gli esercizi ritirati dal backend, ma una
+    // lista vuota quasi mai significa «il catalogo non ha piu' esercizi»: molto
+    // piu' spesso e' una risposta che non si e' saputa leggere. Nel dubbio si
+    // tiene il dato: il catalogo e' ricostruibile, ma finche' non lo si
+    // ricostruisce l'utente resta con una libreria vuota, e questa app e'
+    // local-first, quindi lo stato sbagliato sopravvive al riavvio
+    // (`docs/development/04-data-layer.md`).
+    if (valid.isEmpty) return;
+
     await transaction(() async {
       await (delete(
         catalogExercises,

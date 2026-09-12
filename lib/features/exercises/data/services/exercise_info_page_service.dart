@@ -24,10 +24,15 @@ class ExerciseInfoPageService {
     return await _apiClient.get<List<ExerciseModel>>(
       '/exercises',
       fromJson: (data) {
-        if (data is List) {
-          return data.map((json) => ExerciseModel.fromJson(json)).toList();
+        // Un payload che non e' una lista era un catalogo vuoto: e da li'
+        // `upsertSummaries` cancellava l'intero catalogo locale. Una risposta
+        // che non si capisce e' un errore di parsing, non zero esercizi.
+        if (data is! List) {
+          throw FormatException(
+            'Expected a list of exercises, got ${data.runtimeType}',
+          );
         }
-        return [];
+        return data.map((json) => ExerciseModel.fromJson(json)).toList();
       },
     );
   }
@@ -86,10 +91,14 @@ class ExerciseInfoPageService {
     return await _apiClient.get<List<ExerciseModel>>(
       '/exercises/mine',
       fromJson: (data) {
-        if (data is List) {
-          return data.map((json) => ExerciseModel.fromJson(json)).toList();
+        // Una risposta che non si sa leggere e' un errore di parsing, non un
+        // elenco vuoto: confonderli fa sparire dalla UI dati che esistono.
+        if (data is! List) {
+          throw FormatException(
+            'Expected a list of exercises, got ${data.runtimeType}',
+          );
         }
-        return [];
+        return data.map((json) => ExerciseModel.fromJson(json)).toList();
       },
     );
   }
