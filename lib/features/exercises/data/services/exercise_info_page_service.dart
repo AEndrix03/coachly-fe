@@ -1,7 +1,6 @@
 import 'package:coachly/core/network/api_client.dart';
 import 'package:coachly/core/network/api_response.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
-import 'package:coachly/features/exercises/domain/models/exercise_filter_model.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_model.dart';
 
 class ExerciseInfoPageService {
@@ -33,56 +32,6 @@ class ExerciseInfoPageService {
           );
         }
         return data.map((json) => ExerciseModel.fromJson(json)).toList();
-      },
-    );
-  }
-
-  /// Fetch the complete filtered catalogue in one response.
-  Future<ApiResponse<List<ExerciseDetailModel>>> fetchFilteredExercises(
-    ExerciseFilterModel filter,
-  ) async {
-    final Map<String, String> queryParameters = {};
-    if (filter.scope != null && filter.scope!.isNotEmpty) {
-      queryParameters['scope'] = filter.scope!;
-    }
-
-    if (filter.textFilter != null && filter.textFilter!.isNotEmpty) {
-      queryParameters['textFilter'] = filter.textFilter!;
-    }
-    if (filter.langFilter != null && filter.langFilter!.isNotEmpty) {
-      queryParameters['langFilter'] = filter.langFilter!;
-    }
-    if (filter.difficultyLevel != null && filter.difficultyLevel!.isNotEmpty) {
-      queryParameters['difficultyLevel'] = filter.difficultyLevel!;
-    }
-    if (filter.mechanicsType != null && filter.mechanicsType!.isNotEmpty) {
-      queryParameters['mechanicsType'] = filter.mechanicsType!;
-    }
-    if (filter.forceType != null && filter.forceType!.isNotEmpty) {
-      queryParameters['forceType'] = filter.forceType!;
-    }
-    if (filter.isUnilateral != null) {
-      queryParameters['isUnilateral'] = filter.isUnilateral!.toString();
-    }
-    if (filter.isBodyweight != null) {
-      queryParameters['isBodyweight'] = filter.isBodyweight!.toString();
-    }
-    if (filter.categoryIds != null && filter.categoryIds!.isNotEmpty) {
-      queryParameters['categoryIds'] = filter.categoryIds!.join(',');
-    }
-    if (filter.muscleIds != null && filter.muscleIds!.isNotEmpty) {
-      queryParameters['muscleIds'] = filter.muscleIds!.join(',');
-    }
-    return await _apiClient.get<List<ExerciseDetailModel>>(
-      '/exercises/filtered',
-      queryParameters: queryParameters,
-      fromJson: (data) {
-        if (data is List) {
-          return data
-              .map((json) => ExerciseDetailModel.fromJson(json))
-              .toList();
-        }
-        return [];
       },
     );
   }

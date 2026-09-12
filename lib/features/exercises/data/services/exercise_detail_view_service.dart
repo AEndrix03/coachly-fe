@@ -8,8 +8,6 @@ import 'dart:ui' show Locale;
 
 abstract interface class ExerciseDetailViewService {
   Future<ExerciseDetailViewData> fetch(String exerciseId, Locale locale);
-
-  Future<List<ExerciseDetailViewData>> fetchAll(Locale locale);
 }
 
 class ApiExerciseDetailViewService implements ExerciseDetailViewService {
@@ -30,27 +28,6 @@ class ApiExerciseDetailViewService implements ExerciseDetailViewService {
     }
 
     return toViewData(exercise, exerciseId, locale);
-  }
-
-  @override
-  Future<List<ExerciseDetailViewData>> fetchAll(Locale locale) async {
-    final response = await _apiClient.get<List<ExerciseDetailApiDto>>(
-      '/exercises/filtered',
-      fromJson: (json) => (json as List)
-          .map(
-            (item) => ExerciseDetailApiDto.fromJson(
-              Map<String, dynamic>.from(item as Map),
-            ),
-          )
-          .toList(growable: false),
-    );
-    final exercises = response.data;
-    if (!response.success || exercises == null) {
-      throw StateError(response.message ?? 'Impossibile caricare gli esercizi');
-    }
-    return exercises
-        .map((exercise) => toViewData(exercise, exercise.id, locale))
-        .toList(growable: false);
   }
 
   static ExerciseDetailViewData toViewData(
