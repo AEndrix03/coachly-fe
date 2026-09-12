@@ -33,6 +33,7 @@ part 'app_database.g.dart';
     WorkoutSnapshots,
     ActiveWorkoutDrafts,
     Sessions,
+    SessionEvents,
     Outbox,
   ],
 )
@@ -41,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'coachly'));
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -64,6 +65,12 @@ class AppDatabase extends _$AppDatabase {
         // dati, sono uno schema che mente su cosa fa la app.
         await m.deleteTable('voice_aliases');
         await m.deleteTable('voice_resolution_logs');
+      }
+      if (from < 4) {
+        // Event log delle sessioni: e' il dataset che dice *come* si allenano
+        // le persone, non solo il risultato finale.
+        // `createTable` crea anche gli indici dichiarati con `@TableIndex`.
+        await m.createTable(sessionEvents);
       }
     },
     beforeOpen: (details) async {

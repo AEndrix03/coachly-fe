@@ -4832,6 +4832,471 @@ class SessionsCompanion extends UpdateCompanion<SessionRow> {
   }
 }
 
+class $SessionEventsTable extends SessionEvents
+    with TableInfo<$SessionEventsTable, SessionEventRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SessionEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _seqMeta = const VerificationMeta('seq');
+  @override
+  late final GeneratedColumn<int> seq = GeneratedColumn<int>(
+    'seq',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> occurredAt = GeneratedColumn<DateTime>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  );
+  static const VerificationMeta _syncedAtMeta = const VerificationMeta(
+    'syncedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+    'synced_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sessionId,
+    seq,
+    occurredAt,
+    type,
+    payload,
+    syncedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'session_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SessionEventRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('seq')) {
+      context.handle(
+        _seqMeta,
+        seq.isAcceptableOrUnknown(data['seq']!, _seqMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_seqMeta);
+    }
+    if (data.containsKey('occurred_at')) {
+      context.handle(
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(
+        _syncedAtMeta,
+        syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SessionEventRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SessionEventRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      seq: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}seq'],
+      )!,
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}occurred_at'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      )!,
+      syncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}synced_at'],
+      ),
+    );
+  }
+
+  @override
+  $SessionEventsTable createAlias(String alias) {
+    return $SessionEventsTable(attachedDatabase, alias);
+  }
+}
+
+class SessionEventRow extends DataClass implements Insertable<SessionEventRow> {
+  final String id;
+  final String sessionId;
+
+  /// Ordine dell'evento dentro la sessione, assegnato dal client.
+  final int seq;
+
+  /// Quando il fatto e' accaduto sul dispositivo, non quando e' stato
+  /// sincronizzato: fra i due possono passare giorni.
+  final DateTime occurredAt;
+
+  /// `session_started`, `set_completed`, `rest_started`…
+  final String type;
+
+  /// Corpo dell'evento, JSON. `{}` quando non serve.
+  final String payload;
+
+  /// Valorizzata quando il backend ha confermato l'append.
+  final DateTime? syncedAt;
+  const SessionEventRow({
+    required this.id,
+    required this.sessionId,
+    required this.seq,
+    required this.occurredAt,
+    required this.type,
+    required this.payload,
+    this.syncedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['session_id'] = Variable<String>(sessionId);
+    map['seq'] = Variable<int>(seq);
+    map['occurred_at'] = Variable<DateTime>(occurredAt);
+    map['type'] = Variable<String>(type);
+    map['payload'] = Variable<String>(payload);
+    if (!nullToAbsent || syncedAt != null) {
+      map['synced_at'] = Variable<DateTime>(syncedAt);
+    }
+    return map;
+  }
+
+  SessionEventsCompanion toCompanion(bool nullToAbsent) {
+    return SessionEventsCompanion(
+      id: Value(id),
+      sessionId: Value(sessionId),
+      seq: Value(seq),
+      occurredAt: Value(occurredAt),
+      type: Value(type),
+      payload: Value(payload),
+      syncedAt: syncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncedAt),
+    );
+  }
+
+  factory SessionEventRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SessionEventRow(
+      id: serializer.fromJson<String>(json['id']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      seq: serializer.fromJson<int>(json['seq']),
+      occurredAt: serializer.fromJson<DateTime>(json['occurredAt']),
+      type: serializer.fromJson<String>(json['type']),
+      payload: serializer.fromJson<String>(json['payload']),
+      syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'seq': serializer.toJson<int>(seq),
+      'occurredAt': serializer.toJson<DateTime>(occurredAt),
+      'type': serializer.toJson<String>(type),
+      'payload': serializer.toJson<String>(payload),
+      'syncedAt': serializer.toJson<DateTime?>(syncedAt),
+    };
+  }
+
+  SessionEventRow copyWith({
+    String? id,
+    String? sessionId,
+    int? seq,
+    DateTime? occurredAt,
+    String? type,
+    String? payload,
+    Value<DateTime?> syncedAt = const Value.absent(),
+  }) => SessionEventRow(
+    id: id ?? this.id,
+    sessionId: sessionId ?? this.sessionId,
+    seq: seq ?? this.seq,
+    occurredAt: occurredAt ?? this.occurredAt,
+    type: type ?? this.type,
+    payload: payload ?? this.payload,
+    syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
+  );
+  SessionEventRow copyWithCompanion(SessionEventsCompanion data) {
+    return SessionEventRow(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      seq: data.seq.present ? data.seq.value : this.seq,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+      type: data.type.present ? data.type.value : this.type,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SessionEventRow(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('seq: $seq, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('type: $type, ')
+          ..write('payload: $payload, ')
+          ..write('syncedAt: $syncedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, sessionId, seq, occurredAt, type, payload, syncedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SessionEventRow &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.seq == this.seq &&
+          other.occurredAt == this.occurredAt &&
+          other.type == this.type &&
+          other.payload == this.payload &&
+          other.syncedAt == this.syncedAt);
+}
+
+class SessionEventsCompanion extends UpdateCompanion<SessionEventRow> {
+  final Value<String> id;
+  final Value<String> sessionId;
+  final Value<int> seq;
+  final Value<DateTime> occurredAt;
+  final Value<String> type;
+  final Value<String> payload;
+  final Value<DateTime?> syncedAt;
+  final Value<int> rowid;
+  const SessionEventsCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.seq = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.type = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SessionEventsCompanion.insert({
+    required String id,
+    required String sessionId,
+    required int seq,
+    required DateTime occurredAt,
+    required String type,
+    this.payload = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       sessionId = Value(sessionId),
+       seq = Value(seq),
+       occurredAt = Value(occurredAt),
+       type = Value(type);
+  static Insertable<SessionEventRow> custom({
+    Expression<String>? id,
+    Expression<String>? sessionId,
+    Expression<int>? seq,
+    Expression<DateTime>? occurredAt,
+    Expression<String>? type,
+    Expression<String>? payload,
+    Expression<DateTime>? syncedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (seq != null) 'seq': seq,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (type != null) 'type': type,
+      if (payload != null) 'payload': payload,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SessionEventsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? sessionId,
+    Value<int>? seq,
+    Value<DateTime>? occurredAt,
+    Value<String>? type,
+    Value<String>? payload,
+    Value<DateTime?>? syncedAt,
+    Value<int>? rowid,
+  }) {
+    return SessionEventsCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      seq: seq ?? this.seq,
+      occurredAt: occurredAt ?? this.occurredAt,
+      type: type ?? this.type,
+      payload: payload ?? this.payload,
+      syncedAt: syncedAt ?? this.syncedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (seq.present) {
+      map['seq'] = Variable<int>(seq.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<DateTime>(occurredAt.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SessionEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('seq: $seq, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('type: $type, ')
+          ..write('payload: $payload, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $OutboxTable extends Outbox with TableInfo<$OutboxTable, OutboxRow> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -5583,7 +6048,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ActiveWorkoutDraftsTable activeWorkoutDrafts =
       $ActiveWorkoutDraftsTable(this);
   late final $SessionsTable sessions = $SessionsTable(this);
+  late final $SessionEventsTable sessionEvents = $SessionEventsTable(this);
   late final $OutboxTable outbox = $OutboxTable(this);
+  late final Index sessionEventsSessionSeq = Index(
+    'session_events_session_seq',
+    'CREATE UNIQUE INDEX session_events_session_seq ON session_events (session_id, seq)',
+  );
+  late final Index sessionEventsPending = Index(
+    'session_events_pending',
+    'CREATE INDEX session_events_pending ON session_events (synced_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5600,7 +6074,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     workoutSnapshots,
     activeWorkoutDrafts,
     sessions,
+    sessionEvents,
     outbox,
+    sessionEventsSessionSeq,
+    sessionEventsPending,
   ];
 }
 
@@ -8190,6 +8667,246 @@ typedef $$SessionsTableProcessedTableManager =
       SessionRow,
       PrefetchHooks Function()
     >;
+typedef $$SessionEventsTableCreateCompanionBuilder =
+    SessionEventsCompanion Function({
+      required String id,
+      required String sessionId,
+      required int seq,
+      required DateTime occurredAt,
+      required String type,
+      Value<String> payload,
+      Value<DateTime?> syncedAt,
+      Value<int> rowid,
+    });
+typedef $$SessionEventsTableUpdateCompanionBuilder =
+    SessionEventsCompanion Function({
+      Value<String> id,
+      Value<String> sessionId,
+      Value<int> seq,
+      Value<DateTime> occurredAt,
+      Value<String> type,
+      Value<String> payload,
+      Value<DateTime?> syncedAt,
+      Value<int> rowid,
+    });
+
+class $$SessionEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $SessionEventsTable> {
+  $$SessionEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get seq => $composableBuilder(
+    column: $table.seq,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SessionEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SessionEventsTable> {
+  $$SessionEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get seq => $composableBuilder(
+    column: $table.seq,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SessionEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SessionEventsTable> {
+  $$SessionEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get sessionId =>
+      $composableBuilder(column: $table.sessionId, builder: (column) => column);
+
+  GeneratedColumn<int> get seq =>
+      $composableBuilder(column: $table.seq, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+}
+
+class $$SessionEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SessionEventsTable,
+          SessionEventRow,
+          $$SessionEventsTableFilterComposer,
+          $$SessionEventsTableOrderingComposer,
+          $$SessionEventsTableAnnotationComposer,
+          $$SessionEventsTableCreateCompanionBuilder,
+          $$SessionEventsTableUpdateCompanionBuilder,
+          (
+            SessionEventRow,
+            BaseReferences<_$AppDatabase, $SessionEventsTable, SessionEventRow>,
+          ),
+          SessionEventRow,
+          PrefetchHooks Function()
+        > {
+  $$SessionEventsTableTableManager(_$AppDatabase db, $SessionEventsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SessionEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SessionEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SessionEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> sessionId = const Value.absent(),
+                Value<int> seq = const Value.absent(),
+                Value<DateTime> occurredAt = const Value.absent(),
+                Value<String> type = const Value.absent(),
+                Value<String> payload = const Value.absent(),
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SessionEventsCompanion(
+                id: id,
+                sessionId: sessionId,
+                seq: seq,
+                occurredAt: occurredAt,
+                type: type,
+                payload: payload,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String sessionId,
+                required int seq,
+                required DateTime occurredAt,
+                required String type,
+                Value<String> payload = const Value.absent(),
+                Value<DateTime?> syncedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SessionEventsCompanion.insert(
+                id: id,
+                sessionId: sessionId,
+                seq: seq,
+                occurredAt: occurredAt,
+                type: type,
+                payload: payload,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SessionEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SessionEventsTable,
+      SessionEventRow,
+      $$SessionEventsTableFilterComposer,
+      $$SessionEventsTableOrderingComposer,
+      $$SessionEventsTableAnnotationComposer,
+      $$SessionEventsTableCreateCompanionBuilder,
+      $$SessionEventsTableUpdateCompanionBuilder,
+      (
+        SessionEventRow,
+        BaseReferences<_$AppDatabase, $SessionEventsTable, SessionEventRow>,
+      ),
+      SessionEventRow,
+      PrefetchHooks Function()
+    >;
 typedef $$OutboxTableCreateCompanionBuilder =
     OutboxCompanion Function({
       required String id,
@@ -8549,6 +9266,8 @@ class $AppDatabaseManager {
       $$ActiveWorkoutDraftsTableTableManager(_db, _db.activeWorkoutDrafts);
   $$SessionsTableTableManager get sessions =>
       $$SessionsTableTableManager(_db, _db.sessions);
+  $$SessionEventsTableTableManager get sessionEvents =>
+      $$SessionEventsTableTableManager(_db, _db.sessionEvents);
   $$OutboxTableTableManager get outbox =>
       $$OutboxTableTableManager(_db, _db.outbox);
 }

@@ -16,6 +16,8 @@ import 'package:coachly/features/sessions/data/local/session_dao.dart';
 import 'package:coachly/features/workouts/data/local/workout_dao.dart';
 import 'package:coachly/features/sessions/domain/models/local_workout_session_model.dart';
 import 'package:coachly/features/workouts/data/services/workout_page_service.dart';
+import 'package:coachly/features/sessions/data/local/session_event_dao.dart';
+import 'package:coachly/features/sessions/data/services/session_event_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,6 +31,8 @@ final workoutSessionSyncServiceProvider = Provider<WorkoutSessionSyncService>((
     workoutPageService: ref.watch(workoutPageServiceProvider),
     exerciseService: ref.watch(exerciseInfoPageServiceProvider),
     customExerciseDao: ref.watch(customExerciseDaoProvider),
+    sessionEventDao: ref.watch(sessionEventDaoProvider),
+    sessionEventService: ref.watch(sessionEventServiceProvider),
     clock: ref.watch(clockProvider),
     logger: ref.watch(appLoggerProvider),
     isAuthenticatedReader: () {
@@ -74,6 +78,8 @@ class WorkoutSessionSyncService {
   final WorkoutPageService _workoutPageService;
   final ExerciseInfoPageService? _exerciseService;
   final CustomExerciseDao? _customExerciseDao;
+  final SessionEventDao? _sessionEventDao;
+  final SessionEventService? _sessionEventService;
   final Clock _clock;
   final AppLogger _logger;
   final bool Function() _isAuthenticatedReader;
@@ -89,6 +95,8 @@ class WorkoutSessionSyncService {
     required WorkoutPageService workoutPageService,
     ExerciseInfoPageService? exerciseService,
     CustomExerciseDao? customExerciseDao,
+    SessionEventDao? sessionEventDao,
+    SessionEventService? sessionEventService,
     required bool Function() isAuthenticatedReader,
     Clock clock = const SystemClock(),
     AppLogger logger = const ConsoleAppLogger(),
@@ -99,6 +107,8 @@ class WorkoutSessionSyncService {
        _workoutPageService = workoutPageService,
        _exerciseService = exerciseService,
        _customExerciseDao = customExerciseDao,
+       _sessionEventDao = sessionEventDao,
+       _sessionEventService = sessionEventService,
        _clock = clock,
        _logger = logger,
        _isAuthenticatedReader = isAuthenticatedReader,
@@ -136,6 +146,8 @@ class WorkoutSessionSyncService {
   }
 
   Future<void> _drainPending() async {
+    await _drainSessionEvents();
+
     // FIFO: l'ordine di creazione e' l'ordine di invio.
     final rows = await _outboxDao.pendingOrdered();
     final now = _clock.nowUtc();
@@ -151,6 +163,57 @@ class WorkoutSessionSyncService {
         _ => _markUnsupported(row),
       };
       if (outcome == _SyncOutcome.transientFailure) break;
+    }
+  }
+
+  /// Spedisce l'event log, in batch per sessione.
+  ///
+  /// Gli eventi **non passano dall'outbox**, a differenza dei comandi: una
+  /// riga di coda per evento significherebbe una richiesta per evento, e un
+  /// allenamento da quaranta serie ne produce quaranta. Qui la coda e' la
+  /// tabella stessa — le righe con `syncedAt` nullo — e l'idempotenza e'
+  /// garantita da `(sessionId, seq)` invece che da una chiave di
+  /// idempotenza per riga (`docs/development/05-sync-and-offline.md`).
+  ///
+  /// Un fallimento non marca nulla: gli eventi restano in attesa e ripartono
+  /// al giro successivo. Sono telemetria, non dati che l'utente puo' perdere.
+  Future<void> _drainSessionEvents() async {
+    final dao = _sessionEventDao;
+    final service = _sessionEventService;
+    if (dao == null || service == null) return;
+
+    final pending = await dao.pending(limit: SessionEventService.maxBatchSize);
+    if (pending.isEmpty) return;
+
+    final bySession = <String, List<SessionEventRow>>{};
+    for (final event in pending) {
+      bySession.putIfAbsent(event.sessionId, () => []).add(event);
+    }
+
+    for (final entry in bySession.entries) {
+      final response = await service.appendEvents(
+        sessionId: entry.key,
+        events: entry.value,
+      );
+
+      if (!response.success) {
+        _logger.warn(
+          'Session events not accepted; they stay pending.',
+          context: {
+            'sessionId': entry.key,
+            'events': entry.value.length,
+            'status': response.statusCode,
+          },
+        );
+        // Un batch fallito ferma solo se stesso: le altre sessioni possono
+        // avere eventi piu' vecchi che salgono comunque.
+        continue;
+      }
+
+      await dao.markSynced(
+        entry.value.map((event) => event.id).toList(growable: false),
+        syncedAt: _clock.nowUtc(),
+      );
     }
   }
 

@@ -137,6 +137,47 @@ class Sessions extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+/// Registro degli eventi di una sessione.
+///
+/// **Append-only**: nessun `UPDATE`, nessun `DELETE`
+/// (`docs/development/04-data-layer.md`). Lo stato corrente di una sessione e'
+/// una proiezione di questi eventi, non il contrario.
+///
+/// Il vincolo `(sessionId, seq)` e' lo stesso su cui si fonda l'idempotenza
+/// dell'append lato backend: la stessa coppia non viene mai scritta due volte,
+/// ne' qui ne' la'.
+@DataClassName('SessionEventRow')
+@TableIndex(
+  name: 'session_events_session_seq',
+  columns: {#sessionId, #seq},
+  unique: true,
+)
+@TableIndex(name: 'session_events_pending', columns: {#syncedAt})
+class SessionEvents extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get sessionId => text()();
+
+  /// Ordine dell'evento dentro la sessione, assegnato dal client.
+  IntColumn get seq => integer()();
+
+  /// Quando il fatto e' accaduto sul dispositivo, non quando e' stato
+  /// sincronizzato: fra i due possono passare giorni.
+  DateTimeColumn get occurredAt => dateTime()();
+
+  /// `session_started`, `set_completed`, `rest_started`…
+  TextColumn get type => text()();
+
+  /// Corpo dell'evento, JSON. `{}` quando non serve.
+  TextColumn get payload => text().withDefault(const Constant('{}'))();
+
+  /// Valorizzata quando il backend ha confermato l'append.
+  DateTimeColumn get syncedAt => dateTime().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 /// Coda di caricamento verso il backend.
 ///
 /// **Append-only e client-authored**: non esistono stati `conflict` o

@@ -10,6 +10,8 @@ import 'package:coachly/features/exercises/domain/models/exercise_detail_model.d
 import 'package:coachly/features/exercises/data/services/exercise_info_page_service.dart';
 import 'package:coachly/features/sync/data/local/outbox_dao.dart';
 import 'package:coachly/features/sessions/data/local/session_dao.dart';
+import 'package:coachly/features/sessions/data/local/session_event_dao.dart';
+import 'package:coachly/features/sessions/data/services/session_event_service.dart';
 import 'package:coachly/features/workouts/data/local/workout_dao.dart';
 import 'package:coachly/features/sessions/domain/models/local_workout_session_model.dart';
 import 'package:coachly/features/workouts/domain/models/workout_model.dart';
@@ -29,6 +31,8 @@ void main() {
   late _FakeWorkoutPageService fakeWorkoutPageService;
   late _FakeExerciseService fakeExerciseService;
   late CustomExerciseDao customExerciseDao;
+  late SessionEventDao sessionEventDao;
+  late _FakeSessionEventService fakeSessionEventService;
 
   final frozenNow = DateTime.utc(2026, 3, 18, 11);
 
@@ -41,6 +45,8 @@ void main() {
     fakeWorkoutPageService = _FakeWorkoutPageService();
     fakeExerciseService = _FakeExerciseService();
     customExerciseDao = CustomExerciseDao(db, clock, const SilentAppLogger());
+    sessionEventDao = SessionEventDao(db);
+    fakeSessionEventService = _FakeSessionEventService();
   });
 
   tearDown(() => db.close());
@@ -53,6 +59,8 @@ void main() {
       workoutPageService: fakeWorkoutPageService,
       exerciseService: fakeExerciseService,
       customExerciseDao: customExerciseDao,
+      sessionEventDao: sessionEventDao,
+      sessionEventService: fakeSessionEventService,
       isAuthenticatedReader: () => true,
       isOnlineOverride: () async => online,
       clock: clock,
@@ -246,6 +254,76 @@ void main() {
       service.dispose();
     },
   );
+
+  group('event log delle sessioni', () {
+    Future<void> seedEvents(String sessionId, int count) async {
+      for (var seq = 0; seq < count; seq++) {
+        await sessionEventDao.append(
+          id: '$sessionId-$seq',
+          sessionId: sessionId,
+          seq: seq,
+          occurredAt: frozenNow,
+          type: 'set_completed',
+        );
+      }
+    }
+
+    test('gli eventi di una sessione salgono in una sola richiesta', () async {
+      // Un allenamento da quaranta serie produce una richiesta, non quaranta
+      // (`docs/development/05-sync-and-offline.md`).
+      await seedEvents('s1', 40);
+
+      await buildService(online: true).syncPendingSessions();
+
+      expect(fakeSessionEventService.batches.length, 1);
+      expect(fakeSessionEventService.batches.single.count, 40);
+    });
+
+    test('sessioni diverse viaggiano in batch diversi', () async {
+      await seedEvents('s1', 2);
+      await seedEvents('s2', 3);
+
+      await buildService(online: true).syncPendingSessions();
+
+      expect(fakeSessionEventService.batches.length, 2);
+      expect(
+        fakeSessionEventService.batches.map((batch) => batch.count).toList()
+          ..sort(),
+        [2, 3],
+      );
+    });
+
+    test('dopo la conferma gli eventi non ripartono', () async {
+      await seedEvents('s1', 3);
+      final service = buildService(online: true);
+
+      await service.syncPendingSessions();
+      await service.syncPendingSessions();
+
+      expect(fakeSessionEventService.batches.length, 1);
+      expect(await sessionEventDao.pending(), isEmpty);
+    });
+
+    test('un invio fallito lascia gli eventi in attesa', () async {
+      // Sono telemetria: non si perdono e non bloccano nulla.
+      await seedEvents('s1', 3);
+      fakeSessionEventService.succeeds = false;
+
+      await buildService(online: true).syncPendingSessions();
+
+      expect((await sessionEventDao.pending()).length, 3);
+    });
+
+    test('offline non si spedisce nulla', () async {
+      await seedEvents('s1', 2);
+
+      await buildService(online: false).syncPendingSessions();
+
+      expect(fakeSessionEventService.batches, isEmpty);
+      expect((await sessionEventDao.pending()).length, 2);
+    });
+  });
+
 }
 
 LocalWorkoutSession _buildLocalSession({
@@ -296,6 +374,24 @@ WorkoutModel _buildWorkout({required String id, required bool dirty}) {
     type: 'Strength',
     dirty: dirty,
   );
+}
+
+class _FakeSessionEventService implements SessionEventService {
+  /// Un elemento per richiesta: serve a provare che gli eventi salgono in
+  /// batch e non uno per uno.
+  final List<({String sessionId, int count})> batches = [];
+  bool succeeds = true;
+
+  @override
+  Future<ApiResponse<void>> appendEvents({
+    required String sessionId,
+    required List<SessionEventRow> events,
+  }) async {
+    batches.add((sessionId: sessionId, count: events.length));
+    return succeeds
+        ? ApiResponse<void>.success(statusCode: 202)
+        : ApiResponse<void>.error(message: 'nope', statusCode: 500);
+  }
 }
 
 class _FakeWorkoutPageService extends WorkoutPageService {
