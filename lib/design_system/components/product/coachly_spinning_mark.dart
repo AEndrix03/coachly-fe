@@ -40,7 +40,14 @@ class CoachlySpinningMark extends StatefulWidget {
   const CoachlySpinningMark({required this.size, super.key});
 
   /// Lato del riquadro in cui il marchio e' inscritto.
+  ///
+  /// Il marchio ne occupa poco piu' della meta': il resto e' l'aria che serve
+  /// alla passata per non toccare i bordi. E' la stessa presenza discreta del
+  /// marchio statico che il riquadro sostituisce.
   final double size;
+
+  /// Quanto del riquadro occupa il marchio.
+  static const double _markRatio = 0.62;
 
   @override
   State<CoachlySpinningMark> createState() => _CoachlySpinningMarkState();
@@ -71,7 +78,10 @@ class _CoachlySpinningMarkState extends State<CoachlySpinningMark> {
           AnimatedOpacity(
             opacity: _isModelReady ? 0 : 1,
             duration: const Duration(milliseconds: 400),
-            child: Image.asset(AppAssets.logo, width: widget.size * 0.72),
+            child: Image.asset(
+              AppAssets.logo,
+              width: widget.size * CoachlySpinningMark._markRatio,
+            ),
           ),
           if (!_modelFailed)
             Positioned.fill(
@@ -89,7 +99,7 @@ class _CoachlySpinningMarkState extends State<CoachlySpinningMark> {
                   autoPlay: false,
                   interactionPrompt: InteractionPrompt.none,
                   interpolationDecay: 25,
-                  cameraOrbit: '0deg 92deg 130%',
+                  cameraOrbit: '0deg 92deg 161%',
                   // Il limite automatico del raggio si ferma prima della posa
                   // di riposo: senza questo la camera verrebbe riportata
                   // avanti e il marchio tornerebbe grande.
@@ -148,7 +158,7 @@ model-viewer::part(default-progress-mask) { display: none; }
   var lastOrbit = '', running = false, start = null;
 
   function draw(theta) {
-    var orbit = theta.toFixed(2) + 'deg 92deg 130%';
+    var orbit = theta.toFixed(2) + 'deg 92deg 161%';
     if (orbit !== lastOrbit) { mv.setAttribute('camera-orbit', orbit); lastOrbit = orbit; }
   }
 
