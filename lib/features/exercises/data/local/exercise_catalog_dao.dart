@@ -134,11 +134,42 @@ class ExerciseCatalogDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
+  /// Rimuove un esercizio e tutto ciò che gli appartiene.
+  ///
+  /// Serve al canale a delta: un esercizio ritirato dal catalogo va tolto, non
+  /// nascosto. I testi e i ponti se ne vanno con lui, altrimenti restano righe
+  /// che non appartengono più a niente e che i filtri continuerebbero a
+  /// contare.
+  Future<void> removeExercise(String exerciseId) async {
+    if (exerciseId.isEmpty) return;
+
+    await transaction(() async {
+      await (delete(
+        exerciseMuscles,
+      )..where((table) => table.exerciseId.equals(exerciseId))).go();
+      await (delete(
+        exerciseEquipments,
+      )..where((table) => table.exerciseId.equals(exerciseId))).go();
+      await (delete(
+        exerciseCategories,
+      )..where((table) => table.exerciseId.equals(exerciseId))).go();
+      await (delete(localizedTexts)..where(
+            (table) =>
+                table.entityType.equals(catalogExerciseEntityType) &
+                table.entityId.equals(exerciseId),
+          ))
+          .go();
+      await (delete(
+        catalogExercises,
+      )..where((table) => table.id.equals(exerciseId))).go();
+    });
+  }
+
   /// Salva un dettaglio completo: colonne filtrabili, blob, testi e ponti.
   ///
   /// Tutto in una transazione: una riga di catalogo senza i suoi muscoli è
   /// esattamente l'incoerenza che faceva sparire gli esercizi dai filtri.
-  Future<void> upsertDetail(ExerciseDetailModel exercise) async {
+  Future<void> upsertDetail(ExerciseDetailModel exercise, {String? sha}) async {
     final exerciseId = exercise.id;
     if (exerciseId == null || exerciseId.isEmpty) return;
 
@@ -148,9 +179,10 @@ class ExerciseCatalogDao extends DatabaseAccessor<AppDatabase>
     final categories = categoryRows(exercise);
 
     await transaction(() async {
-      await into(
-        catalogExercises,
-      ).insertOnConflictUpdate(detailToRow(exercise, updatedAt: now));
+      final row = detailToRow(exercise, updatedAt: now);
+      await into(catalogExercises).insertOnConflictUpdate(
+        sha == null ? row : row.copyWith(sha: Value(sha)),
+      );
 
       await (delete(
         exerciseMuscles,

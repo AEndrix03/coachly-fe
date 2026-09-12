@@ -1,72 +1,75 @@
-/// Un delta del catalogo, così come lo manda il backend.
+/// Un delta del catalogo.
 ///
-/// Le righe non vengono interpretate qui: sono mappe grezze che il data layer
-/// travasa nelle tabelle locali. Il client non ha una classe per ognuna delle
-/// ventidue tabelle del backend, e non deve averla: lo schema locale è
-/// modellato dalle clausole `WHERE` della app, non dalla normalizzazione del
-/// backend (`docs/development/04-data-layer.md`).
+/// L'unità di cambiamento è **l'esercizio come lo consuma il client**, non la
+/// riga di una tabella del backend: il payload che arriva qui è lo stesso che
+/// servirebbe `GET /exercises/{id}/details`, e si salva così com'è.
 final class CatalogDelta {
   const CatalogDelta({
     required this.since,
     required this.version,
     required this.complete,
-    required this.tables,
+    required this.exercises,
   });
 
   /// Watermark da cui il delta è stato chiesto.
   final int since;
 
   /// Nuovo watermark: applicato questo delta, si riparte da qui.
-  ///
-  /// Non è il massimo che si vede nelle righe: quando il backend tronca, è la
-  /// soglia sotto la quale è garantito che non manchi nulla.
   final int version;
 
   /// `false` se il backend ha troncato e va richiamato con il nuovo [since].
   final bool complete;
 
-  final Map<String, CatalogTableDelta> tables;
+  final List<CatalogExerciseChange> exercises;
 
-  bool get isEmpty => tables.isEmpty;
+  bool get isEmpty => exercises.isEmpty;
 
   static CatalogDelta fromJson(Map<String, dynamic> json) {
-    final rawTables = json['tables'];
+    final raw = json['exercises'];
     return CatalogDelta(
       since: (json['since'] as num?)?.toInt() ?? 0,
       version: (json['version'] as num?)?.toInt() ?? 0,
       complete: json['complete'] as bool? ?? true,
-      tables: rawTables is Map<String, dynamic>
-          ? rawTables.map(
-              (table, value) => MapEntry(
-                table,
-                CatalogTableDelta.fromJson(value as Map<String, dynamic>),
-              ),
-            )
-          : const {},
+      exercises: raw is List
+          ? raw
+                .whereType<Map<String, dynamic>>()
+                .map(CatalogExerciseChange.fromJson)
+                .toList(growable: false)
+          : const [],
     );
   }
 }
 
-/// Righe cambiate e chiavi sparite per una singola tabella.
-final class CatalogTableDelta {
-  const CatalogTableDelta({required this.upserted, required this.deleted});
+/// Un esercizio cambiato.
+final class CatalogExerciseChange {
+  const CatalogExerciseChange({
+    required this.id,
+    required this.sha,
+    required this.deleted,
+    required this.payload,
+  });
 
-  /// Righe intere, da sovrascrivere per chiave.
-  final List<Map<String, dynamic>> upserted;
+  final String id;
 
-  /// Chiavi primarie delle righe sparite. Sono oggetti e non stringhe perché
-  /// nove tabelle su ventidue hanno una chiave composta.
-  final List<Map<String, dynamic>> deleted;
+  /// Impronta del contenuto. Si conserva accanto all'esercizio: permette di
+  /// verificare che il locale sia davvero ciò che il server crede che sia,
+  /// senza riscaricare il payload per confrontarlo.
+  final String sha;
 
-  static CatalogTableDelta fromJson(Map<String, dynamic> json) {
-    return CatalogTableDelta(
-      upserted: _rows(json['upserted']),
-      deleted: _rows(json['deleted']),
+  /// L'esercizio non fa più parte del catalogo. Il payload è l'ultimo noto e
+  /// va ignorato: quello che conta è rimuoverlo dal locale.
+  final bool deleted;
+
+  /// Il dettaglio completo, già decodificato.
+  final Map<String, dynamic> payload;
+
+  static CatalogExerciseChange fromJson(Map<String, dynamic> json) {
+    final payload = json['payload'];
+    return CatalogExerciseChange(
+      id: json['id'] as String? ?? '',
+      sha: json['sha'] as String? ?? '',
+      deleted: json['deleted'] as bool? ?? false,
+      payload: payload is Map<String, dynamic> ? payload : const {},
     );
-  }
-
-  static List<Map<String, dynamic>> _rows(Object? raw) {
-    if (raw is! List) return const [];
-    return raw.whereType<Map<String, dynamic>>().toList(growable: false);
   }
 }

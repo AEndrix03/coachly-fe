@@ -41,6 +41,13 @@ class CatalogExercises extends Table {
   /// con i riepiloghi e i dettagli restano pigri, uno per volta.
   TextColumn get payload => text().nullable()();
 
+  /// Impronta del contenuto, così come l'ha calcolata il backend.
+  ///
+  /// Non serve a leggere: serve a sapere **se** ciò che c'è in locale è
+  /// davvero ciò che il server crede che ci sia. Vuota finché l'esercizio
+  /// arriva da un percorso che non è il delta.
+  TextColumn get sha => text().withDefault(const Constant(''))();
+
   DateTimeColumn get updatedAt => dateTime()();
 
   @override

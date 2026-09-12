@@ -42,7 +42,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'coachly'));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,6 +75,10 @@ class AppDatabase extends _$AppDatabase {
         // `(sessionId, seq)` esisterebbe solo sulle installazioni nuove.
         await m.create(sessionEventsSessionSeq);
         await m.create(sessionEventsPending);
+      }
+      if (from < 5) {
+        // L'impronta del contenuto arriva col canale a delta del catalogo.
+        await m.addColumn(catalogExercises, catalogExercises.sha);
       }
     },
     beforeOpen: (details) async {

@@ -124,6 +124,16 @@ class $CatalogExercisesTable extends CatalogExercises
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _shaMeta = const VerificationMeta('sha');
+  @override
+  late final GeneratedColumn<String> sha = GeneratedColumn<String>(
+    'sha',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -147,6 +157,7 @@ class $CatalogExercisesTable extends CatalogExercises
     exerciseKind,
     catalogStatus,
     payload,
+    sha,
     updatedAt,
   ];
   @override
@@ -232,6 +243,12 @@ class $CatalogExercisesTable extends CatalogExercises
         payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
       );
     }
+    if (data.containsKey('sha')) {
+      context.handle(
+        _shaMeta,
+        sha.isAcceptableOrUnknown(data['sha']!, _shaMeta),
+      );
+    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -289,6 +306,10 @@ class $CatalogExercisesTable extends CatalogExercises
         DriftSqlType.string,
         data['${effectivePrefix}payload'],
       ),
+      sha: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sha'],
+      )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -319,6 +340,13 @@ class CatalogExerciseRow extends DataClass
   /// `null` finché il dettaglio non è stato scaricato: il catalogo si popola
   /// con i riepiloghi e i dettagli restano pigri, uno per volta.
   final String? payload;
+
+  /// Impronta del contenuto, così come l'ha calcolata il backend.
+  ///
+  /// Non serve a leggere: serve a sapere **se** ciò che c'è in locale è
+  /// davvero ciò che il server crede che ci sia. Vuota finché l'esercizio
+  /// arriva da un percorso che non è il delta.
+  final String sha;
   final DateTime updatedAt;
   const CatalogExerciseRow({
     required this.id,
@@ -331,6 +359,7 @@ class CatalogExerciseRow extends DataClass
     this.exerciseKind,
     this.catalogStatus,
     this.payload,
+    required this.sha,
     required this.updatedAt,
   });
   @override
@@ -358,6 +387,7 @@ class CatalogExerciseRow extends DataClass
     if (!nullToAbsent || payload != null) {
       map['payload'] = Variable<String>(payload);
     }
+    map['sha'] = Variable<String>(sha);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -386,6 +416,7 @@ class CatalogExerciseRow extends DataClass
       payload: payload == null && nullToAbsent
           ? const Value.absent()
           : Value(payload),
+      sha: Value(sha),
       updatedAt: Value(updatedAt),
     );
   }
@@ -406,6 +437,7 @@ class CatalogExerciseRow extends DataClass
       exerciseKind: serializer.fromJson<String?>(json['exerciseKind']),
       catalogStatus: serializer.fromJson<String?>(json['catalogStatus']),
       payload: serializer.fromJson<String?>(json['payload']),
+      sha: serializer.fromJson<String>(json['sha']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -423,6 +455,7 @@ class CatalogExerciseRow extends DataClass
       'exerciseKind': serializer.toJson<String?>(exerciseKind),
       'catalogStatus': serializer.toJson<String?>(catalogStatus),
       'payload': serializer.toJson<String?>(payload),
+      'sha': serializer.toJson<String>(sha),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -438,6 +471,7 @@ class CatalogExerciseRow extends DataClass
     Value<String?> exerciseKind = const Value.absent(),
     Value<String?> catalogStatus = const Value.absent(),
     Value<String?> payload = const Value.absent(),
+    String? sha,
     DateTime? updatedAt,
   }) => CatalogExerciseRow(
     id: id ?? this.id,
@@ -456,6 +490,7 @@ class CatalogExerciseRow extends DataClass
         ? catalogStatus.value
         : this.catalogStatus,
     payload: payload.present ? payload.value : this.payload,
+    sha: sha ?? this.sha,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   CatalogExerciseRow copyWithCompanion(CatalogExercisesCompanion data) {
@@ -482,6 +517,7 @@ class CatalogExerciseRow extends DataClass
           ? data.catalogStatus.value
           : this.catalogStatus,
       payload: data.payload.present ? data.payload.value : this.payload,
+      sha: data.sha.present ? data.sha.value : this.sha,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -499,6 +535,7 @@ class CatalogExerciseRow extends DataClass
           ..write('exerciseKind: $exerciseKind, ')
           ..write('catalogStatus: $catalogStatus, ')
           ..write('payload: $payload, ')
+          ..write('sha: $sha, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -516,6 +553,7 @@ class CatalogExerciseRow extends DataClass
     exerciseKind,
     catalogStatus,
     payload,
+    sha,
     updatedAt,
   );
   @override
@@ -532,6 +570,7 @@ class CatalogExerciseRow extends DataClass
           other.exerciseKind == this.exerciseKind &&
           other.catalogStatus == this.catalogStatus &&
           other.payload == this.payload &&
+          other.sha == this.sha &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -546,6 +585,7 @@ class CatalogExercisesCompanion extends UpdateCompanion<CatalogExerciseRow> {
   final Value<String?> exerciseKind;
   final Value<String?> catalogStatus;
   final Value<String?> payload;
+  final Value<String> sha;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const CatalogExercisesCompanion({
@@ -559,6 +599,7 @@ class CatalogExercisesCompanion extends UpdateCompanion<CatalogExerciseRow> {
     this.exerciseKind = const Value.absent(),
     this.catalogStatus = const Value.absent(),
     this.payload = const Value.absent(),
+    this.sha = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -573,6 +614,7 @@ class CatalogExercisesCompanion extends UpdateCompanion<CatalogExerciseRow> {
     this.exerciseKind = const Value.absent(),
     this.catalogStatus = const Value.absent(),
     this.payload = const Value.absent(),
+    this.sha = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -588,6 +630,7 @@ class CatalogExercisesCompanion extends UpdateCompanion<CatalogExerciseRow> {
     Expression<String>? exerciseKind,
     Expression<String>? catalogStatus,
     Expression<String>? payload,
+    Expression<String>? sha,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -602,6 +645,7 @@ class CatalogExercisesCompanion extends UpdateCompanion<CatalogExerciseRow> {
       if (exerciseKind != null) 'exercise_kind': exerciseKind,
       if (catalogStatus != null) 'catalog_status': catalogStatus,
       if (payload != null) 'payload': payload,
+      if (sha != null) 'sha': sha,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -618,6 +662,7 @@ class CatalogExercisesCompanion extends UpdateCompanion<CatalogExerciseRow> {
     Value<String?>? exerciseKind,
     Value<String?>? catalogStatus,
     Value<String?>? payload,
+    Value<String>? sha,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
@@ -632,6 +677,7 @@ class CatalogExercisesCompanion extends UpdateCompanion<CatalogExerciseRow> {
       exerciseKind: exerciseKind ?? this.exerciseKind,
       catalogStatus: catalogStatus ?? this.catalogStatus,
       payload: payload ?? this.payload,
+      sha: sha ?? this.sha,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -670,6 +716,9 @@ class CatalogExercisesCompanion extends UpdateCompanion<CatalogExerciseRow> {
     if (payload.present) {
       map['payload'] = Variable<String>(payload.value);
     }
+    if (sha.present) {
+      map['sha'] = Variable<String>(sha.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -692,6 +741,7 @@ class CatalogExercisesCompanion extends UpdateCompanion<CatalogExerciseRow> {
           ..write('exerciseKind: $exerciseKind, ')
           ..write('catalogStatus: $catalogStatus, ')
           ..write('payload: $payload, ')
+          ..write('sha: $sha, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -6093,6 +6143,7 @@ typedef $$CatalogExercisesTableCreateCompanionBuilder =
       Value<String?> exerciseKind,
       Value<String?> catalogStatus,
       Value<String?> payload,
+      Value<String> sha,
       required DateTime updatedAt,
       Value<int> rowid,
     });
@@ -6108,6 +6159,7 @@ typedef $$CatalogExercisesTableUpdateCompanionBuilder =
       Value<String?> exerciseKind,
       Value<String?> catalogStatus,
       Value<String?> payload,
+      Value<String> sha,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -6168,6 +6220,11 @@ class $$CatalogExercisesTableFilterComposer
 
   ColumnFilters<String> get payload => $composableBuilder(
     column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sha => $composableBuilder(
+    column: $table.sha,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6236,6 +6293,11 @@ class $$CatalogExercisesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get sha => $composableBuilder(
+    column: $table.sha,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -6293,6 +6355,9 @@ class $$CatalogExercisesTableAnnotationComposer
   GeneratedColumn<String> get payload =>
       $composableBuilder(column: $table.payload, builder: (column) => column);
 
+  GeneratedColumn<String> get sha =>
+      $composableBuilder(column: $table.sha, builder: (column) => column);
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
@@ -6344,6 +6409,7 @@ class $$CatalogExercisesTableTableManager
                 Value<String?> exerciseKind = const Value.absent(),
                 Value<String?> catalogStatus = const Value.absent(),
                 Value<String?> payload = const Value.absent(),
+                Value<String> sha = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CatalogExercisesCompanion(
@@ -6357,6 +6423,7 @@ class $$CatalogExercisesTableTableManager
                 exerciseKind: exerciseKind,
                 catalogStatus: catalogStatus,
                 payload: payload,
+                sha: sha,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -6372,6 +6439,7 @@ class $$CatalogExercisesTableTableManager
                 Value<String?> exerciseKind = const Value.absent(),
                 Value<String?> catalogStatus = const Value.absent(),
                 Value<String?> payload = const Value.absent(),
+                Value<String> sha = const Value.absent(),
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => CatalogExercisesCompanion.insert(
@@ -6385,6 +6453,7 @@ class $$CatalogExercisesTableTableManager
                 exerciseKind: exerciseKind,
                 catalogStatus: catalogStatus,
                 payload: payload,
+                sha: sha,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),

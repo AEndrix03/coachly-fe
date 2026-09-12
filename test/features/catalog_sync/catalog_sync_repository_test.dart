@@ -1,32 +1,30 @@
 import 'package:coachly/core/database/app_database.dart';
-import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/core/network/api_client.dart' show CancelToken;
 import 'package:coachly/core/network/api_response.dart';
-import 'package:coachly/core/result/result.dart';
 import 'package:coachly/core/time/clock.dart';
 import 'package:coachly/features/catalog_sync/data/local/catalog_meta_dao.dart';
 import 'package:coachly/features/catalog_sync/data/repositories/catalog_sync_repository.dart';
 import 'package:coachly/features/catalog_sync/data/services/catalog_delta_service.dart';
 import 'package:coachly/features/catalog_sync/domain/catalog_delta.dart';
-import 'package:coachly/features/exercises/data/repositories/exercise_info_page_repository.dart';
-import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
+import 'package:coachly/features/exercises/data/local/exercise_catalog_dao.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   late AppDatabase db;
   late CatalogMetaDao metaDao;
+  late ExerciseCatalogDao catalogDao;
   late _FakeCatalogDeltaService deltaService;
-  late _FakeExerciseRepository exerciseRepository;
 
   final frozenNow = DateTime.utc(2026, 3, 18, 11);
 
   setUp(() {
     db = AppDatabase(NativeDatabase.memory());
-    metaDao = CatalogMetaDao(db, FixedClock(frozenNow));
+    final clock = FixedClock(frozenNow);
+    metaDao = CatalogMetaDao(db, clock);
+    catalogDao = ExerciseCatalogDao(db, clock);
     deltaService = _FakeCatalogDeltaService();
-    exerciseRepository = _FakeExerciseRepository();
   });
 
   tearDown(() => db.close());
@@ -34,56 +32,167 @@ void main() {
   CatalogSyncRepository buildRepository() => CatalogSyncRepository(
     deltaService: deltaService,
     metaDao: metaDao,
-    exerciseRepository: exerciseRepository,
+    catalogDao: catalogDao,
     logger: const SilentAppLogger(),
   );
 
-  test('la prima volta scarica, anche se le versioni coincidono', () async {
-    // Versione locale 0 significa «non ho mai applicato niente», non «ho la
-    // versione 0»: senza questa distinzione una installazione nuova che trova
-    // un backend a 0 non scaricherebbe mai il catalogo.
-    deltaService.version = 0;
+  Map<String, dynamic> exercisePayload(String id, String name) => {
+    'id': id,
+    'code': id,
+    'nameI18n': {'it': name, 'en': name},
+    'unilateral': false,
+    'bodyweight': false,
+  };
 
-    final result = await buildRepository().syncIfNeeded();
+  CatalogDelta page({
+    required int version,
+    required bool complete,
+    List<CatalogExerciseChange> exercises = const [],
+    int since = 0,
+  }) => CatalogDelta(
+    since: since,
+    version: version,
+    complete: complete,
+    exercises: exercises,
+  );
 
-    expect(result.valueOrNull, CatalogSyncOutcome.updated);
-    expect(exerciseRepository.refreshCalls, 1);
-  });
+  Future<List<String?>> localIds() async {
+    final rows = await db.select(db.catalogExercises).get();
+    return (rows.map((row) => row.id).toList()..sort());
+  }
 
-  test('versione invariata: nessun trasferimento', () async {
-    // È il caso normale, ed è tutto il guadagno del canale a delta: si
-    // confronta un intero invece di riscaricare il catalogo.
+  test('versione invariata: nessun delta viene nemmeno chiesto', () async {
+    // È il caso normale, ed è tutto il guadagno: si confronta un intero.
     deltaService.version = 42;
     await metaDao.setVersion(42);
 
     final result = await buildRepository().syncIfNeeded();
 
     expect(result.valueOrNull, CatalogSyncOutcome.alreadyCurrent);
-    expect(exerciseRepository.refreshCalls, 0);
+    expect(deltaService.deltaCalls, isEmpty);
   });
 
-  test('versione avanzata: aggiorna e registra la nuova', () async {
-    deltaService.version = 43;
-    await metaDao.setVersion(42);
+  test('applica gli esercizi cambiati e registra il watermark', () async {
+    deltaService.version = 7;
+    deltaService.pages = [
+      page(
+        version: 7,
+        complete: true,
+        exercises: [
+          CatalogExerciseChange(
+            id: 'squat',
+            sha: 'sha-squat',
+            deleted: false,
+            payload: exercisePayload('squat', 'Squat'),
+          ),
+        ],
+      ),
+    ];
 
     final result = await buildRepository().syncIfNeeded();
 
     expect(result.valueOrNull, CatalogSyncOutcome.updated);
-    expect(exerciseRepository.refreshCalls, 1);
-    expect(await metaDao.currentVersion(), 43);
+    expect(await localIds(), ['squat']);
+    expect(await metaDao.currentVersion(), 7);
   });
 
-  test('un aggiornamento fallito non registra la versione', () async {
-    // Scriverla comunque farebbe credere alla app di avere un catalogo che non
-    // ha, e il disallineamento non si correggerebbe mai da solo.
-    deltaService.version = 43;
-    await metaDao.setVersion(42);
-    exerciseRepository.fails = true;
+  test('conserva l impronta accanto all esercizio', () async {
+    // Serve a sapere se il locale è davvero ciò che il server crede che sia,
+    // senza riscaricare il payload per confrontarlo.
+    deltaService.version = 7;
+    deltaService.pages = [
+      page(
+        version: 7,
+        complete: true,
+        exercises: [
+          CatalogExerciseChange(
+            id: 'squat',
+            sha: 'sha-squat',
+            deleted: false,
+            payload: exercisePayload('squat', 'Squat'),
+          ),
+        ],
+      ),
+    ];
 
-    final result = await buildRepository().syncIfNeeded();
+    await buildRepository().syncIfNeeded();
 
-    expect(result.isOk, isFalse);
-    expect(await metaDao.currentVersion(), 42);
+    final row = await (db.select(
+      db.catalogExercises,
+    )..where((table) => table.id.equals('squat'))).getSingle();
+    expect(row.sha, 'sha-squat');
+  });
+
+  test('un esercizio ritirato viene rimosso dal locale', () async {
+    deltaService.version = 9;
+    deltaService.pages = [
+      page(
+        version: 8,
+        complete: false,
+        exercises: [
+          CatalogExerciseChange(
+            id: 'squat',
+            sha: 'a',
+            deleted: false,
+            payload: exercisePayload('squat', 'Squat'),
+          ),
+        ],
+      ),
+      page(
+        since: 8,
+        version: 9,
+        complete: true,
+        exercises: const [
+          CatalogExerciseChange(
+            id: 'squat',
+            sha: '',
+            deleted: true,
+            payload: {},
+          ),
+        ],
+      ),
+    ];
+
+    await buildRepository().syncIfNeeded();
+
+    expect(await localIds(), isEmpty);
+  });
+
+  test('un delta troncato continua dalla pagina successiva', () async {
+    deltaService.version = 2;
+    deltaService.pages = [
+      page(
+        version: 1,
+        complete: false,
+        exercises: [
+          CatalogExerciseChange(
+            id: 'a',
+            sha: 'a',
+            deleted: false,
+            payload: exercisePayload('a', 'A'),
+          ),
+        ],
+      ),
+      page(
+        since: 1,
+        version: 2,
+        complete: true,
+        exercises: [
+          CatalogExerciseChange(
+            id: 'b',
+            sha: 'b',
+            deleted: false,
+            payload: exercisePayload('b', 'B'),
+          ),
+        ],
+      ),
+    ];
+
+    await buildRepository().syncIfNeeded();
+
+    expect(await localIds(), ['a', 'b']);
+    expect(deltaService.deltaCalls, [0, 1], reason: 'riparte dal watermark');
+    expect(await metaDao.currentVersion(), 2);
   });
 
   test('senza rete il catalogo locale resta quello buono', () async {
@@ -93,7 +202,6 @@ void main() {
     final result = await buildRepository().syncIfNeeded();
 
     expect(result.valueOrNull, CatalogSyncOutcome.skipped);
-    expect(exerciseRepository.refreshCalls, 0);
     expect(await metaDao.currentVersion(), 42);
   });
 }
@@ -101,6 +209,10 @@ void main() {
 class _FakeCatalogDeltaService implements CatalogDeltaService {
   int version = 0;
   bool fails = false;
+  List<CatalogDelta> pages = const [];
+
+  /// I `since` con cui il delta è stato richiesto, in ordine.
+  final List<int> deltaCalls = [];
 
   @override
   Future<ApiResponse<int>> fetchVersion({CancelToken? cancelToken}) async {
@@ -114,24 +226,11 @@ class _FakeCatalogDeltaService implements CatalogDeltaService {
     required int since,
     int limit = 1000,
     CancelToken? cancelToken,
-  }) {
-    throw UnimplementedError();
+  }) async {
+    deltaCalls.add(since);
+    final next = pages.isEmpty ? null : pages.removeAt(0);
+    return next == null
+        ? ApiResponse<CatalogDelta>.error(message: 'no page')
+        : ApiResponse<CatalogDelta>.success(data: next);
   }
-}
-
-class _FakeExerciseRepository implements IExerciseInfoPageRepository {
-  int refreshCalls = 0;
-  bool fails = false;
-
-  @override
-  Future<Result<List<ExerciseDetailModel>, Failure>>
-  refreshFromRemoteResult() async {
-    refreshCalls++;
-    return fails
-        ? const Err(NetworkFailure('nope'))
-        : const Ok(<ExerciseDetailModel>[]);
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
