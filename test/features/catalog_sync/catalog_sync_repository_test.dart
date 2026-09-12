@@ -195,6 +195,42 @@ void main() {
     expect(await metaDao.currentVersion(), 2);
   });
 
+  test('il delta popola i dettagli che il selettore di esercizi legge', () async {
+    // È la regressione vista in «Edit workout»: il selettore legge i dettagli
+    // *scaricati* (`payload` non nullo), e finché la sync portava solo i
+    // riepiloghi vedeva un esercizio solo — quello che l'utente aveva aperto a
+    // mano. Il delta porta il dettaglio completo, quindi li deve vedere tutti.
+    deltaService.version = 3;
+    deltaService.pages = [
+      page(
+        version: 3,
+        complete: true,
+        exercises: [
+          CatalogExerciseChange(
+            id: 'squat',
+            sha: 'a',
+            deleted: false,
+            payload: exercisePayload('squat', 'Squat'),
+          ),
+          CatalogExerciseChange(
+            id: 'panca',
+            sha: 'b',
+            deleted: false,
+            payload: exercisePayload('panca', 'Panca'),
+          ),
+        ],
+      ),
+    ];
+
+    await buildRepository().syncIfNeeded();
+
+    final details = await catalogDao.getAllDetails();
+    expect(
+      details.map((detail) => detail.id).toList()..sort(),
+      ['panca', 'squat'],
+    );
+  });
+
   test('senza rete il catalogo locale resta quello buono', () async {
     deltaService.fails = true;
     await metaDao.setVersion(42);
