@@ -1,4 +1,5 @@
 import 'package:coachly/core/database/app_database.dart';
+import 'package:coachly/core/error/failures.dart';
 import 'package:coachly/core/logging/app_logger.dart';
 import 'package:coachly/features/auth/data/dto/login_response_dto/login_response_dto.dart';
 import 'package:coachly/features/auth/data/models/auth_state/auth_state.dart';
@@ -13,6 +14,17 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_provider.g.dart';
+
+enum AuthStatus { idle, loading, authenticated, failed }
+
+extension AuthStatusProjection on AuthState {
+  AuthStatus get status {
+    if (isLoading) return AuthStatus.loading;
+    if (canAccessApp) return AuthStatus.authenticated;
+    if (errorMessage != null) return AuthStatus.failed;
+    return AuthStatus.idle;
+  }
+}
 
 @riverpod
 TokenManager tokenManager(Ref ref) => TokenManager();
@@ -42,17 +54,39 @@ class Auth extends _$Auth {
     return _restoreSession();
   }
 
+  /// Tempo minimo in cui la schermata resta in attesa: il logo animato e'
+  /// l'indicatore di caricamento, e un accesso istantaneo sarebbe un lampo
+  /// che l'occhio legge come un errore.
+  static const _minimumLoading = Duration(milliseconds: 300);
+
+  /// Dopo un esito positivo il logo completa il giro prima che il router
+  /// cambi pagina: il feedback di successo e' il marchio che si ferma.
+  static const _successHold = Duration(milliseconds: 500);
+
   Future<void> login() async {
     state = const AsyncData(AuthState(isLoading: true));
     final repository = ref.read(authRepositoryProvider);
+    final stopwatch = Stopwatch()..start();
     final result = await repository.login();
 
-    state = AsyncData(
-      result.fold(
-        (failure) => _unauthenticated.copyWith(errorMessage: failure.message),
-        _authenticatedStateFromTokens,
-      ),
-    );
+    final remaining = _minimumLoading - stopwatch.elapsed;
+    if (remaining > Duration.zero) {
+      await Future<void>.delayed(remaining);
+    }
+
+    final next = result.fold((failure) {
+      if (failure is CancelledFailure) return _unauthenticated;
+
+      ref
+          .read(appLoggerProvider)
+          .warn('Accesso non completato', error: failure);
+      return _unauthenticated.copyWith(errorMessage: 'auth_failed');
+    }, _authenticatedStateFromTokens);
+
+    if (next.canAccessApp) {
+      await Future<void>.delayed(_successHold);
+    }
+    state = AsyncData(next);
   }
 
   /// Numero di allenamenti registrati e non ancora inviati al backend.

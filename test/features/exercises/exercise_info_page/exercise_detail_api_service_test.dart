@@ -50,37 +50,6 @@ void main() {
     },
   );
 
-  test('loads the complete catalogue from the filtered endpoint', () async {
-    final client = FakeDioAdapter(
-      responder: (request) {
-        expect(request.uri.path, '/api/exercises/filtered');
-        return FakeResponse.body(
-          jsonEncode([
-            _exerciseDetailJson,
-            {
-              ..._exerciseDetailJson,
-              'id': 'squat-id',
-              'code': 'BACK_SQUAT',
-              'nameI18n': {'it': 'Back Squat'},
-            },
-          ]),
-          200,
-        );
-      },
-    );
-    final service = ApiExerciseDetailViewService(
-      ApiClient(dio: fakeDio(client), baseUrl: 'https://coachly.test/api'),
-    );
-
-    final catalog = await service.fetchAll(const Locale('it'));
-
-    expect(catalog, hasLength(2));
-    expect(catalog.map((exercise) => exercise.id), ['exercise-id', 'squat-id']);
-    expect(catalog.map((exercise) => exercise.name), [
-      'Lat Pulldown',
-      'Back Squat',
-    ]);
-  });
 }
 
 const _exerciseDetailJson = <String, Object?>{

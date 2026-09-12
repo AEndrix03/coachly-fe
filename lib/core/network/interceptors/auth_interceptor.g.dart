@@ -63,7 +63,7 @@ final class DioClientProvider extends $FunctionalProvider<Dio, Dio, Dio>
   }
 }
 
-String _$dioClientHash() => r'6361539bdeba6df783b0ded53bd5f0f3fbddd7c8';
+String _$dioClientHash() => r'53f851886597b63b100c60fd2794ba723a341797';
 
 /// Il Dio con l'autenticazione agganciata.
 ///
@@ -120,4 +120,4 @@ final class AuthDioProvider extends $FunctionalProvider<Dio, Dio, Dio>
   }
 }
 
-String _$authDioHash() => r'736452034671a201ed80ca8a93825115240dd2bd';
+String _$authDioHash() => r'535ab858ca01916fc34332f64b891c43e673d6b7';

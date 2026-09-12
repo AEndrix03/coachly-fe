@@ -49,11 +49,6 @@ class _FakeService implements ExerciseInfoPageService {
   }
 
   @override
-  Future<ApiResponse<List<ExerciseDetailModel>>> fetchFilteredExercises(
-    ExerciseFilterModel filter,
-  ) async => ApiResponse.success(data: const []);
-
-  @override
   Future<ApiResponse<List<ExerciseModel>>> fetchMyExercises() async =>
       ApiResponse.success(data: const []);
 

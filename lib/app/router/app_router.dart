@@ -236,7 +236,10 @@ final List<RouteBase> _workoutRoutes = [
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) => _athleteTransition(
           state,
-          WorkoutActivePage(workoutId: state.pathParameters['id']!),
+          WorkoutActivePage(
+            workoutId: state.pathParameters['id']!,
+            resume: state.uri.queryParameters['resume'] == 'true',
+          ),
         ),
       ),
       GoRoute(

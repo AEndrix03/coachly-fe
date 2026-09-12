@@ -1793,25 +1793,18 @@ class AppStrings {
     'exercise.force.static': {'en': 'Static', 'it': 'Statico'},
 
     'auth.login.title': {
-      'en': 'Sign in with Keycloak',
-      'it': 'Accedi con Keycloak',
+      'en': 'Train with a plan. Progress using your data.',
+      'it': 'Allenati con un piano. Progredisci usando i tuoi dati.',
     },
     'auth.login.description': {
-      'en':
-          'Sign-in runs in the system browser with Authorization Code Flow and PKCE. The app never handles username or password directly.',
-      'it':
-          'Il login avviene nel browser di sistema con Authorization Code Flow e PKCE. L app non gestisce direttamente username e password.',
+      'en': 'Continue with Apple',
+      'it': 'Continua con Apple',
     },
     'auth.login.configuration_hint': {
-      'en':
-          'If the Keycloak client and redirect URIs are configured correctly, after login you are redirected back to the app automatically.',
-      'it':
-          'Se il client Keycloak e le redirect URI sono configurati correttamente, dopo il login torni automaticamente nell app.',
+      'en': 'Continue with Google',
+      'it': 'Continua con Google',
     },
-    'auth.login.cta': {
-      'en': 'Continue with Keycloak',
-      'it': 'Continua con Keycloak',
-    },
+    'auth.login.cta': {'en': 'Sign in with email', 'it': 'Accedi con email'},
 
     // Local AI settings (profile page)
 

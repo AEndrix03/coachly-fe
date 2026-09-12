@@ -46,11 +46,13 @@ class AuthServiceImpl implements AuthService {
         idToken: response.idToken,
       );
       return loginResponse;
+    } on FlutterAppAuthUserCancelledException {
+      throw const CancelledFailure();
     } catch (e) {
       if (e is Failure) {
         rethrow;
       }
-      throw ServerFailure('Error during Keycloak login: $e');
+      throw exceptionToFailure(e);
     }
   }
 

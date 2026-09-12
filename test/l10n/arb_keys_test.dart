@@ -31,6 +31,12 @@ const _icuOnlyKeys = <String>{
   'updateRequiredBody',
   'updateRequiredAction',
   'updateRecommendedMessage',
+  // Schermata di accesso: pill dei provider non ancora attivi e nota legale
+  // con i due documenti come segnaposto cliccabili.
+  'authSoonBadge',
+  'authLegalNotice',
+  'authLegalTerms',
+  'authLegalPrivacy',
 };
 
 Map<String, String> _messages(String path) {

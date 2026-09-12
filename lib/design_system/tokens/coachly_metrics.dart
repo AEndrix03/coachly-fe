@@ -78,9 +78,15 @@ class CoachlyRadii {
   /// Raggio di un'azione primaria.
   double get action => lg;
 
+  /// Raggio delle azioni di accesso: piu' morbido dell'azione comune, perche'
+  /// sono grandi e isolate sopra una fotografia.
+  double get authAction => 20;
+
   BorderRadius get cardBorder => BorderRadius.circular(card);
 
   BorderRadius get actionBorder => BorderRadius.circular(action);
+
+  BorderRadius get authActionBorder => BorderRadius.circular(authAction);
 }
 
 /// Dimensioni dei controlli.
@@ -99,6 +105,25 @@ class CoachlySizes {
   final double iconLg;
   final double iconXl;
 
+  /// Logo animato della schermata di accesso e spazio che gli serve intorno.
+  ///
+  /// `authLogo` è il diametro visivo del logo; `authLogoStage` è l'altezza
+  /// del palco in cui salta e ruota; `authLogoGlow` è il diametro del bagliore
+  /// che gli sta dietro.
+  /// Altezza delle azioni di accesso: piu' alte di un'azione comune perche'
+  /// sono il solo bersaglio della schermata.
+  final double authAction;
+  final double authLogo;
+  final double authLogoStage;
+  final double authLogoGlow;
+
+  /// Quanto il marchio 3D scende dentro il suo palco: il modello e' montato
+  /// alto nel file, e questo lo riporta a fuoco ottico con il titolo.
+  final double authLogoDrop;
+
+  /// Altezza del titolo illustrato sotto il logo (immagine con proporzione 3:1).
+  final double authTitle;
+
   const CoachlySizes({
     this.touchTarget = 48,
     this.touchTargetWorkout = 56,
@@ -108,6 +133,12 @@ class CoachlySizes {
     this.iconMd = 24,
     this.iconLg = 32,
     this.iconXl = 48,
+    this.authAction = 64,
+    this.authLogo = 133,
+    this.authLogoStage = 224,
+    this.authLogoGlow = 100,
+    this.authLogoDrop = 16,
+    this.authTitle = 108,
   });
 
   static const standard = CoachlySizes();
@@ -125,6 +156,10 @@ class CoachlyMotion {
   final Duration slow;
   final Duration deliberate;
   final Duration confirmHold;
+
+  /// Periodo di un respiro ambientale (bagliori, elementi decorativi a
+  /// riposo). Lento abbastanza da non attirare l'occhio.
+  final Duration ambient;
 
   /// Quanto si aspetta prima di ammettere che si sta caricando.
   ///
@@ -153,6 +188,7 @@ class CoachlyMotion {
     this.slow = const Duration(milliseconds: 280),
     this.deliberate = const Duration(milliseconds: 500),
     this.confirmHold = const Duration(seconds: 2),
+    this.ambient = const Duration(milliseconds: 2800),
     this.loadingDelay = const Duration(milliseconds: 300),
     this.loadingMinimum = const Duration(milliseconds: 450),
     this.enter = Curves.easeOutCubic,

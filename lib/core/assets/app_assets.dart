@@ -10,12 +10,17 @@ abstract final class AppAssets {
 
   // Brand
   static const String logo = 'assets/brand/app_logo.png';
-  static const String logoDark = 'assets/brand/app_logo_dark.png';
-  static const String logoLight = 'assets/brand/app_logo_light.png';
+  static const String logo3d = 'assets/brand/coachly_logo.glb';
+  static const String titleSprite = 'assets/brand/coachly_sprite_title.png';
+
+  // Authentication brands
+  static const String googleG = 'assets/icons/auth/google_g.png';
+  static const String appleLogo = 'assets/icons/auth/apple_logo.png';
+  static const String coachlyMark = 'assets/icons/auth/coachly_mark.png';
 
   // Foto
   static const String gymDarkBackground =
-      'assets/photos/gym_dark_background.jpg';
+      'assets/photos/gym_dark_background.png';
 
   // Illustrazioni delle guide
   static const String guideDoubleProgression =

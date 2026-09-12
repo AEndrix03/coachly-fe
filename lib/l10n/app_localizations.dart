@@ -3844,26 +3844,50 @@ abstract class AppLocalizations {
   /// Migrated from auth.login.title
   ///
   /// In en, this message translates to:
-  /// **'Sign in with Keycloak'**
+  /// **'Train with a plan. Progress using your data.'**
   String get authLoginTitle;
 
   /// Migrated from auth.login.description
   ///
   /// In en, this message translates to:
-  /// **'Sign-in runs in the system browser with Authorization Code Flow and PKCE. The app never handles username or password directly.'**
+  /// **'Continue with Apple'**
   String get authLoginDescription;
 
   /// Migrated from auth.login.configuration_hint
   ///
   /// In en, this message translates to:
-  /// **'If the Keycloak client and redirect URIs are configured correctly, after login you are redirected back to the app automatically.'**
+  /// **'Continue with Google'**
   String get authLoginConfigurationHint;
 
   /// Migrated from auth.login.cta
   ///
   /// In en, this message translates to:
-  /// **'Continue with Keycloak'**
+  /// **'Continue with Coachly'**
   String get authLoginCta;
+
+  /// Legal note under the sign-in actions; the two placeholders are the tappable document names
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our {terms} and {privacy}.'**
+  String authLegalNotice(String terms, String privacy);
+
+  /// Name of the terms document, shown as a link in the legal note
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service'**
+  String get authLegalTerms;
+
+  /// Name of the privacy document, shown as a link in the legal note
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get authLegalPrivacy;
+
+  /// Short pill on a sign-in provider that is announced but not available yet
+  ///
+  /// In en, this message translates to:
+  /// **'SOON'**
+  String get authSoonBadge;
 
   /// Migrated from home.header.greeting
   ///

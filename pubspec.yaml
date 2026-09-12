@@ -17,7 +17,7 @@ dependencies:
   flex_color_scheme: ^8.4.0
   flutter:
     sdk: flutter
-  flutter_animate: ^4.5.2
+  flutter_3d_controller: ^2.3.0
   flutter_appauth: 11.0.0
   flutter_localizations:
     sdk: flutter
@@ -58,6 +58,7 @@ flutter:
   # Struttura e naming: docs/development/16-media.md
   assets:
     - assets/brand/
+    - assets/icons/auth/
     - assets/photos/
     - assets/illustrations/guides/
     - assets/illustrations/set_type/

@@ -6,9 +6,11 @@ import 'package:coachly/core/feedback/app_toast_service.dart';
 import 'package:coachly/features/active_workout/presentation/widgets/adaptive_workout_workspace.dart';
 import 'package:coachly/features/active_workout/application/active_workout_provider.dart';
 import 'package:coachly/features/active_workout/application/active_workout_state.dart';
+import 'package:coachly/features/active_workout/data/services/active_workout_draft_service.dart';
 import 'package:coachly/features/active_workout/application/rest_timer_provider.dart';
 import 'package:coachly/features/exercises/domain/models/exercise_detail_model.dart';
 import 'package:coachly/design_system/theme/exercise_theme.dart';
+import 'package:coachly/design_system/theme/coachly_theme_data.dart';
 import 'package:coachly/shared/i18n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,7 +19,12 @@ import 'package:go_router/go_router.dart';
 
 class WorkoutActivePage extends ConsumerStatefulWidget {
   final String workoutId;
-  const WorkoutActivePage({super.key, required this.workoutId});
+  final bool resume;
+  const WorkoutActivePage({
+    super.key,
+    required this.workoutId,
+    this.resume = false,
+  });
 
   @override
   ConsumerState<WorkoutActivePage> createState() => _WorkoutActivePageState();
@@ -27,10 +34,12 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   Timer? _clock;
   Duration _elapsed = Duration.zero;
   final String _loadUnit = 'kg';
+  late final Future<void> _prepareSession;
 
   @override
   void initState() {
     super.initState();
+    _prepareSession = _prepare();
     _clock = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() => _elapsed += const Duration(seconds: 1));
     });
@@ -47,6 +56,13 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
   ActiveWorkoutState get _state =>
       ref.read(activeWorkoutProvider(widget.workoutId));
 
+  Future<void> _prepare() async {
+    if (widget.resume) return;
+    ref.read(restTimerProvider.notifier).stopTimer();
+    await ref.read(activeWorkoutDraftServiceProvider).delete(widget.workoutId);
+    ref.invalidate(activeWorkoutProvider(widget.workoutId));
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen<RestTimerState>(restTimerProvider, (previous, next) {
@@ -56,27 +72,76 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
         HapticFeedback.mediumImpact();
       }
     });
-    final state = ref.watch(activeWorkoutProvider(widget.workoutId));
-    return Theme(
-      data: exerciseDetailTheme(Theme.of(context)),
-      child: Builder(
-        builder: (context) => Scaffold(
-          backgroundColor: context.exerciseTheme.background,
-          body: SafeArea(
-            child: switch (state.status) {
-              ActiveWorkoutStatus.loading => const CoachlyLoadingSection(
-                sceneKey: 'active-workout',
+    return FutureBuilder<void>(
+      future: _prepareSession,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const CoachlyLoadingSection(sceneKey: 'active-workout');
+        }
+        final state = ref.watch(activeWorkoutProvider(widget.workoutId));
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) unawaited(_requestExit());
+          },
+          child: Theme(
+            data: exerciseDetailTheme(Theme.of(context)),
+            child: Builder(
+              builder: (context) => Scaffold(
+                backgroundColor: context.exerciseTheme.background,
+                body: SafeArea(
+                  child: switch (state.status) {
+                    ActiveWorkoutStatus.loading => const CoachlyLoadingSection(
+                      sceneKey: 'active-workout',
+                    ),
+                    ActiveWorkoutStatus.error => _ErrorState(
+                      message: state.errorMessage,
+                      onBack: _requestExit,
+                    ),
+                    _ => _workspace(context, state),
+                  },
+                ),
               ),
-              ActiveWorkoutStatus.error => _ErrorState(
-                message: state.errorMessage,
-                onBack: context.pop,
-              ),
-              _ => _workspace(context, state),
-            },
+            ),
           ),
+        );
+      },
+    );
+  }
+
+  Future<void> _requestExit() async {
+    final shouldExit = await showModalBottomSheet<bool>(
+      context: context,
+      showDragHandle: true,
+      useSafeArea: true,
+      builder: (sheetContext) => Padding(
+        padding: sheetContext.spacing.pagePadding,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              context.l10n.workoutActiveExitTitle,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            SizedBox(height: sheetContext.spacing.xs),
+            Text(context.l10n.workoutActiveExitBody),
+            SizedBox(height: sheetContext.spacing.lg),
+            FilledButton.icon(
+              onPressed: () => Navigator.pop(sheetContext, true),
+              icon: const Icon(Icons.save_outlined),
+              label: Text(context.l10n.workoutActiveSaveAndExit),
+            ),
+            SizedBox(height: sheetContext.spacing.xs),
+            TextButton(
+              onPressed: () => Navigator.pop(sheetContext, false),
+              child: Text(context.l10n.workoutActiveKeepTraining),
+            ),
+          ],
         ),
       ),
     );
+    if (shouldExit == true && mounted) context.pop();
   }
 
   Widget _workspace(BuildContext context, ActiveWorkoutState state) {
@@ -85,7 +150,7 @@ class _WorkoutActivePageState extends ConsumerState<WorkoutActivePage> {
       title: _title(state),
       elapsed: _elapsed,
       rest: ref.watch(restTimerProvider),
-      onBack: context.pop,
+      onBack: _requestExit,
       onMenu: _completeWorkout,
       onExercise: _controller.goToExercise,
       onSet: _controller.goToSet,

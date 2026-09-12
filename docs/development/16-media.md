@@ -45,7 +45,7 @@ solo sul dispositivo.
 Dart (`02-project-structure.md`), così le convenzioni da ricordare restano una.
 Vietati kebab-case, PascalCase, spazi, accenti.
 
-Il nome descrive **il concetto, non l'uso**: `gym_dark_background.jpg`, non
+Il nome descrive **il concetto, non l'uso**: `gym_dark_background.png`, non
 `auth_page_background.jpg`. Legare un asset a una schermata significa che il
 nome mentirà il giorno in cui lo si riusa altrove.
 

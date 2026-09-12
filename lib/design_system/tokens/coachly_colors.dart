@@ -17,12 +17,16 @@ class CoachlyColors {
   final Color surfaceOverlay;
   final Color surfaceAccent;
   final Color surfaceAccentMuted;
+  final Color authProviderSurface;
+  final Color authProviderSurfaceDark;
 
   // ── Contenuto ─────────────────────────────────────────────────────────────
   final Color textPrimary;
   final Color textSecondary;
   final Color textDisabled;
   final Color textOnAccent;
+  final Color authProviderContent;
+  final Color authProviderContentDark;
 
   // ── Bordi ─────────────────────────────────────────────────────────────────
   final Color border;
@@ -41,10 +45,14 @@ class CoachlyColors {
     required this.surfaceOverlay,
     required this.surfaceAccent,
     required this.surfaceAccentMuted,
+    required this.authProviderSurface,
+    required this.authProviderSurfaceDark,
     required this.textPrimary,
     required this.textSecondary,
     required this.textDisabled,
     required this.textOnAccent,
+    required this.authProviderContent,
+    required this.authProviderContentDark,
     required this.border,
     required this.borderSubtle,
     required this.feedbackSuccess,
@@ -62,10 +70,14 @@ class CoachlyColors {
     surfaceOverlay: CoachlyPalette.ink800,
     surfaceAccent: CoachlyPalette.teal400,
     surfaceAccentMuted: CoachlyPalette.teal900,
+    authProviderSurface: CoachlyPalette.bone50,
+    authProviderSurfaceDark: CoachlyPalette.ink800,
     textPrimary: CoachlyPalette.bone50,
     textSecondary: CoachlyPalette.sage400,
     textDisabled: CoachlyPalette.sage600,
     textOnAccent: CoachlyPalette.ink900,
+    authProviderContent: CoachlyPalette.ink900,
+    authProviderContentDark: CoachlyPalette.bone50,
     border: CoachlyPalette.whiteAlpha09,
     borderSubtle: CoachlyPalette.whiteAlpha04,
     feedbackSuccess: CoachlyPalette.green400,
@@ -114,6 +126,18 @@ class CoachlyColors {
 
   Color get syncOffline => textSecondary;
 
+  /// Bagliore del marchio dietro il logo della schermata di accesso: parte
+  /// dall'accento e si spegne verso il bordo, cosi' il logo sembra emettere
+  /// luce anziche' posare su un disco.
+  RadialGradient get brandGlow => RadialGradient(
+    colors: [
+      surfaceAccent.withValues(alpha: 0.28),
+      surfaceAccent.withValues(alpha: 0.10),
+      surfaceAccent.withValues(alpha: 0),
+    ],
+    stops: const [0, 0.55, 1],
+  );
+
   /// Gradiente del completamento protetto: a riposo resta nel linguaggio
   /// acqua/smeraldo; l'ambra compare solo mentre il gesto è in corso.
   LinearGradient completeWorkoutGradient({
@@ -135,10 +159,14 @@ class CoachlyColors {
     Color? surfaceOverlay,
     Color? surfaceAccent,
     Color? surfaceAccentMuted,
+    Color? authProviderSurface,
+    Color? authProviderSurfaceDark,
     Color? textPrimary,
     Color? textSecondary,
     Color? textDisabled,
     Color? textOnAccent,
+    Color? authProviderContent,
+    Color? authProviderContentDark,
     Color? border,
     Color? borderSubtle,
     Color? feedbackSuccess,
@@ -153,10 +181,16 @@ class CoachlyColors {
       surfaceOverlay: surfaceOverlay ?? this.surfaceOverlay,
       surfaceAccent: surfaceAccent ?? this.surfaceAccent,
       surfaceAccentMuted: surfaceAccentMuted ?? this.surfaceAccentMuted,
+      authProviderSurface: authProviderSurface ?? this.authProviderSurface,
+      authProviderSurfaceDark:
+          authProviderSurfaceDark ?? this.authProviderSurfaceDark,
       textPrimary: textPrimary ?? this.textPrimary,
       textSecondary: textSecondary ?? this.textSecondary,
       textDisabled: textDisabled ?? this.textDisabled,
       textOnAccent: textOnAccent ?? this.textOnAccent,
+      authProviderContent: authProviderContent ?? this.authProviderContent,
+      authProviderContentDark:
+          authProviderContentDark ?? this.authProviderContentDark,
       border: border ?? this.border,
       borderSubtle: borderSubtle ?? this.borderSubtle,
       feedbackSuccess: feedbackSuccess ?? this.feedbackSuccess,
@@ -178,10 +212,30 @@ class CoachlyColors {
         other.surfaceAccentMuted,
         t,
       )!,
+      authProviderSurface: Color.lerp(
+        authProviderSurface,
+        other.authProviderSurface,
+        t,
+      )!,
+      authProviderSurfaceDark: Color.lerp(
+        authProviderSurfaceDark,
+        other.authProviderSurfaceDark,
+        t,
+      )!,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
       textDisabled: Color.lerp(textDisabled, other.textDisabled, t)!,
       textOnAccent: Color.lerp(textOnAccent, other.textOnAccent, t)!,
+      authProviderContent: Color.lerp(
+        authProviderContent,
+        other.authProviderContent,
+        t,
+      )!,
+      authProviderContentDark: Color.lerp(
+        authProviderContentDark,
+        other.authProviderContentDark,
+        t,
+      )!,
       border: Color.lerp(border, other.border, t)!,
       borderSubtle: Color.lerp(borderSubtle, other.borderSubtle, t)!,
       feedbackSuccess: Color.lerp(feedbackSuccess, other.feedbackSuccess, t)!,

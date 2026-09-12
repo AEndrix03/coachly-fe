@@ -56,7 +56,7 @@ abstract final class CoachlyLoadingScenes {
   const CoachlyLoadingScenes._();
 
   static const List<CoachlyLoadingScene> all = <CoachlyLoadingScene>[
-    CoachlyLoadingScene(asset: AppAssets.logoDark, width: 96),
+    CoachlyLoadingScene(asset: AppAssets.logo, width: 96),
   ];
 
   /// La scena per una certa attesa, scelta in modo **deterministico**.

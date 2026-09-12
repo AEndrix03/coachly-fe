@@ -111,6 +111,9 @@ class ActiveWorkout extends _$ActiveWorkout {
                 .read(activeWorkoutDraftServiceProvider)
                 .readCoachDecision(draft),
           );
+      // La sessione nasce su Drift appena viene aperta, non al primo set e non
+      // alla chiusura. Anche un'uscita immediata resta quindi riprendibile.
+      _persistDraft();
     } else {
       state = ActiveWorkoutState.error(
         response.failureOrNull?.message ?? 'Unable to load workout.',

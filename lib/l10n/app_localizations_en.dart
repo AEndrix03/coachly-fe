@@ -2069,18 +2069,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exerciseForceStatic => 'Static';
 
   @override
-  String get authLoginTitle => 'Sign in with Keycloak';
+  String get authLoginTitle => 'Train with a plan. Progress using your data.';
 
   @override
-  String get authLoginDescription =>
-      'Sign-in runs in the system browser with Authorization Code Flow and PKCE. The app never handles username or password directly.';
+  String get authLoginDescription => 'Continue with Apple';
 
   @override
-  String get authLoginConfigurationHint =>
-      'If the Keycloak client and redirect URIs are configured correctly, after login you are redirected back to the app automatically.';
+  String get authLoginConfigurationHint => 'Continue with Google';
 
   @override
-  String get authLoginCta => 'Continue with Keycloak';
+  String get authLoginCta => 'Continue with Coachly';
+
+  @override
+  String authLegalNotice(String terms, String privacy) {
+    return 'By continuing, you agree to our $terms and $privacy.';
+  }
+
+  @override
+  String get authLegalTerms => 'Terms of Service';
+
+  @override
+  String get authLegalPrivacy => 'Privacy Policy';
+
+  @override
+  String get authSoonBadge => 'SOON';
 
   @override
   String homeHeaderGreeting(String name) {

@@ -46,7 +46,14 @@ class WorkoutPage extends ConsumerWidget {
                 },
                 onCreateWorkout: () => _createWorkout(context),
                 onQuickAction: (action) => _handleQuickAction(context, action),
-                onStart: (id) => _openWorkout(context, ref, id, active: true),
+                onStart: (id) => _openWorkout(
+                  context,
+                  ref,
+                  id,
+                  active: true,
+                  resume:
+                      data.today.kind == HomeTrainingStateKind.activeWorkout,
+                ),
                 onRoutine: (id) => _openWorkout(context, ref, id),
                 onNotifications: () =>
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -93,6 +100,7 @@ class WorkoutPage extends ConsumerWidget {
     WidgetRef ref,
     String id, {
     bool active = false,
+    bool resume = false,
   }) {
     final workouts = ref.read(workoutListProvider).value;
     WorkoutModel? workout;
@@ -105,7 +113,7 @@ class WorkoutPage extends ConsumerWidget {
     if (workout == null) return;
     if (active) HapticFeedback.mediumImpact();
     context.push(
-      '/workouts/workout/$id${active ? '/active' : ''}',
+      '/workouts/workout/$id${active ? '/active?resume=$resume' : ''}',
       extra: workout,
     );
   }

@@ -20,6 +20,8 @@ class CoachlyTypography {
   final TextStyle bodyL;
   final TextStyle bodyM;
   final TextStyle bodyS;
+  /// Note legali e altre righe che devono esserci senza farsi notare.
+  final TextStyle fineprint;
   final TextStyle label;
   final TextStyle labelStrong;
   final TextStyle mono;
@@ -33,6 +35,7 @@ class CoachlyTypography {
     required this.bodyL,
     required this.bodyM,
     required this.bodyS,
+    required this.fineprint,
     required this.label,
     required this.labelStrong,
     required this.mono,
@@ -51,6 +54,7 @@ class CoachlyTypography {
     bodyL: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, height: 1.45),
     bodyM: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, height: 1.45),
     bodyS: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, height: 1.4),
+    fineprint: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, height: 1.3),
     label: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, height: 1.2),
     labelStrong: TextStyle(
       fontSize: 12,
@@ -76,6 +80,7 @@ class CoachlyTypography {
       bodyL: TextStyle.lerp(bodyL, other.bodyL, t)!,
       bodyM: TextStyle.lerp(bodyM, other.bodyM, t)!,
       bodyS: TextStyle.lerp(bodyS, other.bodyS, t)!,
+      fineprint: TextStyle.lerp(fineprint, other.fineprint, t)!,
       label: TextStyle.lerp(label, other.label, t)!,
       labelStrong: TextStyle.lerp(labelStrong, other.labelStrong, t)!,
       mono: TextStyle.lerp(mono, other.mono, t)!,
